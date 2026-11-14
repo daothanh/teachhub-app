@@ -9,245 +9,148 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'Tasco Shell';
-
-  @override
-  String get login => 'Login';
-
-  @override
-  String get logout => 'Logout';
-
-  @override
-  String get username => 'Username';
-
-  @override
-  String get password => 'Password';
-
-  @override
-  String get home => 'Home';
-
-  @override
-  String get loading => 'Loading...';
-
-  @override
-  String get error => 'Something went wrong';
+  String get appName => 'TeachHub';
 
   @override
   String get retry => 'Retry';
 
   @override
-  String get cancel => 'Cancel';
+  String get loginSubtitle =>
+      'Sign in with email, Google or Apple. No password needed.';
 
   @override
-  String get confirm => 'Confirm';
+  String get loginEmail => 'Email';
 
   @override
-  String get save => 'Save';
+  String get loginEmailHint => 'you@example.com';
 
   @override
-  String get delete => 'Delete';
+  String get loginEmailInvalid => 'Enter a valid email.';
 
   @override
-  String get search => 'Search';
+  String get loginSendOtp => 'Send sign-in code';
 
   @override
-  String get noData => 'No data';
+  String get loginOr => 'or';
 
   @override
-  String get tabHome => 'Home';
+  String get loginGoogle => 'Continue with Google';
 
   @override
-  String get tabExplore => 'Explore';
+  String get loginApple => 'Continue with Apple';
 
   @override
-  String get tabNotification => 'Notifications';
-
-  @override
-  String get tabProfile => 'Profile';
-
-  @override
-  String get greetingMorning => 'Good morning 👋';
-
-  @override
-  String get greetingAfternoon => 'Good afternoon 👋';
-
-  @override
-  String get greetingEvening => 'Good evening 👋';
-
-  @override
-  String get homeQuickAccess => 'Quick Access';
-
-  @override
-  String get homeOverview => 'Overview';
-
-  @override
-  String get homeMenuHrProfile => 'HR\nProfile';
-
-  @override
-  String get homeMenuTraining => 'Training &\nDevelopment';
-
-  @override
-  String get homeMenuEvaluation => 'Employee\nEvaluation';
-
-  @override
-  String get homeMenuCareerPath => 'Career\nRoadmap';
-
-  @override
-  String get homeMenuCrossSale => 'Ecosystem\nCross-sale';
-
-  @override
-  String get homeMenuSuggestions => 'Innovation\nIdeas';
-
-  @override
-  String get homeMenuFavorites => 'Favor-\nites';
-
-  @override
-  String get homeMenuViewMore => 'View\nMore';
-
-  @override
-  String get homeStatInsuranceOrders => 'Insurance Orders';
-
-  @override
-  String get homeStatPending => 'Pending';
-
-  @override
-  String get homeStatTodayTasks => 'Today\'s Tasks';
-
-  @override
-  String get homeStatNewNotifications => 'New Alerts';
-
-  @override
-  String get underConstructionTitle => 'Feature Under Development';
-
-  @override
-  String get underConstructionMessage =>
-      'This feature is currently under construction and will be available in the next release.';
-
-  @override
-  String get understood => 'Understood';
-
-  @override
-  String get demoModuleTitle => 'VueJS Mini App';
-
-  @override
-  String get demoModuleSubtitle => 'Web bundle mounted via ModuleSlot demo';
-
-  @override
-  String get notificationTitle => 'Notifications';
-
-  @override
-  String get notificationMarkAllAsRead => 'Mark all as read';
-
-  @override
-  String get notificationFilterAll => 'All';
-
-  @override
-  String get notificationFilterSystem => 'System';
-
-  @override
-  String get notificationFilterTransaction => 'Transactions';
-
-  @override
-  String get notificationFilterMiniApps => 'Mini Apps';
-
-  @override
-  String get notificationEmptyTitle => 'No notifications';
-
-  @override
-  String get notificationEmptyMessage =>
-      'You don\'t have any notifications in this category.';
-
-  @override
-  String timeMinutesAgo(int minutes) {
-    return '${minutes}m ago';
+  String loginOtpSentTo(String email) {
+    return 'Enter the 6-digit code sent to $email';
   }
 
   @override
-  String timeHoursAgo(int hours) {
-    return '${hours}h ago';
+  String get loginOtpCode => 'Sign-in code';
+
+  @override
+  String get loginResend => 'Resend code';
+
+  @override
+  String loginResendIn(int seconds) {
+    return 'Resend code in ${seconds}s';
   }
 
   @override
-  String timeDaysAgo(int days) {
-    return '${days}d ago';
-  }
+  String get loginChangeEmail => 'Change email';
 
   @override
-  String get profileStandardUser => 'Standard User';
+  String get loginOtpInvalid => 'The code is wrong or has expired.';
 
   @override
-  String get profilePermissionsTitle => 'Access Permissions';
+  String get loginRateLimited => 'Too many attempts, please try again later.';
 
   @override
-  String get profileStandardUserPermissions => 'STANDARD USER PERMISSIONS';
+  String get loginFailed => 'Sign-in failed. Please try again.';
 
   @override
-  String profileRole(String role) {
-    return 'Role: $role';
-  }
+  String get splashLoadFailed => 'Could not load your roles.';
 
   @override
-  String profilePermissionsCount(int count) {
-    return '$count permissions';
-  }
+  String get roleTitle => 'Roles';
 
   @override
-  String profileShowMore(int count) {
-    return 'Show more ($count permissions) ▼';
-  }
+  String get roleYours => 'Your roles';
 
   @override
-  String get profileShowLess => 'Show less ▲';
+  String get roleWhoAreYou => 'Who are you?';
 
   @override
-  String get profileSettings => 'Settings';
+  String get roleAdd => 'Add a role';
 
   @override
-  String get profileNoPermissions => 'No permissions granted';
+  String get roleTeacher => 'Teacher';
 
   @override
-  String get loginWelcomeTitle => 'Welcome back! 👋';
+  String get roleParent => 'Parent';
 
   @override
-  String get loginWelcomeSubtitle =>
-      'Sign in to continue exploring the Tasco ecosystem';
+  String get roleStudent => 'Student';
 
   @override
-  String get loginSsoOr => 'OR SIGN IN WITH';
+  String get roleAddFailed => 'Could not add the role. Please try again.';
 
   @override
-  String get loginGoogle => 'Google';
+  String get inviteTitle => 'Class invitation';
 
   @override
-  String get loginApple => 'Apple';
+  String get inviteBody =>
+      'A teacher invited you to connect with your child\'s class.';
 
   @override
-  String get loginCorporateSso => 'Corporate SSO';
+  String get inviteAccept => 'Accept invitation';
 
   @override
-  String get loginBiometric => 'Biometric Login';
+  String get inviteInvalid => 'This invitation does not exist or has expired.';
 
   @override
-  String get loginUsernameRequired => 'Please enter your username';
+  String get inviteFailed =>
+      'Could not accept the invitation. Please try again.';
 
   @override
-  String get loginPasswordRequired => 'Please enter your password';
+  String get inviteConsentTitle => 'Data processing consent';
 
   @override
-  String get loginFailed => 'Login failed. Please check your credentials.';
+  String get inviteConsentBody =>
+      'To see your child\'s learning information, you need to agree to TeachHub\'s terms and personal data policy.';
 
   @override
-  String get loginNetworkError =>
-      'Can\'t reach the server. Please check your connection and try again.';
+  String get inviteConsentAccept => 'Agree and accept';
 
   @override
   String get settings => 'Settings';
 
   @override
-  String get settingsSecurity => 'Security & Authentication';
+  String get settingsAbout => 'About';
 
   @override
-  String get settingsBiometricTitle => 'Biometric Login';
+  String get settingsAboutApp => 'Application';
+
+  @override
+  String get settingsAboutEnv => 'Environment';
+
+  @override
+  String get settingsAboutTerms => 'Terms of Use';
+
+  @override
+  String get settingsAboutVersion => 'Version';
+
+  @override
+  String get settingsBiometricAuthReason =>
+      'Verify your identity to enable biometric login';
+
+  @override
+  String get settingsBiometricDisabled => 'Biometric login disabled';
+
+  @override
+  String get settingsBiometricEnabled => 'Biometric login enabled';
+
+  @override
+  String get settingsBiometricFailed => 'Biometric verification failed';
 
   @override
   String get settingsBiometricSubtitleAvailable =>
@@ -262,17 +165,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Device does not support biometrics';
 
   @override
-  String get settingsBiometricAuthReason =>
-      'Verify your identity to enable biometric login';
-
-  @override
-  String get settingsBiometricEnabled => 'Biometric login enabled';
-
-  @override
-  String get settingsBiometricDisabled => 'Biometric login disabled';
-
-  @override
-  String get settingsBiometricFailed => 'Biometric verification failed';
+  String get settingsBiometricTitle => 'Biometric Login';
 
   @override
   String get settingsLanguage => 'Language';
@@ -281,35 +174,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguageSystem => 'System default';
 
   @override
+  String get settingsSecurity => 'Security & Authentication';
+
+  @override
   String get settingsTheme => 'Appearance';
-
-  @override
-  String get settingsThemeSystem => 'System default';
-
-  @override
-  String get settingsThemeLight => 'Light';
 
   @override
   String get settingsThemeDark => 'Dark';
 
   @override
-  String get settingsAbout => 'About';
+  String get settingsThemeLight => 'Light';
 
   @override
-  String get settingsAboutApp => 'Application';
+  String get settingsThemeSystem => 'System default';
 
   @override
-  String get settingsAboutVersion => 'Version';
+  String get logout => 'Logout';
 
   @override
-  String get settingsAboutEnv => 'Environment';
+  String get loading => 'Loading...';
 
   @override
-  String get settingsAboutTerms => 'Terms of Use';
-
-  @override
-  String get splashTagline => 'Tasco Ecosystem';
-
-  @override
-  String get splashCopyright => '© 2026 Tasco Joint Stock Company';
+  String get login => 'Login';
 }

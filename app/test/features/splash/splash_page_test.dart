@@ -1,81 +1,72 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:app/features/role_picker/membership_cubit.dart';
 import 'package:app/features/splash/splash_page.dart';
 import 'package:app/l10n/l10n.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
+import 'package:tasco_utils/tasco_utils.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
 
-Widget _wrap(Widget child, {Locale locale = const Locale('vi')}) {
-  return ScreenUtilPlusInit(
-    designSize: const Size(393, 852),
-    builder: (context, _) => MaterialApp(
-      locale: locale,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      theme: AppTheme.v1,
-      home: child,
+class _Cubit extends MembershipCubit {
+  _Cubit(SharedPreferences prefs, MembershipState initial)
+    : super(
+        api: Dio(),
+        prefs: prefs,
+        activeMembership: ActiveMembership(null),
+      ) {
+    emit(initial);
+  }
+  int loads = 0;
+  @override
+  Future<void> load({bool silent = false}) async => loads++;
+}
+
+Future<_Cubit> _pump(WidgetTester tester, MembershipState state) async {
+  SharedPreferences.setMockInitialValues({});
+  final cubit = _Cubit(await SharedPreferences.getInstance(), state);
+  addTearDown(cubit.close);
+  await tester.pumpWidget(
+    ScreenUtilPlusInit(
+      designSize: const Size(393, 852),
+      builder: (_, _) => MaterialApp(
+        locale: const Locale('vi'),
+        theme: AppTheme.v1,
+        localizationsDelegates: const [
+          ...AppLocalizations.localizationsDelegates,
+          TascoUiKitLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: BlocProvider<MembershipCubit>.value(
+          value: cubit,
+          child: const SplashPage(),
+        ),
+      ),
     ),
   );
+  return cubit;
 }
 
 void main() {
-  group('SplashPage Widget Tests', () {
-    testWidgets(
-      'renders brand logo, loading indicator, and footer strings in vi',
-      (tester) async {
-        tester.view.physicalSize = const Size(800, 1400);
-        tester.view.devicePixelRatio = 1.0;
-        addTearDown(tester.view.resetPhysicalSize);
-        addTearDown(tester.view.resetDevicePixelRatio);
-
-        await tester.pumpWidget(_wrap(const SplashPage()));
-        await tester.pump();
-
-        // Check loading indicator is rendered
-        expect(find.byType(AppLoading), findsOneWidget);
-
-        // Check footer tagline and copyright
-        expect(find.text('Hệ sinh thái Tasco'), findsOneWidget);
-        expect(find.text('© 2026 Tasco Joint Stock Company'), findsOneWidget);
-
-        // Check AppSvgIcon logo exists
-        expect(find.byType(AppSvgIcon), findsOneWidget);
-      },
+  testWidgets('shows the app name and a loader while loading', (tester) async {
+    await _pump(
+      tester,
+      const MembershipState(statusLoad: LoadingStatus.loading),
     );
+    expect(find.text('TeachHub'), findsOneWidget);
+    expect(find.byType(AppLoading), findsOneWidget);
+  });
 
-    testWidgets('renders footer strings properly in en locale', (tester) async {
-      tester.view.physicalSize = const Size(800, 1400);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(
-        _wrap(const SplashPage(), locale: const Locale('en')),
-      );
-      await tester.pump();
-
-      expect(find.byType(AppLoading), findsOneWidget);
-      expect(find.text('Tasco Ecosystem'), findsOneWidget);
-      expect(find.text('© 2026 Tasco Joint Stock Company'), findsOneWidget);
-    });
-
-    testWidgets('renders gradient background container', (tester) async {
-      tester.view.physicalSize = const Size(800, 1400);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(_wrap(const SplashPage()));
-      await tester.pump();
-
-      final scaffoldFinder = find.byType(Scaffold);
-      expect(scaffoldFinder, findsOneWidget);
-
-      final containerFinder = find.descendant(
-        of: scaffoldFinder,
-        matching: find.byType(Container),
-      );
-      expect(containerFinder, findsWidgets);
-    });
+  testWidgets('a failed role load offers a retry', (tester) async {
+    final cubit = await _pump(
+      tester,
+      const MembershipState(statusLoad: LoadingStatus.failure),
+    );
+    expect(find.text('Không tải được vai trò của bạn.'), findsOneWidget);
+    await tester.tap(find.text('Thử lại'));
+    expect(cubit.loads, 1);
   });
 }

@@ -1,53 +1,45 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tasco_core/tasco_core.dart';
 
+/// Cấu hình theo flavor, đọc từ `assets/.env.<flavor>`.
+///
+/// Mỗi bản build chỉ đóng gói file `.env` của flavor đó (asset theo flavor
+/// trong pubspec.yaml), nên bản production không chứa URL dev/staging.
 class AppEnv {
-  late final Env _env;
-
-  AppEnv();
-
-  Future<void> init(Env env) async {
-    _env = env;
-    await dotenv.load(fileName: _envFileName);
-  }
-
-  Env get current => _env;
-  bool get isProduction => _env == Env.production;
-  bool get isDevelopment => _env == Env.development;
-
-  String get _envFileName {
-    switch (_env) {
-      case Env.development:
-        return 'assets/.env.development';
-      case Env.staging:
-        return 'assets/.env.staging';
-      case Env.production:
-        return 'assets/.env.production';
+  AppEnv(this.current, Map<String, String> values)
+    : apiUrl = values['TEACHHUB_API_URL']?.trim() ?? '',
+      googleServerClientId = _orNull(values['GOOGLE_SERVER_CLIENT_ID']),
+      certificatePins = (values['CERT_PINS'] ?? '')
+          .split(',')
+          .map((pin) => pin.trim())
+          .where((pin) => pin.isNotEmpty)
+          .toSet() {
+    if (apiUrl.isEmpty) {
+      throw StateError(
+        'TEACHHUB_API_URL is empty in assets/.env.${current.name}',
+      );
     }
   }
 
-  /// SHA-256 fingerprint của leaf certificate cho môi trường hiện tại.
-  ///
-  /// Framework cấp cơ chế (`CertificatePinning`), fingerprint là dữ liệu của
-  /// sản phẩm nên khai trong `.env*` theo flavor:
-  /// `CERT_PINS=aabb...,ccdd...` (chấp nhận cả dạng `AA:BB:..`).
-  /// Rỗng ⇒ không pin — đây là mặc định, và là hành vi trước đây.
-  Set<String> get certificatePins => (dotenv.env['CERT_PINS'] ?? '')
-      .split(',')
-      .map((pin) => pin.trim())
-      .where((pin) => pin.isNotEmpty)
-      .toSet();
+  static Future<AppEnv> load(Env env) async {
+    await dotenv.load(fileName: 'assets/.env.${env.name}');
+    return AppEnv(env, dotenv.env);
+  }
 
-  String get authUrl => dotenv.env['AUTH_URL'] ?? '';
-  String get crmUrl => dotenv.env['CRM_URL'] ?? '';
-  String get hrmUrl => dotenv.env['HRM_URL'] ?? '';
-  String get ticketUrl => dotenv.env['TICKET_URL'] ?? '';
+  final Env current;
 
-  /// The auth client this app signs in as (`clientId` in the sign-in body).
-  /// Empty while unset.
-  String get authClientId => dotenv.env['AUTH_CLIENT_ID'] ?? '';
+  /// Base URL của TeachHub API, đã gồm `/v1`.
+  final String apiUrl;
 
-  /// Which client the backend attributes requests to (the `client_source`
-  /// header). Empty while unset.
-  String get clientSource => dotenv.env['CLIENT_SOURCE'] ?? '';
+  /// SHA-256 pin của leaf certificate API. Rỗng = không pin.
+  final Set<String> certificatePins;
+
+  /// OAuth client "Web" để id_token Google có audience mà API xác minh.
+  final String? googleServerClientId;
+
+  bool get isProduction => current == Env.production;
+  bool get isDevelopment => current == Env.development;
+
+  static String? _orNull(String? v) =>
+      (v == null || v.trim().isEmpty) ? null : v.trim();
 }

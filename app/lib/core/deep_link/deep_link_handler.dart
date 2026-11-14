@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:app_links/app_links.dart';
@@ -6,83 +7,59 @@ import 'package:tasco_core/tasco_core.dart';
 
 import '../routing/app_routes.dart';
 
-/// Listens for incoming deep-links (custom scheme `tasco://`) via the
-/// `app_links` package and navigates the app accordingly.
+/// Nghe deep link qua `app_links` và điều hướng.
 ///
-/// Behaviour:
-/// - **Authenticated**: navigate immediately to the resolved path.
-/// - **Not authenticated**: save [PendingDeepLink] and redirect to login;
-///   [AppRouter] resumes navigation after a successful login.
-/// - **Unknown link**: silently fall back to [AppRoutes.home].
-///
-/// Cold-start handling: [getInitialUri] should be called once by the router
-/// before the first route is resolved.
+/// - Đã đăng nhập: đi thẳng tới route.
+/// - Chưa đăng nhập: lưu [PendingDeepLink], về màn đăng nhập; router mở lại
+///   link sau khi đăng nhập xong.
+/// - Link lạ: bỏ qua.
 class DeepLinkHandler {
-  final GoRouter _router;
-  final DeepLinkService _service;
-  final AppAuthStateReader _authReader;
-
   DeepLinkHandler({
     required GoRouter router,
-    required DeepLinkService service,
-    required AppAuthStateReader authReader,
+    required DeepLinkTarget? Function(Uri uri) resolve,
+    required bool Function() isAuthenticated,
+    AppLinks? appLinks,
   }) : _router = router,
-       _service = service,
-       _authReader = authReader;
+       _resolve = resolve,
+       _isAuthenticated = isAuthenticated,
+       _appLinks = appLinks ?? AppLinks();
 
-  final _appLinks = AppLinks();
+  final GoRouter _router;
+  final DeepLinkTarget? Function(Uri uri) _resolve;
+  final bool Function() _isAuthenticated;
+  final AppLinks _appLinks;
+  StreamSubscription<Uri>? _sub;
 
-  /// Call once during bootstrap to handle the link that cold-started the app.
+  /// Gọi một lần ở bootstrap cho link đã mở app (cold start).
   Future<void> handleInitialLink() async {
     try {
       final uri = await _appLinks.getInitialLink();
-      if (uri != null) _handleUri(uri);
+      if (uri != null) handle(uri);
     } catch (e, st) {
-      log('DeepLinkHandler.handleInitialLink error: $e',
-          name: 'deep_link', stackTrace: st);
+      log('initial link failed: $e', name: 'deep_link', stackTrace: st);
     }
   }
 
-  /// Subscribe to deep-links arriving while the app is already running.
-  /// Call once and keep the subscription alive.
+  /// Nghe link đến khi app đang chạy.
   void startListening() {
-    _appLinks.uriLinkStream.listen(
-      _handleUri,
-      onError: (Object e, StackTrace st) {
-        log('DeepLinkHandler stream error: $e',
-            name: 'deep_link', stackTrace: st);
-      },
+    _sub ??= _appLinks.uriLinkStream.listen(
+      handle,
+      onError: (Object e, StackTrace st) =>
+          log('link stream error: $e', name: 'deep_link', stackTrace: st),
     );
   }
 
-  void _handleUri(Uri uri) {
-    final target = _service.resolve(uri);
+  void handle(Uri uri) {
+    final target = _resolve(uri);
     if (target == null) {
-      log('DeepLinkHandler: no route for $uri — falling back to home',
-          name: 'deep_link');
-      // Silently fall back — only navigate if app is not on home already.
-      if (_router.routerDelegate.currentConfiguration.last.matchedLocation !=
-          AppRoutes.home) {
-        _router.go(AppRoutes.home);
-      }
+      log('no route for $uri', name: 'deep_link');
       return;
     }
-
-    if (target.requiresAuth && !_authReader.isAuthenticated) {
-      log('DeepLinkHandler: pending link saved (not authenticated): ${target.path}',
-          name: 'deep_link');
+    if (target.requiresAuth && !_isAuthenticated()) {
       PendingDeepLink.save(target);
       _router.go(AppRoutes.login);
       return;
     }
-
-    log('DeepLinkHandler: navigating to ${target.path}', name: 'deep_link');
     _router.go(target.path, extra: target.queryParams);
   }
-}
-
-/// Thin read-only interface over [AppAuthCubit] that [DeepLinkHandler] needs.
-/// Kept separate to avoid hard-coupling to the auth package.
-abstract interface class AppAuthStateReader {
-  bool get isAuthenticated;
 }

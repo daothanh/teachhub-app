@@ -1,0 +1,126 @@
+import 'package:app/features/role_picker/membership_cubit.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tasco_utils/tasco_utils.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
+
+/// Trả JSON cố định theo `METHOD path`, ghi lại các lệnh đã gửi.
+class _FakeApi extends Interceptor {
+  _FakeApi(this.routes);
+  final Map<String, Object? Function()> routes;
+  final calls = <String>[];
+
+  @override
+  void onRequest(RequestOptions o, RequestInterceptorHandler h) {
+    final key = '${o.method} ${o.path}';
+    calls.add(key);
+    final handler = routes[key];
+    if (handler == null) {
+      h.reject(DioException(requestOptions: o, message: 'no route $key'));
+      return;
+    }
+    h.resolve(Response(requestOptions: o, statusCode: 200, data: handler()));
+  }
+}
+
+Map<String, dynamic> _m(String id, String role) => {
+  'id': id,
+  'role': role,
+  'label': role,
+};
+
+void main() {
+  late SharedPreferences prefs;
+  late ValueNotifier<Membership?> active;
+
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
+    active = ValueNotifier(null);
+  });
+
+  MembershipCubit cubit(_FakeApi api) => MembershipCubit(
+    api: Dio()..interceptors.add(api),
+    prefs: prefs,
+    activeMembership: active,
+  );
+
+  test(
+    'a single membership opens directly and is published to mini-apps',
+    () async {
+      final c = cubit(
+        _FakeApi({
+          'GET /me/memberships': () => {
+            'items': [_m('m1', 'parent')],
+          },
+        }),
+      );
+      await c.load();
+      expect(c.state.statusLoad, LoadingStatus.success);
+      expect(c.state.active?.id, 'm1');
+      expect(active.value?.id, 'm1');
+      expect(c.state.permissions, {'role:parent'});
+    },
+  );
+
+  test(
+    'several memberships: device choice wins over server last choice',
+    () async {
+      await prefs.setString('active_membership_id', 'm2');
+      final c = cubit(
+        _FakeApi({
+          'GET /me/memberships': () => {
+            'items': [_m('m1', 'tenant_owner'), _m('m2', 'parent')],
+            'lastMembershipId': 'm1',
+          },
+        }),
+      );
+      await c.load();
+      expect(c.state.active?.id, 'm2');
+    },
+  );
+
+  test('several memberships and no remembered choice: none active', () async {
+    final c = cubit(
+      _FakeApi({
+        'GET /me/memberships': () => {
+          'items': [_m('m1', 'tenant_owner'), _m('m2', 'parent')],
+        },
+      }),
+    );
+    await c.load();
+    expect(c.state.active, isNull);
+  });
+
+  test('adding the teacher role creates a workspace and opens it', () async {
+    var items = <Map<String, dynamic>>[];
+    final api = _FakeApi({
+      'GET /me/memberships': () => {'items': items},
+      'POST /workspaces': () {
+        items = [_m('m9', 'tenant_owner')];
+        return null;
+      },
+      'PUT /me/active-membership': () => null,
+    });
+    final c = cubit(api);
+    await c.load();
+    await c.addRole(MembershipRole.tenantOwner);
+    expect(c.state.statusCreate, LoadingStatus.success);
+    expect(c.state.active?.id, 'm9');
+    expect(prefs.getString('active_membership_id'), 'm9');
+    // PUT chạy nền, không chặn UI.
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    expect(api.calls, contains('PUT /me/active-membership'));
+  });
+
+  test('load failure is reported and clear() forgets the session', () async {
+    final c = cubit(_FakeApi({}));
+    await c.load();
+    expect(c.state.statusLoad, LoadingStatus.failure);
+    await c.clear();
+    expect(c.state.statusLoad, LoadingStatus.initial);
+    expect(active.value, isNull);
+  });
+}

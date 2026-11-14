@@ -1,146 +1,62 @@
 {
   "@@locale": "en",
-  "appName": "Tasco Shell",
-  "login": "Login",
-  "logout": "Logout",
-  "username": "Username",
-  "password": "Password",
-  "home": "Home",
-  "loading": "Loading...",
-  "error": "Something went wrong",
+  "appName": "TeachHub",
   "retry": "Retry",
-  "cancel": "Cancel",
-  "confirm": "Confirm",
-  "save": "Save",
-  "delete": "Delete",
-  "search": "Search",
-  "noData": "No data",
-
-  "tabHome": "Home",
-  "tabExplore": "Explore",
-  "tabNotification": "Notifications",
-  "tabProfile": "Profile",
-
-  "greetingMorning": "Good morning 👋",
-  "greetingAfternoon": "Good afternoon 👋",
-  "greetingEvening": "Good evening 👋",
-  "homeQuickAccess": "Quick Access",
-  "homeOverview": "Overview",
-  "homeMenuHrProfile": "HR\nProfile",
-  "homeMenuTraining": "Training &\nDevelopment",
-  "homeMenuEvaluation": "Employee\nEvaluation",
-  "homeMenuCareerPath": "Career\nRoadmap",
-  "homeMenuCrossSale": "Ecosystem\nCross-sale",
-  "homeMenuSuggestions": "Innovation\nIdeas",
-  "homeMenuFavorites": "Favor-\nites",
-  "homeMenuViewMore": "View\nMore",
-  "homeStatInsuranceOrders": "Insurance Orders",
-  "homeStatPending": "Pending",
-  "homeStatTodayTasks": "Today's Tasks",
-  "homeStatNewNotifications": "New Alerts",
-  "underConstructionTitle": "Feature Under Development",
-  "underConstructionMessage": "This feature is currently under construction and will be available in the next release.",
-  "understood": "Understood",
-  "demoModuleTitle": "VueJS Mini App",
-  "demoModuleSubtitle": "Web bundle mounted via ModuleSlot demo",
-
-  "notificationTitle": "Notifications",
-  "notificationMarkAllAsRead": "Mark all as read",
-  "notificationFilterAll": "All",
-  "notificationFilterSystem": "System",
-  "notificationFilterTransaction": "Transactions",
-  "notificationFilterMiniApps": "Mini Apps",
-  "notificationEmptyTitle": "No notifications",
-  "notificationEmptyMessage": "You don't have any notifications in this category.",
-  "timeMinutesAgo": "{minutes}m ago",
-  "@timeMinutesAgo": {
-    "placeholders": {
-      "minutes": {
-        "type": "int"
-      }
-    }
-  },
-  "timeHoursAgo": "{hours}h ago",
-  "@timeHoursAgo": {
-    "placeholders": {
-      "hours": {
-        "type": "int"
-      }
-    }
-  },
-  "timeDaysAgo": "{days}d ago",
-  "@timeDaysAgo": {
-    "placeholders": {
-      "days": {
-        "type": "int"
-      }
-    }
-  },
-
-  "profileStandardUser": "Standard User",
-  "profilePermissionsTitle": "Access Permissions",
-  "profileStandardUserPermissions": "STANDARD USER PERMISSIONS",
-  "profileRole": "Role: {role}",
-  "@profileRole": {
-    "placeholders": {
-      "role": {
-        "type": "String"
-      }
-    }
-  },
-  "profilePermissionsCount": "{count} permissions",
-  "@profilePermissionsCount": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "profileShowMore": "Show more ({count} permissions) ▼",
-  "@profileShowMore": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "profileShowLess": "Show less ▲",
-  "profileSettings": "Settings",
-  "profileNoPermissions": "No permissions granted",
-
-  "loginWelcomeTitle": "Welcome back! 👋",
-  "loginWelcomeSubtitle": "Sign in to continue exploring the Tasco ecosystem",
-  "loginSsoOr": "OR SIGN IN WITH",
-  "loginGoogle": "Google",
-  "loginApple": "Apple",
-  "loginCorporateSso": "Corporate SSO",
-  "loginBiometric": "Biometric Login",
-  "loginUsernameRequired": "Please enter your username",
-  "loginPasswordRequired": "Please enter your password",
-  "loginFailed": "Login failed. Please check your credentials.",
-  "loginNetworkError": "Can't reach the server. Please check your connection and try again.",
-
+  "loginSubtitle": "Sign in with email, Google or Apple. No password needed.",
+  "loginEmail": "Email",
+  "loginEmailHint": "you@example.com",
+  "loginEmailInvalid": "Enter a valid email.",
+  "loginSendOtp": "Send sign-in code",
+  "loginOr": "or",
+  "loginGoogle": "Continue with Google",
+  "loginApple": "Continue with Apple",
+  "loginOtpSentTo": "Enter the 6-digit code sent to {email}",
+  "loginOtpCode": "Sign-in code",
+  "loginResend": "Resend code",
+  "loginResendIn": "Resend code in {seconds}s",
+  "loginChangeEmail": "Change email",
+  "loginOtpInvalid": "The code is wrong or has expired.",
+  "loginRateLimited": "Too many attempts, please try again later.",
+  "loginFailed": "Sign-in failed. Please try again.",
+  "splashLoadFailed": "Could not load your roles.",
+  "roleTitle": "Roles",
+  "roleYours": "Your roles",
+  "roleWhoAreYou": "Who are you?",
+  "roleAdd": "Add a role",
+  "roleTeacher": "Teacher",
+  "roleParent": "Parent",
+  "roleStudent": "Student",
+  "roleAddFailed": "Could not add the role. Please try again.",
+  "inviteTitle": "Class invitation",
+  "inviteBody": "A teacher invited you to connect with your child's class.",
+  "inviteAccept": "Accept invitation",
+  "inviteInvalid": "This invitation does not exist or has expired.",
+  "inviteFailed": "Could not accept the invitation. Please try again.",
+  "inviteConsentTitle": "Data processing consent",
+  "inviteConsentBody": "To see your child's learning information, you need to agree to TeachHub's terms and personal data policy.",
+  "inviteConsentAccept": "Agree and accept",
   "settings": "Settings",
-  "settingsSecurity": "Security & Authentication",
-  "settingsBiometricTitle": "Biometric Login",
+  "settingsAbout": "About",
+  "settingsAboutApp": "Application",
+  "settingsAboutEnv": "Environment",
+  "settingsAboutTerms": "Terms of Use",
+  "settingsAboutVersion": "Version",
+  "settingsBiometricAuthReason": "Verify your identity to enable biometric login",
+  "settingsBiometricDisabled": "Biometric login disabled",
+  "settingsBiometricEnabled": "Biometric login enabled",
+  "settingsBiometricFailed": "Biometric verification failed",
   "settingsBiometricSubtitleAvailable": "Face ID / Touch ID for subsequent app opens",
   "settingsBiometricSubtitleNotEnrolled": "Go to device Settings to register Face ID / Touch ID",
   "settingsBiometricSubtitleUnsupported": "Device does not support biometrics",
-  "settingsBiometricAuthReason": "Verify your identity to enable biometric login",
-  "settingsBiometricEnabled": "Biometric login enabled",
-  "settingsBiometricDisabled": "Biometric login disabled",
-  "settingsBiometricFailed": "Biometric verification failed",
+  "settingsBiometricTitle": "Biometric Login",
   "settingsLanguage": "Language",
   "settingsLanguageSystem": "System default",
+  "settingsSecurity": "Security & Authentication",
   "settingsTheme": "Appearance",
-  "settingsThemeSystem": "System default",
-  "settingsThemeLight": "Light",
   "settingsThemeDark": "Dark",
-  "settingsAbout": "About",
-  "settingsAboutApp": "Application",
-  "settingsAboutVersion": "Version",
-  "settingsAboutEnv": "Environment",
-  "settingsAboutTerms": "Terms of Use",
-  "splashTagline": "Tasco Ecosystem",
-  "splashCopyright": "© 2026 Tasco Joint Stock Company"
+  "settingsThemeLight": "Light",
+  "settingsThemeSystem": "System default",
+  "logout": "Logout",
+  "loading": "Loading...",
+  "login": "Login"
 }

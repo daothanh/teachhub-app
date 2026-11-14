@@ -1,146 +1,76 @@
 {
   "@@locale": "vi",
-  "appName": "Tasco Shell",
-  "login": "Đăng nhập",
-  "logout": "Đăng xuất",
-  "username": "Tên đăng nhập",
-  "password": "Mật khẩu",
-  "home": "Trang chủ",
-  "loading": "Đang tải...",
-  "error": "Đã có lỗi xảy ra",
+  "appName": "TeachHub",
   "retry": "Thử lại",
-  "cancel": "Hủy",
-  "confirm": "Xác nhận",
-  "save": "Lưu",
-  "delete": "Xóa",
-  "search": "Tìm kiếm",
-  "noData": "Không có dữ liệu",
-
-  "tabHome": "Trang chủ",
-  "tabExplore": "Khám phá",
-  "tabNotification": "Thông báo",
-  "tabProfile": "Cá nhân",
-
-  "greetingMorning": "Chào buổi sáng 👋",
-  "greetingAfternoon": "Chào buổi chiều 👋",
-  "greetingEvening": "Chào buổi tối 👋",
-  "homeQuickAccess": "Truy cập nhanh",
-  "homeOverview": "Tổng quan",
-  "homeMenuHrProfile": "Hồ sơ\nnhân sự",
-  "homeMenuTraining": "Đào tạo\nphát triển",
-  "homeMenuEvaluation": "Đánh giá\nnhân sự",
-  "homeMenuCareerPath": "Lộ trình\nphát triển",
-  "homeMenuCrossSale": "Bán chéo\nhệ sinh thái",
-  "homeMenuSuggestions": "Đề xuất\ncải tiến",
-  "homeMenuFavorites": "Yêu\nthích",
-  "homeMenuViewMore": "Xem\nthêm",
-  "homeStatInsuranceOrders": "Đơn bảo hiểm",
-  "homeStatPending": "Chờ xử lý",
-  "homeStatTodayTasks": "Công việc hôm nay",
-  "homeStatNewNotifications": "Thông báo mới",
-  "underConstructionTitle": "Tính năng đang phát triển",
-  "underConstructionMessage": "Chức năng này đang được xây dựng và sẽ sớm ra mắt trong phiên bản tiếp theo.",
-  "understood": "Đã hiểu",
-  "demoModuleTitle": "Mini App VueJS",
-  "demoModuleSubtitle": "Demo web bundle mount qua ModuleSlot",
-
-  "notificationTitle": "Thông báo",
-  "notificationMarkAllAsRead": "Đã đọc tất cả",
-  "notificationFilterAll": "Tất cả",
-  "notificationFilterSystem": "Hệ thống",
-  "notificationFilterTransaction": "Giao dịch",
-  "notificationFilterMiniApps": "Mini Apps",
-  "notificationEmptyTitle": "Không có thông báo",
-  "notificationEmptyMessage": "Bạn chưa có thông báo nào trong mục này.",
-  "timeMinutesAgo": "{minutes} phút trước",
-  "@timeMinutesAgo": {
+  "loginSubtitle": "Đăng nhập bằng email, Google hoặc Apple. Không cần mật khẩu.",
+  "loginEmail": "Email",
+  "loginEmailHint": "ban@example.com",
+  "loginEmailInvalid": "Email chưa đúng định dạng.",
+  "loginSendOtp": "Gửi mã đăng nhập",
+  "loginOr": "hoặc",
+  "loginGoogle": "Tiếp tục với Google",
+  "loginApple": "Tiếp tục với Apple",
+  "loginOtpSentTo": "Nhập mã 6 số đã gửi tới {email}",
+  "@loginOtpSentTo": {
     "placeholders": {
-      "minutes": {
-        "type": "int"
-      }
-    }
-  },
-  "timeHoursAgo": "{hours} giờ trước",
-  "@timeHoursAgo": {
-    "placeholders": {
-      "hours": {
-        "type": "int"
-      }
-    }
-  },
-  "timeDaysAgo": "{days} ngày trước",
-  "@timeDaysAgo": {
-    "placeholders": {
-      "days": {
-        "type": "int"
-      }
-    }
-  },
-
-  "profileStandardUser": "Người dùng tiêu chuẩn",
-  "profilePermissionsTitle": "Quyền hạn truy cập",
-  "profileStandardUserPermissions": "QUYỀN NGƯỜI DÙNG TIÊU CHUẨN",
-  "profileRole": "Vai trò: {role}",
-  "@profileRole": {
-    "placeholders": {
-      "role": {
+      "email": {
         "type": "String"
       }
     }
   },
-  "profilePermissionsCount": "{count} quyền",
-  "@profilePermissionsCount": {
+  "loginOtpCode": "Mã đăng nhập",
+  "loginResend": "Gửi lại mã",
+  "loginResendIn": "Gửi lại mã sau {seconds} giây",
+  "@loginResendIn": {
     "placeholders": {
-      "count": {
+      "seconds": {
         "type": "int"
       }
     }
   },
-  "profileShowMore": "Xem thêm ({count} quyền) ▼",
-  "@profileShowMore": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "profileShowLess": "Thu gọn ▲",
-  "profileSettings": "Cài đặt",
-  "profileNoPermissions": "Chưa có quyền hạn nào",
-
-  "loginWelcomeTitle": "Chào mừng trở lại! 👋",
-  "loginWelcomeSubtitle": "Đăng nhập để tiếp tục trải nghiệm hệ sinh thái Tasco",
-  "loginSsoOr": "HOẶC ĐĂNG NHẬP VỚI",
-  "loginGoogle": "Google",
-  "loginApple": "Apple",
-  "loginCorporateSso": "Corporate SSO",
-  "loginBiometric": "Đăng nhập sinh trắc học",
-  "loginUsernameRequired": "Vui lòng nhập tên đăng nhập",
-  "loginPasswordRequired": "Vui lòng nhập mật khẩu",
-  "loginFailed": "Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.",
-  "loginNetworkError": "Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.",
-
+  "loginChangeEmail": "Đổi email",
+  "loginOtpInvalid": "Mã đăng nhập không đúng hoặc đã hết hạn.",
+  "loginRateLimited": "Bạn thao tác quá nhanh, vui lòng thử lại sau.",
+  "loginFailed": "Đăng nhập không thành công. Vui lòng thử lại.",
+  "splashLoadFailed": "Không tải được vai trò của bạn.",
+  "roleTitle": "Vai trò",
+  "roleYours": "Vai trò của bạn",
+  "roleWhoAreYou": "Bạn là…?",
+  "roleAdd": "Thêm vai trò",
+  "roleTeacher": "Giáo viên",
+  "roleParent": "Phụ huynh",
+  "roleStudent": "Học sinh",
+  "roleAddFailed": "Không thêm được vai trò. Vui lòng thử lại.",
+  "inviteTitle": "Lời mời tham gia lớp",
+  "inviteBody": "Giáo viên đã mời bạn kết nối với lớp học của con.",
+  "inviteAccept": "Nhận lời mời",
+  "inviteInvalid": "Lời mời không tồn tại hoặc đã hết hạn.",
+  "inviteFailed": "Không nhận được lời mời. Vui lòng thử lại.",
+  "inviteConsentTitle": "Đồng ý xử lý dữ liệu",
+  "inviteConsentBody": "Để xem thông tin học tập của con, bạn cần đồng ý với điều khoản và chính sách xử lý dữ liệu cá nhân của TeachHub.",
+  "inviteConsentAccept": "Đồng ý và nhận lời mời",
   "settings": "Cài đặt",
-  "settingsSecurity": "Bảo mật & Xác thực",
-  "settingsBiometricTitle": "Đăng nhập bằng Sinh trắc học",
+  "settingsAbout": "Về ứng dụng",
+  "settingsAboutApp": "Ứng dụng",
+  "settingsAboutEnv": "Môi trường",
+  "settingsAboutTerms": "Điều khoản sử dụng",
+  "settingsAboutVersion": "Phiên bản",
+  "settingsBiometricAuthReason": "Xác minh danh tính để bật đăng nhập sinh trắc học",
+  "settingsBiometricDisabled": "Đã tắt đăng nhập sinh trắc học",
+  "settingsBiometricEnabled": "Đã bật đăng nhập sinh trắc học",
+  "settingsBiometricFailed": "Xác minh sinh trắc học thất bại",
   "settingsBiometricSubtitleAvailable": "Face ID / Touch ID cho các lần mở app sau",
   "settingsBiometricSubtitleNotEnrolled": "Vào Cài đặt thiết bị để đăng ký Face ID / Touch ID",
   "settingsBiometricSubtitleUnsupported": "Thiết bị không hỗ trợ sinh trắc học",
-  "settingsBiometricAuthReason": "Xác minh danh tính để bật đăng nhập sinh trắc học",
-  "settingsBiometricEnabled": "Đã bật đăng nhập sinh trắc học",
-  "settingsBiometricDisabled": "Đã tắt đăng nhập sinh trắc học",
-  "settingsBiometricFailed": "Xác minh sinh trắc học thất bại",
+  "settingsBiometricTitle": "Đăng nhập bằng Sinh trắc học",
   "settingsLanguage": "Ngôn ngữ",
   "settingsLanguageSystem": "Theo hệ thống",
+  "settingsSecurity": "Bảo mật & Xác thực",
   "settingsTheme": "Giao diện",
-  "settingsThemeSystem": "Theo hệ thống",
-  "settingsThemeLight": "Sáng",
   "settingsThemeDark": "Tối",
-  "settingsAbout": "Về ứng dụng",
-  "settingsAboutApp": "Ứng dụng",
-  "settingsAboutVersion": "Phiên bản",
-  "settingsAboutEnv": "Môi trường",
-  "settingsAboutTerms": "Điều khoản sử dụng",
-  "splashTagline": "Hệ sinh thái Tasco",
-  "splashCopyright": "© 2026 Tasco Joint Stock Company"
+  "settingsThemeLight": "Sáng",
+  "settingsThemeSystem": "Theo hệ thống",
+  "logout": "Đăng xuất",
+  "loading": "Đang tải...",
+  "login": "Đăng nhập"
 }

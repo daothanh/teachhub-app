@@ -9,246 +9,147 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get appName => 'Tasco Shell';
-
-  @override
-  String get login => 'Đăng nhập';
-
-  @override
-  String get logout => 'Đăng xuất';
-
-  @override
-  String get username => 'Tên đăng nhập';
-
-  @override
-  String get password => 'Mật khẩu';
-
-  @override
-  String get home => 'Trang chủ';
-
-  @override
-  String get loading => 'Đang tải...';
-
-  @override
-  String get error => 'Đã có lỗi xảy ra';
+  String get appName => 'TeachHub';
 
   @override
   String get retry => 'Thử lại';
 
   @override
-  String get cancel => 'Hủy';
+  String get loginSubtitle =>
+      'Đăng nhập bằng email, Google hoặc Apple. Không cần mật khẩu.';
 
   @override
-  String get confirm => 'Xác nhận';
+  String get loginEmail => 'Email';
 
   @override
-  String get save => 'Lưu';
+  String get loginEmailHint => 'ban@example.com';
 
   @override
-  String get delete => 'Xóa';
+  String get loginEmailInvalid => 'Email chưa đúng định dạng.';
 
   @override
-  String get search => 'Tìm kiếm';
+  String get loginSendOtp => 'Gửi mã đăng nhập';
 
   @override
-  String get noData => 'Không có dữ liệu';
+  String get loginOr => 'hoặc';
 
   @override
-  String get tabHome => 'Trang chủ';
+  String get loginGoogle => 'Tiếp tục với Google';
 
   @override
-  String get tabExplore => 'Khám phá';
+  String get loginApple => 'Tiếp tục với Apple';
 
   @override
-  String get tabNotification => 'Thông báo';
-
-  @override
-  String get tabProfile => 'Cá nhân';
-
-  @override
-  String get greetingMorning => 'Chào buổi sáng 👋';
-
-  @override
-  String get greetingAfternoon => 'Chào buổi chiều 👋';
-
-  @override
-  String get greetingEvening => 'Chào buổi tối 👋';
-
-  @override
-  String get homeQuickAccess => 'Truy cập nhanh';
-
-  @override
-  String get homeOverview => 'Tổng quan';
-
-  @override
-  String get homeMenuHrProfile => 'Hồ sơ\nnhân sự';
-
-  @override
-  String get homeMenuTraining => 'Đào tạo\nphát triển';
-
-  @override
-  String get homeMenuEvaluation => 'Đánh giá\nnhân sự';
-
-  @override
-  String get homeMenuCareerPath => 'Lộ trình\nphát triển';
-
-  @override
-  String get homeMenuCrossSale => 'Bán chéo\nhệ sinh thái';
-
-  @override
-  String get homeMenuSuggestions => 'Đề xuất\ncải tiến';
-
-  @override
-  String get homeMenuFavorites => 'Yêu\nthích';
-
-  @override
-  String get homeMenuViewMore => 'Xem\nthêm';
-
-  @override
-  String get homeStatInsuranceOrders => 'Đơn bảo hiểm';
-
-  @override
-  String get homeStatPending => 'Chờ xử lý';
-
-  @override
-  String get homeStatTodayTasks => 'Công việc hôm nay';
-
-  @override
-  String get homeStatNewNotifications => 'Thông báo mới';
-
-  @override
-  String get underConstructionTitle => 'Tính năng đang phát triển';
-
-  @override
-  String get underConstructionMessage =>
-      'Chức năng này đang được xây dựng và sẽ sớm ra mắt trong phiên bản tiếp theo.';
-
-  @override
-  String get understood => 'Đã hiểu';
-
-  @override
-  String get demoModuleTitle => 'Mini App VueJS';
-
-  @override
-  String get demoModuleSubtitle => 'Demo web bundle mount qua ModuleSlot';
-
-  @override
-  String get notificationTitle => 'Thông báo';
-
-  @override
-  String get notificationMarkAllAsRead => 'Đã đọc tất cả';
-
-  @override
-  String get notificationFilterAll => 'Tất cả';
-
-  @override
-  String get notificationFilterSystem => 'Hệ thống';
-
-  @override
-  String get notificationFilterTransaction => 'Giao dịch';
-
-  @override
-  String get notificationFilterMiniApps => 'Mini Apps';
-
-  @override
-  String get notificationEmptyTitle => 'Không có thông báo';
-
-  @override
-  String get notificationEmptyMessage =>
-      'Bạn chưa có thông báo nào trong mục này.';
-
-  @override
-  String timeMinutesAgo(int minutes) {
-    return '$minutes phút trước';
+  String loginOtpSentTo(String email) {
+    return 'Nhập mã 6 số đã gửi tới $email';
   }
 
   @override
-  String timeHoursAgo(int hours) {
-    return '$hours giờ trước';
+  String get loginOtpCode => 'Mã đăng nhập';
+
+  @override
+  String get loginResend => 'Gửi lại mã';
+
+  @override
+  String loginResendIn(int seconds) {
+    return 'Gửi lại mã sau $seconds giây';
   }
 
   @override
-  String timeDaysAgo(int days) {
-    return '$days ngày trước';
-  }
+  String get loginChangeEmail => 'Đổi email';
 
   @override
-  String get profileStandardUser => 'Người dùng tiêu chuẩn';
+  String get loginOtpInvalid => 'Mã đăng nhập không đúng hoặc đã hết hạn.';
 
   @override
-  String get profilePermissionsTitle => 'Quyền hạn truy cập';
+  String get loginRateLimited =>
+      'Bạn thao tác quá nhanh, vui lòng thử lại sau.';
 
   @override
-  String get profileStandardUserPermissions => 'QUYỀN NGƯỜI DÙNG TIÊU CHUẨN';
+  String get loginFailed => 'Đăng nhập không thành công. Vui lòng thử lại.';
 
   @override
-  String profileRole(String role) {
-    return 'Vai trò: $role';
-  }
+  String get splashLoadFailed => 'Không tải được vai trò của bạn.';
 
   @override
-  String profilePermissionsCount(int count) {
-    return '$count quyền';
-  }
+  String get roleTitle => 'Vai trò';
 
   @override
-  String profileShowMore(int count) {
-    return 'Xem thêm ($count quyền) ▼';
-  }
+  String get roleYours => 'Vai trò của bạn';
 
   @override
-  String get profileShowLess => 'Thu gọn ▲';
+  String get roleWhoAreYou => 'Bạn là…?';
 
   @override
-  String get profileSettings => 'Cài đặt';
+  String get roleAdd => 'Thêm vai trò';
 
   @override
-  String get profileNoPermissions => 'Chưa có quyền hạn nào';
+  String get roleTeacher => 'Giáo viên';
 
   @override
-  String get loginWelcomeTitle => 'Chào mừng trở lại! 👋';
+  String get roleParent => 'Phụ huynh';
 
   @override
-  String get loginWelcomeSubtitle =>
-      'Đăng nhập để tiếp tục trải nghiệm hệ sinh thái Tasco';
+  String get roleStudent => 'Học sinh';
 
   @override
-  String get loginSsoOr => 'HOẶC ĐĂNG NHẬP VỚI';
+  String get roleAddFailed => 'Không thêm được vai trò. Vui lòng thử lại.';
 
   @override
-  String get loginGoogle => 'Google';
+  String get inviteTitle => 'Lời mời tham gia lớp';
 
   @override
-  String get loginApple => 'Apple';
+  String get inviteBody => 'Giáo viên đã mời bạn kết nối với lớp học của con.';
 
   @override
-  String get loginCorporateSso => 'Corporate SSO';
+  String get inviteAccept => 'Nhận lời mời';
 
   @override
-  String get loginBiometric => 'Đăng nhập sinh trắc học';
+  String get inviteInvalid => 'Lời mời không tồn tại hoặc đã hết hạn.';
 
   @override
-  String get loginUsernameRequired => 'Vui lòng nhập tên đăng nhập';
+  String get inviteFailed => 'Không nhận được lời mời. Vui lòng thử lại.';
 
   @override
-  String get loginPasswordRequired => 'Vui lòng nhập mật khẩu';
+  String get inviteConsentTitle => 'Đồng ý xử lý dữ liệu';
 
   @override
-  String get loginFailed =>
-      'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
+  String get inviteConsentBody =>
+      'Để xem thông tin học tập của con, bạn cần đồng ý với điều khoản và chính sách xử lý dữ liệu cá nhân của TeachHub.';
 
   @override
-  String get loginNetworkError =>
-      'Không thể kết nối tới máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.';
+  String get inviteConsentAccept => 'Đồng ý và nhận lời mời';
 
   @override
   String get settings => 'Cài đặt';
 
   @override
-  String get settingsSecurity => 'Bảo mật & Xác thực';
+  String get settingsAbout => 'Về ứng dụng';
 
   @override
-  String get settingsBiometricTitle => 'Đăng nhập bằng Sinh trắc học';
+  String get settingsAboutApp => 'Ứng dụng';
+
+  @override
+  String get settingsAboutEnv => 'Môi trường';
+
+  @override
+  String get settingsAboutTerms => 'Điều khoản sử dụng';
+
+  @override
+  String get settingsAboutVersion => 'Phiên bản';
+
+  @override
+  String get settingsBiometricAuthReason =>
+      'Xác minh danh tính để bật đăng nhập sinh trắc học';
+
+  @override
+  String get settingsBiometricDisabled => 'Đã tắt đăng nhập sinh trắc học';
+
+  @override
+  String get settingsBiometricEnabled => 'Đã bật đăng nhập sinh trắc học';
+
+  @override
+  String get settingsBiometricFailed => 'Xác minh sinh trắc học thất bại';
 
   @override
   String get settingsBiometricSubtitleAvailable =>
@@ -263,17 +164,7 @@ class AppLocalizationsVi extends AppLocalizations {
       'Thiết bị không hỗ trợ sinh trắc học';
 
   @override
-  String get settingsBiometricAuthReason =>
-      'Xác minh danh tính để bật đăng nhập sinh trắc học';
-
-  @override
-  String get settingsBiometricEnabled => 'Đã bật đăng nhập sinh trắc học';
-
-  @override
-  String get settingsBiometricDisabled => 'Đã tắt đăng nhập sinh trắc học';
-
-  @override
-  String get settingsBiometricFailed => 'Xác minh sinh trắc học thất bại';
+  String get settingsBiometricTitle => 'Đăng nhập bằng Sinh trắc học';
 
   @override
   String get settingsLanguage => 'Ngôn ngữ';
@@ -282,35 +173,26 @@ class AppLocalizationsVi extends AppLocalizations {
   String get settingsLanguageSystem => 'Theo hệ thống';
 
   @override
+  String get settingsSecurity => 'Bảo mật & Xác thực';
+
+  @override
   String get settingsTheme => 'Giao diện';
-
-  @override
-  String get settingsThemeSystem => 'Theo hệ thống';
-
-  @override
-  String get settingsThemeLight => 'Sáng';
 
   @override
   String get settingsThemeDark => 'Tối';
 
   @override
-  String get settingsAbout => 'Về ứng dụng';
+  String get settingsThemeLight => 'Sáng';
 
   @override
-  String get settingsAboutApp => 'Ứng dụng';
+  String get settingsThemeSystem => 'Theo hệ thống';
 
   @override
-  String get settingsAboutVersion => 'Phiên bản';
+  String get logout => 'Đăng xuất';
 
   @override
-  String get settingsAboutEnv => 'Môi trường';
+  String get loading => 'Đang tải...';
 
   @override
-  String get settingsAboutTerms => 'Điều khoản sử dụng';
-
-  @override
-  String get splashTagline => 'Hệ sinh thái Tasco';
-
-  @override
-  String get splashCopyright => '© 2026 Tasco Joint Stock Company';
+  String get login => 'Đăng nhập';
 }

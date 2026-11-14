@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tasco_core/tasco_core.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 
-import '../../core/config/app_config.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../core/config/app_env.dart';
 import '../../core/routing/app_routes.dart';
 import '../../core/theme/theme_controller.dart';
@@ -34,8 +34,9 @@ class SettingsPage extends StatelessWidget {
             color: Theme.of(context).colorScheme.primary,
           ),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-          onPressed: () =>
-              context.canPop() ? context.pop() : context.go(AppRoutes.profile),
+          onPressed: () => context.canPop()
+              ? context.pop()
+              : context.go(AppRoutes.rolePicker),
         ),
       ),
       body: SingleChildScrollView(
@@ -65,6 +66,12 @@ class SettingsPage extends StatelessWidget {
             _SectionHeader(title: l10n.settingsAbout),
             SizedBox(height: 8.h),
             _AboutSection(isDark: isDark),
+            SizedBox(height: 20.h),
+            AppButton(
+              label: l10n.logout,
+              variant: AppButtonVariant.outlineDanger,
+              onPressed: () => context.read<AppAuthCubit>().logout(),
+            ),
             SizedBox(height: 40.h),
           ],
         ),
@@ -432,14 +439,14 @@ class _AboutSection extends StatelessWidget {
         _AboutTile(
           iconPath: AppIcons.grid,
           label: l10n.settingsAboutApp,
-          value: 'Tasco Shell',
+          value: l10n.appName,
           isDark: isDark,
         ),
         const AppDivider(indent: 56, endIndent: 16),
         _AboutTile(
           iconPath: AppIcons.infoCircle,
           label: l10n.settingsAboutVersion,
-          value: AppConfig.frameworkVersion,
+          value: GetIt.I<PackageInfo>().version,
           isDark: isDark,
         ),
         const AppDivider(indent: 56, endIndent: 16),

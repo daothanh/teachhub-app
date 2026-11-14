@@ -1,13 +1,14 @@
 import 'package:flutter/widgets.dart';
+import 'package:get_it/get_it.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tasco_core/tasco_core.dart';
 import 'package:tasco_storage/tasco_storage.dart';
-import 'package:get_it/get_it.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../core/config/app_env.dart';
-import '../core/config/client_identity.dart';
 import '../core/theme/theme_controller.dart';
-import '../data/model/user_model.dart';
+import '../features/auth/teachhub_user.dart';
 import '../l10n/l10n.dart';
 
 const _localeKey = 'app_locale';
@@ -15,32 +16,28 @@ const _userKey = 'user_info';
 
 Future<void> localModule(GetIt getIt, {required Env env}) async {
   final sharedPrefs = await SharedPreferences.getInstance();
-  final appEnv = AppEnv();
-  await appEnv.init(env);
-  // Resolved before any Dio client exists, since every client sends it.
-  final clientIdentity = await ClientIdentity.resolve(
-    store: SharedPrefsStore(sharedPrefs),
-    clientSource: appEnv.clientSource,
-  );
+  final appEnv = await AppEnv.load(env);
+  final packageInfo = await PackageInfo.fromPlatform();
 
   getIt
-    ..registerLazySingleton<SharedPreferences>(() => sharedPrefs)
+    ..registerSingleton<SharedPreferences>(sharedPrefs)
+    ..registerSingleton<AppEnv>(appEnv)
+    ..registerSingleton<PackageInfo>(packageInfo)
+    // Token chỉ nằm ở Keychain/Keystore (spec §2.2).
     ..registerLazySingleton<TokenStore>(() => TokenStore(SecureStore()))
-    // Cached user for fast session restore (tasco_auth userCache).
-    ..registerLazySingleton<JsonStore<UserModel>>(
-      () => JsonStore<UserModel>(
+    // User đã lưu để khôi phục phiên nhanh (tasco_auth userCache).
+    ..registerLazySingleton<JsonStore<TeachHubUser>>(
+      () => JsonStore<TeachHubUser>(
         store: SharedPrefsStore(sharedPrefs),
         key: _userKey,
-        fromJson: UserModel.fromStorageJson,
-        toJson: (u) => u.toStorageJson(),
+        fromJson: TeachHubUser.fromJson,
+        toJson: (u) => u.toJson(),
       ),
     )
-    ..registerLazySingleton<AppEnv>(() => appEnv)
-    ..registerLazySingleton<ClientIdentity>(() => clientIdentity)
     ..registerLazySingleton<LoadingManager>(() => LoadingManager())
-    // Bus phiên xác thực — đăng ký sớm để AuthCubit/App subscribe được.
     ..registerLazySingleton<AuthEventBus>(() => AuthEventBus())
-    // Locale runtime: khôi phục lựa chọn đã lưu; persist khi đổi (P2-11).
+    // Vai trò đang mở — mini-app đọc qua teachhub_shared.
+    ..registerSingleton<ActiveMembership>(ActiveMembership(null))
     ..registerLazySingleton<LocaleController>(() {
       final saved = sharedPrefs.getString(_localeKey);
       return LocaleController(
@@ -51,6 +48,7 @@ Future<void> localModule(GetIt getIt, {required Env env}) async {
             : sharedPrefs.setString(_localeKey, locale.languageCode),
       );
     })
-    // Theme mode: Light / Dark / System, persisted across restarts.
-    ..registerLazySingleton<ThemeController>(() => ThemeController(sharedPrefs));
+    ..registerLazySingleton<ThemeController>(
+      () => ThemeController(sharedPrefs),
+    );
 }

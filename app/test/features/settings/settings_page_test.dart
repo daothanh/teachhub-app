@@ -4,10 +4,10 @@ import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:app/core/config/app_config.dart';
 import 'package:app/core/config/app_env.dart';
 import 'package:app/core/theme/theme_controller.dart';
-import 'package:app/data/model/user_model.dart';
+import 'package:app/features/auth/teachhub_user.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:app/features/auth/auth_cubit.dart';
 import 'package:app/features/settings/settings_page.dart';
 import 'package:app/l10n/l10n.dart';
@@ -18,18 +18,18 @@ import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 
 // ── Minimal fakes ─────────────────────────────────────────────────────────────
 
-class FakeAuthRepo implements AuthRepository<UserModel> {
+class FakeAuthRepo implements AuthRepository<TeachHubUser> {
   bool setBiometricEnabledCalled = false;
   bool isBiometricEnabledValue = false;
 
   @override
-  Future<AuthResult<UserModel>> login(Map<String, dynamic> c) async =>
-      const AuthSuccess(UserModel(id: '1', name: 'U'));
+  Future<AuthResult<TeachHubUser>> login(Map<String, dynamic> c) async =>
+      const AuthSuccess(TeachHubUser(id: '1', email: 'u@b.vn'));
   @override
-  Future<UserModel> loginWithSso({
+  Future<TeachHubUser> loginWithSso({
     required String providerId,
     required SsoResult ssoResult,
-  }) async => const UserModel(id: '1', name: 'U');
+  }) async => const TeachHubUser(id: '1', email: 'u@b.vn');
   @override
   Future<bool> isBiometricEnabled() async => isBiometricEnabledValue;
   @override
@@ -39,9 +39,10 @@ class FakeAuthRepo implements AuthRepository<UserModel> {
   }
 
   @override
-  Future<UserModel?> cachedUser() async => null;
+  Future<TeachHubUser?> cachedUser() async => null;
   @override
-  Future<UserModel> getUserInfo() async => const UserModel(id: '1', name: 'U');
+  Future<TeachHubUser> getUserInfo() async =>
+      const TeachHubUser(id: '1', email: 'u@b.vn');
   @override
   Future<bool> hasValidToken() async => false;
   @override
@@ -136,6 +137,14 @@ void main() {
       supportedLocales: const [Locale('vi'), Locale('en')],
     );
     _themeCtrl = ThemeController(_prefs);
+    GetIt.I.registerSingleton<PackageInfo>(
+      PackageInfo(
+        appName: 'TeachHub',
+        packageName: 'vn.com.tasco.teachhub',
+        version: '1.2.3',
+        buildNumber: '1',
+      ),
+    );
   });
 
   tearDown(() async {
@@ -161,48 +170,49 @@ void main() {
       expect(find.byType(AppIconButton), findsOneWidget);
     });
 
-    testWidgets('back button returns to profile when settings is the root', (
-      tester,
-    ) async {
-      await _setupGetIt();
-      final cubit = GetIt.I<AppAuthCubit>();
-      final router = GoRouter(
-        initialLocation: '/settings',
-        routes: [
-          GoRoute(
-            path: '/settings',
-            builder: (_, _) => BlocProvider<AppAuthCubit>.value(
-              value: cubit,
-              child: const SettingsPage(),
+    testWidgets(
+      'back button returns to the role picker when settings is the root',
+      (tester) async {
+        await _setupGetIt();
+        final cubit = GetIt.I<AppAuthCubit>();
+        final router = GoRouter(
+          initialLocation: '/settings',
+          routes: [
+            GoRoute(
+              path: '/settings',
+              builder: (_, _) => BlocProvider<AppAuthCubit>.value(
+                value: cubit,
+                child: const SettingsPage(),
+              ),
+            ),
+            GoRoute(
+              path: '/role-picker',
+              builder: (_, _) => const Scaffold(body: Text('RolePicker')),
+            ),
+          ],
+        );
+        addTearDown(router.dispose);
+
+        await tester.pumpWidget(
+          ScreenUtilPlusInit(
+            designSize: const Size(393, 852),
+            builder: (context, _) => MaterialApp.router(
+              locale: const Locale('vi'),
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              theme: AppTheme.v1,
+              routerConfig: router,
             ),
           ),
-          GoRoute(
-            path: '/profile',
-            builder: (_, _) => const Scaffold(body: Text('Profile')),
-          ),
-        ],
-      );
-      addTearDown(router.dispose);
+        );
+        await tester.pumpAndSettle();
 
-      await tester.pumpWidget(
-        ScreenUtilPlusInit(
-          designSize: const Size(393, 852),
-          builder: (context, _) => MaterialApp.router(
-            locale: const Locale('vi'),
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            theme: AppTheme.v1,
-            routerConfig: router,
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
+        await tester.tap(find.byType(AppIconButton));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(AppIconButton));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Profile'), findsOneWidget);
-    });
+        expect(find.text('RolePicker'), findsOneWidget);
+      },
+    );
 
     testWidgets('shows biometric switch enabled when available and enrolled', (
       tester,
@@ -382,16 +392,16 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Về ứng dụng'), findsOneWidget);
-      expect(find.text('Tasco Shell'), findsOneWidget);
-      expect(find.text(AppConfig.frameworkVersion), findsOneWidget);
+      expect(find.text('TeachHub'), findsOneWidget);
+      expect(find.text('1.2.3'), findsOneWidget);
     });
 
     testWidgets('About section shows env badge when AppEnv is registered', (
       tester,
     ) async {
-      final appEnv = AppEnv();
-      await appEnv.init(Env.development);
-      GetIt.I.registerSingleton<AppEnv>(appEnv);
+      GetIt.I.registerSingleton<AppEnv>(
+        AppEnv(Env.development, {'TEACHHUB_API_URL': 'http://localhost/v1'}),
+      );
 
       await _setupGetIt();
       final cubit = GetIt.I<AppAuthCubit>();

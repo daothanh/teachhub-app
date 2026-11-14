@@ -6,113 +6,86 @@ import 'package:get_it/get_it.dart';
 import 'package:tasco_auth/tasco_auth.dart';
 import 'package:tasco_core/tasco_core.dart';
 import 'package:tasco_storage/tasco_storage.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../core/config/app_env.dart';
-import '../core/config/client_identity.dart';
-import '../data/model/user_model.dart';
-import 'const_key.dart';
+import '../core/network/teachhub_headers_interceptor.dart';
+import '../features/auth/teachhub_user.dart';
 
+/// HTTP inspector; `null` ở production.
 Alice? alice;
 
+/// Hai client theo spec §3.5:
+/// - [TeachHubDiKey.api]: toàn bộ TeachHub API (`<base>/v1`), kể cả
+///   `tasco_auth` (`/auth/*`) và `tasco_notifications` (`/push/*`).
+/// - [TeachHubDiKey.objectStorage]: URL presigned R2 — không baseURL, không
+///   Bearer, không pin (chứng chỉ R2 không phải của API).
 Future<void> apiModule(GetIt getIt) async {
   final appEnv = getIt<AppEnv>();
+  alice = appEnv.isProduction ? null : Alice();
 
-  if (!appEnv.isProduction) {
-    alice = Alice();
-  }
-
-  // Pinning: cơ chế ở framework, fingerprint là dữ liệu sản phẩm (theo flavor).
-  // Dựng adapter MỘT lần rồi dùng chung, để service client và retry client của
-  // AuthInterceptor cùng một chính sách TLS. Pins rỗng ⇒ không pin.
+  // Pin cho API (theo flavor). Retry client dùng chung adapter này, nếu không
+  // request gửi lại — vẫn mang Bearer — sẽ đi trên TLS không pin.
   final pins = appEnv.certificatePins;
   final pinnedAdapter = pins.isEmpty
       ? null
       : CertificatePinning.adapter(allowedSha256: pins);
+  final clientInfo = await TeachHubHeadersInterceptor.resolveClientInfo();
 
-  // Đăng ký lazy: factory chỉ chạy ở lần resolve đầu tiên (thời điểm gọi mạng /
-  // sau khi bootstrap dựng xong DI), nên RefreshTokenUseCase/AuthRepository ở
-  // module sau đã sẵn sàng dù apiModule chạy trước.
   getIt
     ..registerLazySingleton<TokenRefresher>(
       () => TokenRefresher(
-        // Delegate to the auth repository (core stays app-agnostic).
-        refresh: () => getIt<AuthRepository<UserModel>>().refreshToken(),
+        refresh: () => getIt<AuthRepository<TeachHubUser>>().refreshToken(),
         authEventBus: getIt<AuthEventBus>(),
       ),
     )
     ..registerLazySingleton<AuthInterceptor>(
       () => AuthInterceptor(
-        // Inject token reader; core does not depend on app's TokenStore.
         () => getIt<TokenStore>().getAccessToken(),
-        // Thunk: chỉ resolve TokenRefresher khi xử lý 401 (tránh vòng DI).
         () => getIt<TokenRefresher>(),
-        // Retry chạy NGOÀI stack interceptor của service Dio (cố ý — để không
-        // đệ quy), nên nó cũng nằm ngoài những gì service Dio đặt ở tầng
-        // client: timeout và adapter đã pin. Dựng tường minh, nếu không thì
-        // đúng request mang token vừa refresh lại là request duy nhất đi trên
-        // TLS không pinned và không có timeout.
         retryClient: AuthInterceptor.buildRetryClient(adapter: pinnedAdapter),
-        // Refresh thật xong, retry vẫn 401 ⇒ phiên hết cứu. Không truyền bus
-        // thì nhánh force-logout này chết lặng.
         authEventBus: getIt<AuthEventBus>(),
       ),
-    );
-
-  final clientHeaders = getIt<ClientIdentity>().headers;
-
-  Dio buildClient(String baseUrl) => _buildDio(
-    baseUrl,
-    pinnedAdapter,
-    serviceInterceptors(
-      loadingManager: getIt<LoadingManager>(),
-      authInterceptor: getIt<AuthInterceptor>(),
-      // Same reasoning as the retry client above: retries run outside this
-      // Dio's interceptor chain, so they are also outside its timeout and
-      // pinned adapter. The retried request still carries the Authorization
-      // header, so an un-pinned default would send the bearer token over
-      // unverified TLS.
-      retryInterceptor: RetryInterceptor(
-        retryClient: RetryInterceptor.buildRetryClient(adapter: pinnedAdapter),
+    )
+    ..registerLazySingleton<Dio>(
+      () => _buildDio(
+        NetworkDefaults.baseOptions(baseUrl: appEnv.apiUrl),
+        pinnedAdapter,
+        apiInterceptors(
+          headers: TeachHubHeadersInterceptor(clientInfo: clientInfo),
+          loadingManager: getIt<LoadingManager>(),
+          authInterceptor: getIt<AuthInterceptor>(),
+          retryInterceptor: RetryInterceptor(
+            retryClient: RetryInterceptor.buildRetryClient(
+              adapter: pinnedAdapter,
+            ),
+          ),
+        ),
       ),
-    ),
-    headers: clientHeaders,
-  );
-
-  getIt
-    ..registerLazySingleton<Dio>(
-      () => buildClient(appEnv.authUrl),
-      instanceName: DiKey.authDio,
+      instanceName: TeachHubDiKey.api,
     )
     ..registerLazySingleton<Dio>(
-      () => buildClient(appEnv.crmUrl),
-      instanceName: DiKey.crmDio,
-    )
-    ..registerLazySingleton<Dio>(
-      () => buildClient(appEnv.hrmUrl),
-      instanceName: DiKey.hrmDio,
-    )
-    ..registerLazySingleton<Dio>(
-      () => buildClient(appEnv.ticketUrl),
-      instanceName: DiKey.ticketDio,
+      () => _buildDio(NetworkDefaults.baseOptions(baseUrl: ''), null, [
+        LoggingInterceptor(),
+      ]),
+      instanceName: TeachHubDiKey.objectStorage,
     );
 }
 
-/// The interceptors every service client carries, in the order they run.
+/// Chuỗi interceptor của client API, theo thứ tự chạy.
 ///
-/// [ErrorInterceptor] (the loading overlay) goes first. [AuthInterceptor]
-/// replays a 401 and [RetryInterceptor] retries a transient failure, and both
-/// end the chain by resolving from `onError`: no interceptor after them sees
-/// the outcome. Behind them, the overlay's `hide()` never ran and the overlay
-/// stayed up until `LoadingManager`'s 5-second safety timer.
-///
-/// [RetryInterceptor] retries timeouts, connection errors and 502-504 with
-/// backoff; a 401 is left to [AuthInterceptor] ahead of it.
+/// Header đứng đầu để `Idempotency-Key`/`x-request-id` có trong
+/// `RequestOptions` trước khi Auth/Retry gửi lại. [ErrorInterceptor] (overlay
+/// loading) đứng trước Auth và Retry vì hai interceptor này kết thúc chuỗi
+/// bằng `resolve` — đứng sau chúng thì overlay không bao giờ được ẩn.
 @visibleForTesting
-List<Interceptor> serviceInterceptors({
+List<Interceptor> apiInterceptors({
+  required TeachHubHeadersInterceptor headers,
   required LoadingManager loadingManager,
   required AuthInterceptor authInterceptor,
   required RetryInterceptor retryInterceptor,
 }) => [
+  headers,
   ErrorInterceptor(loadingManager: loadingManager),
   authInterceptor,
   retryInterceptor,
@@ -120,23 +93,16 @@ List<Interceptor> serviceInterceptors({
 ];
 
 Dio _buildDio(
-  String baseUrl,
-  HttpClientAdapter? pinnedAdapter,
-  List<Interceptor> interceptors, {
-  required Map<String, String> headers,
-}) {
-  // Standard timeout policy from the framework (NetworkDefaults).
-  final dio = Dio(NetworkDefaults.baseOptions(baseUrl: baseUrl));
-  // Adapter đã pin (nếu app khai CERT_PINS) — đặt trước khi thêm interceptor,
-  // vì nó thay thế httpClientAdapter của client.
-  if (pinnedAdapter != null) dio.httpClientAdapter = pinnedAdapter;
-
-  // App version, installation and client source (ClientIdentity).
-  dio.options.headers.addAll(headers);
-
-  if (alice != null) {
+  BaseOptions options,
+  HttpClientAdapter? adapter,
+  List<Interceptor> interceptors,
+) {
+  final dio = Dio(options);
+  if (adapter != null) dio.httpClientAdapter = adapter;
+  final inspector = alice;
+  if (inspector != null) {
     final aliceDioAdapter = AliceDioAdapter();
-    alice!.addAdapter(aliceDioAdapter);
+    inspector.addAdapter(aliceDioAdapter);
     dio.interceptors.add(aliceDioAdapter);
   }
   dio.interceptors.addAll(interceptors);

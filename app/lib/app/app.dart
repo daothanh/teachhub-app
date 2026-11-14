@@ -6,11 +6,13 @@ import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 
 import '../core/theme/theme_controller.dart';
 import '../features/auth/auth_cubit.dart';
+import '../features/role_picker/membership_cubit.dart';
 import '../l10n/l10n.dart';
 
 class App extends StatelessWidget {
   final GoRouter router;
   final AppAuthCubit authCubit;
+  final MembershipCubit membershipCubit;
   final LocaleController localeController;
   final ThemeController themeController;
   final List<LocalizationsDelegate> miniAppDelegates;
@@ -19,6 +21,7 @@ class App extends StatelessWidget {
     super.key,
     required this.router,
     required this.authCubit,
+    required this.membershipCubit,
     required this.localeController,
     required this.themeController,
     this.miniAppDelegates = const [],
@@ -29,8 +32,11 @@ class App extends StatelessWidget {
     // App-shell boilerplate (ScreenUtil + MaterialApp.router + EasyLoading +
     // runtime locale) lives in TascoApp (ui_kit, P2-17). Shell only supplies the
     // app-specific bits: AppAuthCubit, router, theme, locale source, l10n delegates.
-    return BlocProvider<AppAuthCubit>.value(
-      value: authCubit,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AppAuthCubit>.value(value: authCubit),
+        BlocProvider<MembershipCubit>.value(value: membershipCubit),
+      ],
       child: ValueListenableBuilder<ThemeMode>(
         valueListenable: themeController,
         builder: (context, themeMode, _) => TascoApp(

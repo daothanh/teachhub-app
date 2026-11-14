@@ -1,8 +1,7 @@
 import 'package:tasco_auth/tasco_auth.dart';
 
-import '../../data/model/user_model.dart';
+import 'teachhub_user.dart';
 
-/// The shell's concrete auth cubit + state types: the generic `tasco_auth`
-/// feature bound to the product `UserModel` (ADR-0019).
-typedef AppAuthCubit = AuthCubit<UserModel>;
-typedef AppAuthState = AuthState<UserModel>;
+/// `tasco_auth` gắn với [TeachHubUser] (ADR-0019).
+typedef AppAuthCubit = AuthCubit<TeachHubUser>;
+typedef AppAuthState = AuthState<TeachHubUser>;

@@ -1,5 +1,5 @@
 name: app
-description: Tasco Shell App - Host Shell
+description: TeachHub — host shell (super app giáo viên, phụ huynh, học sinh).
 publish_to: none
 version: 1.0.0+1
 
@@ -10,6 +10,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  # TeachHub
+  teachhub_shared:
+    path: ../packages/teachhub_shared
+  teacher:
+    path: ../mini_apps/teacher
+  parent:
+    path: ../mini_apps/parent
+  student:
+    path: ../mini_apps/student
+
+  # Đăng nhập native (spec §2.2)
+  google_sign_in: ^7.2.0
+  sign_in_with_apple: ^7.0.1
+  crypto: ^3.0.6
   flutter_localizations:
     sdk: flutter
 
@@ -37,8 +52,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   shared_preferences: ^2.5.3
 
-  # Installed app version for X-App-Version. ^8 because alice 1.0.0 caps it
-  # there (docs/backlog.md P2-22).
+  # Phiên bản cho header x-client-info. ^8 vì alice 1.0.0 chặn ở đó.
   package_info_plus: ^8.3.1
 
   # Internal packages
@@ -77,7 +91,6 @@ dependencies:
   alice_dio: ^1.0.7
   firebase_messaging: ^16.4.1
   flutter_local_notifications: ^19.5.0
-  preload_page_view: ^0.2.0
 
 dev_dependencies:
   flutter_test:
@@ -87,12 +100,22 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
+  # Mỗi flavor chỉ đóng gói .env của chính nó: bản production không chứa URL
+  # dev/staging. Build/run luôn kèm --flavor (docs/native-setup.md).
   assets:
-    - assets/
-    - assets/.env
-    - assets/.env.development
-    - assets/.env.staging
-    - assets/.env.production
+    - path: assets/.env.development
+      flavors: [development]
+    - path: assets/.env.staging
+      flavors: [staging]
+    - path: assets/.env.production
+      flavors: [production]
 
     # Bundled so the Shorebird engine can read the app id (ADR-0017 / P1-6).
     - shorebird.yaml
+
+# Bản SQLite có mã hóa (SQLite3MultipleCiphers) cho CSDL ngoại tuyến của
+# mini-app teacher — docs/adr/0001-encrypted-local-database.md.
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3mc
