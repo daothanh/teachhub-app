@@ -1,0 +1,98 @@
+name: app
+description: Tasco Shell App - Host Shell
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management
+  flutter_bloc: ^9.1.0
+  equatable: ^2.0.7
+
+  # DI
+  get_it: ^8.0.3
+
+  # Network
+  dio: ^5.7.0
+  flutter_secure_storage: ^10.3.1
+
+  # Routing
+  go_router: ^14.8.1
+  app_links: ^6.4.0
+
+  # Firebase
+  firebase_core: ^4.11.0
+  firebase_crashlytics: ^5.2.5
+  firebase_remote_config: ^6.5.3
+
+  # Env & Storage
+  flutter_dotenv: ^5.2.1
+  shared_preferences: ^2.5.3
+
+  # Installed app version for X-App-Version. ^8 because alice 1.0.0 caps it
+  # there (docs/backlog.md P2-22).
+  package_info_plus: ^8.3.1
+
+  # Internal packages
+  tasco_ui_kit:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  tasco_utils:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  tasco_core:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  tasco_module:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  tasco_notifications:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  tasco_observability:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  tasco_storage:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  tasco_auth:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  # Shorebird-backed OTA updater (host-only; ADR-0017). Plugin footprint stays
+  # in this package, never reaching mini-apps.
+  tasco_ota:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  alice: ^1.0.0
+  flutter_screenutil_plus: ^1.4.0
+  flutter_easyloading_plus: ^3.2.0
+  alice_dio: ^1.0.7
+  firebase_messaging: ^16.4.1
+  flutter_local_notifications: ^19.5.0
+  preload_page_view: ^0.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/.env
+    - assets/.env.development
+    - assets/.env.staging
+    - assets/.env.production
+
+    # Bundled so the Shorebird engine can read the app id (ADR-0017 / P1-6).
+    - shorebird.yaml

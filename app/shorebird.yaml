@@ -1,0 +1,13 @@
+# Shorebird configuration (ADR-0017 / P1-6).
+#
+# PLACEHOLDER app id — replace with the real one from `shorebird init` once the
+# product has a Shorebird account. Until then this file is inert: a plain
+# `flutter build` ignores it and ShorebirdUpdater.isAvailable is false, so OTA is
+# a safe no-op. Real patch delivery requires `shorebird release` / `shorebird
+# patch` in the build pipeline.
+app_id: REPLACE_WITH_SHOREBIRD_APP_ID
+
+# Optional: enable per-flavor app ids when staging/prod ship as separate apps.
+# flavors:
+#   staging: REPLACE_WITH_STAGING_APP_ID
+#   production: REPLACE_WITH_PROD_APP_ID

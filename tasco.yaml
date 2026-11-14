@@ -1,0 +1,16 @@
+app_name: "Teachhub"
+folder_name: "teachhub"
+package_name: "vn.com.tasco.teachhub"
+architecture: "clean"
+state_management: "cubit"
+di: "get_it"
+network: "dio"
+framework_version: "5.2.7"
+test:
+  enabled: true
+generate:
+  entity: true
+  repository: true
+  service: true
+  controller: true
+  unit_test: true
