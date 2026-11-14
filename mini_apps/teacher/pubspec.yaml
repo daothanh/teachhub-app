@@ -1,0 +1,50 @@
+name: teacher
+description: TeachHub — mini-app không gian Giáo viên.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  go_router: ^14.8.1
+  tasco_ui_kit:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  tasco_module:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  teachhub_shared:
+    path: ../../packages/teachhub_shared
+  tasco_storage:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  get_it: ^8.0.3
+  # Điểm danh ngoại tuyến (spec §6.4, ADR-0001 của TeachHub).
+  drift: ^2.32.0
+  drift_flutter: ^0.3.1
+  sqlite3: ^3.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_screenutil_plus: ^1.4.0
+  drift_dev: any
+  build_runner: any
+
+flutter:
+  generate: true
+  uses-material-design: true
+
+# SQLite3MultipleCiphers thay SQLite gốc để mã hóa CSDL cục bộ (ADR-0001).
+# Phải khai cả ở app host vì hook đọc pubspec gốc của lần build.
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3mc
