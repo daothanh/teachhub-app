@@ -16,3 +16,4 @@ key.properties
 # Build outputs
 /app/build/
 /build/
+.kotlin/

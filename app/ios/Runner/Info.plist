@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Teachhub</string>
+	<string>$(APP_DISPLAY_NAME)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -67,7 +67,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Ứng dụng sử dụng Face ID / Touch ID để xác thực danh tính khi đăng nhập.</string>
+	<string>TeachHub dùng Face ID để xác thực khi bạn mở khoá chế độ phụ huynh.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -77,15 +77,29 @@
 			<string>vn.com.tasco.teachhub</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>tasco</string>
+				<string>teachhub</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>$(GOOGLE_REVERSED_CLIENT_ID)</string>
+			</array>
+		</dict>
+	</array>
+	<key>GIDClientID</key>
+	<string>$(GOOGLE_CLIENT_ID)</string>
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>
-		<true/>
-		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
 	</dict>
 </dict>

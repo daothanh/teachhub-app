@@ -30,6 +30,8 @@ Runner/GeneratedPluginRegistrant.*
 # Xcode user-specific
 *.xcuserstate
 *.xcscheme
+# Shared flavor schemes (development/staging/production) must be committed.
+!Runner.xcodeproj/xcshareddata/xcschemes/*.xcscheme
 
 # Exceptions to above rules.
 !default.mode1v3
