@@ -1,0 +1,6 @@
+arb-dir: lib/l10n/arb
+template-arb-file: app_vi.arb
+output-localization-file: mini_app_localizations.dart
+output-class: MiniAppLocalizations
+output-dir: lib/l10n/generated
+nullable-getter: false

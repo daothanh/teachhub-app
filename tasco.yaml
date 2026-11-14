@@ -6,6 +6,10 @@ state_management: "cubit"
 di: "get_it"
 network: "dio"
 framework_version: "5.2.7"
+miniapps:
+  - teacher
+  - parent
+  - student
 test:
   enabled: true
 generate:

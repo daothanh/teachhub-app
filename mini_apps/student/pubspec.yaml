@@ -1,0 +1,33 @@
+name: student
+description: TeachHub — mini-app không gian Học sinh.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  go_router: ^14.8.1
+  tasco_ui_kit:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  tasco_module:
+    hosted: https://pub.vtii.vn
+    version: ^5.2.7
+  teachhub_shared:
+    path: ../../packages/teachhub_shared
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_screenutil_plus: ^1.4.0
+
+flutter:
+  generate: true
+  uses-material-design: true
