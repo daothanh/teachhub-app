@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:tasco_auth/tasco_auth.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:tasco_utils/tasco_utils.dart';
@@ -245,17 +246,28 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: tokens.spacingContent),
                     const Spacer(),
                     if (isIOS) ...[
-                      _ssoButton(
-                        l10n.loginApple,
-                        TeachHubIcons.appleLogo,
-                        busy ? null : () => auth.loginWithSso(widget.apple),
+                      _SsoButton(
+                        label: l10n.loginApple,
+                        logo: const _AppleLogo(),
+                        borderColor: scheme.onSurface,
+                        onPressed: busy
+                            ? null
+                            : () => auth.loginWithSso(widget.apple),
                       ),
                       SizedBox(height: tokens.spacingContent),
                     ],
-                    _ssoButton(
-                      l10n.loginGoogle,
-                      TeachHubIcons.googleLogo,
-                      busy ? null : () => auth.loginWithSso(widget.google),
+                    _SsoButton(
+                      label: l10n.loginGoogle,
+                      logo: Image.asset(
+                        'assets/images/login/google_g.png',
+                        width: 20,
+                        height: 20,
+                      ),
+                      // Google branding (Light): viền #747775 — màu của Google, không phải token DS.
+                      borderColor: const Color(0xFF747775),
+                      onPressed: busy
+                          ? null
+                          : () => auth.loginWithSso(widget.google),
                     ),
                     SizedBox(height: tokens.spacingContent),
                     _labelledDivider(context, l10n.loginOrEmail),
@@ -299,15 +311,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  Widget _ssoButton(String label, IconData icon, VoidCallback? onPressed) =>
-      AppButton(
-        label: label,
-        icon: Icon(icon, size: 20),
-        variant: AppButtonVariant.outlinePrimary,
-        onPressed: onPressed,
-        disabled: onPressed == null,
-      );
 
   Widget _labelledDivider(BuildContext context, String label) {
     final scheme = Theme.of(context).colorScheme;
@@ -560,4 +563,67 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+}
+
+/// Nút "Tiếp tục với Google/Apple" theo quy định thương hiệu của hai hãng, không
+/// theo kiểu nút Secondary của DS: nền trắng, chữ và logo Apple màu chữ chính
+/// (#1F1F1F), logo Google giữ nguyên màu (Google Identity branding, Apple HIG
+/// "Sign in with Apple").
+class _SsoButton extends StatelessWidget {
+  const _SsoButton({
+    required this.label,
+    required this.logo,
+    required this.borderColor,
+    required this.onPressed,
+  });
+
+  final String label;
+  final Widget logo;
+  final Color borderColor;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = context.tasco;
+    final scheme = Theme.of(context).colorScheme;
+    return OutlinedButton(
+      onPressed: onPressed,
+      style: OutlinedButton.styleFrom(
+        minimumSize: const Size.fromHeight(48),
+        backgroundColor: scheme.surface,
+        foregroundColor: scheme.onSurface,
+        textStyle: Theme.of(context).textTheme.labelLarge,
+        side: BorderSide(color: borderColor),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(tokens.buttonRadius),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ExcludeSemantics(child: logo),
+          SizedBox(width: tokens.spacingControl),
+          Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Logo Apple của gói `sign_in_with_apple` (cùng logo nút chính thức vẽ), cùng màu chữ.
+class _AppleLogo extends StatelessWidget {
+  const _AppleLogo();
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: 17,
+    height: 20,
+    child: CustomPaint(
+      painter: AppleLogoPainter(
+        color:
+            DefaultTextStyle.of(context).style.color ??
+            Theme.of(context).colorScheme.onSurface,
+      ),
+    ),
+  );
 }

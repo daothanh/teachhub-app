@@ -10,11 +10,6 @@ abstract final class TeachHubIcons {
   static const _family = 'Phosphor';
   static const _package = 'teachhub_shared';
 
-  static const appleLogo = IconData(
-    0xe516,
-    fontFamily: _family,
-    fontPackage: _package,
-  );
   static const caretLeft = IconData(
     0xe138,
     fontFamily: _family,
@@ -29,11 +24,6 @@ abstract final class TeachHubIcons {
   );
   static const gear = IconData(
     0xe270,
-    fontFamily: _family,
-    fontPackage: _package,
-  );
-  static const googleLogo = IconData(
-    0xe292,
     fontFamily: _family,
     fontPackage: _package,
   );
