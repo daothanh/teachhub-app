@@ -2,41 +2,18 @@
   "@@locale": "vi",
   "appName": "TeachHub",
   "retry": "Thử lại",
-  "loginSubtitle": "Đăng nhập bằng email, Google hoặc Apple. Không cần mật khẩu.",
   "loginEmail": "Email",
-  "loginEmailHint": "ban@example.com",
-  "loginEmailInvalid": "Email chưa đúng định dạng.",
+  "loginEmailHint": "ten@email.com",
+  "loginEmailInvalid": "Email chưa đúng định dạng, ví dụ: ten@gmail.com",
   "loginSendOtp": "Gửi mã đăng nhập",
-  "loginOr": "hoặc",
   "loginGoogle": "Tiếp tục với Google",
   "loginApple": "Tiếp tục với Apple",
-  "loginOtpSentTo": "Nhập mã 6 số đã gửi tới {email}",
-  "@loginOtpSentTo": {
-    "placeholders": {
-      "email": {
-        "type": "String"
-      }
-    }
-  },
-  "loginOtpCode": "Mã đăng nhập",
   "loginResend": "Gửi lại mã",
-  "loginResendIn": "Gửi lại mã sau {seconds} giây",
-  "@loginResendIn": {
-    "placeholders": {
-      "seconds": {
-        "type": "int"
-      }
-    }
-  },
   "loginChangeEmail": "Đổi email",
-  "loginOtpInvalid": "Mã đăng nhập không đúng hoặc đã hết hạn.",
   "loginRateLimited": "Bạn thao tác quá nhanh, vui lòng thử lại sau.",
   "loginFailed": "Đăng nhập không thành công. Vui lòng thử lại.",
   "splashLoadFailed": "Không tải được vai trò của bạn.",
-  "roleTitle": "Vai trò",
-  "roleYours": "Vai trò của bạn",
   "roleWhoAreYou": "Bạn là…?",
-  "roleAdd": "Thêm vai trò",
   "roleTeacher": "Giáo viên",
   "roleParent": "Phụ huynh",
   "roleStudent": "Học sinh",
@@ -72,5 +49,71 @@
   "settingsThemeSystem": "Theo hệ thống",
   "logout": "Đăng xuất",
   "loading": "Đang tải...",
-  "login": "Đăng nhập"
+  "loginSlogan": "Kết nối thầy, trò và gia đình.",
+  "loginTagline": "Quản lý lớp dạy thêm thật đơn giản.",
+  "loginOrEmail": "hoặc dùng email",
+  "loginEmailHelper": "Chúng tôi gửi mã 6 số, không cần mật khẩu.",
+  "loginSending": "Đang gửi mã…",
+  "loginTermsPrefix": "Tiếp tục nghĩa là bạn đồng ý với ",
+  "loginTerms": "Điều khoản sử dụng",
+  "loginTermsAnd": " và ",
+  "loginPrivacy": "Chính sách dữ liệu",
+  "loginTermsSuffix": " của TeachHub.",
+  "heroTeacher": "Thầy cô",
+  "heroStudent": "Học trò",
+  "heroFamily": "Gia đình",
+  "heroAttended": "Đã điểm danh",
+  "heroInvoiceSent": "Hóa đơn đã gửi",
+  "heroAbsenceReported": "Đã báo vắng",
+  "otpTitle": "Xác thực email",
+  "otpHeading": "Nhập mã xác thực",
+  "otpSentTo": "Mã 6 số đã gửi tới {email}",
+  "@otpSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "otpCodeLabel": "Mã xác thực 6 số",
+  "otpConfirm": "Xác nhận",
+  "otpVerifying": "Đang xác thực…",
+  "otpResendIn": "Gửi lại mã sau {time}",
+  "@otpResendIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "otpInvalid": "Mã chưa đúng.",
+  "otpInvalidAttempts": "Mã chưa đúng. Còn {count} lần thử.",
+  "@otpInvalidAttempts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "otpLockedTitle": "Nhập sai 5 lần",
+  "otpLockedBody": "Xác thực tạm khóa 15 phút để bảo vệ tài khoản.",
+  "otpRetryIn": "Thử lại sau {time}",
+  "@otpRetryIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "otpLocked": "Tạm khóa",
+  "roleIntro": "Chọn để TeachHub hiện đúng những gì bạn cần. Bạn có thể thêm vai trò khác sau.",
+  "roleTeacherDesc": "Quản lý lớp, điểm danh, thu học phí",
+  "roleParentDesc": "Theo dõi việc học của con, đóng học phí",
+  "roleStudentDesc": "Xem lịch, nộp bài, xem điểm",
+  "roleCenterOwner": "Chủ trung tâm",
+  "roleCenterOwnerDesc": "Quản lý nhiều giáo viên, nhiều lớp",
+  "roleComingSoon": "Sắp ra mắt",
+  "roleSelected": "Đã chọn",
+  "roleOwned": "Đang có",
+  "roleContinue": "Tiếp tục"
 }

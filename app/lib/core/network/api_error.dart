@@ -8,3 +8,12 @@ String? apiErrorCode(Object? error) {
   if (data is Map && data['code'] is String) return data['code'] as String;
   return null;
 }
+
+/// `details` trong body lỗi (vd. `retryAfterSec` của 429 `OTP_LOCKED`), hoặc
+/// map rỗng khi không có.
+Map<String, Object?> apiErrorDetails(Object? error) {
+  if (error is! DioException) return const {};
+  final data = error.response?.data;
+  final details = data is Map ? data['details'] : null;
+  return details is Map ? details.cast<String, Object?>() : const {};
+}

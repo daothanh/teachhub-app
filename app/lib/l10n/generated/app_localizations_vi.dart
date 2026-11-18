@@ -15,23 +15,17 @@ class AppLocalizationsVi extends AppLocalizations {
   String get retry => 'Thử lại';
 
   @override
-  String get loginSubtitle =>
-      'Đăng nhập bằng email, Google hoặc Apple. Không cần mật khẩu.';
-
-  @override
   String get loginEmail => 'Email';
 
   @override
-  String get loginEmailHint => 'ban@example.com';
+  String get loginEmailHint => 'ten@email.com';
 
   @override
-  String get loginEmailInvalid => 'Email chưa đúng định dạng.';
+  String get loginEmailInvalid =>
+      'Email chưa đúng định dạng, ví dụ: ten@gmail.com';
 
   @override
   String get loginSendOtp => 'Gửi mã đăng nhập';
-
-  @override
-  String get loginOr => 'hoặc';
 
   @override
   String get loginGoogle => 'Tiếp tục với Google';
@@ -40,26 +34,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loginApple => 'Tiếp tục với Apple';
 
   @override
-  String loginOtpSentTo(String email) {
-    return 'Nhập mã 6 số đã gửi tới $email';
-  }
-
-  @override
-  String get loginOtpCode => 'Mã đăng nhập';
-
-  @override
   String get loginResend => 'Gửi lại mã';
 
   @override
-  String loginResendIn(int seconds) {
-    return 'Gửi lại mã sau $seconds giây';
-  }
-
-  @override
   String get loginChangeEmail => 'Đổi email';
-
-  @override
-  String get loginOtpInvalid => 'Mã đăng nhập không đúng hoặc đã hết hạn.';
 
   @override
   String get loginRateLimited =>
@@ -72,16 +50,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get splashLoadFailed => 'Không tải được vai trò của bạn.';
 
   @override
-  String get roleTitle => 'Vai trò';
-
-  @override
-  String get roleYours => 'Vai trò của bạn';
-
-  @override
   String get roleWhoAreYou => 'Bạn là…?';
-
-  @override
-  String get roleAdd => 'Thêm vai trò';
 
   @override
   String get roleTeacher => 'Giáo viên';
@@ -194,5 +163,128 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loading => 'Đang tải...';
 
   @override
-  String get login => 'Đăng nhập';
+  String get loginSlogan => 'Kết nối thầy, trò và gia đình.';
+
+  @override
+  String get loginTagline => 'Quản lý lớp dạy thêm thật đơn giản.';
+
+  @override
+  String get loginOrEmail => 'hoặc dùng email';
+
+  @override
+  String get loginEmailHelper => 'Chúng tôi gửi mã 6 số, không cần mật khẩu.';
+
+  @override
+  String get loginSending => 'Đang gửi mã…';
+
+  @override
+  String get loginTermsPrefix => 'Tiếp tục nghĩa là bạn đồng ý với ';
+
+  @override
+  String get loginTerms => 'Điều khoản sử dụng';
+
+  @override
+  String get loginTermsAnd => ' và ';
+
+  @override
+  String get loginPrivacy => 'Chính sách dữ liệu';
+
+  @override
+  String get loginTermsSuffix => ' của TeachHub.';
+
+  @override
+  String get heroTeacher => 'Thầy cô';
+
+  @override
+  String get heroStudent => 'Học trò';
+
+  @override
+  String get heroFamily => 'Gia đình';
+
+  @override
+  String get heroAttended => 'Đã điểm danh';
+
+  @override
+  String get heroInvoiceSent => 'Hóa đơn đã gửi';
+
+  @override
+  String get heroAbsenceReported => 'Đã báo vắng';
+
+  @override
+  String get otpTitle => 'Xác thực email';
+
+  @override
+  String get otpHeading => 'Nhập mã xác thực';
+
+  @override
+  String otpSentTo(String email) {
+    return 'Mã 6 số đã gửi tới $email';
+  }
+
+  @override
+  String get otpCodeLabel => 'Mã xác thực 6 số';
+
+  @override
+  String get otpConfirm => 'Xác nhận';
+
+  @override
+  String get otpVerifying => 'Đang xác thực…';
+
+  @override
+  String otpResendIn(String time) {
+    return 'Gửi lại mã sau $time';
+  }
+
+  @override
+  String get otpInvalid => 'Mã chưa đúng.';
+
+  @override
+  String otpInvalidAttempts(int count) {
+    return 'Mã chưa đúng. Còn $count lần thử.';
+  }
+
+  @override
+  String get otpLockedTitle => 'Nhập sai 5 lần';
+
+  @override
+  String get otpLockedBody => 'Xác thực tạm khóa 15 phút để bảo vệ tài khoản.';
+
+  @override
+  String otpRetryIn(String time) {
+    return 'Thử lại sau $time';
+  }
+
+  @override
+  String get otpLocked => 'Tạm khóa';
+
+  @override
+  String get roleIntro =>
+      'Chọn để TeachHub hiện đúng những gì bạn cần. Bạn có thể thêm vai trò khác sau.';
+
+  @override
+  String get roleTeacherDesc => 'Quản lý lớp, điểm danh, thu học phí';
+
+  @override
+  String get roleParentDesc => 'Theo dõi việc học của con, đóng học phí';
+
+  @override
+  String get roleStudentDesc => 'Xem lịch, nộp bài, xem điểm';
+
+  @override
+  String get roleCenterOwner => 'Chủ trung tâm';
+
+  @override
+  String get roleCenterOwnerDesc => 'Quản lý nhiều giáo viên, nhiều lớp';
+
+  @override
+  String get roleComingSoon => 'Sắp ra mắt';
+
+  @override
+  String get roleSelected => 'Đã chọn';
+
+  @override
+  String get roleOwned => 'Đang có';
+
+  @override
+  String get roleContinue => 'Tiếp tục';
 }
