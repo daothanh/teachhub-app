@@ -26,7 +26,11 @@ class _TeacherHomePageState extends State<TeacherHomePage> {
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.spaceTitle)),
+      appBar: AppBar(
+        // Chip vai trò của shell (C20, mở T00); chạy riêng mini-app thì hiện tên không gian.
+        title: RoleSwitcherScope.chipOf(context) ?? Text(l10n.spaceTitle),
+        centerTitle: false,
+      ),
       body: Column(
         children: [
           StreamBuilder<bool>(

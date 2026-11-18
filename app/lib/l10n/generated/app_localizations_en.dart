@@ -298,4 +298,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateAction => 'Update';
+
+  @override
+  String get roleSwitchTitle => 'Switch role';
+
+  @override
+  String get roleAdd => 'Add a role';
+
+  @override
+  String roleSwitchedTo(String role) {
+    return 'Now in the $role role';
+  }
 }
