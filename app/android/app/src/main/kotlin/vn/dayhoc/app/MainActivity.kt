@@ -1,4 +1,4 @@
-package vn.com.tasco.teachhub
+package vn.dayhoc.app
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

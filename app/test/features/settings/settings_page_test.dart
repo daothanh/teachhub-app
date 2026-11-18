@@ -140,7 +140,7 @@ void main() {
     GetIt.I.registerSingleton<PackageInfo>(
       PackageInfo(
         appName: 'TeachHub',
-        packageName: 'vn.com.tasco.teachhub',
+        packageName: 'vn.dayhoc.app',
         version: '1.2.3',
         buildNumber: '1',
       ),

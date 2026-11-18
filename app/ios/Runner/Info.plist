@@ -74,7 +74,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>vn.com.tasco.teachhub</string>
+			<string>vn.dayhoc.app</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>teachhub</string>
