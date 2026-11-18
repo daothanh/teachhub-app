@@ -32,7 +32,7 @@ void main() {
   test('bo góc và khoảng cách theo DS · Spacing & Size (lưới 4pt)', () {
     final t = light.extension<TascoThemeExtension>()!;
     expect(t.buttonRadius, 10);
-    expect(t.fieldRadius, 10);
+    expect(t.fieldRadius, 8);
     expect(t.sheetRadius, 20);
     expect(t.spacingPage, 16);
     expect(t.spacingContent, 12);
