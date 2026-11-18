@@ -31,7 +31,7 @@ class SettingsPage extends StatelessWidget {
           icon: AppSvgIcon(
             AppIcons.arrowLeft,
             size: 18.sp,
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           onPressed: () => context.canPop()
@@ -103,11 +103,10 @@ class _SectionHeader extends StatelessWidget {
         SizedBox(width: 8.w),
         Text(
           title,
-          style: TextStyle(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w600,
-            color: primary,
-            letterSpacing: 0.4,
+          // TeachHub/Section: 12/16, đậm, chữ phụ.
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
       ],
@@ -126,12 +125,14 @@ class _SettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    // DS: card phân tầng bằng viền, không đổ bóng (elevation chỉ cho lớp nổi).
     return Material(
       color: scheme.surface,
-      borderRadius: BorderRadius.circular(12.r),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(context.tasco.cardRadius),
+        side: BorderSide(color: scheme.outlineVariant),
+      ),
       clipBehavior: Clip.antiAlias,
-      elevation: isDark ? 0 : 1,
-      shadowColor: isDark ? Colors.transparent : Colors.black.withAlpha(20),
       child: Column(children: children),
     );
   }
@@ -162,7 +163,7 @@ class _BiometricTile extends StatelessWidget {
             : l10n.settingsBiometricSubtitleAvailable;
 
         final subtitleColor = available && !enrolled
-            ? Colors.orange.shade700
+            ? context.tasco.warningColor
             : scheme.onSurfaceVariant;
 
         return _SettingsCard(
@@ -172,16 +173,18 @@ class _BiometricTile extends StatelessWidget {
               key: const Key('biometric_switch'),
               secondary: AppSvgIcon(
                 AppIcons.fingerprint,
-                color: available ? scheme.primary : scheme.onSurfaceVariant,
+                color: available ? scheme.onSurface : scheme.onSurfaceVariant,
                 size: 28.sp,
               ),
               title: Text(
                 l10n.settingsBiometricTitle,
-                style: TextStyle(fontSize: 14.sp, color: scheme.onSurface),
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
               subtitle: Text(
                 subtitle,
-                style: TextStyle(fontSize: 12.sp, color: subtitleColor),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: subtitleColor),
               ),
               value: enabled,
               onChanged: available && enrolled
@@ -329,7 +332,7 @@ class _ThemeSection extends StatelessWidget {
                 leading: AppSvgIcon(
                   themes[i].iconPath,
                   color: currentMode == themes[i].mode
-                      ? scheme.primary
+                      ? scheme.onSurface
                       : scheme.onSurfaceVariant,
                   size: 22.sp,
                 ),
@@ -377,7 +380,7 @@ class _OptionTile extends StatelessWidget {
         label,
         style: textTheme.bodyMedium?.copyWith(
           fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-          color: selected ? scheme.primary : scheme.onSurface,
+          color: scheme.onSurface,
         ),
       ),
       trailing: AnimatedSwitcher(
@@ -385,7 +388,7 @@ class _OptionTile extends StatelessWidget {
         child: selected
             ? AppSvgIcon(
                 AppIcons.checkCircle,
-                color: scheme.primary,
+                color: scheme.onSurface,
                 size: 20.sp,
                 key: const ValueKey('checked'),
               )
@@ -424,9 +427,9 @@ class _AboutSection extends StatelessWidget {
         Env.production => 'Production',
       };
       envColor = switch (env.current) {
-        Env.development => Colors.orange,
-        Env.staging => Colors.blue,
-        Env.production => scheme.primary,
+        Env.development => context.tasco.warningColor,
+        Env.staging => context.tasco.infoColor,
+        Env.production => context.tasco.successColor,
       };
     } catch (_) {
       envLabel = '—';
@@ -453,7 +456,7 @@ class _AboutSection extends StatelessWidget {
         ListTile(
           leading: AppSvgIcon(
             AppIcons.network,
-            color: scheme.primary,
+            color: scheme.onSurface,
             size: 20.sp,
           ),
           title: Text(
@@ -463,16 +466,16 @@ class _AboutSection extends StatelessWidget {
           trailing: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             decoration: BoxDecoration(
-              color: envColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(12),
+              color: envColor.withValues(
+                alpha: context.tasco.statusTintOpacity,
+              ),
+              borderRadius: BorderRadius.circular(context.tasco.pillRadius),
             ),
             child: Text(
               envLabel,
-              style: TextStyle(
-                fontSize: 12.sp,
-                fontWeight: FontWeight.w600,
-                color: envColor,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.labelMedium?.copyWith(color: envColor),
             ),
           ),
         ),
@@ -480,7 +483,7 @@ class _AboutSection extends StatelessWidget {
         ListTile(
           leading: AppSvgIcon(
             AppIcons.document,
-            color: scheme.primary,
+            color: scheme.onSurface,
             size: 20.sp,
           ),
           title: Text(
@@ -520,7 +523,7 @@ class _AboutTile extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return ListTile(
-      leading: AppSvgIcon(iconPath, color: scheme.primary, size: 20.sp),
+      leading: AppSvgIcon(iconPath, color: scheme.onSurface, size: 20.sp),
       title: Text(
         label,
         style: textTheme.bodyMedium?.copyWith(color: scheme.onSurface),

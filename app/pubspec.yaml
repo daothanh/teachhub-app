@@ -113,6 +113,21 @@ flutter:
     # Bundled so the Shorebird engine can read the app id (ADR-0017 / P1-6).
     - shorebird.yaml
 
+    # Token TeachHub ghi đè preset Tasco (lib/core/theme/teachhub_theme.dart).
+    - assets/tokens/teachhub.tokens.json
+
+  # Inter 4.1 (rsms/inter, SIL OFL 1.1 — assets/fonts/inter/OFL.txt), font của Figma DS.
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/inter/Inter-Regular.ttf
+        - asset: assets/fonts/inter/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/inter/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/inter/Inter-Bold.ttf
+          weight: 700
+
 # Bản SQLite có mã hóa (SQLite3MultipleCiphers) cho CSDL ngoại tuyến của
 # mini-app teacher — docs/adr/0001-encrypted-local-database.md.
 hooks:

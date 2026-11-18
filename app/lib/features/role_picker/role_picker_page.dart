@@ -51,7 +51,7 @@ class RolePickerPage extends StatelessWidget {
             actions: [
               IconButton(
                 tooltip: l10n.settings,
-                icon: const Icon(Icons.settings_outlined),
+                icon: const Icon(TeachHubIcons.gear),
                 onPressed: () => context.push(AppRoutes.settings),
               ),
             ],
@@ -67,7 +67,7 @@ class RolePickerPage extends StatelessWidget {
                     title: Text(roleName(l10n, m.role)),
                     subtitle: m.label.isEmpty ? null : Text(m.label),
                     selected: m == state.active,
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: const Icon(TeachHubIcons.caretRight),
                     onTap: busy
                         ? null
                         : () async {

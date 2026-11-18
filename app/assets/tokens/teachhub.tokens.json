@@ -1,0 +1,99 @@
+{
+  "$description": "TeachHub — token ghi đè lên preset Tasco (TascoTokenOverlay, ADR-0043 của tasco_ui_kit). Nguồn: Figma kOMrSBbbMkgGSBTNnFV72z, collection DS · Color mode \"Brand\" + DS · Spacing & Size. Chữ trên nền lime luôn #1F1F1F; chữ/viền mảnh dùng lime/800 #4F7300 (lime/500 trên nền trắng chỉ 1.2:1). DS chưa có mode Dark: dark chỉ đổi màu thương hiệu.",
+  "core": {
+    "$type": "color",
+    "color": {
+      "lime500": { "$value": "#BDFF3E" },
+      "lime800": { "$value": "#4F7300" },
+      "lime50": { "$value": "#F7FFE6" },
+      "ink": { "$value": "#1F1F1F" },
+      "textSecondary": { "$value": "#555555" },
+      "placeholder": { "$value": "#6B6B6B" },
+      "borderDefault": { "$value": "#CFCFCF" },
+      "borderSubtle": { "$value": "#E5E5E5" },
+      "bgSubtle": { "$value": "#F4F4F4" },
+      "bgMuted": { "$value": "#EFEFEF" },
+      "white": { "$value": "#FFFFFF" },
+      "success": { "$value": "#047857" },
+      "successBg": { "$value": "#ECFDF5" },
+      "warning": { "$value": "#A15C07" },
+      "error": { "$value": "#A31F1F" },
+      "errorBorder": { "$value": "#C62828" }
+    }
+  },
+  "shared": {
+    "tasco": {
+      "cardRadius": { "$type": "dimension", "$value": 10 },
+      "buttonRadius": { "$type": "dimension", "$value": 10 },
+      "fieldRadius": { "$type": "dimension", "$value": 10 },
+      "controlRadius": { "$type": "dimension", "$value": 8 },
+      "dialogRadius": { "$type": "dimension", "$value": 16 },
+      "sheetRadius": { "$type": "dimension", "$value": 20 },
+      "tagRadius": { "$type": "dimension", "$value": 999 },
+      "badgeRadius": { "$type": "dimension", "$value": 999 },
+      "pillRadius": { "$type": "dimension", "$value": 999 },
+      "checkboxRadius": { "$type": "dimension", "$value": 3 },
+      "spacingInline": { "$type": "dimension", "$value": 4 },
+      "spacingControl": { "$type": "dimension", "$value": 8 },
+      "spacingContent": { "$type": "dimension", "$value": 12 },
+      "spacingSection": { "$type": "dimension", "$value": 24 },
+      "spacingPage": { "$type": "dimension", "$value": 16 },
+      "spacingPageLarge": { "$type": "dimension", "$value": 24 },
+      "focusRingWidth": { "$type": "dimension", "$value": 2 },
+      "buttonElevation": { "$type": "number", "$value": 0 },
+      "appBarElevation": { "$type": "number", "$value": 0 }
+    }
+  },
+  "light": {
+    "colorScheme": {
+      "$type": "color",
+      "primary": { "$value": "{core.color.lime500}" },
+      "onPrimary": { "$value": "{core.color.ink}" },
+      "primaryContainer": { "$value": "{core.color.lime50}" },
+      "onPrimaryContainer": { "$value": "{core.color.ink}" },
+      "secondary": { "$value": "{core.color.lime800}" },
+      "onSecondary": { "$value": "{core.color.white}" },
+      "error": { "$value": "{core.color.errorBorder}" },
+      "onErrorContainer": { "$value": "{core.color.error}" },
+      "surface": { "$value": "{core.color.white}" },
+      "onSurface": { "$value": "{core.color.ink}" },
+      "onSurfaceVariant": { "$value": "{core.color.textSecondary}" },
+      "surfaceContainerLow": { "$value": "{core.color.bgSubtle}" },
+      "surfaceContainerHighest": { "$value": "{core.color.bgMuted}" },
+      "outline": { "$value": "{core.color.ink}" },
+      "outlineVariant": { "$value": "{core.color.borderDefault}" },
+      "inverseSurface": { "$value": "{core.color.ink}" },
+      "surfaceTint": { "$value": "{core.color.white}" }
+    },
+    "theme": {
+      "$type": "color",
+      "scaffoldBackground": { "$value": "{core.color.white}" },
+      "divider": { "$value": "{core.color.borderSubtle}" }
+    },
+    "tasco": {
+      "$type": "color",
+      "primaryColor": { "$value": "{core.color.lime500}" },
+      "successColor": { "$value": "{core.color.success}" },
+      "warningColor": { "$value": "{core.color.warning}" },
+      "infoColor": { "$value": "{core.color.ink}" },
+      "placeholderColor": { "$value": "{core.color.placeholder}" },
+      "sectionHeaderBackground": { "$value": "{core.color.bgSubtle}" },
+      "sectionHeaderForeground": { "$value": "{core.color.ink}" },
+      "focusRingColor": { "$value": "{core.color.lime800}" }
+    }
+  },
+  "dark": {
+    "colorScheme": {
+      "$type": "color",
+      "primary": { "$value": "{core.color.lime500}" },
+      "onPrimary": { "$value": "{core.color.ink}" },
+      "secondary": { "$value": "{core.color.lime500}" },
+      "onSecondary": { "$value": "{core.color.ink}" }
+    },
+    "tasco": {
+      "$type": "color",
+      "primaryColor": { "$value": "{core.color.lime500}" },
+      "focusRingColor": { "$value": "{core.color.lime500}" }
+    }
+  }
+}
