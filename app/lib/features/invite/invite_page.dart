@@ -36,7 +36,7 @@ class InvitePage extends StatelessWidget {
             subMessage: needsConsent
                 ? l10n.inviteConsentBody
                 : failed
-                ? (state.errorCode == 'NOT_FOUND'
+                ? (state.errorCode == ApiErrorCode.notFound
                       ? l10n.inviteInvalid
                       : l10n.inviteFailed)
                 : l10n.inviteBody,

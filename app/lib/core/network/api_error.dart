@@ -1,19 +1,17 @@
 import 'package:dio/dio.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
 
-/// Mã lỗi `code` trong body lỗi của TeachHub API (`{ code, message, ... }`,
-/// spec §5.6), hoặc `null` khi lỗi không đến từ API (mất mạng, timeout…).
-String? apiErrorCode(Object? error) {
+/// Lỗi gọi TeachHub API dưới dạng [ApiException] (spec §5.6): có phản hồi →
+/// đọc body `{ code, message, details?, errors?, requestId }`; không có phản hồi
+/// (mất mạng, timeout) → [ApiException.network]; lỗi khác không phải từ API → `null`.
+ApiException? apiException(Object? error) {
+  if (error is ApiException) return error;
   if (error is! DioException) return null;
-  final data = error.response?.data;
-  if (data is Map && data['code'] is String) return data['code'] as String;
-  return null;
-}
-
-/// `details` trong body lỗi (vd. `retryAfterSec` của 429 `OTP_LOCKED`), hoặc
-/// map rỗng khi không có.
-Map<String, Object?> apiErrorDetails(Object? error) {
-  if (error is! DioException) return const {};
-  final data = error.response?.data;
-  final details = data is Map ? data['details'] : null;
-  return details is Map ? details.cast<String, Object?>() : const {};
+  final response = error.response;
+  if (response == null) return const ApiException.network();
+  return ApiException.fromResponse(
+    response.statusCode,
+    response.data,
+    retryAfterHeader: response.headers.value('retry-after'),
+  );
 }

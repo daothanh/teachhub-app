@@ -136,17 +136,17 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onLoginFailed(Object? error) {
-    switch (apiErrorCode(error)) {
-      case 'OTP_INVALID':
-        final left = apiErrorDetails(error)['attemptsLeft'];
+    final e = apiException(error);
+    switch (e?.code) {
+      case ApiErrorCode.otpInvalid:
+        final left = e!.details['attemptsLeft'];
         setState(() {
           _codeInvalid = true;
           _attemptsLeft = left is int ? left : null;
         });
-      case 'OTP_LOCKED':
-        final retry = apiErrorDetails(error)['retryAfterSec'];
+      case ApiErrorCode.otpLocked:
         _lockTimer?.cancel();
-        _lockTimer = _countdown(retry is int ? retry : 15 * 60, (s) {
+        _lockTimer = _countdown(e!.retryAfter?.inSeconds ?? 15 * 60, (s) {
           _lockedFor = s;
           if (s <= 0) _code.clear();
         });
@@ -160,8 +160,8 @@ class _LoginPageState extends State<LoginPage> {
     ..showSnackBar(SnackBar(content: Text(message)));
 
   static String _errorMessage(AppLocalizations l10n, Object? error) =>
-      switch (apiErrorCode(error)) {
-        'RATE_LIMITED' => l10n.loginRateLimited,
+      switch (apiException(error)?.code) {
+        ApiErrorCode.rateLimited => l10n.loginRateLimited,
         _ => l10n.loginFailed,
       };
 

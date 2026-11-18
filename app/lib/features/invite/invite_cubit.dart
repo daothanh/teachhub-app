@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasco_utils/tasco_utils.dart';
 
+import 'package:teachhub_shared/teachhub_shared.dart';
+
 import '../../core/network/api_error.dart';
 import '../role_picker/membership_cubit.dart';
 
@@ -18,7 +20,7 @@ class InviteState extends Equatable {
   /// Có giá trị khi API trả `CONSENT_REQUIRED`: phiên bản điều khoản cần đồng
   /// ý trước khi nhận lời mời (FR-0.14).
   final String? consentTermsVersion;
-  final String? errorCode;
+  final ApiErrorCode? errorCode;
 
   @override
   List<Object?> get props => [statusAccept, consentTermsVersion, errorCode];
@@ -56,14 +58,15 @@ class InviteCubit extends Cubit<InviteState> {
       }
     } on DioException catch (e) {
       if (isClosed) return;
-      final code = apiErrorCode(e);
-      final details = (e.response?.data as Map?)?['details'];
+      final error = apiException(e);
+      final version = error?.details['termsVersion'];
       emit(
         InviteState(
           statusAccept: LoadingStatus.failure,
-          errorCode: code,
-          consentTermsVersion: code == 'CONSENT_REQUIRED' && details is Map
-              ? details['termsVersion'] as String?
+          errorCode: error?.code,
+          consentTermsVersion:
+              error?.code == ApiErrorCode.consentRequired && version is String
+              ? version
               : null,
         ),
       );
@@ -85,7 +88,7 @@ class InviteCubit extends Cubit<InviteState> {
         emit(
           InviteState(
             statusAccept: LoadingStatus.failure,
-            errorCode: apiErrorCode(e),
+            errorCode: apiException(e)?.code,
           ),
         );
       }
