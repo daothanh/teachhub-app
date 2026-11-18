@@ -25,7 +25,7 @@ Shell chỉ làm phần ghép nối, không chứa luật nghiệp vụ:
 | Header `x-request-id`, `x-client-info`, `Idempotency-Key` | `lib/core/network/teachhub_headers_interceptor.dart` |
 | Đăng nhập email OTP, Google, Apple (T01, T01a) | `lib/features/auth/` |
 | Vai trò: tải, chọn, thêm (T01c, T00) | `lib/features/role_picker/` |
-| Nhận lời mời `teachhub.vn/i/<token>` | `lib/features/invite/`, `lib/core/deep_link/` |
+| Nhận lời mời `dayhoc.app/i/<token>` | `lib/features/invite/`, `lib/core/deep_link/` |
 | Router và guard (đăng nhập → vai trò → quyền theo vai trò) | `lib/core/routing/app_router.dart` |
 
 ## Chạy

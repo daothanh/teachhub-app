@@ -8,8 +8,8 @@ void main() {
     'invite links over https and the custom scheme open /invite/<token>',
     () {
       for (final link in [
-        'https://teachhub.vn/i/Ab3_x-9',
-        'https://www.teachhub.vn/i/Ab3_x-9/',
+        'https://dayhoc.app/i/Ab3_x-9',
+        'https://www.dayhoc.app/i/Ab3_x-9/',
         'teachhub://i/Ab3_x-9',
       ]) {
         final target = resolver.resolve(Uri.parse(link));
@@ -22,9 +22,9 @@ void main() {
   test('foreign hosts, old tasco:// links and unknown paths are ignored', () {
     for (final link in [
       'https://evil.example/i/abc',
-      'http://teachhub.vn/i/abc',
+      'http://dayhoc.app/i/abc',
       'tasco://i/abc',
-      'https://teachhub.vn/i/a/b',
+      'https://dayhoc.app/i/a/b',
       'teachhub://unknown/route',
     ]) {
       expect(resolver.resolve(Uri.parse(link)), isNull, reason: link);

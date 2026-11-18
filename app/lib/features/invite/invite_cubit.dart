@@ -26,7 +26,7 @@ class InviteState extends Equatable {
   List<Object?> get props => [statusAccept, consentTermsVersion, errorCode];
 }
 
-/// Nhận lời mời từ link `teachhub.vn/i/<token>` (spec §5.2c).
+/// Nhận lời mời từ link `dayhoc.app/i/<token>` (spec §5.2c).
 class InviteCubit extends Cubit<InviteState> {
   InviteCubit({
     required Dio api,

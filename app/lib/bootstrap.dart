@@ -137,7 +137,7 @@ Future<void> bootstrap({required Env env}) async {
     );
   }
 
-  // 8. Deep link teachhub.vn / teachhub:// (spec §2.11 G3).
+  // 8. Deep link dayhoc.app / teachhub:// (spec §2.11 G3).
   final resolver = TeachHubDeepLinkResolver(
     moduleResolver: (path) {
       final match = moduleManager.resolveDeepLink(path);

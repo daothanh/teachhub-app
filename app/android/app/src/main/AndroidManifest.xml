@@ -18,7 +18,7 @@
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
             <!-- app_links xử lý deep link; tắt cơ chế mặc định của Flutter để
-                 GoRouter không nhận URL thô (teachhub.vn/i/...). -->
+                 GoRouter không nhận URL thô (dayhoc.app/i/...). -->
             <meta-data
               android:name="flutter_deeplinking_enabled"
               android:value="false" />
@@ -37,12 +37,12 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="teachhub"/>
             </intent-filter>
-            <!-- App link: https://teachhub.vn/i/<token>; needs /.well-known/assetlinks.json on teachhub.vn -->
+            <!-- App link: https://dayhoc.app/i/<token>; needs /.well-known/assetlinks.json on dayhoc.app -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
-                <data android:scheme="https" android:host="teachhub.vn" android:pathPrefix="/i/"/>
+                <data android:scheme="https" android:host="dayhoc.app" android:pathPrefix="/i/"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

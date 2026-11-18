@@ -63,12 +63,12 @@ nhưng đăng nhập Google trên iOS sẽ không hoạt động. Android dùng 
 
 ## Sign in with Apple, deep link, universal/app link
 
-- Entitlements: `ios/Runner/Runner.entitlements` (`applinks:teachhub.vn`, Sign in with Apple).
+- Entitlements: `ios/Runner/Runner.entitlements` (`applinks:dayhoc.app`, Sign in with Apple).
   App ID trên Apple Developer phải bật Associated Domains và Sign in with Apple cho cả 3 bundle id.
 - Deep link: `teachhub://...` (Android + iOS).
-- Universal/App link: `https://teachhub.vn/i/<token>`. Web app teachhub.vn phải phục vụ:
-  - `https://teachhub.vn/.well-known/apple-app-site-association` (appID `BACYKSGK57.vn.dayhoc.app[.dev|.stg]`, path `/i/*`)
-  - `https://teachhub.vn/.well-known/assetlinks.json` (package name từng flavor + SHA-256 của chứng chỉ ký)
+- Universal/App link: `https://dayhoc.app/i/<token>`. Domain `dayhoc.app` (teachhub-web, Technical Spec A4) phải phục vụ:
+  - `https://dayhoc.app/.well-known/apple-app-site-association` (appID `BACYKSGK57.vn.dayhoc.app[.dev|.stg]`, path `/i/*`)
+  - `https://dayhoc.app/.well-known/assetlinks.json` (package name từng flavor + SHA-256 của chứng chỉ ký)
 
 ## Push (iOS)
 
