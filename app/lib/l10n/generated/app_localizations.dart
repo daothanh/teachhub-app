@@ -110,12 +110,6 @@ abstract class AppLocalizations {
   /// **'Thử lại'**
   String get retry;
 
-  /// No description provided for @loginSubtitle.
-  ///
-  /// In vi, this message translates to:
-  /// **'Đăng nhập bằng email, Google hoặc Apple. Không cần mật khẩu.'**
-  String get loginSubtitle;
-
   /// No description provided for @loginEmail.
   ///
   /// In vi, this message translates to:
@@ -125,13 +119,13 @@ abstract class AppLocalizations {
   /// No description provided for @loginEmailHint.
   ///
   /// In vi, this message translates to:
-  /// **'ban@example.com'**
+  /// **'ten@email.com'**
   String get loginEmailHint;
 
   /// No description provided for @loginEmailInvalid.
   ///
   /// In vi, this message translates to:
-  /// **'Email chưa đúng định dạng.'**
+  /// **'Email chưa đúng định dạng, ví dụ: ten@gmail.com'**
   String get loginEmailInvalid;
 
   /// No description provided for @loginSendOtp.
@@ -139,12 +133,6 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Gửi mã đăng nhập'**
   String get loginSendOtp;
-
-  /// No description provided for @loginOr.
-  ///
-  /// In vi, this message translates to:
-  /// **'hoặc'**
-  String get loginOr;
 
   /// No description provided for @loginGoogle.
   ///
@@ -158,41 +146,17 @@ abstract class AppLocalizations {
   /// **'Tiếp tục với Apple'**
   String get loginApple;
 
-  /// No description provided for @loginOtpSentTo.
-  ///
-  /// In vi, this message translates to:
-  /// **'Nhập mã 6 số đã gửi tới {email}'**
-  String loginOtpSentTo(String email);
-
-  /// No description provided for @loginOtpCode.
-  ///
-  /// In vi, this message translates to:
-  /// **'Mã đăng nhập'**
-  String get loginOtpCode;
-
   /// No description provided for @loginResend.
   ///
   /// In vi, this message translates to:
   /// **'Gửi lại mã'**
   String get loginResend;
 
-  /// No description provided for @loginResendIn.
-  ///
-  /// In vi, this message translates to:
-  /// **'Gửi lại mã sau {seconds} giây'**
-  String loginResendIn(int seconds);
-
   /// No description provided for @loginChangeEmail.
   ///
   /// In vi, this message translates to:
   /// **'Đổi email'**
   String get loginChangeEmail;
-
-  /// No description provided for @loginOtpInvalid.
-  ///
-  /// In vi, this message translates to:
-  /// **'Mã đăng nhập không đúng hoặc đã hết hạn.'**
-  String get loginOtpInvalid;
 
   /// No description provided for @loginRateLimited.
   ///
@@ -212,29 +176,11 @@ abstract class AppLocalizations {
   /// **'Không tải được vai trò của bạn.'**
   String get splashLoadFailed;
 
-  /// No description provided for @roleTitle.
-  ///
-  /// In vi, this message translates to:
-  /// **'Vai trò'**
-  String get roleTitle;
-
-  /// No description provided for @roleYours.
-  ///
-  /// In vi, this message translates to:
-  /// **'Vai trò của bạn'**
-  String get roleYours;
-
   /// No description provided for @roleWhoAreYou.
   ///
   /// In vi, this message translates to:
   /// **'Bạn là…?'**
   String get roleWhoAreYou;
-
-  /// No description provided for @roleAdd.
-  ///
-  /// In vi, this message translates to:
-  /// **'Thêm vai trò'**
-  String get roleAdd;
 
   /// No description provided for @roleTeacher.
   ///
@@ -446,11 +392,239 @@ abstract class AppLocalizations {
   /// **'Đang tải...'**
   String get loading;
 
-  /// No description provided for @login.
+  /// No description provided for @loginSlogan.
   ///
   /// In vi, this message translates to:
-  /// **'Đăng nhập'**
-  String get login;
+  /// **'Kết nối thầy, trò và gia đình.'**
+  String get loginSlogan;
+
+  /// No description provided for @loginTagline.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quản lý lớp dạy thêm thật đơn giản.'**
+  String get loginTagline;
+
+  /// No description provided for @loginOrEmail.
+  ///
+  /// In vi, this message translates to:
+  /// **'hoặc dùng email'**
+  String get loginOrEmail;
+
+  /// No description provided for @loginEmailHelper.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chúng tôi gửi mã 6 số, không cần mật khẩu.'**
+  String get loginEmailHelper;
+
+  /// No description provided for @loginSending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang gửi mã…'**
+  String get loginSending;
+
+  /// No description provided for @loginTermsPrefix.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục nghĩa là bạn đồng ý với '**
+  String get loginTermsPrefix;
+
+  /// No description provided for @loginTerms.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điều khoản sử dụng'**
+  String get loginTerms;
+
+  /// No description provided for @loginTermsAnd.
+  ///
+  /// In vi, this message translates to:
+  /// **' và '**
+  String get loginTermsAnd;
+
+  /// No description provided for @loginPrivacy.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chính sách dữ liệu'**
+  String get loginPrivacy;
+
+  /// No description provided for @loginTermsSuffix.
+  ///
+  /// In vi, this message translates to:
+  /// **' của TeachHub.'**
+  String get loginTermsSuffix;
+
+  /// No description provided for @heroTeacher.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thầy cô'**
+  String get heroTeacher;
+
+  /// No description provided for @heroStudent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học trò'**
+  String get heroStudent;
+
+  /// No description provided for @heroFamily.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gia đình'**
+  String get heroFamily;
+
+  /// No description provided for @heroAttended.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã điểm danh'**
+  String get heroAttended;
+
+  /// No description provided for @heroInvoiceSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn đã gửi'**
+  String get heroInvoiceSent;
+
+  /// No description provided for @heroAbsenceReported.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã báo vắng'**
+  String get heroAbsenceReported;
+
+  /// No description provided for @otpTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác thực email'**
+  String get otpTitle;
+
+  /// No description provided for @otpHeading.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập mã xác thực'**
+  String get otpHeading;
+
+  /// No description provided for @otpSentTo.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã 6 số đã gửi tới {email}'**
+  String otpSentTo(String email);
+
+  /// No description provided for @otpCodeLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã xác thực 6 số'**
+  String get otpCodeLabel;
+
+  /// No description provided for @otpConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác nhận'**
+  String get otpConfirm;
+
+  /// No description provided for @otpVerifying.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang xác thực…'**
+  String get otpVerifying;
+
+  /// No description provided for @otpResendIn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi lại mã sau {time}'**
+  String otpResendIn(String time);
+
+  /// No description provided for @otpInvalid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã chưa đúng.'**
+  String get otpInvalid;
+
+  /// No description provided for @otpInvalidAttempts.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã chưa đúng. Còn {count} lần thử.'**
+  String otpInvalidAttempts(int count);
+
+  /// No description provided for @otpLockedTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập sai 5 lần'**
+  String get otpLockedTitle;
+
+  /// No description provided for @otpLockedBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác thực tạm khóa 15 phút để bảo vệ tài khoản.'**
+  String get otpLockedBody;
+
+  /// No description provided for @otpRetryIn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thử lại sau {time}'**
+  String otpRetryIn(String time);
+
+  /// No description provided for @otpLocked.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạm khóa'**
+  String get otpLocked;
+
+  /// No description provided for @roleIntro.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn để TeachHub hiện đúng những gì bạn cần. Bạn có thể thêm vai trò khác sau.'**
+  String get roleIntro;
+
+  /// No description provided for @roleTeacherDesc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quản lý lớp, điểm danh, thu học phí'**
+  String get roleTeacherDesc;
+
+  /// No description provided for @roleParentDesc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Theo dõi việc học của con, đóng học phí'**
+  String get roleParentDesc;
+
+  /// No description provided for @roleStudentDesc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem lịch, nộp bài, xem điểm'**
+  String get roleStudentDesc;
+
+  /// No description provided for @roleCenterOwner.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chủ trung tâm'**
+  String get roleCenterOwner;
+
+  /// No description provided for @roleCenterOwnerDesc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quản lý nhiều giáo viên, nhiều lớp'**
+  String get roleCenterOwnerDesc;
+
+  /// No description provided for @roleComingSoon.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sắp ra mắt'**
+  String get roleComingSoon;
+
+  /// No description provided for @roleSelected.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã chọn'**
+  String get roleSelected;
+
+  /// No description provided for @roleOwned.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang có'**
+  String get roleOwned;
+
+  /// No description provided for @roleContinue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục'**
+  String get roleContinue;
 }
 
 class _AppLocalizationsDelegate

@@ -25,7 +25,7 @@
     "tasco": {
       "cardRadius": { "$type": "dimension", "$value": 10 },
       "buttonRadius": { "$type": "dimension", "$value": 10 },
-      "fieldRadius": { "$type": "dimension", "$value": 10 },
+      "fieldRadius": { "$type": "dimension", "$value": 8 },
       "controlRadius": { "$type": "dimension", "$value": 8 },
       "dialogRadius": { "$type": "dimension", "$value": 16 },
       "sheetRadius": { "$type": "dimension", "$value": 20 },

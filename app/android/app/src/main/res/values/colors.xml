@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- brand/logo (Figma DS) — cố định ở mọi mode; splash B00a/B00b. -->
+    <color name="brand_logo">#BDFF3E</color>
+</resources>

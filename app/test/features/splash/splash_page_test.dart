@@ -51,13 +51,20 @@ Future<_Cubit> _pump(WidgetTester tester, MembershipState state) async {
 }
 
 void main() {
-  testWidgets('shows the app name and a loader while loading', (tester) async {
+  testWidgets('B00a: mark, tên app và khẩu hiệu trên nền thương hiệu', (
+    tester,
+  ) async {
     await _pump(
       tester,
       const MembershipState(statusLoad: LoadingStatus.loading),
     );
     expect(find.text('TeachHub'), findsOneWidget);
-    expect(find.byType(AppLoading), findsOneWidget);
+    expect(find.text('T'), findsOneWidget);
+    expect(
+      find.textContaining('Kết nối thầy, trò và gia đình.'),
+      findsOneWidget,
+    );
+    expect(find.text('Thử lại'), findsNothing);
   });
 
   testWidgets('a failed role load offers a retry', (tester) async {

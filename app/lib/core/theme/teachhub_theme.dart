@@ -40,7 +40,7 @@ abstract final class TeachHubTheme {
         sizes: TascoButtonSizes(
           md: TascoButtonSizeTheme(height: 48, textStyle: text.labelLarge),
           lg: TascoButtonSizeTheme(height: 48, textStyle: text.labelLarge),
-          sm: TascoButtonSizeTheme(height: 40, textStyle: _buttonSmall),
+          sm: TascoButtonSizeTheme(height: 40, textStyle: buttonSmall),
         ),
         variants: TascoButtonVariants(
           primary: light
@@ -61,6 +61,11 @@ abstract final class TeachHubTheme {
     // withTokens dựng lại component theme (app bar, input, nút…) theo chữ Inter.
     final base = AppTheme.withTokens(themed.copyWith(textTheme: text), tokens);
     return base.copyWith(
+      extensions: [
+        ...base.extensions.values,
+        const TeachHubColors(warningBorder: Color(0xFFF59E0B)),
+      ],
+      disabledColor: light ? _disabledFg : null,
       // Mặc định Material lấy `primary` (lime) cho chữ nút và vạch tiến trình — không đủ tương phản.
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
@@ -103,11 +108,12 @@ abstract final class TeachHubTheme {
   );
 
   /// `TeachHub/Button S` — 13/18/600.
-  static const _buttonSmall = TextStyle(
+  static const buttonSmall = TextStyle(
     fontFamily: fontFamily,
     fontSize: 13,
     height: 18 / 13,
     fontWeight: FontWeight.w600,
+    letterSpacing: 0,
   );
 
   static TextStyle _style(
@@ -120,6 +126,36 @@ abstract final class TeachHubTheme {
     fontSize: size,
     height: lineHeight / size,
     fontWeight: weight,
+    // Figma letterSpacing 0; không để Typography của Material chèn giá trị mặc định.
+    letterSpacing: 0,
     color: color,
   );
+}
+
+/// Màu DS không có slot trong `ColorScheme`/`TascoThemeExtension` (token riêng
+/// của app nên là extension riêng — README tasco_ui_kit). Chỉ thêm khi màn cần.
+@immutable
+class TeachHubColors extends ThemeExtension<TeachHubColors> {
+  const TeachHubColors({required this.warningBorder});
+
+  /// `status/warning/border` (amber/500) — viền thẻ "Sắp ra mắt".
+  final Color warningBorder;
+
+  @override
+  TeachHubColors copyWith({Color? warningBorder}) =>
+      TeachHubColors(warningBorder: warningBorder ?? this.warningBorder);
+
+  @override
+  TeachHubColors lerp(TeachHubColors? other, double t) => other == null
+      ? this
+      : TeachHubColors(
+          warningBorder: Color.lerp(warningBorder, other.warningBorder, t)!,
+        );
+}
+
+extension TeachHubColorsX on BuildContext {
+  /// Rơi về preset khi theme không có extension (test dùng `AppTheme.v1`).
+  TeachHubColors get teachHubColors =>
+      Theme.of(this).extension<TeachHubColors>() ??
+      TeachHubColors(warningBorder: tasco.warningColor);
 }
