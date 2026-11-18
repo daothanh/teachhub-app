@@ -52,3 +52,6 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed .
       - run: flutter analyze
       - run: flutter test
+      - name: Mini-app không import lẫn nhau (S0-FL-03)
+        if: matrix.package == 'app'
+        run: dart tool/check_miniapp_imports.dart
