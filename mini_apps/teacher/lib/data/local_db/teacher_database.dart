@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:drift/drift.dart';
@@ -20,6 +21,12 @@ class OutboxMutations extends Table {
   /// JSON của thay đổi.
   TextColumn get payload => text()();
   DateTimeColumn get clientUpdatedAt => dateTime()();
+
+  /// v2: số lần SyncEngine đã gửi thất bại (để giãn thời gian thử lại).
+  IntColumn get attemptCount => integer().withDefault(const Constant(0))();
+
+  /// v2: mã lỗi lần gửi gần nhất (không lưu body/PII).
+  TextColumn get lastError => text().nullable()();
 }
 
 /// CSDL cục bộ của mini-app `teacher`, mã hóa bằng SQLite3MultipleCiphers
@@ -29,7 +36,19 @@ class TeacherDatabase extends _$TeacherDatabase {
   TeacherDatabase(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  /// Chỉ thêm (expand), không xóa/đổi tên cột — giống quy ước migration backend.
+  /// Mỗi bước có test trong test/data/teacher_migration_test.dart.
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(outboxMutations, outboxMutations.attemptCount);
+        await m.addColumn(outboxMutations, outboxMutations.lastError);
+      }
+    },
+  );
 
   /// Mở `teacher.sqlite` với khóa 256-bit lấy từ [keyStore] (Keychain/
   /// Keystore), sinh khóa ở lần mở đầu.
@@ -45,6 +64,20 @@ class TeacherDatabase extends _$TeacherDatabase {
 }
 
 const _keyName = 'teacher.db_key';
+
+/// Xóa CSDL `teacher` (file + WAL/SHM/journal) và khóa của nó — dùng khi đăng
+/// xuất, sau khi outbox đã trống (spec §6.4). [dir] là thư mục drift_flutter
+/// lưu file (`getApplicationDocumentsDirectory()`). Phải đóng CSDL trước.
+Future<void> deleteTeacherDatabase(
+  KeyValueStore keyStore,
+  Directory dir,
+) async {
+  for (final suffix in ['', '-wal', '-shm', '-journal']) {
+    final file = File('${dir.path}/teacher.sqlite$suffix');
+    if (file.existsSync()) await file.delete();
+  }
+  await keyStore.delete(_keyName);
+}
 
 /// Khóa CSDL dạng hex 64 ký tự; sinh bằng CSPRNG và lưu ở lần đầu.
 Future<String> databaseKey(KeyValueStore store, {Random? random}) async {
