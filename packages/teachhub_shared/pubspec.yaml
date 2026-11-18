@@ -16,3 +16,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+flutter:
+  # Phosphor Regular (MIT — assets/fonts/phosphor/LICENSE), dùng qua TeachHubIcons.
+  fonts:
+    - family: Phosphor
+      fonts:
+        - asset: assets/fonts/phosphor/Phosphor.ttf
