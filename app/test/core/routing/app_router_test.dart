@@ -124,4 +124,26 @@ void main() {
     expect(_redirect('/t/today', _signedIn, parentOnly), AppRoutes.rolePicker);
     expect(_redirect(AppRoutes.rolePicker, _signedIn, parentOnly), isNull);
   });
+
+  test(
+    'bản quá cũ: mọi route chuyển sang Cần cập nhật, kể cả khi chưa đăng nhập',
+    () {
+      String? r(String location, {required bool required}) => resolveRedirect(
+        location: location,
+        auth: _signedOut,
+        memberships: const MembershipState(),
+        authGuard: AuthGuard(const AuthPolicy(), loginPath: AppRoutes.login),
+        permissionGuard: PermissionGuard(
+          permissions: () => const {},
+          routePermissions: roleRoutePermissions,
+          deniedPath: AppRoutes.rolePicker,
+        ),
+        updateRequired: required,
+      );
+      expect(r(AppRoutes.login, required: true), AppRoutes.updateRequired);
+      expect(r(AppRoutes.updateRequired, required: true), isNull);
+      // Hết bắt buộc (vd. server hạ mức) → rời màn cập nhật.
+      expect(r(AppRoutes.updateRequired, required: false), AppRoutes.splash);
+    },
+  );
 }

@@ -288,4 +288,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roleContinue => 'Continue';
+
+  @override
+  String get updateTitle => 'Update TeachHub';
+
+  @override
+  String get updateBody =>
+      'This version is no longer supported. Please update to continue.';
+
+  @override
+  String get updateAction => 'Update';
 }

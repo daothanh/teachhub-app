@@ -115,5 +115,8 @@
   "roleComingSoon": "Sắp ra mắt",
   "roleSelected": "Đã chọn",
   "roleOwned": "Đang có",
-  "roleContinue": "Tiếp tục"
+  "roleContinue": "Tiếp tục",
+  "updateTitle": "Cần cập nhật TeachHub",
+  "updateBody": "Phiên bản bạn đang dùng không còn được hỗ trợ. Vui lòng cập nhật để tiếp tục.",
+  "updateAction": "Cập nhật"
 }

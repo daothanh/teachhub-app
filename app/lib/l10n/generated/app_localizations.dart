@@ -625,6 +625,24 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Tiếp tục'**
   String get roleContinue;
+
+  /// No description provided for @updateTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cần cập nhật TeachHub'**
+  String get updateTitle;
+
+  /// No description provided for @updateBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phiên bản bạn đang dùng không còn được hỗ trợ. Vui lòng cập nhật để tiếp tục.'**
+  String get updateBody;
+
+  /// No description provided for @updateAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cập nhật'**
+  String get updateAction;
 }
 
 class _AppLocalizationsDelegate
