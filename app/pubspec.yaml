@@ -57,6 +57,7 @@ dependencies:
 
   # Internal packages
   flutter_svg: ^2.0.10
+  path_provider: ^2.1.6
   tasco_ui_kit:
     hosted: https://pub.vtii.vn
     version: ^5.2.7
@@ -95,6 +96,9 @@ dependencies:
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  # Test chạy trên máy thật (integration_test/): đo CSDL teacher mã hóa — ADR-0001.
+  integration_test:
     sdk: flutter
   flutter_lints: ^6.0.0
 
