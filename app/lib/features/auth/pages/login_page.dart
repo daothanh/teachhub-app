@@ -443,6 +443,8 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         toolbarHeight: 56,
         titleSpacing: 0,
+        centerTitle:
+            false, // B02: tiêu đề sát nút back (kit mặc định canh giữa)
         leading: IconButton(
           tooltip: MaterialLocalizations.of(context).backButtonTooltip,
           icon: const Icon(TeachHubIcons.caretLeft),

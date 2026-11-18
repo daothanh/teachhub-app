@@ -78,3 +78,24 @@ Associated Domains và Sign in with Apple; upload APNs key lên Firebase.
 
 `app_links` + `TeachHubDeepLinkResolver` xử lý link, nên cơ chế deep link mặc định của Flutter
 đã tắt (`FlutterDeepLinkingEnabled = false`, `flutter_deeplinking_enabled = false`).
+
+## Chạy với mock API (Prism)
+
+Mock trả ví dụ trong hợp đồng `teachhub-backend/contracts/openapi.json` — làm màn hình
+trước khi API thật có (S0-FL-10).
+
+```sh
+# 1. Trong teachhub-backend
+pnpm mock                                   # http://localhost:4010/v1
+
+# 2a. Máy Android thật (USB): chuyển cổng máy → máy tính
+adb reverse tcp:4010 tcp:4010
+flutter run --flavor development -t lib/main_development.dart \
+  --dart-define=TEACHHUB_API_URL=http://localhost:4010/v1
+
+# 2b. Android emulator: http://10.0.2.2:4010/v1 · iPhone thật: http://<IP-LAN-máy-tính>:4010/v1
+```
+
+- `--dart-define=TEACHHUB_API_URL` chỉ ghi đè ở flavor development/staging; production luôn dùng `assets/.env.production`.
+- HTTP thường (không TLS) chỉ được phép ở bản debug (Android `src/debug/AndroidManifest.xml`).
+- Mock không giữ trạng thái: mã OTP nào đúng định dạng cũng đăng nhập được, dữ liệu là ví dụ cố định.
