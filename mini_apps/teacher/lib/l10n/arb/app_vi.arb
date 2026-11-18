@@ -2,5 +2,6 @@
   "@@locale": "vi",
   "spaceTitle": "Giáo viên",
   "spaceComingSoon": "Không gian này đang được xây dựng.",
-  "switchRole": "Đổi vai trò"
+  "switchRole": "Đổi vai trò",
+  "offlineBanner": "Ngoại tuyến — thay đổi được lưu trên máy và tự đồng bộ khi có mạng."
 }

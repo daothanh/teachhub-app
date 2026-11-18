@@ -118,6 +118,12 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Đổi vai trò'**
   String get switchRole;
+
+  /// No description provided for @offlineBanner.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngoại tuyến — thay đổi được lưu trên máy và tự đồng bộ khi có mạng.'**
+  String get offlineBanner;
 }
 
 class _MiniAppLocalizationsDelegate

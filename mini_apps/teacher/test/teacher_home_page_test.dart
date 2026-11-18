@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
+import 'package:teacher/features/home/pages/teacher_home_page.dart';
 import 'package:teacher/teacher.dart';
 import 'package:teacher/l10n/l10n.dart';
 
@@ -42,5 +45,37 @@ void main() {
     await tester.tap(find.text('Switch role'));
     await tester.pumpAndSettle();
     expect(find.text('role-picker'), findsOneWidget);
+  });
+
+  testWidgets('shows the offline banner while there is no network', (
+    tester,
+  ) async {
+    final online = StreamController<bool>();
+    addTearDown(online.close);
+    await tester.pumpWidget(
+      ScreenUtilPlusInit(
+        designSize: const Size(393, 852),
+        builder: (context, _) => MaterialApp(
+          locale: const Locale('vi'),
+          localizationsDelegates: const [
+            ...MiniAppLocalizations.localizationsDelegates,
+            TascoUiKitLocalizations.delegate,
+          ],
+          supportedLocales: MiniAppLocalizations.supportedLocales,
+          theme: AppTheme.v1,
+          home: TeacherHomePage(online: online.stream),
+        ),
+      ),
+    );
+    final banner = find.textContaining('Ngoại tuyến');
+    expect(banner, findsNothing);
+
+    online.add(false);
+    await tester.pump();
+    expect(banner, findsOneWidget);
+
+    online.add(true);
+    await tester.pumpAndSettle();
+    expect(banner, findsNothing);
   });
 }

@@ -16,4 +16,8 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get switchRole => 'Đổi vai trò';
+
+  @override
+  String get offlineBanner =>
+      'Ngoại tuyến — thay đổi được lưu trên máy và tự đồng bộ khi có mạng.';
 }

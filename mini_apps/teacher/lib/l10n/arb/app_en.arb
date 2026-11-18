@@ -2,5 +2,6 @@
   "@@locale": "en",
   "spaceTitle": "Teacher",
   "spaceComingSoon": "This space is under construction.",
-  "switchRole": "Switch role"
+  "switchRole": "Switch role",
+  "offlineBanner": "Offline — changes are saved on this device and sync when you are back online."
 }
