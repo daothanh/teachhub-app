@@ -4,9 +4,9 @@
 
 | Flavor | Entrypoint | Android applicationId | iOS bundle id | Tên app |
 |---|---|---|---|---|
-| `development` | `lib/main_development.dart` | `vn.com.tasco.teachhub.dev` | `vn.com.tasco.teachhub.dev` | TeachHub Dev |
-| `staging` | `lib/main_staging.dart` | `vn.com.tasco.teachhub.stg` | `vn.com.tasco.teachhub.stg` | TeachHub Stg |
-| `production` | `lib/main_production.dart` | `vn.com.tasco.teachhub` | `vn.com.tasco.teachhub` | TeachHub |
+| `development` | `lib/main_development.dart` | `vn.dayhoc.app.dev` | `vn.dayhoc.app.dev` | TeachHub Dev |
+| `staging` | `lib/main_staging.dart` | `vn.dayhoc.app.stg` | `vn.dayhoc.app.stg` | TeachHub Stg |
+| `production` | `lib/main_production.dart` | `vn.dayhoc.app` | `vn.dayhoc.app` | TeachHub |
 
 ```sh
 flutter run --flavor development -t lib/main_development.dart
@@ -64,7 +64,7 @@ nhưng đăng nhập Google trên iOS sẽ không hoạt động. Android dùng 
   App ID trên Apple Developer phải bật Associated Domains và Sign in with Apple cho cả 3 bundle id.
 - Deep link: `teachhub://...` (Android + iOS).
 - Universal/App link: `https://teachhub.vn/i/<token>`. Web app teachhub.vn phải phục vụ:
-  - `https://teachhub.vn/.well-known/apple-app-site-association` (appID `<TEAM_ID>.vn.com.tasco.teachhub[.dev|.stg]`, path `/i/*`)
+  - `https://teachhub.vn/.well-known/apple-app-site-association` (appID `<TEAM_ID>.vn.dayhoc.app[.dev|.stg]`, path `/i/*`)
   - `https://teachhub.vn/.well-known/assetlinks.json` (package name từng flavor + SHA-256 của chứng chỉ ký)
 
 ## Push (iOS)

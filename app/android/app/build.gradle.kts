@@ -23,7 +23,7 @@ val keystoreProperties = Properties().apply {
 }
 
 android {
-    namespace = "vn.com.tasco.teachhub"
+    namespace = "vn.dayhoc.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -38,7 +38,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "vn.com.tasco.teachhub"
+        applicationId = "vn.dayhoc.app"
         minSdk = 28 // Android 9+
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

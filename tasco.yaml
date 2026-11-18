@@ -1,6 +1,6 @@
 app_name: "Teachhub"
 folder_name: "teachhub"
-package_name: "vn.com.tasco.teachhub"
+package_name: "vn.dayhoc.app"
 architecture: "clean"
 state_management: "cubit"
 di: "get_it"
