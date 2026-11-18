@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tasco_core/tasco_core.dart';
 import 'package:tasco_module/tasco_module.dart';
 import 'package:tasco_notifications/tasco_notifications.dart';
@@ -29,6 +30,7 @@ import 'core/theme/teachhub_theme.dart';
 import 'core/theme/theme_controller.dart';
 import 'di/api_module.dart';
 import 'di/di.dart';
+import 'features/app_version/app_version_gate.dart';
 import 'features/auth/auth_cubit.dart';
 import 'features/auth/email_otp_sender.dart';
 import 'features/auth/pages/login_page.dart';
@@ -100,6 +102,13 @@ Future<void> bootstrap({required Env env}) async {
   // 6. Router.
   final api = GetIt.I<Dio>(instanceName: TeachHubDiKey.api);
   final appEnv = GetIt.I<AppEnv>();
+  // Ép cập nhật: kiểm song song, không làm chậm khởi động (spec §5.1).
+  final versionGate = AppVersionGate(
+    api: api,
+    currentVersion: (await PackageInfo.fromPlatform()).version,
+    platform: Platform.isIOS ? 'ios' : 'android',
+  );
+  unawaited(versionGate.check());
   final router = buildAppRouter(
     moduleManager: moduleManager,
     authCubit: authCubit,
@@ -112,6 +121,7 @@ Future<void> bootstrap({required Env env}) async {
     ),
     inviteCubit: (token) =>
         InviteCubit(api: api, memberships: membershipCubit, token: token),
+    updateRequired: versionGate,
     navigatorKey: alice?.getNavigatorKey(),
   );
 

@@ -87,5 +87,8 @@
   "roleComingSoon": "Coming soon",
   "roleSelected": "Selected",
   "roleOwned": "Already yours",
-  "roleContinue": "Continue"
+  "roleContinue": "Continue",
+  "updateTitle": "Update TeachHub",
+  "updateBody": "This version is no longer supported. Please update to continue.",
+  "updateAction": "Update"
 }

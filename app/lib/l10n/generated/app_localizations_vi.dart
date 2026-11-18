@@ -287,4 +287,14 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get roleContinue => 'Tiếp tục';
+
+  @override
+  String get updateTitle => 'Cần cập nhật TeachHub';
+
+  @override
+  String get updateBody =>
+      'Phiên bản bạn đang dùng không còn được hỗ trợ. Vui lòng cập nhật để tiếp tục.';
+
+  @override
+  String get updateAction => 'Cập nhật';
 }

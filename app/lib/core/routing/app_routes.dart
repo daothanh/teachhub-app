@@ -5,6 +5,7 @@ abstract final class AppRoutes {
   static const login = '/login';
   static const rolePicker = TeachHubRoutes.rolePicker;
   static const settings = '/settings';
+  static const updateRequired = '/update-required';
   static const invitePattern = '/invite/:token';
   static String invite(String token) => '/invite/$token';
 }

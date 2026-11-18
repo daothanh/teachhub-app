@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:tasco_module/tasco_module.dart';
 import 'package:tasco_utils/tasco_utils.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
+import '../../features/app_version/update_required_page.dart';
 import '../../features/auth/auth_cubit.dart';
 import '../../features/invite/invite_cubit.dart';
 import '../../features/invite/invite_page.dart';
@@ -22,7 +24,7 @@ final Map<String, Set<String>> roleRoutePermissions = {
 
 /// Router của shell: route host + route mini-app (`collectRoutes`).
 ///
-/// Thứ tự kiểm tra (spec §8.7): kiểm phiên → đăng nhập (mặc định mọi route
+/// Thứ tự kiểm tra (spec §8.7): phiên bản tối thiểu → kiểm phiên → đăng nhập (mặc định mọi route
 /// cần đăng nhập) → tải vai trò → chưa có vai trò thì chọn vai trò →
 /// `PermissionGuard` theo vai trò cho `/t`, `/p`, `/s`.
 GoRouter buildAppRouter({
@@ -31,6 +33,7 @@ GoRouter buildAppRouter({
   required MembershipCubit membershipCubit,
   required Widget Function() loginPage,
   required InviteCubit Function(String token) inviteCubit,
+  ValueListenable<bool>? updateRequired,
   GlobalKey<NavigatorState>? navigatorKey,
 }) {
   final authGuard = AuthGuard(
@@ -51,6 +54,7 @@ GoRouter buildAppRouter({
     refreshListenable: Listenable.merge([
       GoRouterRefreshStream(authCubit.stream),
       GoRouterRefreshStream(membershipCubit.stream),
+      ?updateRequired,
     ]),
     onException: (_, _, router) => router.go(AppRoutes.splash),
     redirect: (context, state) => resolveRedirect(
@@ -59,8 +63,13 @@ GoRouter buildAppRouter({
       memberships: membershipCubit.state,
       authGuard: authGuard,
       permissionGuard: permissionGuard,
+      updateRequired: updateRequired?.value ?? false,
     ),
     routes: [
+      GoRoute(
+        path: AppRoutes.updateRequired,
+        builder: (_, _) => const UpdateRequiredPage(),
+      ),
       GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashPage()),
       GoRoute(path: AppRoutes.login, builder: (_, _) => loginPage()),
       GoRoute(
@@ -91,7 +100,13 @@ String? resolveRedirect({
   required MembershipState memberships,
   required RouteGuard authGuard,
   required RouteGuard permissionGuard,
+  bool updateRequired = false,
 }) {
+  // Bản quá cũ: chặn mọi màn, kể cả khi chưa đăng nhập (spec §5.1).
+  final atUpdate = location == AppRoutes.updateRequired;
+  if (updateRequired) return atUpdate ? null : AppRoutes.updateRequired;
+  if (atUpdate) return AppRoutes.splash;
+
   final atSplash = location == AppRoutes.splash;
   final atLogin = location == AppRoutes.login;
 
