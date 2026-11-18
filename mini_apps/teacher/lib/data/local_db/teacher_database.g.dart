@@ -66,6 +66,29 @@ class $OutboxMutationsTable extends OutboxMutations
         type: DriftSqlType.dateTime,
         requiredDuringInsert: true,
       );
+  static const VerificationMeta _attemptCountMeta = const VerificationMeta(
+    'attemptCount',
+  );
+  @override
+  late final GeneratedColumn<int> attemptCount = GeneratedColumn<int>(
+    'attempt_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _lastErrorMeta = const VerificationMeta(
+    'lastError',
+  );
+  @override
+  late final GeneratedColumn<String> lastError = GeneratedColumn<String>(
+    'last_error',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -73,6 +96,8 @@ class $OutboxMutationsTable extends OutboxMutations
     entity,
     payload,
     clientUpdatedAt,
+    attemptCount,
+    lastError,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -127,6 +152,21 @@ class $OutboxMutationsTable extends OutboxMutations
     } else if (isInserting) {
       context.missing(_clientUpdatedAtMeta);
     }
+    if (data.containsKey('attempt_count')) {
+      context.handle(
+        _attemptCountMeta,
+        attemptCount.isAcceptableOrUnknown(
+          data['attempt_count']!,
+          _attemptCountMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_error')) {
+      context.handle(
+        _lastErrorMeta,
+        lastError.isAcceptableOrUnknown(data['last_error']!, _lastErrorMeta),
+      );
+    }
     return context;
   }
 
@@ -156,6 +196,14 @@ class $OutboxMutationsTable extends OutboxMutations
         DriftSqlType.dateTime,
         data['${effectivePrefix}client_updated_at'],
       )!,
+      attemptCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}attempt_count'],
+      )!,
+      lastError: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_error'],
+      ),
     );
   }
 
@@ -175,12 +223,20 @@ class OutboxMutation extends DataClass implements Insertable<OutboxMutation> {
   /// JSON của thay đổi.
   final String payload;
   final DateTime clientUpdatedAt;
+
+  /// v2: số lần SyncEngine đã gửi thất bại (để giãn thời gian thử lại).
+  final int attemptCount;
+
+  /// v2: mã lỗi lần gửi gần nhất (không lưu body/PII).
+  final String? lastError;
   const OutboxMutation({
     required this.id,
     required this.clientMutationId,
     required this.entity,
     required this.payload,
     required this.clientUpdatedAt,
+    required this.attemptCount,
+    this.lastError,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -190,6 +246,10 @@ class OutboxMutation extends DataClass implements Insertable<OutboxMutation> {
     map['entity'] = Variable<String>(entity);
     map['payload'] = Variable<String>(payload);
     map['client_updated_at'] = Variable<DateTime>(clientUpdatedAt);
+    map['attempt_count'] = Variable<int>(attemptCount);
+    if (!nullToAbsent || lastError != null) {
+      map['last_error'] = Variable<String>(lastError);
+    }
     return map;
   }
 
@@ -200,6 +260,10 @@ class OutboxMutation extends DataClass implements Insertable<OutboxMutation> {
       entity: Value(entity),
       payload: Value(payload),
       clientUpdatedAt: Value(clientUpdatedAt),
+      attemptCount: Value(attemptCount),
+      lastError: lastError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastError),
     );
   }
 
@@ -214,6 +278,8 @@ class OutboxMutation extends DataClass implements Insertable<OutboxMutation> {
       entity: serializer.fromJson<String>(json['entity']),
       payload: serializer.fromJson<String>(json['payload']),
       clientUpdatedAt: serializer.fromJson<DateTime>(json['clientUpdatedAt']),
+      attemptCount: serializer.fromJson<int>(json['attemptCount']),
+      lastError: serializer.fromJson<String?>(json['lastError']),
     );
   }
   @override
@@ -225,6 +291,8 @@ class OutboxMutation extends DataClass implements Insertable<OutboxMutation> {
       'entity': serializer.toJson<String>(entity),
       'payload': serializer.toJson<String>(payload),
       'clientUpdatedAt': serializer.toJson<DateTime>(clientUpdatedAt),
+      'attemptCount': serializer.toJson<int>(attemptCount),
+      'lastError': serializer.toJson<String?>(lastError),
     };
   }
 
@@ -234,12 +302,16 @@ class OutboxMutation extends DataClass implements Insertable<OutboxMutation> {
     String? entity,
     String? payload,
     DateTime? clientUpdatedAt,
+    int? attemptCount,
+    Value<String?> lastError = const Value.absent(),
   }) => OutboxMutation(
     id: id ?? this.id,
     clientMutationId: clientMutationId ?? this.clientMutationId,
     entity: entity ?? this.entity,
     payload: payload ?? this.payload,
     clientUpdatedAt: clientUpdatedAt ?? this.clientUpdatedAt,
+    attemptCount: attemptCount ?? this.attemptCount,
+    lastError: lastError.present ? lastError.value : this.lastError,
   );
   OutboxMutation copyWithCompanion(OutboxMutationsCompanion data) {
     return OutboxMutation(
@@ -252,6 +324,10 @@ class OutboxMutation extends DataClass implements Insertable<OutboxMutation> {
       clientUpdatedAt: data.clientUpdatedAt.present
           ? data.clientUpdatedAt.value
           : this.clientUpdatedAt,
+      attemptCount: data.attemptCount.present
+          ? data.attemptCount.value
+          : this.attemptCount,
+      lastError: data.lastError.present ? data.lastError.value : this.lastError,
     );
   }
 
@@ -262,14 +338,23 @@ class OutboxMutation extends DataClass implements Insertable<OutboxMutation> {
           ..write('clientMutationId: $clientMutationId, ')
           ..write('entity: $entity, ')
           ..write('payload: $payload, ')
-          ..write('clientUpdatedAt: $clientUpdatedAt')
+          ..write('clientUpdatedAt: $clientUpdatedAt, ')
+          ..write('attemptCount: $attemptCount, ')
+          ..write('lastError: $lastError')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, clientMutationId, entity, payload, clientUpdatedAt);
+  int get hashCode => Object.hash(
+    id,
+    clientMutationId,
+    entity,
+    payload,
+    clientUpdatedAt,
+    attemptCount,
+    lastError,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -278,7 +363,9 @@ class OutboxMutation extends DataClass implements Insertable<OutboxMutation> {
           other.clientMutationId == this.clientMutationId &&
           other.entity == this.entity &&
           other.payload == this.payload &&
-          other.clientUpdatedAt == this.clientUpdatedAt);
+          other.clientUpdatedAt == this.clientUpdatedAt &&
+          other.attemptCount == this.attemptCount &&
+          other.lastError == this.lastError);
 }
 
 class OutboxMutationsCompanion extends UpdateCompanion<OutboxMutation> {
@@ -287,12 +374,16 @@ class OutboxMutationsCompanion extends UpdateCompanion<OutboxMutation> {
   final Value<String> entity;
   final Value<String> payload;
   final Value<DateTime> clientUpdatedAt;
+  final Value<int> attemptCount;
+  final Value<String?> lastError;
   const OutboxMutationsCompanion({
     this.id = const Value.absent(),
     this.clientMutationId = const Value.absent(),
     this.entity = const Value.absent(),
     this.payload = const Value.absent(),
     this.clientUpdatedAt = const Value.absent(),
+    this.attemptCount = const Value.absent(),
+    this.lastError = const Value.absent(),
   });
   OutboxMutationsCompanion.insert({
     this.id = const Value.absent(),
@@ -300,6 +391,8 @@ class OutboxMutationsCompanion extends UpdateCompanion<OutboxMutation> {
     required String entity,
     required String payload,
     required DateTime clientUpdatedAt,
+    this.attemptCount = const Value.absent(),
+    this.lastError = const Value.absent(),
   }) : clientMutationId = Value(clientMutationId),
        entity = Value(entity),
        payload = Value(payload),
@@ -310,6 +403,8 @@ class OutboxMutationsCompanion extends UpdateCompanion<OutboxMutation> {
     Expression<String>? entity,
     Expression<String>? payload,
     Expression<DateTime>? clientUpdatedAt,
+    Expression<int>? attemptCount,
+    Expression<String>? lastError,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -317,6 +412,8 @@ class OutboxMutationsCompanion extends UpdateCompanion<OutboxMutation> {
       if (entity != null) 'entity': entity,
       if (payload != null) 'payload': payload,
       if (clientUpdatedAt != null) 'client_updated_at': clientUpdatedAt,
+      if (attemptCount != null) 'attempt_count': attemptCount,
+      if (lastError != null) 'last_error': lastError,
     });
   }
 
@@ -326,6 +423,8 @@ class OutboxMutationsCompanion extends UpdateCompanion<OutboxMutation> {
     Value<String>? entity,
     Value<String>? payload,
     Value<DateTime>? clientUpdatedAt,
+    Value<int>? attemptCount,
+    Value<String?>? lastError,
   }) {
     return OutboxMutationsCompanion(
       id: id ?? this.id,
@@ -333,6 +432,8 @@ class OutboxMutationsCompanion extends UpdateCompanion<OutboxMutation> {
       entity: entity ?? this.entity,
       payload: payload ?? this.payload,
       clientUpdatedAt: clientUpdatedAt ?? this.clientUpdatedAt,
+      attemptCount: attemptCount ?? this.attemptCount,
+      lastError: lastError ?? this.lastError,
     );
   }
 
@@ -354,6 +455,12 @@ class OutboxMutationsCompanion extends UpdateCompanion<OutboxMutation> {
     if (clientUpdatedAt.present) {
       map['client_updated_at'] = Variable<DateTime>(clientUpdatedAt.value);
     }
+    if (attemptCount.present) {
+      map['attempt_count'] = Variable<int>(attemptCount.value);
+    }
+    if (lastError.present) {
+      map['last_error'] = Variable<String>(lastError.value);
+    }
     return map;
   }
 
@@ -364,7 +471,9 @@ class OutboxMutationsCompanion extends UpdateCompanion<OutboxMutation> {
           ..write('clientMutationId: $clientMutationId, ')
           ..write('entity: $entity, ')
           ..write('payload: $payload, ')
-          ..write('clientUpdatedAt: $clientUpdatedAt')
+          ..write('clientUpdatedAt: $clientUpdatedAt, ')
+          ..write('attemptCount: $attemptCount, ')
+          ..write('lastError: $lastError')
           ..write(')'))
         .toString();
   }
@@ -390,6 +499,8 @@ typedef $$OutboxMutationsTableCreateCompanionBuilder =
       required String entity,
       required String payload,
       required DateTime clientUpdatedAt,
+      Value<int> attemptCount,
+      Value<String?> lastError,
     });
 typedef $$OutboxMutationsTableUpdateCompanionBuilder =
     OutboxMutationsCompanion Function({
@@ -398,6 +509,8 @@ typedef $$OutboxMutationsTableUpdateCompanionBuilder =
       Value<String> entity,
       Value<String> payload,
       Value<DateTime> clientUpdatedAt,
+      Value<int> attemptCount,
+      Value<String?> lastError,
     });
 
 class $$OutboxMutationsTableFilterComposer
@@ -431,6 +544,16 @@ class $$OutboxMutationsTableFilterComposer
 
   ColumnFilters<DateTime> get clientUpdatedAt => $composableBuilder(
     column: $table.clientUpdatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get attemptCount => $composableBuilder(
+    column: $table.attemptCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastError => $composableBuilder(
+    column: $table.lastError,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -468,6 +591,16 @@ class $$OutboxMutationsTableOrderingComposer
     column: $table.clientUpdatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get attemptCount => $composableBuilder(
+    column: $table.attemptCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastError => $composableBuilder(
+    column: $table.lastError,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$OutboxMutationsTableAnnotationComposer
@@ -497,6 +630,14 @@ class $$OutboxMutationsTableAnnotationComposer
     column: $table.clientUpdatedAt,
     builder: (column) => column,
   );
+
+  GeneratedColumn<int> get attemptCount => $composableBuilder(
+    column: $table.attemptCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastError =>
+      $composableBuilder(column: $table.lastError, builder: (column) => column);
 }
 
 class $$OutboxMutationsTableTableManager
@@ -541,12 +682,16 @@ class $$OutboxMutationsTableTableManager
                 Value<String> entity = const Value.absent(),
                 Value<String> payload = const Value.absent(),
                 Value<DateTime> clientUpdatedAt = const Value.absent(),
+                Value<int> attemptCount = const Value.absent(),
+                Value<String?> lastError = const Value.absent(),
               }) => OutboxMutationsCompanion(
                 id: id,
                 clientMutationId: clientMutationId,
                 entity: entity,
                 payload: payload,
                 clientUpdatedAt: clientUpdatedAt,
+                attemptCount: attemptCount,
+                lastError: lastError,
               ),
           createCompanionCallback:
               ({
@@ -555,12 +700,16 @@ class $$OutboxMutationsTableTableManager
                 required String entity,
                 required String payload,
                 required DateTime clientUpdatedAt,
+                Value<int> attemptCount = const Value.absent(),
+                Value<String?> lastError = const Value.absent(),
               }) => OutboxMutationsCompanion.insert(
                 id: id,
                 clientMutationId: clientMutationId,
                 entity: entity,
                 payload: payload,
                 clientUpdatedAt: clientUpdatedAt,
+                attemptCount: attemptCount,
+                lastError: lastError,
               ),
           withReferenceMapper: (p0) => p0
               .map(
