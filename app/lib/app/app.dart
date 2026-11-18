@@ -15,6 +15,10 @@ class App extends StatelessWidget {
   final MembershipCubit membershipCubit;
   final LocaleController localeController;
   final ThemeController themeController;
+
+  /// [TeachHubTheme.load] — dựng một lần ở bootstrap (đọc asset token).
+  final ThemeData theme;
+  final ThemeData darkTheme;
   final List<LocalizationsDelegate> miniAppDelegates;
 
   const App({
@@ -24,6 +28,8 @@ class App extends StatelessWidget {
     required this.membershipCubit,
     required this.localeController,
     required this.themeController,
+    required this.theme,
+    required this.darkTheme,
     this.miniAppDelegates = const [],
   });
 
@@ -41,8 +47,8 @@ class App extends StatelessWidget {
         valueListenable: themeController,
         builder: (context, themeMode, _) => TascoApp(
           routerConfig: router,
-          theme: AppTheme.v1,
-          darkTheme: AppTheme.v1Dark,
+          theme: theme,
+          darkTheme: darkTheme,
           themeMode: themeMode,
           localeListenable: localeController,
           localeOf: () => localeController.locale,

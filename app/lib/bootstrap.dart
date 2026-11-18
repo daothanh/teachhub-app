@@ -25,6 +25,7 @@ import 'core/deep_link/deep_link_handler.dart';
 import 'core/deep_link/teachhub_deep_link_resolver.dart';
 import 'core/module_health_report.dart';
 import 'core/routing/app_router.dart';
+import 'core/theme/teachhub_theme.dart';
 import 'core/theme/theme_controller.dart';
 import 'di/api_module.dart';
 import 'di/di.dart';
@@ -146,6 +147,7 @@ Future<void> bootstrap({required Env env}) async {
   await deepLinks.handleInitialLink();
   deepLinks.startListening();
 
+  final theme = await TeachHubTheme.load();
   runApp(
     App(
       router: router,
@@ -153,6 +155,8 @@ Future<void> bootstrap({required Env env}) async {
       membershipCubit: membershipCubit,
       localeController: GetIt.I<LocaleController>(),
       themeController: GetIt.I<ThemeController>(),
+      theme: theme.light,
+      darkTheme: theme.dark,
       miniAppDelegates: [
         ...TeacherController.instance.localizationsDelegates,
         ...ParentController.instance.localizationsDelegates,
