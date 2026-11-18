@@ -28,4 +28,21 @@ void main() {
     expect(env.certificatePins, isEmpty);
     expect(env.isProduction, isTrue);
   });
+
+  test(
+    '--dart-define TEACHHUB_API_URL ghi đè ở dev/staging, không ở production',
+    () {
+      const file = {'TEACHHUB_API_URL': 'https://api.teachhub.vn/v1'};
+      const mock = 'http://localhost:4010/v1';
+      expect(
+        AppEnv.withApiOverride(Env.development, file, mock)['TEACHHUB_API_URL'],
+        mock,
+      );
+      expect(
+        AppEnv.withApiOverride(Env.production, file, mock)['TEACHHUB_API_URL'],
+        'https://api.teachhub.vn/v1',
+      );
+      expect(AppEnv.withApiOverride(Env.staging, file, ''), file);
+    },
+  );
 }

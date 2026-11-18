@@ -23,8 +23,19 @@ class AppEnv {
 
   static Future<AppEnv> load(Env env) async {
     await dotenv.load(fileName: 'assets/.env.${env.name}');
-    return AppEnv(env, dotenv.env);
+    return AppEnv(env, withApiOverride(env, dotenv.env, _apiOverride));
   }
+
+  /// `--dart-define=TEACHHUB_API_URL=…` (vd. mock Prism) — không bao giờ áp cho production.
+  static const _apiOverride = String.fromEnvironment('TEACHHUB_API_URL');
+
+  static Map<String, String> withApiOverride(
+    Env env,
+    Map<String, String> values,
+    String override,
+  ) => override.isEmpty || env == Env.production
+      ? values
+      : {...values, 'TEACHHUB_API_URL': override};
 
   final Env current;
 
