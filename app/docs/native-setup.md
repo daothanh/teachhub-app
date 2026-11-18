@@ -40,6 +40,9 @@ HTTP không mã hoá (cleartext) chỉ bật ở debug (`android/app/src/debug/A
 
 ## Firebase (FCM, Crashlytics, Remote Config)
 
+Project (tài khoản Firebase của PO): `development` → `dayhoc-dev`, `staging` → `dayhoc-stg`,
+`production` → `dayhoc-4c6db`. Tải lại config: `firebase apps:sdkconfig <ANDROID|IOS> <appId> --project <id>`.
+
 - Android: `android/app/src/<flavor>/google-services.json`
   (ví dụ `android/app/src/development/google-services.json`). Plugin Google Services và
   Crashlytics chỉ được apply khi có ít nhất một file; khi đã apply thì flavor nào thiếu file sẽ build lỗi.

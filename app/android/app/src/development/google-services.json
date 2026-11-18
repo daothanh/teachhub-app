@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "305225338991",
+    "project_id": "dayhoc-dev",
+    "storage_bucket": "dayhoc-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:305225338991:android:88b646216cd00cb3a47d9a",
+        "android_client_info": {
+          "package_name": "vn.dayhoc.app.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD36Bv0yZ2OL4FNsPeNYm3-6r2RvnGaf1E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
