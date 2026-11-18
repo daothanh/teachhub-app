@@ -7,3 +7,5 @@ export 'src/di_key.dart';
 export 'src/membership.dart';
 export 'src/routes.dart';
 export 'src/teachhub_icons.dart';
+export 'src/api/api_exception.dart';
+export 'src/api/paginated.dart';

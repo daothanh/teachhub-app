@@ -1,4 +1,5 @@
 import 'package:app/core/network/api_error.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
 import 'package:app/core/network/teachhub_headers_interceptor.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -58,17 +59,34 @@ void main() {
     );
   });
 
-  test('apiErrorCode reads the code of a TeachHub error body', () {
-    final options = RequestOptions(path: '/auth/login');
-    final err = DioException(
-      requestOptions: options,
-      response: Response(
+  test(
+    'apiException đọc body lỗi TeachHub, Retry-After; mất mạng → network',
+    () {
+      final options = RequestOptions(path: '/auth/login');
+      final err = DioException(
         requestOptions: options,
-        statusCode: 401,
-        data: {'code': 'OTP_INVALID', 'message': 'x'},
-      ),
-    );
-    expect(apiErrorCode(err), 'OTP_INVALID');
-    expect(apiErrorCode(StateError('x')), isNull);
-  });
+        response: Response(
+          requestOptions: options,
+          statusCode: 429,
+          data: {'code': 'RATE_LIMITED', 'message': 'x'},
+          headers: Headers.fromMap({
+            'retry-after': ['30'],
+          }),
+        ),
+      );
+      final e = apiException(err)!;
+      expect(e.code, ApiErrorCode.rateLimited);
+      expect(e.kind, ApiErrorKind.rateLimited);
+      expect(e.retryAfter, const Duration(seconds: 30));
+
+      final offline = apiException(
+        DioException(
+          requestOptions: options,
+          type: DioExceptionType.connectionError,
+        ),
+      )!;
+      expect(offline.kind, ApiErrorKind.network);
+      expect(apiException(StateError('x')), isNull);
+    },
+  );
 }
