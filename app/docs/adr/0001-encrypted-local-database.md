@@ -58,10 +58,33 @@ flutter test integration_test/teacher_db_device_test.dart -d <máy> \
 
 `--no-uninstall` ở pha write là bắt buộc: mặc định `flutter test` gỡ app sau khi chạy test tích hợp, xóa luôn dữ liệu.
 
+## Spike SyncEngine (S0-FL-08, 18/11/2026)
+
+`mini_apps/teacher/lib/data/sync/sync_engine.dart`: đẩy outbox theo lô đúng thứ tự `id`;
+`applied`/`duplicate`/`stale` → xóa khỏi outbox, `rejected` → giữ với
+`lastError = rejected:<mã>` và không gửi lại; mất mạng/5xx/429 → tăng `attemptCount`,
+thử lại sau 1s, 2s, 4s… tối đa 1 giờ; có mạng trở lại (`connectivity_plus`) → đẩy ngay.
+Banner "Ngoại tuyến" ở trang gốc Giáo viên.
+
+Ghi chú DoD trên OPPO CPH2577 (`app/integration_test/sync_engine_device_test.dart`,
+endpoint giả là HttpServer trong app, "mất mạng" = server chưa mở):
+
+| Bước | Kết quả |
+| --- | --- |
+| Mất mạng → lưu 25 mutation | Lưu xong (620 ms, gồm lần mở CSDL đầu tiên) |
+| Chờ 4 s | Vẫn 25 mutation, `attemptCount = 3`, `lastError = network` |
+| Bật mạng, lô đầu áp dụng xong nhưng **mất phản hồi** | Lô đó gửi lại, server trả `duplicate` cho cả 10 |
+| Kết thúc | Outbox trống sau 4 request; server áp dụng đúng 25 mutation, không lần nào 2 lần |
+
+Nhận xét: backoff tính theo `attemptCount` tích lũy, nên lỗi ngay sau khi có mạng lại chờ
+lâu hơn (lần chạy trên chờ 8 s) — chấp nhận được vì sự kiện có mạng luôn kích hoạt đẩy ngay.
+
 ## Chưa làm (việc của sprint điểm danh)
 
-- SyncEngine, `workmanager` (đẩy outbox khi chạy nền), `connectivity_plus` (banner
-  "Ngoại tuyến" T03/T04). Schema v2 đã có `attemptCount`, `lastError` cho việc thử lại.
+- `workmanager` (đẩy outbox khi app chạy nền): chưa thêm ở spike — isolate nền phải tự
+  dựng lại CSDL (khóa từ Keystore), token và Dio; làm cùng transport thật ở S3-FL-08.
+- Transport thật (Dio `TeachHubDiKey.api`, `POST /v1/attendance/sync`, Idempotency-Key)
+  và `stale` kéo bản của server về: S3-FL-08 sau hợp đồng S2-FL-10.
 - Gọi `deleteTeacherDatabase` trong luồng đăng xuất sau khi outbox trống (S1-FL-10);
   cảnh báo "Còn N buổi chưa đồng bộ".
 

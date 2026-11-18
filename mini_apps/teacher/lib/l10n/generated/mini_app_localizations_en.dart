@@ -16,4 +16,8 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get switchRole => 'Switch role';
+
+  @override
+  String get offlineBanner =>
+      'Offline — changes are saved on this device and sync when you are back online.';
 }
