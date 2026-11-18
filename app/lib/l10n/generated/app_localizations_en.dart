@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'TeachHub';
+  String get appName => 'DayHoc';
 
   @override
   String get retry => 'Retry';
@@ -84,7 +84,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get inviteConsentBody =>
-      'To see your child\'s learning information, you need to agree to TeachHub\'s terms and personal data policy.';
+      'To see your child\'s learning information, you need to agree to DayHoc\'s terms and personal data policy.';
 
   @override
   String get inviteConsentAccept => 'Agree and accept';
@@ -190,7 +190,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginPrivacy => 'Data policy';
 
   @override
-  String get loginTermsSuffix => ' of TeachHub.';
+  String get loginTermsSuffix => ' of DayHoc.';
 
   @override
   String get heroTeacher => 'Teacher';
@@ -260,7 +260,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roleIntro =>
-      'Choose so TeachHub shows what you need. You can add other roles later.';
+      'Choose so DayHoc shows what you need. You can add other roles later.';
 
   @override
   String get roleTeacherDesc => 'Manage classes, attendance, tuition';
@@ -290,7 +290,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleContinue => 'Continue';
 
   @override
-  String get updateTitle => 'Update TeachHub';
+  String get updateTitle => 'Update DayHoc';
 
   @override
   String get updateBody =>

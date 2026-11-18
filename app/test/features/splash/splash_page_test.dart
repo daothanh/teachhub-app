@@ -58,7 +58,7 @@ void main() {
       tester,
       const MembershipState(statusLoad: LoadingStatus.loading),
     );
-    expect(find.text('TeachHub'), findsOneWidget);
+    expect(find.text('DayHoc'), findsOneWidget);
     expect(find.text('T'), findsOneWidget);
     expect(
       find.textContaining('Kết nối thầy, trò và gia đình.'),

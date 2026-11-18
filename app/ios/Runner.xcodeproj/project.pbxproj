@@ -509,7 +509,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 6116F7751C63823E4E06AADE /* Profile-production.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = TeachHub;
+				APP_DISPLAY_NAME = DayHoc;
 				APP_FLAVOR = production;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -568,7 +568,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3367176554A2DC5D09A78FD9 /* Release-production.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = TeachHub;
+				APP_DISPLAY_NAME = DayHoc;
 				APP_FLAVOR = production;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -717,7 +717,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = TeachHub;
+				APP_DISPLAY_NAME = DayHoc;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
@@ -743,7 +743,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 99FE0B2D8924CDE276E984FD /* Profile-staging.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "TeachHub Stg";
+				APP_DISPLAY_NAME = "DayHoc Stg";
 				APP_FLAVOR = staging;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -770,7 +770,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1815F0DDC6C0D41F2802C73F /* Release-staging.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "TeachHub Stg";
+				APP_DISPLAY_NAME = "DayHoc Stg";
 				APP_FLAVOR = staging;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -847,7 +847,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2C7B12853164901A96CEB67E /* Debug-production.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = TeachHub;
+				APP_DISPLAY_NAME = DayHoc;
 				APP_FLAVOR = production;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -929,7 +929,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DCC59BAF0B77127CEEA91373 /* Debug-staging.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "TeachHub Stg";
+				APP_DISPLAY_NAME = "DayHoc Stg";
 				APP_FLAVOR = staging;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -1025,7 +1025,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2D55338B3A2735566A574085 /* Release-development.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "TeachHub Dev";
+				APP_DISPLAY_NAME = "DayHoc Dev";
 				APP_FLAVOR = development;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -1347,7 +1347,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = TeachHub;
+				APP_DISPLAY_NAME = DayHoc;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
@@ -1374,7 +1374,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = TeachHub;
+				APP_DISPLAY_NAME = DayHoc;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
@@ -1597,7 +1597,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D8706FAAB26A627AD577C914 /* Profile-development.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "TeachHub Dev";
+				APP_DISPLAY_NAME = "DayHoc Dev";
 				APP_FLAVOR = development;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -1658,7 +1658,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 71043320680F1A160D87D5FB /* Debug-development.xcconfig */;
 			buildSettings = {
-				APP_DISPLAY_NAME = "TeachHub Dev";
+				APP_DISPLAY_NAME = "DayHoc Dev";
 				APP_FLAVOR = development;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

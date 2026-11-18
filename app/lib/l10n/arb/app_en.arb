@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appName": "TeachHub",
+  "appName": "DayHoc",
   "retry": "Retry",
   "loginEmail": "Email",
   "loginEmailHint": "name@email.com",
@@ -24,7 +24,7 @@
   "inviteInvalid": "This invitation does not exist or has expired.",
   "inviteFailed": "Could not accept the invitation. Please try again.",
   "inviteConsentTitle": "Data processing consent",
-  "inviteConsentBody": "To see your child's learning information, you need to agree to TeachHub's terms and personal data policy.",
+  "inviteConsentBody": "To see your child's learning information, you need to agree to DayHoc's terms and personal data policy.",
   "inviteConsentAccept": "Agree and accept",
   "settings": "Settings",
   "settingsAbout": "About",
@@ -58,7 +58,7 @@
   "loginTerms": "Terms of use",
   "loginTermsAnd": " and ",
   "loginPrivacy": "Data policy",
-  "loginTermsSuffix": " of TeachHub.",
+  "loginTermsSuffix": " of DayHoc.",
   "heroTeacher": "Teacher",
   "heroStudent": "Student",
   "heroFamily": "Family",
@@ -78,7 +78,7 @@
   "otpLockedBody": "Verification is locked for 15 minutes to protect your account.",
   "otpRetryIn": "Try again in {time}",
   "otpLocked": "Locked",
-  "roleIntro": "Choose so TeachHub shows what you need. You can add other roles later.",
+  "roleIntro": "Choose so DayHoc shows what you need. You can add other roles later.",
   "roleTeacherDesc": "Manage classes, attendance, tuition",
   "roleParentDesc": "Follow your child's learning, pay tuition",
   "roleStudentDesc": "View schedule, submit work, see grades",
@@ -88,7 +88,7 @@
   "roleSelected": "Selected",
   "roleOwned": "Already yours",
   "roleContinue": "Continue",
-  "updateTitle": "Update TeachHub",
+  "updateTitle": "Update DayHoc",
   "updateBody": "This version is no longer supported. Please update to continue.",
   "updateAction": "Update"
 }

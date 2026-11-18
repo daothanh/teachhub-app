@@ -4,9 +4,9 @@
 
 | Flavor | Entrypoint | Android applicationId | iOS bundle id | Tên app |
 |---|---|---|---|---|
-| `development` | `lib/main_development.dart` | `vn.dayhoc.app.dev` | `vn.dayhoc.app.dev` | TeachHub Dev |
-| `staging` | `lib/main_staging.dart` | `vn.dayhoc.app.stg` | `vn.dayhoc.app.stg` | TeachHub Stg |
-| `production` | `lib/main_production.dart` | `vn.dayhoc.app` | `vn.dayhoc.app` | TeachHub |
+| `development` | `lib/main_development.dart` | `vn.dayhoc.app.dev` | `vn.dayhoc.app.dev` | DayHoc Dev |
+| `staging` | `lib/main_staging.dart` | `vn.dayhoc.app.stg` | `vn.dayhoc.app.stg` | DayHoc Stg |
+| `production` | `lib/main_production.dart` | `vn.dayhoc.app` | `vn.dayhoc.app` | DayHoc |
 
 ```sh
 flutter run --flavor development -t lib/main_development.dart

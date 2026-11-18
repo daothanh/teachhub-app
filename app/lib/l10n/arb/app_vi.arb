@@ -1,6 +1,6 @@
 {
   "@@locale": "vi",
-  "appName": "TeachHub",
+  "appName": "DayHoc",
   "retry": "Thử lại",
   "loginEmail": "Email",
   "loginEmailHint": "ten@email.com",
@@ -24,7 +24,7 @@
   "inviteInvalid": "Lời mời không tồn tại hoặc đã hết hạn.",
   "inviteFailed": "Không nhận được lời mời. Vui lòng thử lại.",
   "inviteConsentTitle": "Đồng ý xử lý dữ liệu",
-  "inviteConsentBody": "Để xem thông tin học tập của con, bạn cần đồng ý với điều khoản và chính sách xử lý dữ liệu cá nhân của TeachHub.",
+  "inviteConsentBody": "Để xem thông tin học tập của con, bạn cần đồng ý với điều khoản và chính sách xử lý dữ liệu cá nhân của DayHoc.",
   "inviteConsentAccept": "Đồng ý và nhận lời mời",
   "settings": "Cài đặt",
   "settingsAbout": "Về ứng dụng",
@@ -58,7 +58,7 @@
   "loginTerms": "Điều khoản sử dụng",
   "loginTermsAnd": " và ",
   "loginPrivacy": "Chính sách dữ liệu",
-  "loginTermsSuffix": " của TeachHub.",
+  "loginTermsSuffix": " của DayHoc.",
   "heroTeacher": "Thầy cô",
   "heroStudent": "Học trò",
   "heroFamily": "Gia đình",
@@ -106,7 +106,7 @@
     }
   },
   "otpLocked": "Tạm khóa",
-  "roleIntro": "Chọn để TeachHub hiện đúng những gì bạn cần. Bạn có thể thêm vai trò khác sau.",
+  "roleIntro": "Chọn để DayHoc hiện đúng những gì bạn cần. Bạn có thể thêm vai trò khác sau.",
   "roleTeacherDesc": "Quản lý lớp, điểm danh, thu học phí",
   "roleParentDesc": "Theo dõi việc học của con, đóng học phí",
   "roleStudentDesc": "Xem lịch, nộp bài, xem điểm",
@@ -116,7 +116,7 @@
   "roleSelected": "Đã chọn",
   "roleOwned": "Đang có",
   "roleContinue": "Tiếp tục",
-  "updateTitle": "Cần cập nhật TeachHub",
+  "updateTitle": "Cần cập nhật DayHoc",
   "updateBody": "Phiên bản bạn đang dùng không còn được hỗ trợ. Vui lòng cập nhật để tiếp tục.",
   "updateAction": "Cập nhật"
 }
