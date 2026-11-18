@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tasco_core/tasco_core.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../core/theme/theme_controller.dart';
 import '../features/auth/auth_cubit.dart';
 import '../features/role_picker/membership_cubit.dart';
+import '../features/role_picker/role_switcher.dart';
 import '../l10n/l10n.dart';
 
 class App extends StatelessWidget {
@@ -45,18 +47,22 @@ class App extends StatelessWidget {
       ],
       child: ValueListenableBuilder<ThemeMode>(
         valueListenable: themeController,
-        builder: (context, themeMode, _) => TascoApp(
-          routerConfig: router,
-          theme: theme,
-          darkTheme: darkTheme,
-          themeMode: themeMode,
-          localeListenable: localeController,
-          localeOf: () => localeController.locale,
-          localizationsDelegates: [
-            ...AppLocalizations.localizationsDelegates,
-            ...miniAppDelegates,
-          ],
-          supportedLocales: AppLocalizations.supportedLocales,
+        // Chip vai trò C20 cho App Bar của mọi mini-app (US-0.11).
+        builder: (context, themeMode, _) => RoleSwitcherScope(
+          chip: (_) => const RoleChip(),
+          child: TascoApp(
+            routerConfig: router,
+            theme: theme,
+            darkTheme: darkTheme,
+            themeMode: themeMode,
+            localeListenable: localeController,
+            localeOf: () => localeController.locale,
+            localizationsDelegates: [
+              ...AppLocalizations.localizationsDelegates,
+              ...miniAppDelegates,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+          ),
         ),
       ),
     );

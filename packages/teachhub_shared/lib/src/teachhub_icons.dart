@@ -10,6 +10,11 @@ abstract final class TeachHubIcons {
   static const _family = 'Phosphor';
   static const _package = 'teachhub_shared';
 
+  static const caretDown = IconData(
+    0xe136,
+    fontFamily: _family,
+    fontPackage: _package,
+  );
   static const caretLeft = IconData(
     0xe138,
     fontFamily: _family,
@@ -22,8 +27,18 @@ abstract final class TeachHubIcons {
     fontPackage: _package,
     matchTextDirection: true,
   );
+  static const check = IconData(
+    0xe182,
+    fontFamily: _family,
+    fontPackage: _package,
+  );
   static const gear = IconData(
     0xe270,
+    fontFamily: _family,
+    fontPackage: _package,
+  );
+  static const plus = IconData(
+    0xe3d4,
     fontFamily: _family,
     fontPackage: _package,
   );

@@ -643,6 +643,24 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Cập nhật'**
   String get updateAction;
+
+  /// No description provided for @roleSwitchTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển vai trò'**
+  String get roleSwitchTitle;
+
+  /// No description provided for @roleAdd.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm vai trò'**
+  String get roleAdd;
+
+  /// No description provided for @roleSwitchedTo.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang ở vai trò {role}'**
+  String roleSwitchedTo(String role);
 }
 
 class _AppLocalizationsDelegate

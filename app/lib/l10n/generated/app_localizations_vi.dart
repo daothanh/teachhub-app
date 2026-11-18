@@ -297,4 +297,15 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get updateAction => 'Cập nhật';
+
+  @override
+  String get roleSwitchTitle => 'Chuyển vai trò';
+
+  @override
+  String get roleAdd => 'Thêm vai trò';
+
+  @override
+  String roleSwitchedTo(String role) {
+    return 'Đang ở vai trò $role';
+  }
 }
