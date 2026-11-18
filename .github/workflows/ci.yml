@@ -1,0 +1,54 @@
+# CI mobile (S0-FL-01, phần đầu S0-FL-05): mỗi gói một job — pub get (gói tasco_*
+# từ pub.vtii.vn), analyze, format, test. Build APK + phân phối bản dev chờ Firebase.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: ${{ matrix.package }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - app
+          - mini_apps/teacher
+          - mini_apps/parent
+          - mini_apps/student
+          - packages/teachhub_shared
+    defaults:
+      run:
+        working-directory: ${{ matrix.package }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: 3.44.9
+          channel: stable
+          cache: true
+      # pub.vtii.vn hiện cho tải ẩn danh; khi registry bật xác thực, thêm secret
+      # PUB_VTII_TOKEN (S0-PO-09) là đủ.
+      - name: Token pub.vtii.vn (nếu có)
+        env:
+          PUB_VTII_TOKEN: ${{ secrets.PUB_VTII_TOKEN }}
+        run: |
+          if [ -n "$PUB_VTII_TOKEN" ]; then
+            dart pub token add https://pub.vtii.vn --env-var PUB_VTII_TOKEN
+          fi
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed .
+      - run: flutter analyze
+      - run: flutter test
