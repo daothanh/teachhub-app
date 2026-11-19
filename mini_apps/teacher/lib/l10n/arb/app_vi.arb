@@ -549,5 +549,46 @@
   "inviteAllCreating": "Đang tạo link…",
   "inviteAllShareAgain": "Chia sẻ lại",
   "inviteAllShowQr": "Xem mã QR",
-  "inviteAllSharedMark": "Đã mở chia sẻ"
+  "inviteAllSharedMark": "Đã mở chia sẻ",
+  "sessionActionReschedule": "Đổi giờ",
+  "sessionActionCancel": "Hủy buổi",
+  "sessionActionMakeup": "Tạo buổi bù",
+  "sessionRescheduleTitle": "Đổi giờ buổi học",
+  "sessionCancelTitle": "Hủy buổi học?",
+  "sessionCancelBody": "Phụ huynh của lớp sẽ nhận thông báo buổi này đã hủy.",
+  "sessionMakeupTitle": "Tạo buổi bù",
+  "sessionPickDate": "Ngày",
+  "sessionPickTime": "Giờ bắt đầu",
+  "sessionReasonLabel": "Lý do (không bắt buộc)",
+  "sessionConfirmReschedule": "Đổi giờ",
+  "sessionConfirmCancel": "Hủy buổi",
+  "sessionConfirmMakeup": "Tạo buổi bù",
+  "sessionClose": "Đóng",
+  "sessionErrPast": "Giờ mới phải ở tương lai.",
+  "sessionErrCancelled": "Buổi này đã hủy nên không đổi giờ được.",
+  "sessionHasAttendanceTitle": "Buổi đã có điểm danh",
+  "sessionHasAttendanceBody": "Buổi này đã có điểm danh nên chưa hủy được. Mở bảng điểm danh để sửa lại, rồi hủy buổi sau.",
+  "sessionOpenAttendance": "Mở điểm danh",
+  "sessionDoneRescheduled": "Đã đổi giờ buổi học.",
+  "sessionDoneCancelled": "Đã hủy buổi học.",
+  "sessionDoneMakeup": "Đã tạo buổi bù.",
+  "sessionActionsLabel": "Thao tác buổi {date} lúc {start}",
+  "@sessionActionsLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionCancelReasonLine": "Lý do hủy: {reason}",
+  "@sessionCancelReasonLine": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  }
 }

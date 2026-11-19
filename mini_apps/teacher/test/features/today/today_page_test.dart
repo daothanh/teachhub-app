@@ -41,6 +41,23 @@ const cancelled = TodaySession(
   attended: false,
 );
 
+const makeupSession = TodaySession(
+  id: 's-4',
+  className: 'Anh 9D',
+  startTime: '18:00',
+  cancelled: false,
+  attended: false,
+  isMakeup: true,
+);
+const cancelledWithReason = TodaySession(
+  id: 's-5',
+  className: 'Sử 8A',
+  startTime: '19:00',
+  cancelled: true,
+  attended: false,
+  cancelReason: 'Cô bận việc đột xuất',
+);
+
 GoRouter routerFor(
   FakeAttendanceRepository repo, {
   OnboardingRepository? onboarding,
@@ -88,6 +105,18 @@ GoRouter routerFor(
 
 void main() {
   tearDown(() => GetIt.I.reset());
+
+  testWidgets('T03: buổi bù có nhãn, buổi hủy hiện lý do (chữ 200% không vỡ)', (
+    tester,
+  ) async {
+    final repo = FakeAttendanceRepository(
+      sessions: [makeupSession, cancelledWithReason],
+    );
+    await pumpRouter(tester, routerFor(repo), textScale: 2);
+    expect(find.text('Buổi bù'), findsOneWidget);
+    expect(find.text('Lý do: Cô bận việc đột xuất'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets(
     'AC-1: liệt kê buổi hôm nay: giờ, tên lớp, trạng thái, nút Điểm danh',

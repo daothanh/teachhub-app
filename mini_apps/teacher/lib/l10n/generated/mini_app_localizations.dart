@@ -1635,6 +1635,150 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Đã mở chia sẻ'**
   String get inviteAllSharedMark;
+
+  /// No description provided for @sessionActionReschedule.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi giờ'**
+  String get sessionActionReschedule;
+
+  /// No description provided for @sessionActionCancel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy buổi'**
+  String get sessionActionCancel;
+
+  /// No description provided for @sessionActionMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo buổi bù'**
+  String get sessionActionMakeup;
+
+  /// No description provided for @sessionRescheduleTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi giờ buổi học'**
+  String get sessionRescheduleTitle;
+
+  /// No description provided for @sessionCancelTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy buổi học?'**
+  String get sessionCancelTitle;
+
+  /// No description provided for @sessionCancelBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phụ huynh của lớp sẽ nhận thông báo buổi này đã hủy.'**
+  String get sessionCancelBody;
+
+  /// No description provided for @sessionMakeupTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo buổi bù'**
+  String get sessionMakeupTitle;
+
+  /// No description provided for @sessionPickDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày'**
+  String get sessionPickDate;
+
+  /// No description provided for @sessionPickTime.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giờ bắt đầu'**
+  String get sessionPickTime;
+
+  /// No description provided for @sessionReasonLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do (không bắt buộc)'**
+  String get sessionReasonLabel;
+
+  /// No description provided for @sessionConfirmReschedule.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi giờ'**
+  String get sessionConfirmReschedule;
+
+  /// No description provided for @sessionConfirmCancel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy buổi'**
+  String get sessionConfirmCancel;
+
+  /// No description provided for @sessionConfirmMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo buổi bù'**
+  String get sessionConfirmMakeup;
+
+  /// No description provided for @sessionClose.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đóng'**
+  String get sessionClose;
+
+  /// No description provided for @sessionErrPast.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giờ mới phải ở tương lai.'**
+  String get sessionErrPast;
+
+  /// No description provided for @sessionErrCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi này đã hủy nên không đổi giờ được.'**
+  String get sessionErrCancelled;
+
+  /// No description provided for @sessionHasAttendanceTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi đã có điểm danh'**
+  String get sessionHasAttendanceTitle;
+
+  /// No description provided for @sessionHasAttendanceBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi này đã có điểm danh nên chưa hủy được. Mở bảng điểm danh để sửa lại, rồi hủy buổi sau.'**
+  String get sessionHasAttendanceBody;
+
+  /// No description provided for @sessionOpenAttendance.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mở điểm danh'**
+  String get sessionOpenAttendance;
+
+  /// No description provided for @sessionDoneRescheduled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã đổi giờ buổi học.'**
+  String get sessionDoneRescheduled;
+
+  /// No description provided for @sessionDoneCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy buổi học.'**
+  String get sessionDoneCancelled;
+
+  /// No description provided for @sessionDoneMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã tạo buổi bù.'**
+  String get sessionDoneMakeup;
+
+  /// No description provided for @sessionActionsLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thao tác buổi {date} lúc {start}'**
+  String sessionActionsLabel(String date, String start);
+
+  /// No description provided for @sessionCancelReasonLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do hủy: {reason}'**
+  String sessionCancelReasonLine(String reason);
 }
 
 class _MiniAppLocalizationsDelegate

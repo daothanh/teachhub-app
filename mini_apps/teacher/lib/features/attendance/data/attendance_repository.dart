@@ -152,6 +152,8 @@ class DriftAttendanceRepository implements AttendanceRepository {
               startTime: wallTime(s.startsAt, s.tzOffsetMinutes),
               cancelled: s.status == 'cancelled',
               attended: s.status == 'taught' || recorded.contains(s.id),
+              isMakeup: s.isMakeup,
+              cancelReason: s.cancelReason,
             ),
         ];
       });

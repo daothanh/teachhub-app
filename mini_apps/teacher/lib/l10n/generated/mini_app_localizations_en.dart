@@ -912,4 +912,83 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get inviteAllSharedMark => 'Share opened';
+
+  @override
+  String get sessionActionReschedule => 'Reschedule';
+
+  @override
+  String get sessionActionCancel => 'Cancel session';
+
+  @override
+  String get sessionActionMakeup => 'Add makeup';
+
+  @override
+  String get sessionRescheduleTitle => 'Reschedule session';
+
+  @override
+  String get sessionCancelTitle => 'Cancel this session?';
+
+  @override
+  String get sessionCancelBody =>
+      'The class\'s parents will be notified that this session is cancelled.';
+
+  @override
+  String get sessionMakeupTitle => 'Add makeup session';
+
+  @override
+  String get sessionPickDate => 'Date';
+
+  @override
+  String get sessionPickTime => 'Start time';
+
+  @override
+  String get sessionReasonLabel => 'Reason (optional)';
+
+  @override
+  String get sessionConfirmReschedule => 'Reschedule';
+
+  @override
+  String get sessionConfirmCancel => 'Cancel session';
+
+  @override
+  String get sessionConfirmMakeup => 'Add makeup';
+
+  @override
+  String get sessionClose => 'Close';
+
+  @override
+  String get sessionErrPast => 'The new time must be in the future.';
+
+  @override
+  String get sessionErrCancelled =>
+      'This session is cancelled, so it cannot be rescheduled.';
+
+  @override
+  String get sessionHasAttendanceTitle => 'Attendance already taken';
+
+  @override
+  String get sessionHasAttendanceBody =>
+      'This session has attendance, so it cannot be cancelled yet. Open the attendance sheet to fix it, then cancel the session.';
+
+  @override
+  String get sessionOpenAttendance => 'Open attendance';
+
+  @override
+  String get sessionDoneRescheduled => 'Session rescheduled.';
+
+  @override
+  String get sessionDoneCancelled => 'Session cancelled.';
+
+  @override
+  String get sessionDoneMakeup => 'Makeup session added.';
+
+  @override
+  String sessionActionsLabel(String date, String start) {
+    return 'Actions for session on $date at $start';
+  }
+
+  @override
+  String sessionCancelReasonLine(String reason) {
+    return 'Cancel reason: $reason';
+  }
 }

@@ -88,7 +88,6 @@ class ClassDetailCubit extends Cubit<ClassDetailState> {
   Future<void> load() async {
     emit(const ClassDetailState());
     try {
-      final today = _now();
       final results = await Future.wait([
         _repo.get(classId),
         _repo.roster(classId),
@@ -98,20 +97,7 @@ class ClassDetailCubit extends Cubit<ClassDetailState> {
       var sessions = const <ClassSession>[];
       var sessionsError = false;
       try {
-        sessions = cls.archived
-            ? const []
-            : await _repo.sessions(
-                from: isoDate(today),
-                // Cộng theo lịch (không cộng 24h) để qua đổi giờ mùa hè vẫn đúng ngày.
-                to: isoDate(
-                  DateTime(
-                    today.year,
-                    today.month,
-                    today.day + sessionWindowDays,
-                  ),
-                ),
-                classId: classId,
-              );
+        sessions = cls.archived ? const [] : await _fetchSessions();
       } on ApiException {
         sessionsError = true;
       }
@@ -129,6 +115,73 @@ class ClassDetailCubit extends Cubit<ClassDetailState> {
       if (isClosed) return;
       emit(ClassDetailState(load: ClassesLoad.failure, error: e));
     }
+  }
+
+  Future<List<ClassSession>> _fetchSessions() {
+    final today = _now();
+    return _repo.sessions(
+      from: isoDate(today),
+      // Cộng theo lịch (không cộng 24h) để qua đổi giờ mùa hè vẫn đúng ngày.
+      to: isoDate(
+        DateTime(today.year, today.month, today.day + sessionWindowDays),
+      ),
+      classId: classId,
+    );
+  }
+
+  /// Đổi giờ buổi `planned` (US-2.2). Trả lỗi (null = xong) để hộp thoại tự
+  /// hiện; thử lại sau lỗi mạng giữ khóa, lỗi chắc chắn thì lệnh sau là lệnh mới.
+  Future<ApiException?> rescheduleSession(
+    ClassSession s, {
+    required String startsAt,
+    String? reason,
+  }) => _sessionCommand(
+    'reschedule:${s.id}',
+    '$startsAt|$reason',
+    (key) => _repo.reschedule(
+      s.id,
+      startsAt: startsAt,
+      reason: reason,
+      idempotencyKey: key,
+    ),
+  );
+
+  Future<ApiException?> cancelSession(ClassSession s, {String? reason}) =>
+      _sessionCommand(
+        'cancel:${s.id}',
+        '$reason',
+        (key) => _repo.cancel(s.id, reason: reason, idempotencyKey: key),
+      );
+
+  Future<ApiException?> makeupSession(
+    ClassSession s, {
+    required String startsAt,
+  }) => _sessionCommand(
+    'makeup:${s.id}',
+    startsAt,
+    (key) => _repo.makeup(s.id, startsAt: startsAt, idempotencyKey: key),
+  );
+
+  Future<ApiException?> _sessionCommand(
+    String op,
+    String draft,
+    Future<ClassSession> Function(String key) run,
+  ) async {
+    try {
+      await run(_keys.of(op, draft));
+      _keys.done(op);
+    } on ApiException catch (e) {
+      if (!e.retryable) _keys.done(op);
+      return e;
+    }
+    // Lệnh đã xong; tải lại danh sách buổi, lỗi tải không làm hỏng kết quả.
+    try {
+      final sessions = await _fetchSessions();
+      if (!isClosed) emit(state.copyWith(sessions: sessions));
+    } on ApiException {
+      if (!isClosed) emit(state.copyWith(sessionsError: true));
+    }
+    return null;
   }
 
   /// Lưu trữ lớp (US-1.1 AC3). Lỗi → [ClassDetailState.actionError].

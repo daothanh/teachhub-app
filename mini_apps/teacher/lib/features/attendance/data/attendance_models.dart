@@ -29,6 +29,8 @@ class TodaySession extends Equatable {
     required this.startTime,
     required this.cancelled,
     required this.attended,
+    this.isMakeup = false,
+    this.cancelReason,
   });
 
   final String id;
@@ -38,11 +40,19 @@ class TodaySession extends Equatable {
   final String startTime;
   final bool cancelled;
 
+  /// Buổi dạy bù (US-2.2).
+  final bool isMakeup;
+
+  /// Lý do hủy; chỉ có khi [cancelled] và giáo viên có nhập.
+  final String? cancelReason;
+
   /// Đã điểm danh: server đã đánh dấu "đã dạy" hoặc cache có dòng đã ghi.
   final bool attended;
 
   @override
-  List<Object?> get props => [id, className, startTime, cancelled, attended];
+  List<Object?> get props => [
+    id, className, startTime, cancelled, attended, isMakeup, cancelReason, //
+  ];
 }
 
 class SheetStudent extends Equatable {

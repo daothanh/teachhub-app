@@ -250,6 +250,19 @@ void main() {
       containsAll(input.toJson().keys),
     );
 
+    // Lệnh đổi giờ / hủy / bù (US-2.2): khóa body khớp hợp đồng.
+    expect(
+      _props(_schema('RescheduleSessionRequest')),
+      containsAll(['startsAt', 'reason']),
+    );
+    expect(_props(_schema('CancelSessionRequest')), contains('reason'));
+    expect(_props(_schema('MakeupSessionRequest')), contains('startsAt'));
+    expect(
+      ((_schema('CancelSessionRequest')['properties'] as Map)['reason']
+          as Map)['maxLength'],
+      300,
+    );
+
     final rule = body('/v1/classes/{id}/schedule-rules', 'put');
     final item = ((rule['properties'] as Map)['rules'] as Map)['items'] as Map;
     expect(
@@ -321,8 +334,15 @@ void main() {
           to: '2027-02-12',
           classId: 'c1',
         );
+        await repo.reschedule(
+          'x1',
+          startsAt: '2099-12-18T18:00:00+07:00',
+          reason: 'Bận',
+        );
+        await repo.cancel('x1', reason: 'Bận');
+        await repo.makeup('x1', startsAt: '2099-12-20T18:00:00+07:00');
 
-        expect(adapter.requests, hasLength(10));
+        expect(adapter.requests, hasLength(13));
         for (final r in adapter.requests) {
           _operation(r.method, r.path); // ném nếu hợp đồng không có
           expect(

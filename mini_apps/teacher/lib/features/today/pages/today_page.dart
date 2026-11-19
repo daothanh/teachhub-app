@@ -254,6 +254,11 @@ class _SessionCard extends StatelessWidget {
                   ),
                 ],
               ),
+              if (session.isMakeup)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xs),
+                  child: Chip(label: Text(l10n.scheduleMakeup)),
+                ),
               const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
@@ -269,6 +274,14 @@ class _SessionCard extends StatelessWidget {
                     ),
                 ],
               ),
+              if (session.cancelled && session.cancelReason != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xs),
+                  child: Text(
+                    l10n.scheduleCancelReason(session.cancelReason!),
+                    style: text.bodySmall,
+                  ),
+                ),
             ],
           ),
         ),

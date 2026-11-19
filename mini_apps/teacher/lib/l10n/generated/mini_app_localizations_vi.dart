@@ -900,4 +900,82 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get inviteAllSharedMark => 'Đã mở chia sẻ';
+
+  @override
+  String get sessionActionReschedule => 'Đổi giờ';
+
+  @override
+  String get sessionActionCancel => 'Hủy buổi';
+
+  @override
+  String get sessionActionMakeup => 'Tạo buổi bù';
+
+  @override
+  String get sessionRescheduleTitle => 'Đổi giờ buổi học';
+
+  @override
+  String get sessionCancelTitle => 'Hủy buổi học?';
+
+  @override
+  String get sessionCancelBody =>
+      'Phụ huynh của lớp sẽ nhận thông báo buổi này đã hủy.';
+
+  @override
+  String get sessionMakeupTitle => 'Tạo buổi bù';
+
+  @override
+  String get sessionPickDate => 'Ngày';
+
+  @override
+  String get sessionPickTime => 'Giờ bắt đầu';
+
+  @override
+  String get sessionReasonLabel => 'Lý do (không bắt buộc)';
+
+  @override
+  String get sessionConfirmReschedule => 'Đổi giờ';
+
+  @override
+  String get sessionConfirmCancel => 'Hủy buổi';
+
+  @override
+  String get sessionConfirmMakeup => 'Tạo buổi bù';
+
+  @override
+  String get sessionClose => 'Đóng';
+
+  @override
+  String get sessionErrPast => 'Giờ mới phải ở tương lai.';
+
+  @override
+  String get sessionErrCancelled => 'Buổi này đã hủy nên không đổi giờ được.';
+
+  @override
+  String get sessionHasAttendanceTitle => 'Buổi đã có điểm danh';
+
+  @override
+  String get sessionHasAttendanceBody =>
+      'Buổi này đã có điểm danh nên chưa hủy được. Mở bảng điểm danh để sửa lại, rồi hủy buổi sau.';
+
+  @override
+  String get sessionOpenAttendance => 'Mở điểm danh';
+
+  @override
+  String get sessionDoneRescheduled => 'Đã đổi giờ buổi học.';
+
+  @override
+  String get sessionDoneCancelled => 'Đã hủy buổi học.';
+
+  @override
+  String get sessionDoneMakeup => 'Đã tạo buổi bù.';
+
+  @override
+  String sessionActionsLabel(String date, String start) {
+    return 'Thao tác buổi $date lúc $start';
+  }
+
+  @override
+  String sessionCancelReasonLine(String reason) {
+    return 'Lý do hủy: $reason';
+  }
 }

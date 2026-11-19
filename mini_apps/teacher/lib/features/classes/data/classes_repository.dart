@@ -43,6 +43,28 @@ abstract class ClassesRepository {
     required String to,
     String? classId,
   });
+
+  /// Đổi giờ buổi `planned` (US-2.2). [startsAt] ISO 8601 kèm offset, ở tương lai.
+  Future<ClassSession> reschedule(
+    String sessionId, {
+    required String startsAt,
+    String? reason,
+    String? idempotencyKey,
+  });
+
+  /// Hủy buổi. Đã có điểm danh → 409 `SESSION_HAS_ATTENDANCE`.
+  Future<ClassSession> cancel(
+    String sessionId, {
+    String? reason,
+    String? idempotencyKey,
+  });
+
+  /// Tạo buổi bù cho buổi gốc đã hủy.
+  Future<ClassSession> makeup(
+    String sessionId, {
+    required String startsAt,
+    String? idempotencyKey,
+  });
 }
 
 /// Bản dùng thật: `Dio` của host (`TeachHubDiKey.api`) đã có Bearer và
@@ -176,6 +198,49 @@ class DioClassesRepository implements ClassesRepository {
       for (final e in r.data!['items'] as List)
         ClassSession.fromJson(e as Map<String, dynamic>),
     ];
+  });
+
+  @override
+  Future<ClassSession> reschedule(
+    String sessionId, {
+    required String startsAt,
+    String? reason,
+    String? idempotencyKey,
+  }) => _call(() async {
+    final r = await _dio.post<Map<String, dynamic>>(
+      '/sessions/$sessionId/reschedule',
+      data: {'startsAt': startsAt, 'reason': ?reason},
+      options: _key(idempotencyKey),
+    );
+    return ClassSession.fromJson(r.data!);
+  });
+
+  @override
+  Future<ClassSession> cancel(
+    String sessionId, {
+    String? reason,
+    String? idempotencyKey,
+  }) => _call(() async {
+    final r = await _dio.post<Map<String, dynamic>>(
+      '/sessions/$sessionId/cancel',
+      data: {'reason': ?reason},
+      options: _key(idempotencyKey),
+    );
+    return ClassSession.fromJson(r.data!);
+  });
+
+  @override
+  Future<ClassSession> makeup(
+    String sessionId, {
+    required String startsAt,
+    String? idempotencyKey,
+  }) => _call(() async {
+    final r = await _dio.post<Map<String, dynamic>>(
+      '/sessions/$sessionId/makeup',
+      data: {'startsAt': startsAt},
+      options: _key(idempotencyKey),
+    );
+    return ClassSession.fromJson(r.data!);
   });
 }
 

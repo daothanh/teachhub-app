@@ -549,5 +549,46 @@
   "inviteAllCreating": "Creating link…",
   "inviteAllShareAgain": "Share again",
   "inviteAllShowQr": "Show QR code",
-  "inviteAllSharedMark": "Share opened"
+  "inviteAllSharedMark": "Share opened",
+  "sessionActionReschedule": "Reschedule",
+  "sessionActionCancel": "Cancel session",
+  "sessionActionMakeup": "Add makeup",
+  "sessionRescheduleTitle": "Reschedule session",
+  "sessionCancelTitle": "Cancel this session?",
+  "sessionCancelBody": "The class's parents will be notified that this session is cancelled.",
+  "sessionMakeupTitle": "Add makeup session",
+  "sessionPickDate": "Date",
+  "sessionPickTime": "Start time",
+  "sessionReasonLabel": "Reason (optional)",
+  "sessionConfirmReschedule": "Reschedule",
+  "sessionConfirmCancel": "Cancel session",
+  "sessionConfirmMakeup": "Add makeup",
+  "sessionClose": "Close",
+  "sessionErrPast": "The new time must be in the future.",
+  "sessionErrCancelled": "This session is cancelled, so it cannot be rescheduled.",
+  "sessionHasAttendanceTitle": "Attendance already taken",
+  "sessionHasAttendanceBody": "This session has attendance, so it cannot be cancelled yet. Open the attendance sheet to fix it, then cancel the session.",
+  "sessionOpenAttendance": "Open attendance",
+  "sessionDoneRescheduled": "Session rescheduled.",
+  "sessionDoneCancelled": "Session cancelled.",
+  "sessionDoneMakeup": "Makeup session added.",
+  "sessionActionsLabel": "Actions for session on {date} at {start}",
+  "@sessionActionsLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionCancelReasonLine": "Cancel reason: {reason}",
+  "@sessionCancelReasonLine": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  }
 }
