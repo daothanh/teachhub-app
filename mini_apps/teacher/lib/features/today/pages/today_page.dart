@@ -12,8 +12,8 @@ import '../../attendance/data/attendance_models.dart';
 import '../../attendance/data/attendance_repository.dart';
 import '../../classes/classes_routes.dart';
 import '../../onboarding/data/onboarding_models.dart';
-import '../../schedule/schedule_routes.dart';
 import '../../onboarding/data/onboarding_repository.dart';
+import '../../schedule/schedule_routes.dart';
 import '../cubit/today_cubit.dart';
 
 /// T03 "Hôm nay": màn chính của giáo viên (route `/t`).

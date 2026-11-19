@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 
 import '../../../data/cache/session_cache.dart';
+import '../../../data/cache/wall_time.dart';
 import '../../../data/local_db/teacher_database.dart';
 import '../../classes/data/class_models.dart' show SessionStatus;
 import 'schedule_models.dart';
@@ -41,17 +42,8 @@ ScheduleSession _toSession(CachedSession s) => ScheduleSession(
   id: s.id,
   className: s.className,
   sessionDate: s.sessionDate,
-  startTime: _wallTime(s),
+  startTime: wallTime(s.startsAt, s.tzOffsetMinutes),
   status: SessionStatus.fromWire(s.status),
   isMakeup: s.isMakeup,
   cancelReason: s.cancelReason,
 );
-
-/// Giờ tường `HH:mm` theo offset của tenant; dòng cũ chưa có offset thì giờ máy.
-String _wallTime(CachedSession s) {
-  final t = s.tzOffsetMinutes == null
-      ? s.startsAt.toLocal()
-      : s.startsAt.toUtc().add(Duration(minutes: s.tzOffsetMinutes!));
-  String two(int n) => n.toString().padLeft(2, '0');
-  return '${two(t.hour)}:${two(t.minute)}';
-}

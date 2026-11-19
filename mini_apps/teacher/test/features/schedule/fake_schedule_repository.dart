@@ -20,9 +20,21 @@ class FakeScheduleRepository implements ScheduleRepository {
   /// completer đầu hàng.
   final gates = <Completer<void>>[];
 
+  /// Nếu đặt, `watch` ném lỗi (giả CSDL đóng).
+  Object? watchError;
+
+  /// Bật để tự phát: `watch` trả controller theo khoảng, test tự `add`.
+  bool manual = false;
+  final streams = <String, StreamController<List<ScheduleSession>>>{};
+
   @override
   Stream<List<ScheduleSession>> watch(String from, String to) async* {
     watched.add((from, to));
+    if (watchError != null) throw watchError!;
+    if (manual) {
+      yield* (streams['$from|$to'] ??= StreamController.broadcast()).stream;
+      return;
+    }
     yield [
       for (final s in all)
         if (s.sessionDate.compareTo(from) >= 0 &&

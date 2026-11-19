@@ -218,4 +218,38 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(CircularProgressIndicator), findsNothing);
   });
+
+  testWidgets('Semantics: một nhãn cho thẻ; chưa hủy là nút, hủy thì không', (
+    tester,
+  ) async {
+    final handle = tester.ensureSemantics();
+    final repo = FakeScheduleRepository([
+      sess(
+        'c',
+        '2026-11-18',
+        '07:00',
+        className: 'Hóa 8C',
+        status: SessionStatus.cancelled,
+        reason: 'Nghỉ lễ',
+      ),
+      sess('a', '2026-11-18', '08:00', makeup: true),
+    ]);
+    await pumpRouter(tester, routerFor(repo));
+    final cancelled = tester.getSemantics(find.text('Hóa 8C'));
+    expect(cancelled.label, contains('Đã hủy'));
+    expect(cancelled.label, contains('Lý do: Nghỉ lễ'));
+    expect(cancelled.flagsCollection.isButton, isFalse);
+    final makeup = tester.getSemantics(find.text('Toán 6A'));
+    expect(makeup.label, contains('Buổi bù'));
+    expect(makeup.flagsCollection.isButton, isTrue);
+    handle.dispose();
+  });
+
+  testWidgets('chữ phóng to 2.0: thanh công cụ không tràn', (tester) async {
+    final repo = FakeScheduleRepository([sess('a', '2026-11-18', '08:00')]);
+    await pumpRouter(tester, routerFor(repo), textScale: 2);
+    await tester.tap(find.text('Tuần'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
 }

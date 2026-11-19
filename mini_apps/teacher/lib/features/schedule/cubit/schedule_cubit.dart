@@ -73,37 +73,60 @@ class ScheduleCubit extends Cubit<ScheduleState> {
   StreamSubscription<List<ScheduleSession>>? _sub;
   int _gen = 0;
 
+  /// Stream cache lỗi: làm mới API xong vẫn chưa hết lỗi, chỉ Thử lại (đăng ký lại) mới hết.
+  bool _streamFailed = false;
+
   static DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
   /// shortcut: "hôm nay" theo ngày của máy, chưa theo múi giờ tenant; đủ cho
   /// tenant cùng múi giờ với giáo viên.
   Future<void> start() => _load();
 
-  Future<void> setMode(ScheduleMode mode) =>
-      _move(ScheduleState(mode: mode, anchor: state.anchor));
+  Future<void> setMode(ScheduleMode mode) => _move(mode, state.anchor);
 
   /// Sang ngày/tuần liền kề: [steps] là +1/-1 theo chế độ đang xem.
   Future<void> shift(int steps) {
     final a = state.anchor;
     final days = steps * (state.mode == ScheduleMode.week ? 7 : 1);
-    return _move(
-      ScheduleState(
-        mode: state.mode,
-        anchor: DateTime(a.year, a.month, a.day + days),
-      ),
-    );
+    return _move(state.mode, DateTime(a.year, a.month, a.day + days));
   }
 
-  Future<void> goToday() =>
-      _move(ScheduleState(mode: state.mode, anchor: _dateOnly(_now())));
+  Future<void> goToday() => _move(state.mode, _dateOnly(_now()));
 
   /// Kéo xuống / nút Thử lại: giữ danh sách đang hiện, tải lại khoảng này.
-  Future<void> refresh() => _refresh();
+  Future<void> refresh() => _load();
 
-  Future<void> _move(ScheduleState next) {
+  Future<void> _move(ScheduleMode mode, DateTime anchor) {
     if (isClosed) return Future.value();
+    final next = ScheduleState(
+      mode: mode,
+      anchor: anchor,
+      sessions: state.sessions,
+      refreshed: state.refreshed,
+      offline: state.offline,
+      error: state.error,
+    );
+    // Khoảng không đổi (vd. bấm "Hôm nay" khi đang ở hôm nay): không tải lại.
+    if (next.from == state.from && next.to == state.to) {
+      if (next != state) emit(next);
+      return Future.value();
+    }
     _gen++; // lượt làm mới của khoảng cũ trả muộn sẽ bị bỏ ngay từ giờ
-    emit(next);
+    final f = isoDate(next.from), t = isoDate(next.to);
+    // Giữ phần buổi còn nằm trong khoảng mới để khỏi nháy rỗng; cache phát sau.
+    emit(
+      ScheduleState(
+        mode: mode,
+        anchor: anchor,
+        sessions: [
+          for (final x in state.sessions)
+            if (x.sessionDate.compareTo(f) >= 0 &&
+                x.sessionDate.compareTo(t) <= 0)
+              x,
+        ],
+        offline: state.offline,
+      ),
+    );
     return _load();
   }
 
@@ -112,6 +135,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     final from = isoDate(state.from), to = isoDate(state.to);
     String key() => '${isoDate(state.from)}|${isoDate(state.to)}';
     final range = key();
+    _streamFailed = false;
     // Không await: hai lần chuyển khoảng sát nhau không được để lọt một sub.
     unawaited(_sub?.cancel());
     _sub = _repo
@@ -124,6 +148,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
           },
           onError: (Object _) {
             if (isClosed) return;
+            _streamFailed = true;
             emit(
               _copy(error: const ApiException.unexpected(), refreshed: true),
             );
@@ -139,7 +164,7 @@ class ScheduleCubit extends Cubit<ScheduleState> {
     try {
       await _repo.refresh(from, to);
       if (isClosed || gen != _gen) return;
-      emit(_copy(refreshed: true, offline: false, clearError: true));
+      emit(_copy(refreshed: true, offline: false, clearError: !_streamFailed));
     } on ApiException catch (e) {
       if (isClosed || gen != _gen) return;
       final network = e.kind == ApiErrorKind.network;

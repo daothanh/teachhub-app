@@ -120,11 +120,11 @@ class TeacherDatabase extends _$TeacherDatabase {
           'DELETE FROM outbox_mutations WHERE session_id IS NULL',
         );
       }
-      // from < 3: createTable ở trên đã tạo bảng với cột này.
+      // from < 3: createTable ở trên đã tạo bảng với cột tzOffsetMinutes.
       if (from == 3) {
         await m.addColumn(cachedSessions, cachedSessions.tzOffsetMinutes);
       }
-      // from < 3: createTable ở trên đã có cột này.
+      // v5 cancelReason; from < 3 thì createTable ở trên đã có cột.
       if (from >= 3 && from < 5) {
         await m.addColumn(cachedSessions, cachedSessions.cancelReason);
       }

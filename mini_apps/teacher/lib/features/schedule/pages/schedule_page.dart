@@ -45,7 +45,14 @@ class _ScheduleViewState extends State<_ScheduleView> {
     final l10n = context.miniAppL10n;
     final cubit = context.read<ScheduleCubit>();
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.scheduleTitle), centerTitle: false),
+      appBar: AppBar(
+        title: Text(l10n.scheduleTitle),
+        centerTitle: false,
+        // Ở thanh trên để thanh công cụ không tràn khi chữ phóng to.
+        actions: [
+          TextButton(onPressed: cubit.goToday, child: Text(l10n.scheduleToday)),
+        ],
+      ),
       body: Column(
         children: [
           StreamBuilder<bool>(
@@ -137,10 +144,6 @@ class _Toolbar extends StatelessWidget {
                 icon: const Icon(Icons.chevron_right),
                 onPressed: () => cubit.shift(1),
               ),
-              TextButton(
-                onPressed: cubit.goToday,
-                child: Text(l10n.scheduleToday),
-              ),
             ],
           ),
         ],
@@ -209,22 +212,24 @@ class _Body extends StatelessWidget {
     for (final x in s.sessions) {
       if (s.mode == ScheduleMode.week && x.sessionDate != last) {
         last = x.sessionDate;
-        final d = DateTime.parse(x.sessionDate);
-        out.add(
-          Padding(
-            padding: const EdgeInsets.only(
-              top: AppSpacing.sm,
-              bottom: AppSpacing.xs,
-            ),
-            child: Text(
-              l10n.scheduleDayHeading(
-                l10n.classesWeekday('${d.weekday}'),
-                _ddMM(d),
+        final d = DateTime.tryParse(x.sessionDate);
+        if (d != null) {
+          out.add(
+            Padding(
+              padding: const EdgeInsets.only(
+                top: AppSpacing.sm,
+                bottom: AppSpacing.xs,
               ),
-              style: Theme.of(context).textTheme.titleSmall,
+              child: Text(
+                l10n.scheduleDayHeading(
+                  l10n.classesWeekday('${d.weekday}'),
+                  _ddMM(d),
+                ),
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
       out.add(_SessionCard(session: x));
     }
@@ -246,11 +251,19 @@ class _SessionCard extends StatelessWidget {
       SessionStatus.taught => l10n.classesSessionTaught,
       SessionStatus.cancelled => l10n.scheduleCancelled,
     };
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    // Buổi hủy: gạch ngang và màu phụ (đủ tương phản), không làm mờ cả thẻ.
     final title = text.titleMedium?.copyWith(
       decoration: cancelled ? TextDecoration.lineThrough : null,
+      color: cancelled ? muted : null,
     );
+    void open() => context.push(AttendanceRoutes.sheet(session.id));
     return Semantics(
       container: true,
+      button: !cancelled,
+      // Một nhãn gọn cho cả thẻ, không đọc lại từng Text bên trong.
+      excludeSemantics: true,
+      onTap: cancelled ? null : open,
       label: [
         l10n.todaySessionSemantics(
           session.className,
@@ -261,51 +274,51 @@ class _SessionCard extends StatelessWidget {
         if (cancelled && session.cancelReason != null)
           l10n.scheduleCancelReason(session.cancelReason!),
       ].join(', '),
-      child: Opacity(
-        opacity: cancelled ? 0.6 : 1,
-        child: Card(
-          margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-          child: InkWell(
-            // Buổi đã hủy không có gì để điểm danh.
-            onTap: cancelled
-                ? null
-                : () => context.push(AttendanceRoutes.sheet(session.id)),
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(session.startTime, style: title),
-                      const SizedBox(width: AppSpacing.md),
-                      Expanded(child: Text(session.className, style: title)),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Wrap(
-                    spacing: AppSpacing.sm,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Text(status, style: text.bodyMedium),
-                      if (session.isMakeup)
-                        Chip(
-                          avatar: const Icon(Icons.event_repeat, size: 18),
-                          label: Text(l10n.scheduleMakeup),
-                        ),
-                    ],
-                  ),
-                  if (cancelled && session.cancelReason != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: AppSpacing.xs),
-                      child: Text(
-                        l10n.scheduleCancelReason(session.cancelReason!),
-                        style: text.bodySmall,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+        child: InkWell(
+          // Buổi đã hủy không có gì để điểm danh.
+          onTap: cancelled ? null : open,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(session.startTime, style: title),
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(child: Text(session.className, style: title)),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      status,
+                      style: text.bodyMedium?.copyWith(
+                        color: cancelled ? muted : null,
                       ),
                     ),
-                ],
-              ),
+                    if (session.isMakeup)
+                      Chip(
+                        avatar: const Icon(Icons.event_repeat, size: 18),
+                        label: Text(l10n.scheduleMakeup),
+                      ),
+                  ],
+                ),
+                if (cancelled && session.cancelReason != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.xs),
+                    child: Text(
+                      l10n.scheduleCancelReason(session.cancelReason!),
+                      style: text.bodySmall?.copyWith(color: muted),
+                    ),
+                  ),
+              ],
             ),
           ),
         ),

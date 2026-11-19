@@ -154,4 +154,63 @@ void main() {
       await started; // emit sau close sẽ ném StateError nếu thiếu isClosed
     },
   );
+
+  test(
+    'goToday khi đang ở hôm nay: không tải lại, không xóa danh sách',
+    () async {
+      final repo = FakeScheduleRepository([sess('a', '2026-11-18', '08:00')]);
+      final c = await open(repo);
+      addTearDown(c.close);
+      await c.goToday();
+      await c.setMode(ScheduleMode.day);
+      expect(repo.refreshed, hasLength(1));
+      expect(c.state.sessions, hasLength(1));
+    },
+  );
+
+  test('đổi sang tuần giữ buổi còn trong khoảng, không nháy rỗng', () async {
+    final repo = FakeScheduleRepository([sess('a', '2026-11-18', '08:00')])
+      ..manual = true;
+    final c = ScheduleCubit(repo, now: () => wed);
+    addTearDown(c.close);
+    unawaited(c.start());
+    await Future<void>.delayed(Duration.zero);
+    repo.streams['2026-11-18|2026-11-18']!.add([
+      sess('a', '2026-11-18', '08:00'),
+    ]);
+    await Future<void>.delayed(Duration.zero);
+
+    final states = <ScheduleState>[];
+    final sub = c.stream.listen(states.add);
+    addTearDown(sub.cancel);
+    await c.setMode(ScheduleMode.week);
+    expect(states.first.sessions.map((s) => s.id), ['a']);
+  });
+
+  test('onError của stream cache: báo lỗi chung có thể Thử lại', () async {
+    final repo = FakeScheduleRepository()..watchError = StateError('db đóng');
+    final c = await open(repo);
+    addTearDown(c.close);
+    expect(c.state.error, isNotNull);
+    expect(c.state.refreshed, isTrue);
+  });
+
+  test('stream của khoảng cũ phát muộn sau đổi khoảng bị bỏ', () async {
+    final repo = FakeScheduleRepository()..manual = true;
+    final c = ScheduleCubit(repo, now: () => wed);
+    addTearDown(c.close);
+    unawaited(c.start());
+    await Future<void>.delayed(Duration.zero);
+    final old = repo.streams['2026-11-18|2026-11-18']!;
+    await c.shift(1);
+    await Future<void>.delayed(Duration.zero);
+    old.add([sess('stale', '2026-11-18', '08:00')]);
+    await Future<void>.delayed(Duration.zero);
+    expect(c.state.sessions, isEmpty);
+    repo.streams['2026-11-19|2026-11-19']!.add([
+      sess('new', '2026-11-19', '09:00'),
+    ]);
+    await Future<void>.delayed(Duration.zero);
+    expect(c.state.sessions.map((s) => s.id), ['new']);
+  });
 }
