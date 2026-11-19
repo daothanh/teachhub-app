@@ -56,13 +56,15 @@ class BulkInviteItem extends Equatable {
   ];
 }
 
-enum BulkInviteStatus { loading, working, done, failure }
+/// [paused]: dừng vì lỗi mạng/429 liên tiếp, chờ giáo viên bấm "Tiếp tục".
+enum BulkInviteStatus { loading, working, paused, done, failure }
 
 class BulkInviteState extends Equatable {
   const BulkInviteState({
     this.status = BulkInviteStatus.loading,
     this.items = const [],
     this.error,
+    this.retryAfter,
   });
 
   final BulkInviteStatus status;
@@ -71,11 +73,14 @@ class BulkInviteState extends Equatable {
   /// Lỗi tải danh sách lớp ([BulkInviteStatus.failure]).
   final ApiException? error;
 
+  /// Server yêu cầu chờ bao lâu khi dừng vì 429 ([BulkInviteStatus.paused]).
+  final Duration? retryAfter;
+
   /// Số người đã có link.
   int get ready => items.where((i) => i.link != null).length;
 
   @override
-  List<Object?> get props => [status, items, error];
+  List<Object?> get props => [status, items, error, retryAfter];
 }
 
 /// "Mời tất cả phụ huynh chưa kích hoạt" của lớp (US-1.6 AC3). Chỉ lặp trên
@@ -123,8 +128,50 @@ class BulkInviteCubit extends Cubit<BulkInviteState> {
       emit(BulkInviteState(status: BulkInviteStatus.failure, error: e));
       return;
     }
+    await _run();
+  }
+
+  /// Số lỗi mạng/429 liên tiếp thì dừng, kẻo bắn hàng trăm yêu cầu vô ích.
+  static const maxConsecutiveFailures = 3;
+
+  /// Giáo viên bấm "Tiếp tục" sau khi dừng: làm nốt người chưa có link (bỏ
+  /// qua người bị lỗi dứt khoát, những người đó thử lại riêng).
+  Future<void> resume() async {
+    if (state.status != BulkInviteStatus.paused) return;
+    emit(BulkInviteState(status: BulkInviteStatus.working, items: state.items));
+    await _run();
+  }
+
+  Future<void> _run() async {
+    var streak = 0;
     for (var i = 0; i < state.items.length && !isClosed; i++) {
+      final item = state.items[i];
+      if (item.link != null) continue;
+      if (item.error != null && !item.error!.retryable) continue;
       await _issue(i);
+      final e = state.items[i].error;
+      if (e == null) {
+        streak = 0;
+      } else if (e.kind == ApiErrorKind.network ||
+          e.kind == ApiErrorKind.rateLimited) {
+        streak++;
+        if (streak >= maxConsecutiveFailures) {
+          if (!isClosed) {
+            emit(
+              BulkInviteState(
+                status: BulkInviteStatus.paused,
+                items: state.items,
+                retryAfter: e.kind == ApiErrorKind.rateLimited
+                    ? e.retryAfter ?? Duration.zero
+                    : null,
+              ),
+            );
+          }
+          return;
+        }
+      } else {
+        streak = 0;
+      }
     }
     if (!isClosed) {
       emit(BulkInviteState(status: BulkInviteStatus.done, items: state.items));
@@ -159,7 +206,12 @@ class BulkInviteCubit extends Cubit<BulkInviteState> {
     final items = [...state.items];
     items[index] = f(items[index]);
     emit(
-      BulkInviteState(status: state.status, items: items, error: state.error),
+      BulkInviteState(
+        status: state.status,
+        items: items,
+        error: state.error,
+        retryAfter: state.retryAfter,
+      ),
     );
   }
 }

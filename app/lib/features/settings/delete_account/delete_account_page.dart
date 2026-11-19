@@ -31,6 +31,8 @@ class DeleteAccountScope extends StatelessWidget {
       repository: GetIt.I<AccountRepository>(),
       pendingCount: logout.pendingCount,
       // Cảnh báo outbox đã hiện trước khi gửi mã nên bỏ qua hỏi lại.
+      markDeleting: logout.markWipePending,
+      clearDeleting: logout.clearWipePending,
       finish: () => logout.logout(confirmDiscard: (_) async => true),
     );
   }

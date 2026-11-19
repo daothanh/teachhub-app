@@ -83,9 +83,6 @@ class DioStudentRepository implements StudentRepository {
     }
   }
 
-  /// Lớp tối đa 500 học viên, 100 mỗi trang.
-  static const _maxPages = 5;
-
   @override
   Future<Student> find(
     String id, {
@@ -93,7 +90,7 @@ class DioStudentRepository implements StudentRepository {
     String status = 'active',
   }) async {
     try {
-      for (var page = 1; page <= _maxPages; page++) {
+      for (var page = 1; ; page++) {
         final res = await _api.get<Map<String, dynamic>>(
           '/students',
           queryParameters: {
@@ -107,7 +104,7 @@ class DioStudentRepository implements StudentRepository {
         for (final s in data.items) {
           if (s.id == id) return s;
         }
-        if (!data.hasMore) break;
+        if (!data.hasMore || data.items.isEmpty) break;
       }
       throw const ApiException(
         code: ApiErrorCode.notFound,

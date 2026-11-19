@@ -546,6 +546,18 @@
     }
   },
   "inviteAllHint": "Tap Share to send to each parent in turn. Parents with a valid invitation are skipped.",
+  "inviteAllPausedNetwork": "Stopped after repeated network errors. Check your connection, then tap Continue.",
+  "inviteAllPausedRate": "Stopped because of too many requests. Wait about {seconds} seconds, then tap Continue.",
+  "@inviteAllPausedRate": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteAllPausedRateNoWait": "Stopped because of too many requests. Wait a moment, then tap Continue.",
+  "inviteAllResume": "Continue",
+  "inviteAllWaiting": "Not created yet",
   "inviteAllCreating": "Creating link…",
   "inviteAllShareAgain": "Share again",
   "inviteAllShowQr": "Show QR code",

@@ -890,6 +890,25 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
       'Bấm Chia sẻ để gửi lần lượt cho từng phụ huynh. Phụ huynh đang có lời mời còn hạn được bỏ qua.';
 
   @override
+  String get inviteAllPausedNetwork =>
+      'Đã dừng vì lỗi mạng liên tiếp. Kiểm tra kết nối rồi bấm Tiếp tục.';
+
+  @override
+  String inviteAllPausedRate(int seconds) {
+    return 'Đã dừng vì gửi quá nhiều yêu cầu. Chờ khoảng $seconds giây rồi bấm Tiếp tục.';
+  }
+
+  @override
+  String get inviteAllPausedRateNoWait =>
+      'Đã dừng vì gửi quá nhiều yêu cầu. Chờ một lát rồi bấm Tiếp tục.';
+
+  @override
+  String get inviteAllResume => 'Tiếp tục';
+
+  @override
+  String get inviteAllWaiting => 'Chưa tạo';
+
+  @override
   String get inviteAllCreating => 'Đang tạo link…';
 
   @override

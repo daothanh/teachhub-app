@@ -1,9 +1,11 @@
-import 'dart:math';
+import 'dart:developer';
+import 'dart:math' show Random;
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
+import '../../auth/logout_service.dart';
 import 'account_repository.dart';
 
 enum DeleteStep { confirm, code, done }
@@ -71,11 +73,15 @@ class DeleteAccountCubit extends Cubit<DeleteAccountState> {
   DeleteAccountCubit({
     required AccountRepository repository,
     required Future<int?> Function() pendingCount,
-    required Future<void> Function() finish,
+    required Future<LogoutResult> Function() finish,
+    Future<void> Function()? markDeleting,
+    Future<void> Function()? clearDeleting,
     Random? random,
   }) : _repo = repository,
        _pendingCount = pendingCount,
        _finish = finish,
+       _mark = markDeleting,
+       _clear = clearDeleting,
        _random = random,
        super(const DeleteAccountState());
 
@@ -83,8 +89,15 @@ class DeleteAccountCubit extends Cubit<DeleteAccountState> {
   final Future<int?> Function() _pendingCount;
 
   /// Đăng xuất và xóa CSDL cục bộ qua luồng đăng xuất sẵn có.
-  final Future<void> Function() _finish;
+  final Future<LogoutResult> Function() _finish;
+
+  /// Đặt cờ trước `DELETE /me` (app chết sau 204 thì khởi động sau vẫn xóa
+  /// CSDL máy) và bỏ cờ khi bị từ chối hẳn.
+  final Future<void> Function()? _mark;
+  final Future<void> Function()? _clear;
   final Random? _random;
+  // Khóa hiện tại đã được gửi đi mà chưa biết kết quả (lỗi tạm thời).
+  var _inFlight = false;
   String? _key;
   String? _otp;
 
@@ -110,22 +123,52 @@ class DeleteAccountCubit extends Cubit<DeleteAccountState> {
   Future<void> confirm(String otp) async {
     if (state.busy) return;
     // Cùng mã thử lại giữ khóa; mã khác là lệnh mới.
-    if (_key == null || otp != _otp) _key = uuidV4(_random ?? Random.secure());
+    if (_key == null || otp != _otp) {
+      _key = uuidV4(_random ?? Random.secure());
+      _inFlight = false;
+    }
     _otp = otp;
     emit(state.copyWith(busy: true, clearFailure: true));
     try {
-      await _repo.deleteAccount(otp: otp, idempotencyKey: _key!);
-    } on ApiException catch (e) {
-      if (!e.retryable) _key = null;
-      if (isClosed) return;
-      emit(_failed(e));
+      await _mark?.call();
+    } on Object catch (e, st) {
+      // Không có lưới an toàn thì không gửi lệnh xóa.
+      log('Đặt cờ xóa lỗi', name: 'delete_account', error: e, stackTrace: st);
+      if (!isClosed) {
+        emit(state.copyWith(busy: false, failure: DeleteFailure.generic));
+      }
       return;
     }
+    var alreadyDeleted = false;
+    try {
+      await _repo.deleteAccount(otp: otp, idempotencyKey: _key!);
+    } on ApiException catch (e) {
+      // 401 (không phải sai OTP) khi thử lại cùng khóa: token đã mất vì server
+      // xử lý xong lần trước.
+      alreadyDeleted =
+          _inFlight && e.status == 401 && e.code != ApiErrorCode.otpInvalid;
+      if (!alreadyDeleted) {
+        _inFlight = e.retryable;
+        if (!e.retryable) {
+          _key = null;
+          await _clear?.call();
+        }
+        if (isClosed) return;
+        emit(_failed(e));
+        return;
+      }
+    }
+    _inFlight = false;
     // Server đã xóa; lỗi dọn máy không được làm người dùng tưởng chưa xóa.
     try {
-      await _finish();
-    } on Object {
-      // Lần khởi động sau sẽ xóa nốt (retryPendingWipe).
+      if (await _finish() == LogoutResult.wipeFailed) {
+        log(
+          'Xóa CSDL cục bộ lỗi sau khi xóa tài khoản; xóa nốt ở lần khởi động sau',
+          name: 'delete_account',
+        );
+      }
+    } on Object catch (e, st) {
+      log('Dọn máy lỗi', name: 'delete_account', error: e, stackTrace: st);
     }
     if (!isClosed) emit(state.copyWith(busy: false, step: DeleteStep.done));
   }

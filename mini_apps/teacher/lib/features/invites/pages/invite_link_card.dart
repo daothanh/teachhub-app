@@ -78,20 +78,23 @@ class InviteLinkCard extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         Text(l10n.inviteExpiryNote, style: text.bodySmall),
         const SizedBox(height: AppSpacing.md),
-        AppButton(
-          label: l10n.inviteShare,
-          width: double.infinity,
-          onPressed: () async {
-            await inviteSharer().share(
-              inviteMessage(
-                l10n,
-                guardianName: guardianName,
-                studentName: studentName,
-                link: link,
-              ),
-            );
-            onShared?.call();
-          },
+        Builder(
+          builder: (context) => AppButton(
+            label: l10n.inviteShare,
+            width: double.infinity,
+            onPressed: () async {
+              final opened = await inviteSharer().share(
+                inviteMessage(
+                  l10n,
+                  guardianName: guardianName,
+                  studentName: studentName,
+                  link: link,
+                ),
+                origin: shareOrigin(context),
+              );
+              if (opened) onShared?.call();
+            },
+          ),
         ),
       ],
     );

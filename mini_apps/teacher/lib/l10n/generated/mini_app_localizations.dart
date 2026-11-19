@@ -1612,6 +1612,36 @@ abstract class MiniAppLocalizations {
   /// **'Bấm Chia sẻ để gửi lần lượt cho từng phụ huynh. Phụ huynh đang có lời mời còn hạn được bỏ qua.'**
   String get inviteAllHint;
 
+  /// No description provided for @inviteAllPausedNetwork.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã dừng vì lỗi mạng liên tiếp. Kiểm tra kết nối rồi bấm Tiếp tục.'**
+  String get inviteAllPausedNetwork;
+
+  /// No description provided for @inviteAllPausedRate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã dừng vì gửi quá nhiều yêu cầu. Chờ khoảng {seconds} giây rồi bấm Tiếp tục.'**
+  String inviteAllPausedRate(int seconds);
+
+  /// No description provided for @inviteAllPausedRateNoWait.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã dừng vì gửi quá nhiều yêu cầu. Chờ một lát rồi bấm Tiếp tục.'**
+  String get inviteAllPausedRateNoWait;
+
+  /// No description provided for @inviteAllResume.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục'**
+  String get inviteAllResume;
+
+  /// No description provided for @inviteAllWaiting.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa tạo'**
+  String get inviteAllWaiting;
+
   /// No description provided for @inviteAllCreating.
   ///
   /// In vi, this message translates to:

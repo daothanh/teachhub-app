@@ -21,6 +21,8 @@ class TeachHubLoggingInterceptor extends LoggingInterceptor {
     // Lời mời: token và mã ngắn là bí mật (US-0.12), không được vào log.
     'token',
     'code',
+    'shortcode',
+    'url',
   };
 
   /// Thay giá trị của mọi khóa cá nhân bằng `***` (đệ quy), rồi áp che mặc định

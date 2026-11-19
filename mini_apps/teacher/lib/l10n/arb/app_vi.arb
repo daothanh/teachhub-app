@@ -546,6 +546,18 @@
     }
   },
   "inviteAllHint": "Bấm Chia sẻ để gửi lần lượt cho từng phụ huynh. Phụ huynh đang có lời mời còn hạn được bỏ qua.",
+  "inviteAllPausedNetwork": "Đã dừng vì lỗi mạng liên tiếp. Kiểm tra kết nối rồi bấm Tiếp tục.",
+  "inviteAllPausedRate": "Đã dừng vì gửi quá nhiều yêu cầu. Chờ khoảng {seconds} giây rồi bấm Tiếp tục.",
+  "@inviteAllPausedRate": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteAllPausedRateNoWait": "Đã dừng vì gửi quá nhiều yêu cầu. Chờ một lát rồi bấm Tiếp tục.",
+  "inviteAllResume": "Tiếp tục",
+  "inviteAllWaiting": "Chưa tạo",
   "inviteAllCreating": "Đang tạo link…",
   "inviteAllShareAgain": "Chia sẻ lại",
   "inviteAllShowQr": "Xem mã QR",

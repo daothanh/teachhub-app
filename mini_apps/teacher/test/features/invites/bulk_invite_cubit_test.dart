@@ -98,6 +98,81 @@ void main() {
     expect(cubit.state.items[1].shared, isFalse);
     await cubit.close();
   });
+
+  group('dừng khi lỗi liên tiếp', () {
+    void manyGuardians() => classes.rosterItems = [
+      for (var n = 1; n <= 6; n++)
+        entryOf('s$n', 'HS$n', [
+          guardianOf('g$n', GuardianInviteStatus.notInvited),
+        ]),
+    ];
+
+    test(
+      '3 lỗi mạng liên tiếp: dừng, không gọi tiếp; Tiếp tục làm nốt',
+      () async {
+        manyGuardians();
+        invites.errors.addAll([
+          for (var n = 0; n < 3; n++) const ApiException.network(),
+        ]);
+        final cubit = make();
+        await cubit.start();
+
+        expect(cubit.state.status, BulkInviteStatus.paused);
+        expect(cubit.state.retryAfter, isNull);
+        expect(invites.calls, hasLength(3));
+        expect(cubit.state.ready, 0);
+
+        await cubit.resume();
+        expect(cubit.state.status, BulkInviteStatus.done);
+        expect(cubit.state.ready, 6);
+        // Ba người lỗi thử lại cùng khóa.
+        expect(invites.calls[3].key, invites.calls[0].key);
+        await cubit.close();
+      },
+    );
+
+    test('3 lỗi 429 liên tiếp: dừng và đọc retryAfter', () async {
+      manyGuardians();
+      invites.errors.addAll([
+        for (var n = 0; n < 3; n++)
+          ApiException.fromResponse(429, {
+            'code': 'RATE_LIMITED',
+            'message': 'x',
+            'details': {'retryAfterSec': 30},
+          }),
+      ]);
+      final cubit = make();
+      await cubit.start();
+      expect(cubit.state.status, BulkInviteStatus.paused);
+      expect(cubit.state.retryAfter, const Duration(seconds: 30));
+      expect(invites.calls, hasLength(3));
+      await cubit.close();
+    });
+
+    test('lỗi xen kẽ thành công không đủ ba liên tiếp: chạy hết', () async {
+      manyGuardians();
+      invites.errors.addAll([
+        const ApiException.network(),
+        const ApiException.network(),
+      ]);
+      final cubit = make();
+      await cubit.start();
+      // Hai lỗi đầu, rồi thành công ở người thứ 3 trở đi.
+      expect(cubit.state.status, BulkInviteStatus.done);
+      expect(cubit.state.ready, 4);
+      await cubit.close();
+    });
+
+    test('lỗi dứt khoát (409) không tính vào chuỗi dừng', () async {
+      manyGuardians();
+      invites.errors.addAll([for (var n = 0; n < 3; n++) conflict()]);
+      final cubit = make();
+      await cubit.start();
+      expect(cubit.state.status, BulkInviteStatus.done);
+      expect(cubit.state.ready, 3);
+      await cubit.close();
+    });
+  });
 }
 
 class _FailingRoster extends FakeClassesRepository {

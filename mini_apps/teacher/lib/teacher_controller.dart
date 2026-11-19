@@ -263,6 +263,9 @@ class TeacherController {
     await localData.wipe();
   }
 
+  Future<void> markWipePending() => localData.markWipePending();
+  Future<void> clearWipePending() => localData.clearWipePending();
+
   Future<void> retryPendingWipe() => localData.retryPendingWipe();
   Future<void> claimDatabaseFor(String userId) => localData.claimFor(userId);
 

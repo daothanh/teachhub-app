@@ -199,4 +199,37 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('chữ 200%: hộp thoại hủy buổi (có ô lý do) bấm được, gọi API', (
+    tester,
+  ) async {
+    await open(tester, scale: 2);
+    await tester.tap(find.text('Hủy buổi').first);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Cô ốm');
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.tap(find.text('Hủy buổi').last);
+    await tester.pumpAndSettle();
+    expect(repo.calls.where((c) => c.startsWith('cancel')), [
+      'cancel:p1:Cô ốm',
+    ]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('chữ 200%: lý do hủy, nút Tạo buổi bù và hộp thoại bù', (
+    tester,
+  ) async {
+    await open(tester, scale: 2);
+    await scrollTo(tester, find.textContaining('Lý do hủy: Cô bận'));
+    expect(tester.takeException(), isNull);
+    await scrollTo(tester, find.text('Tạo buổi bù'));
+    await tester.tap(find.text('Tạo buổi bù'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.tap(find.text('Tạo buổi bù').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Đã tạo buổi bù.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

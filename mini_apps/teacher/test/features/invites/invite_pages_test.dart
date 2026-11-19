@@ -189,4 +189,52 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Đã tạo 2/2 link'), findsOneWidget);
   });
+
+  testWidgets('chia sẻ gửi vùng nút (iPad) và chỉ đánh dấu khi mở được', (
+    tester,
+  ) async {
+    await open(tester, path: ClassesRoutes.inviteAll('c1'));
+    sharer.fail = true;
+    await tester.tap(find.text('Chia sẻ link').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Đã mở chia sẻ'), findsNothing);
+
+    sharer.fail = false;
+    await tester.tap(find.text('Chia sẻ link').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Đã mở chia sẻ'), findsOneWidget);
+    final origin = sharer.origins.single;
+    expect(origin, isNotNull);
+    expect(origin!.isEmpty, isFalse);
+  });
+
+  for (final scale in [1.0, 2.0]) {
+    testWidgets(
+      'mời tất cả dừng vì lỗi mạng: banner và Tiếp tục (chữ $scale)',
+      (tester) async {
+        classes.rosterItems = [
+          for (var n = 1; n <= 5; n++)
+            entryOf('s$n', 'HS$n', [
+              guardianOf('g$n', GuardianInviteStatus.notInvited),
+            ]),
+        ];
+        invites.errors.addAll([
+          for (var n = 0; n < 3; n++) const ApiException.network(),
+        ]);
+        await open(tester, path: ClassesRoutes.inviteAll('c1'), scale: scale);
+        expect(
+          find.textContaining('Đã dừng vì lỗi mạng liên tiếp'),
+          findsOneWidget,
+        );
+        expect(invites.calls, hasLength(3));
+        expect(tester.takeException(), isNull);
+
+        await tester.tap(find.text('Tiếp tục'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('Đã dừng'), findsNothing);
+        expect(find.text('Đã tạo 5/5 link'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
+  }
 }

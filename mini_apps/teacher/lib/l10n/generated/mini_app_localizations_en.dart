@@ -902,6 +902,25 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
       'Tap Share to send to each parent in turn. Parents with a valid invitation are skipped.';
 
   @override
+  String get inviteAllPausedNetwork =>
+      'Stopped after repeated network errors. Check your connection, then tap Continue.';
+
+  @override
+  String inviteAllPausedRate(int seconds) {
+    return 'Stopped because of too many requests. Wait about $seconds seconds, then tap Continue.';
+  }
+
+  @override
+  String get inviteAllPausedRateNoWait =>
+      'Stopped because of too many requests. Wait a moment, then tap Continue.';
+
+  @override
+  String get inviteAllResume => 'Continue';
+
+  @override
+  String get inviteAllWaiting => 'Not created yet';
+
+  @override
   String get inviteAllCreating => 'Creating link…';
 
   @override

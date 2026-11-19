@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app/core/routing/app_routes.dart';
+import 'package:app/features/auth/logout_service.dart';
 import 'package:app/features/settings/delete_account/account_repository.dart';
 import 'package:app/features/settings/delete_account/delete_account_cubit.dart';
 import 'package:app/features/settings/delete_account/delete_account_page.dart';
@@ -36,6 +37,17 @@ class _FakeAccountRepo implements AccountRepository {
   }
 }
 
+class _OrderRepo extends _FakeAccountRepo {
+  _OrderRepo(this.order);
+  final List<String> order;
+
+  @override
+  Future<void> deleteAccount({
+    required String otp,
+    required String idempotencyKey,
+  }) async => order.add('delete');
+}
+
 ApiException _err(int status, String code, [Map<String, Object?>? details]) =>
     ApiException.fromResponse(status, {
       'code': code,
@@ -47,10 +59,16 @@ DeleteAccountCubit _cubit(
   _FakeAccountRepo repo, {
   int? pending = 0,
   List<String>? finished,
+  List<String>? flags,
 }) => DeleteAccountCubit(
   repository: repo,
   pendingCount: () async => pending,
-  finish: () async => finished?.add('finish'),
+  markDeleting: () async => flags?.add('mark'),
+  clearDeleting: () async => flags?.add('clear'),
+  finish: () async {
+    finished?.add('finish');
+    return LogoutResult.done;
+  },
 );
 
 void main() {
@@ -138,6 +156,124 @@ void main() {
         expect(repo2.keys[1], isNot(repo2.keys[0]));
       },
     );
+
+    test('đặt cờ trước DELETE /me; thành công thì không bỏ cờ', () async {
+      final order = <String>[];
+      final repo = _OrderRepo(order);
+      final c = DeleteAccountCubit(
+        repository: repo,
+        pendingCount: () async => 0,
+        markDeleting: () async => order.add('mark'),
+        clearDeleting: () async => order.add('clear'),
+        finish: () async {
+          order.add('finish');
+          return LogoutResult.done;
+        },
+      );
+      await c.sendCode('a@b.vn');
+      await c.confirm('123456');
+      expect(order, ['mark', 'delete', 'finish']);
+    });
+
+    test('lỗi dứt khoát (sai OTP, 409): bỏ cờ; lỗi mạng: giữ cờ', () async {
+      final flags = <String>[];
+      final repo = _FakeAccountRepo()
+        ..deleteErrors.addAll([
+          _err(401, 'OTP_INVALID'),
+          _err(409, 'CONFLICT_STALE'),
+          const ApiException.network(),
+        ]);
+      final c = _cubit(repo, flags: flags);
+      await c.sendCode('a@b.vn');
+      await c.confirm('000001');
+      expect(flags, ['mark', 'clear']);
+      await c.confirm('000002');
+      expect(flags, ['mark', 'clear', 'mark', 'clear']);
+      await c.confirm('000003');
+      expect(flags, ['mark', 'clear', 'mark', 'clear', 'mark']);
+      expect(c.state.failure, DeleteFailure.network);
+    });
+
+    test('đặt cờ lỗi: không gửi DELETE /me', () async {
+      final repo = _FakeAccountRepo();
+      final c = DeleteAccountCubit(
+        repository: repo,
+        pendingCount: () async => 0,
+        markDeleting: () async => throw StateError('keychain'),
+        finish: () async => LogoutResult.done,
+      );
+      await c.sendCode('a@b.vn');
+      await c.confirm('123456');
+      expect(repo.calls, ['otp:a@b.vn']);
+      expect(c.state.failure, DeleteFailure.generic);
+      expect(c.state.busy, isFalse);
+    });
+
+    test('finish báo wipeFailed vẫn coi là xong', () async {
+      final repo = _FakeAccountRepo();
+      final c = DeleteAccountCubit(
+        repository: repo,
+        pendingCount: () async => 0,
+        finish: () async => LogoutResult.wipeFailed,
+      );
+      await c.sendCode('a@b.vn');
+      await c.confirm('123456');
+      expect(c.state.step, DeleteStep.done);
+    });
+
+    test(
+      'thử lại cùng khóa gặp 401 (token mất): coi như server đã xóa',
+      () async {
+        final repo = _FakeAccountRepo()
+          ..deleteErrors.addAll([
+            const ApiException.network(),
+            _err(401, 'UNAUTHORIZED'),
+          ]);
+        final finished = <String>[];
+        final flags = <String>[];
+        final c = _cubit(repo, finished: finished, flags: flags);
+        await c.sendCode('a@b.vn');
+        await c.confirm('123456');
+        expect(c.state.failure, DeleteFailure.network);
+        await c.confirm('123456');
+        expect(repo.keys[1], repo.keys[0]);
+        expect(finished, ['finish']);
+        expect(c.state.step, DeleteStep.done);
+        expect(flags, ['mark', 'mark']);
+      },
+    );
+
+    test(
+      '401 ở lần gửi đầu (chưa từng gửi): lỗi thường, không dọn máy',
+      () async {
+        final repo = _FakeAccountRepo()
+          ..deleteErrors.add(_err(401, 'UNAUTHORIZED'));
+        final finished = <String>[];
+        final flags = <String>[];
+        final c = _cubit(repo, finished: finished, flags: flags);
+        await c.sendCode('a@b.vn');
+        await c.confirm('123456');
+        expect(finished, isEmpty);
+        expect(c.state.step, DeleteStep.code);
+        expect(c.state.failure, DeleteFailure.generic);
+        expect(flags, ['mark', 'clear']);
+      },
+    );
+
+    test('thử lại gặp OTP_INVALID: vẫn là sai mã, không dọn máy', () async {
+      final repo = _FakeAccountRepo()
+        ..deleteErrors.addAll([
+          const ApiException.network(),
+          _err(401, 'OTP_INVALID'),
+        ]);
+      final finished = <String>[];
+      final c = _cubit(repo, finished: finished);
+      await c.sendCode('a@b.vn');
+      await c.confirm('123456');
+      await c.confirm('123456');
+      expect(c.state.failure, DeleteFailure.otpInvalid);
+      expect(finished, isEmpty);
+    });
 
     test('lỗi dọn máy sau khi server đã xóa vẫn coi là xong', () async {
       final repo = _FakeAccountRepo();

@@ -71,8 +71,16 @@ class _BulkView extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: AppSpacing.md),
+              if (s.status == BulkInviteStatus.paused) ...[
+                _PausedBanner(retryAfter: s.retryAfter, onResume: cubit.resume),
+                const SizedBox(height: AppSpacing.md),
+              ],
               for (final (i, item) in s.items.indexed)
-                _BulkRow(index: i, item: item),
+                _BulkRow(
+                  index: i,
+                  item: item,
+                  paused: s.status == BulkInviteStatus.paused,
+                ),
             ],
           ),
         },
@@ -81,10 +89,50 @@ class _BulkView extends StatelessWidget {
   }
 }
 
+class _PausedBanner extends StatelessWidget {
+  const _PausedBanner({required this.retryAfter, required this.onResume});
+  final Duration? retryAfter;
+  final VoidCallback onResume;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    final wait = retryAfter?.inSeconds;
+    final message = retryAfter == null
+        ? l10n.inviteAllPausedNetwork
+        : wait != null && wait > 0
+        ? l10n.inviteAllPausedRate(wait)
+        : l10n.inviteAllPausedRateNoWait;
+    return Card(
+      color: Theme.of(context).colorScheme.errorContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Semantics(liveRegion: true, child: Text(message)),
+            const SizedBox(height: AppSpacing.sm),
+            AppButton(
+              label: l10n.inviteAllResume,
+              size: AppButtonSize.sm,
+              onPressed: onResume,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _BulkRow extends StatelessWidget {
-  const _BulkRow({required this.index, required this.item});
+  const _BulkRow({
+    required this.index,
+    required this.item,
+    required this.paused,
+  });
   final int index;
   final BulkInviteItem item;
+  final bool paused;
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +169,9 @@ class _BulkRow extends StatelessWidget {
                   child: Text(l10n.classesRetry),
                 ),
               ),
-            ] else if (link == null)
+            ] else if (link == null && paused)
+              Text(l10n.inviteAllWaiting, style: text.bodySmall)
+            else if (link == null)
               Row(
                 children: [
                   const SizedBox(
@@ -141,22 +191,25 @@ class _BulkRow extends StatelessWidget {
                 runSpacing: AppSpacing.xs,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  AppButton(
-                    label: item.shared
-                        ? l10n.inviteAllShareAgain
-                        : l10n.inviteShare,
-                    size: AppButtonSize.sm,
-                    onPressed: () async {
-                      await inviteSharer().share(
-                        inviteMessage(
-                          l10n,
-                          guardianName: g.fullName,
-                          studentName: item.studentName,
-                          link: link,
-                        ),
-                      );
-                      cubit.markShared(index);
-                    },
+                  Builder(
+                    builder: (context) => AppButton(
+                      label: item.shared
+                          ? l10n.inviteAllShareAgain
+                          : l10n.inviteShare,
+                      size: AppButtonSize.sm,
+                      onPressed: () async {
+                        final opened = await inviteSharer().share(
+                          inviteMessage(
+                            l10n,
+                            guardianName: g.fullName,
+                            studentName: item.studentName,
+                            link: link,
+                          ),
+                          origin: shareOrigin(context),
+                        );
+                        if (opened) cubit.markShared(index);
+                      },
+                    ),
                   ),
                   TextButton(
                     onPressed: () => showModalBottomSheet<void>(

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:teacher/features/classes/data/class_models.dart';
 import 'package:teacher/features/invites/data/invite_models.dart';
 import 'package:teacher/features/invites/data/invite_repository.dart';
@@ -71,9 +73,18 @@ class FakeInviteRepository implements InviteRepository {
 
 class FakeInviteSharer implements InviteSharer {
   final shared = <String>[];
+  final origins = <Rect?>[];
+
+  /// `true` thì giả lập bảng chia sẻ không mở được.
+  bool fail = false;
 
   @override
-  Future<void> share(String text) async => shared.add(text);
+  Future<bool> share(String text, {Rect? origin}) async {
+    if (fail) return false;
+    shared.add(text);
+    origins.add(origin);
+    return true;
+  }
 }
 
 ApiException conflict() => const ApiException(

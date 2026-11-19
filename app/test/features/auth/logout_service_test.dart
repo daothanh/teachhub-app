@@ -29,6 +29,26 @@ void main() {
     wipeError = null;
   });
 
+  test(
+    'markWipePending/clearWipePending gọi hook; hook bỏ cờ lỗi chỉ ghi log',
+    () async {
+      final hooks = <String>[];
+      final svc = LogoutService(
+        logout: () async {},
+        pendingCount: () async => 0,
+        wipeLocalData: () async {},
+        markWipePending: () async => hooks.add('mark'),
+        clearWipePending: () async {
+          hooks.add('clear');
+          throw StateError('disk');
+        },
+      );
+      await svc.markWipePending();
+      await svc.clearWipePending();
+      expect(hooks, ['mark', 'clear']);
+    },
+  );
+
   group('logout', () {
     test('outbox trống: đăng xuất rồi xóa CSDL, không hỏi', () async {
       final r = await build().logout(

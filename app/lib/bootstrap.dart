@@ -211,6 +211,8 @@ Future<void> bootstrap({required Env env}) async {
     },
     pendingCount: TeacherController.instance.pendingSyncCount,
     wipeLocalData: TeacherController.instance.wipeLocalData,
+    markWipePending: TeacherController.instance.markWipePending,
+    clearWipePending: TeacherController.instance.clearWipePending,
   );
   GetIt.I.registerSingleton<LogoutService>(logoutService);
   GetIt.I<AuthEventBus>().stream

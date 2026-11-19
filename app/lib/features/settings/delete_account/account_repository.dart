@@ -40,7 +40,7 @@ class DioAccountRepository implements AccountRepository {
     try {
       await run();
     } on DioException catch (e) {
-      throw ApiException.fromDio(e)!;
+      throw ApiException.fromDio(e) ?? const ApiException.unexpected();
     }
   }
 }
