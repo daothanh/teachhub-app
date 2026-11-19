@@ -2,6 +2,7 @@ import 'package:app/core/routing/app_router.dart';
 import 'package:app/core/routing/app_routes.dart';
 import 'package:app/features/auth/auth_cubit.dart';
 import 'package:app/features/auth/teachhub_user.dart';
+import 'package:app/features/consent/consent_cubit.dart';
 import 'package:app/features/role_picker/membership_cubit.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tasco_core/tasco_core.dart';
@@ -32,18 +33,23 @@ MembershipState _loaded(List<Membership> items, {Membership? active}) =>
       active: active,
     );
 
-String? _redirect(String location, AppAuthState auth, MembershipState m) =>
-    resolveRedirect(
-      location: location,
-      auth: auth,
-      memberships: m,
-      authGuard: AuthGuard(const AuthPolicy(), loginPath: AppRoutes.login),
-      permissionGuard: PermissionGuard(
-        permissions: () => m.permissions,
-        routePermissions: roleRoutePermissions,
-        deniedPath: AppRoutes.rolePicker,
-      ),
-    );
+String? _redirect(
+  String location,
+  AppAuthState auth,
+  MembershipState m, {
+  ConsentState consent = const ConsentState.accepted(),
+}) => resolveRedirect(
+  location: location,
+  auth: auth,
+  memberships: m,
+  consent: consent,
+  authGuard: AuthGuard(const AuthPolicy(), loginPath: AppRoutes.login),
+  permissionGuard: PermissionGuard(
+    permissions: () => m.permissions,
+    routePermissions: roleRoutePermissions,
+    deniedPath: AppRoutes.rolePicker,
+  ),
+);
 
 void main() {
   tearDown(PendingDeepLink.clear);
@@ -125,6 +131,53 @@ void main() {
     expect(_redirect(AppRoutes.rolePicker, _signedIn, parentOnly), isNull);
   });
 
+  group('guard đã đồng ý (US-0.3 AC2)', () {
+    final parentOnly = _loaded([_parent], active: _parent);
+    const required = ConsentState(
+      phase: ConsentPhase.required,
+      termsVersion: '2026-12-01',
+    );
+
+    test('Phụ huynh chưa đồng ý: mọi route /p/** về màn đồng ý', () {
+      for (final consent in [const ConsentState(), required]) {
+        for (final route in ['/p', '/p/child/1']) {
+          expect(
+            _redirect(route, _signedIn, parentOnly, consent: consent),
+            AppRoutes.consent,
+            reason: '$route ${consent.phase}',
+          );
+        }
+      }
+    });
+
+    test('đã đồng ý thì vào được; màn đồng ý không bị chặn', () {
+      expect(_redirect('/p', _signedIn, parentOnly), isNull);
+      expect(
+        _redirect(AppRoutes.consent, _signedIn, parentOnly, consent: required),
+        isNull,
+      );
+    });
+
+    test('không chặn không gian khác, và /p chỉ cần đồng ý khi có vai trò', () {
+      final both = _loaded([_teacher, _parent], active: _teacher);
+      expect(_redirect('/t', _signedIn, both, consent: required), isNull);
+      // Không có vai trò Phụ huynh thì PermissionGuard xử lý như cũ.
+      final teacherOnly = _loaded([_teacher], active: _teacher);
+      expect(
+        _redirect('/p', _signedIn, teacherOnly, consent: required),
+        AppRoutes.rolePicker,
+      );
+      expect(_redirect('/pay', _signedIn, both, consent: required), isNull);
+    });
+
+    test('mở app vào /p khi chưa đồng ý: splash → /p → màn đồng ý', () {
+      expect(
+        _redirect(AppRoutes.splash, _signedIn, parentOnly, consent: required),
+        '/p',
+      );
+    });
+  });
+
   test(
     'bản quá cũ: mọi route chuyển sang Cần cập nhật, kể cả khi chưa đăng nhập',
     () {
@@ -132,6 +185,7 @@ void main() {
         location: location,
         auth: _signedOut,
         memberships: const MembershipState(),
+        consent: const ConsentState(),
         authGuard: AuthGuard(const AuthPolicy(), loginPath: AppRoutes.login),
         permissionGuard: PermissionGuard(
           permissions: () => const {},

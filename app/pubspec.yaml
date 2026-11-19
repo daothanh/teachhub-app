@@ -94,6 +94,9 @@ dependencies:
   firebase_messaging: ^16.4.1
   flutter_local_notifications: ^19.5.0
   url_launcher: ^6.3.0
+  # P05b: quét QR lời mời (US-0.12); chia sẻ tin xin link khi máy không có Zalo.
+  mobile_scanner: ^7.4.2
+  share_plus: ^11.1.0
   # Đồng bộ nền outbox của teacher (Android WorkManager, iOS BGTaskScheduler); S3-FL-09.
   workmanager: ^0.10.10
 

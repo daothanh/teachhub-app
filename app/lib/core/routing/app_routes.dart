@@ -7,6 +7,9 @@ abstract final class AppRoutes {
   static const settings = '/settings';
   static const centerWaitlist = '/center-waitlist';
   static const updateRequired = '/update-required';
+  static const inviteEntry = TeachHubRoutes.inviteEntry;
+  static const inviteScan = '/invite/scan';
+  static const consent = '/consent';
   static const invitePattern = '/invite/:token';
   static String invite(String token) => '/invite/$token';
 }
