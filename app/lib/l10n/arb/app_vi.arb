@@ -12,6 +12,8 @@
   "loginChangeEmail": "Đổi email",
   "loginRateLimited": "Bạn thao tác quá nhanh, vui lòng thử lại sau.",
   "loginFailed": "Đăng nhập không thành công. Vui lòng thử lại.",
+  "loginUnavailable": "Hệ thống đang bận, vui lòng thử lại sau ít phút.",
+  "loginEmailRequiresOtp": "Email này cần đăng nhập bằng mã OTP. Nhập email bên dưới để nhận mã.",
   "splashLoadFailed": "Không tải được vai trò của bạn.",
   "roleWhoAreYou": "Bạn là…?",
   "roleTeacher": "Giáo viên",
