@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../sync/sync_engine.dart';
@@ -15,6 +16,7 @@ typedef SessionDto = ({
   DateTime endsAt,
   String status,
   bool isMakeup,
+  int? tzOffsetMinutes,
 });
 
 typedef AttendanceItemDto = ({
@@ -60,6 +62,7 @@ class TeacherApi {
           endsAt: DateTime.parse(s['endsAt'] as String),
           status: s['status'] as String,
           isMakeup: s['isMakeup'] as bool,
+          tzOffsetMinutes: offsetMinutes(s['startsAt'] as String),
         ),
     ];
   });
@@ -126,6 +129,16 @@ class TeacherApi {
       },
     );
   });
+
+  /// Offset UTC (phút) ở cuối chuỗi ISO 8601 (`+07:00`, `Z`); null nếu không có.
+  @visibleForTesting
+  static int? offsetMinutes(String iso) {
+    if (iso.endsWith('Z')) return 0;
+    final m = RegExp(r'([+-])(\d\d):?(\d\d)$').firstMatch(iso);
+    if (m == null) return null;
+    final v = int.parse(m[2]!) * 60 + int.parse(m[3]!);
+    return m[1] == '-' ? -v : v;
+  }
 
   static DateTime? _date(Object? v) => v == null ? null : DateTime.parse('$v');
 

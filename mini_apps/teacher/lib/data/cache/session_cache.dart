@@ -73,6 +73,7 @@ class SessionCache {
                 endsAt: x.endsAt,
                 status: x.status,
                 isMakeup: x.isMakeup,
+                tzOffsetMinutes: Value(x.tzOffsetMinutes),
               ),
             );
       }
