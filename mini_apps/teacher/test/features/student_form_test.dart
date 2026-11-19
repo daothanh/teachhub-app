@@ -45,6 +45,9 @@ Future<void> _fillName(WidgetTester tester) async {
 }
 
 Future<void> _save(WidgetTester tester) async {
+  // Form dài hơn màn hình khi có khối phụ huynh (quan hệ, SĐT, email).
+  await tester.drag(find.byType(Scrollable).first, const Offset(0, -1500));
+  await tester.pumpAndSettle();
   await tester.tap(find.text('Lưu học viên'));
   await tester.pumpAndSettle();
 }
@@ -78,10 +81,11 @@ void main() {
   ) async {
     final repo = await _open(tester, [_saved], []);
     await _fillName(tester);
-    await tester.tap(find.text('Thêm phụ huynh'));
-    await tester.pump();
-    await tester.tap(find.text('Thêm phụ huynh'));
-    await tester.pump();
+    for (var i = 0; i < 2; i++) {
+      await tester.ensureVisible(find.text('Thêm phụ huynh'));
+      await tester.tap(find.text('Thêm phụ huynh'));
+      await tester.pumpAndSettle();
+    }
     expect(find.text('Thêm phụ huynh'), findsNothing); // đã đủ 2
 
     final fields = find.byType(EditableText);
@@ -90,6 +94,9 @@ void main() {
     await tester.enterText(fields.at(5), '12ab');
     await tester.enterText(fields.at(6), 'Lan');
     await _save(tester);
+    // Lỗi nằm ở ô SĐT phía trên; cuộn lên để ListView dựng lại ô đó.
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 500));
+    await tester.pumpAndSettle();
     expect(find.text('Số điện thoại chưa đúng.'), findsOneWidget);
     expect(repo.calls, isEmpty);
 
