@@ -62,5 +62,75 @@
   },
   "notificationBannerTitle": "Turn on notifications",
   "notificationBannerBody": "Get attendance and schedule updates for your child as soon as the teacher posts them.",
-  "notificationBannerAction": "Turn on notifications"
+  "notificationBannerAction": "Turn on notifications",
+  "invoiceTuitionTitle": "Tuition",
+  "invoiceTuitionUnpaid": "{count} unpaid invoices, {total} in total",
+  "@invoiceTuitionUnpaid": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceTuitionNone": "No invoices to pay.",
+  "invoiceTuitionOpen": "View invoices",
+  "invoiceListTitle": "Invoices",
+  "invoiceFilterAll": "All",
+  "invoiceStatusIssued": "Unpaid",
+  "invoiceStatusPending": "Awaiting confirmation",
+  "invoiceStatusPartial": "Partially paid",
+  "invoiceStatusPaid": "Paid",
+  "invoiceStatusVoid": "Cancelled",
+  "invoiceStatusUnknown": "Other",
+  "invoiceEmpty": "No invoices yet.",
+  "invoiceLoadMore": "Load more",
+  "invoiceRowSubtitle": "{student}, {month}",
+  "@invoiceRowSubtitle": {
+    "placeholders": {
+      "student": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceDue": "Due {date}",
+  "@invoiceDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceCodeLabel": "Code {code}",
+  "@invoiceCodeLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceLinesTitle": "Items",
+  "invoiceTotal": "Total",
+  "invoiceVoidNotice": "This invoice was cancelled. No payment needed.",
+  "invoicePayTitle": "Bank transfer",
+  "invoiceQrHint": "Scan with your banking app.",
+  "invoiceSaveQr": "Save QR image",
+  "invoiceQrSaved": "QR image saved.",
+  "invoiceQrDenied": "No permission to save photos. Allow it in Settings.",
+  "invoiceQrFailed": "Couldn't save the QR image. Please try again.",
+  "invoiceCopyNote": "Copy transfer note",
+  "invoiceCopyAccount": "Copy account number",
+  "invoiceCopied": "Copied.",
+  "invoiceBank": "Bank",
+  "invoiceAccountNo": "Account number",
+  "invoiceAccountName": "Account holder",
+  "invoiceTransferNote": "Transfer note",
+  "invoiceNotFound": "Invoice not found",
+  "invoiceNotFoundBody": "This invoice doesn't exist or you can't view it.",
+  "invoiceLoadFailed": "Couldn't load the invoice. Please try again."
 }

@@ -10,5 +10,8 @@ abstract final class TeachHubRoutes {
   static const inviteEntry = '/invite';
   static const teacher = '/t';
   static const parent = '/p';
+
+  /// P03: hóa đơn của con (phụ huynh); chi tiết là `<parentInvoices>/<id>`.
+  static const parentInvoices = '/p/invoices';
   static const student = '/s';
 }
