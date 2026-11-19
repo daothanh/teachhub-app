@@ -5,6 +5,9 @@ abstract final class TeachHubRoutes {
 
   /// Cài đặt của shell, gồm "Xóa tài khoản" (US-0.x, S4-FL-04).
   static const settings = '/settings';
+
+  /// P05: phụ huynh chưa có lời mời nhập link, mã hoặc quét QR.
+  static const inviteEntry = '/invite';
   static const teacher = '/t';
   static const parent = '/p';
   static const student = '/s';

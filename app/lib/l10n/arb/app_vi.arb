@@ -21,13 +21,68 @@
   "roleStudent": "Học sinh",
   "roleAddFailed": "Không thêm được vai trò. Vui lòng thử lại.",
   "inviteTitle": "Lời mời tham gia lớp",
-  "inviteBody": "Giáo viên đã mời bạn kết nối với lớp học của con.",
   "inviteAccept": "Nhận lời mời",
-  "inviteInvalid": "Lời mời không tồn tại hoặc đã hết hạn.",
+  "inviteCardTitle": "Lời mời từ {teacher}",
+  "@inviteCardTitle": {
+    "placeholders": {
+      "teacher": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteCardBody": "{teacher} mời bạn xem thông tin học tập của {student}. Link còn hiệu lực tới {expires}.",
+  "@inviteCardBody": {
+    "placeholders": {
+      "teacher": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      },
+      "expires": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteInvalid": "Link mời hết hạn hoặc không còn dùng được. Hãy nhắn giáo viên xin link mới.",
+  "inviteEntryTitle": "Cần lời mời từ giáo viên",
+  "inviteEntryBody": "Giáo viên của con sẽ gửi cho bạn link, mã hoặc mã QR. Ứng dụng không tìm học sinh theo tên, trường hay số điện thoại.",
+  "inviteScanQr": "Quét mã QR",
+  "inviteInputLabel": "Dán link hoặc nhập mã mời",
+  "inviteInputSubmit": "Tiếp tục",
+  "inviteInputBad": "Chưa nhận ra link hoặc mã. Hãy dán cả link, hoặc nhập mã gồm 8 ký tự.",
+  "inviteCodeInvalid": "Mã không đúng hoặc đã hết hạn. Hãy nhắn giáo viên xin mã mới.",
+  "inviteCodeLocked": "Bạn đã nhập sai quá nhiều lần. Thử lại sau {minutes} phút.",
+  "@inviteCodeLocked": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteRateLimited": "Bạn thao tác quá nhanh, vui lòng thử lại sau.",
+  "inviteAskTeacher": "Nhắn giáo viên xin link",
+  "inviteAskMessage": "Chào thầy/cô, tôi là phụ huynh. Nhờ thầy/cô gửi lại link mời TeachHub để tôi xem thông tin của con. Cảm ơn thầy/cô.",
+  "inviteAskCopied": "Đã sao chép tin nhắn. Hãy dán vào Zalo để gửi cho giáo viên.",
+  "inviteScanTitle": "Quét mã QR lời mời",
+  "inviteScanHint": "Đưa mã QR vào khung hình.",
+  "inviteScanDenied": "Ứng dụng chưa được dùng camera. Bạn có thể dán link hoặc nhập mã thay thế.",
+  "inviteScanNotInvite": "Mã QR này không phải lời mời TeachHub.",
+  "consentTitle": "Đồng ý xử lý dữ liệu",
+  "consentBody": "Để xem thông tin học tập của con, bạn cần đồng ý để TeachHub xử lý dữ liệu cá nhân của bạn và của con theo điều khoản và chính sách bảo mật.",
+  "consentVersion": "Phiên bản điều khoản: {version}",
+  "@consentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "consentAccept": "Đồng ý và tiếp tục",
+  "consentTermsChanged": "Điều khoản vừa được cập nhật. Vui lòng đọc lại rồi đồng ý.",
+  "consentFailed": "Chưa gửi được. Vui lòng thử lại.",
+  "consentLoadFailed": "Không tải được điều khoản. Vui lòng thử lại.",
   "inviteFailed": "Không nhận được lời mời. Vui lòng thử lại.",
-  "inviteConsentTitle": "Đồng ý xử lý dữ liệu",
-  "inviteConsentBody": "Để xem thông tin học tập của con, bạn cần đồng ý với điều khoản và chính sách xử lý dữ liệu cá nhân của TeachHub.",
-  "inviteConsentAccept": "Đồng ý và nhận lời mời",
   "settings": "Cài đặt",
   "settingsAbout": "Về ứng dụng",
   "settingsAboutApp": "Ứng dụng",
@@ -209,5 +264,6 @@
   "deleteAccountErrOwnerHasStaff": "Bạn đang là chủ không gian còn giáo viên khác. Hãy chuyển quyền hoặc gỡ họ khỏi không gian trước khi xóa tài khoản.",
   "deleteAccountErrActiveClasses": "Còn lớp đang hoạt động. Hãy lưu trữ hết các lớp trước khi xóa tài khoản.",
   "deleteAccountErrStale": "Dữ liệu vừa thay đổi. Mở lại màn này rồi thử lại.",
-  "deleteAccountErrGeneric": "Chưa xóa được tài khoản. Thử lại sau."
+  "deleteAccountErrGeneric": "Chưa xóa được tài khoản. Thử lại sau.",
+  "consentLater": "Để sau"
 }

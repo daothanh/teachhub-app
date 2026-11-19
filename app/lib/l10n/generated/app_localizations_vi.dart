@@ -76,26 +76,107 @@ class AppLocalizationsVi extends AppLocalizations {
   String get inviteTitle => 'Lời mời tham gia lớp';
 
   @override
-  String get inviteBody => 'Giáo viên đã mời bạn kết nối với lớp học của con.';
-
-  @override
   String get inviteAccept => 'Nhận lời mời';
 
   @override
-  String get inviteInvalid => 'Lời mời không tồn tại hoặc đã hết hạn.';
+  String inviteCardTitle(String teacher) {
+    return 'Lời mời từ $teacher';
+  }
+
+  @override
+  String inviteCardBody(String teacher, String student, String expires) {
+    return '$teacher mời bạn xem thông tin học tập của $student. Link còn hiệu lực tới $expires.';
+  }
+
+  @override
+  String get inviteInvalid =>
+      'Link mời hết hạn hoặc không còn dùng được. Hãy nhắn giáo viên xin link mới.';
+
+  @override
+  String get inviteEntryTitle => 'Cần lời mời từ giáo viên';
+
+  @override
+  String get inviteEntryBody =>
+      'Giáo viên của con sẽ gửi cho bạn link, mã hoặc mã QR. Ứng dụng không tìm học sinh theo tên, trường hay số điện thoại.';
+
+  @override
+  String get inviteScanQr => 'Quét mã QR';
+
+  @override
+  String get inviteInputLabel => 'Dán link hoặc nhập mã mời';
+
+  @override
+  String get inviteInputSubmit => 'Tiếp tục';
+
+  @override
+  String get inviteInputBad =>
+      'Chưa nhận ra link hoặc mã. Hãy dán cả link, hoặc nhập mã gồm 8 ký tự.';
+
+  @override
+  String get inviteCodeInvalid =>
+      'Mã không đúng hoặc đã hết hạn. Hãy nhắn giáo viên xin mã mới.';
+
+  @override
+  String inviteCodeLocked(int minutes) {
+    return 'Bạn đã nhập sai quá nhiều lần. Thử lại sau $minutes phút.';
+  }
+
+  @override
+  String get inviteRateLimited =>
+      'Bạn thao tác quá nhanh, vui lòng thử lại sau.';
+
+  @override
+  String get inviteAskTeacher => 'Nhắn giáo viên xin link';
+
+  @override
+  String get inviteAskMessage =>
+      'Chào thầy/cô, tôi là phụ huynh. Nhờ thầy/cô gửi lại link mời TeachHub để tôi xem thông tin của con. Cảm ơn thầy/cô.';
+
+  @override
+  String get inviteAskCopied =>
+      'Đã sao chép tin nhắn. Hãy dán vào Zalo để gửi cho giáo viên.';
+
+  @override
+  String get inviteScanTitle => 'Quét mã QR lời mời';
+
+  @override
+  String get inviteScanHint => 'Đưa mã QR vào khung hình.';
+
+  @override
+  String get inviteScanDenied =>
+      'Ứng dụng chưa được dùng camera. Bạn có thể dán link hoặc nhập mã thay thế.';
+
+  @override
+  String get inviteScanNotInvite => 'Mã QR này không phải lời mời TeachHub.';
+
+  @override
+  String get consentTitle => 'Đồng ý xử lý dữ liệu';
+
+  @override
+  String get consentBody =>
+      'Để xem thông tin học tập của con, bạn cần đồng ý để TeachHub xử lý dữ liệu cá nhân của bạn và của con theo điều khoản và chính sách bảo mật.';
+
+  @override
+  String consentVersion(String version) {
+    return 'Phiên bản điều khoản: $version';
+  }
+
+  @override
+  String get consentAccept => 'Đồng ý và tiếp tục';
+
+  @override
+  String get consentTermsChanged =>
+      'Điều khoản vừa được cập nhật. Vui lòng đọc lại rồi đồng ý.';
+
+  @override
+  String get consentFailed => 'Chưa gửi được. Vui lòng thử lại.';
+
+  @override
+  String get consentLoadFailed =>
+      'Không tải được điều khoản. Vui lòng thử lại.';
 
   @override
   String get inviteFailed => 'Không nhận được lời mời. Vui lòng thử lại.';
-
-  @override
-  String get inviteConsentTitle => 'Đồng ý xử lý dữ liệu';
-
-  @override
-  String get inviteConsentBody =>
-      'Để xem thông tin học tập của con, bạn cần đồng ý với điều khoản và chính sách xử lý dữ liệu cá nhân của TeachHub.';
-
-  @override
-  String get inviteConsentAccept => 'Đồng ý và nhận lời mời';
 
   @override
   String get settings => 'Cài đặt';
@@ -470,4 +551,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get deleteAccountErrGeneric => 'Chưa xóa được tài khoản. Thử lại sau.';
+
+  @override
+  String get consentLater => 'Để sau';
 }

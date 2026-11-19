@@ -74,28 +74,108 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inviteTitle => 'Class invitation';
 
   @override
-  String get inviteBody =>
-      'A teacher invited you to connect with your child\'s class.';
-
-  @override
   String get inviteAccept => 'Accept invitation';
 
   @override
-  String get inviteInvalid => 'This invitation does not exist or has expired.';
+  String inviteCardTitle(String teacher) {
+    return 'Invitation from $teacher';
+  }
+
+  @override
+  String inviteCardBody(String teacher, String student, String expires) {
+    return '$teacher invites you to see $student\'s learning information. The link is valid until $expires.';
+  }
+
+  @override
+  String get inviteInvalid =>
+      'This invitation link has expired or can no longer be used. Message the teacher for a new link.';
+
+  @override
+  String get inviteEntryTitle => 'You need an invitation from a teacher';
+
+  @override
+  String get inviteEntryBody =>
+      'Your child\'s teacher will send you a link, a code or a QR code. The app cannot search for students by name, school or phone number.';
+
+  @override
+  String get inviteScanQr => 'Scan QR code';
+
+  @override
+  String get inviteInputLabel => 'Paste the link or enter the invitation code';
+
+  @override
+  String get inviteInputSubmit => 'Continue';
+
+  @override
+  String get inviteInputBad =>
+      'Link or code not recognised. Paste the whole link, or enter the 8-character code.';
+
+  @override
+  String get inviteCodeInvalid =>
+      'The code is wrong or has expired. Message the teacher for a new code.';
+
+  @override
+  String inviteCodeLocked(int minutes) {
+    return 'Too many wrong attempts. Try again in $minutes minutes.';
+  }
+
+  @override
+  String get inviteRateLimited =>
+      'You are going too fast, please try again later.';
+
+  @override
+  String get inviteAskTeacher => 'Message the teacher for a link';
+
+  @override
+  String get inviteAskMessage =>
+      'Hello, I am a parent. Could you please resend the TeachHub invitation link so I can see my child\'s information? Thank you.';
+
+  @override
+  String get inviteAskCopied =>
+      'Message copied. Paste it into Zalo to send it to the teacher.';
+
+  @override
+  String get inviteScanTitle => 'Scan the invitation QR code';
+
+  @override
+  String get inviteScanHint => 'Point the camera at the QR code.';
+
+  @override
+  String get inviteScanDenied =>
+      'The app is not allowed to use the camera. You can paste the link or enter the code instead.';
+
+  @override
+  String get inviteScanNotInvite =>
+      'This QR code is not a TeachHub invitation.';
+
+  @override
+  String get consentTitle => 'Consent to data processing';
+
+  @override
+  String get consentBody =>
+      'To see your child\'s learning information, you need to agree that TeachHub processes your and your child\'s personal data under the terms and privacy policy.';
+
+  @override
+  String consentVersion(String version) {
+    return 'Terms version: $version';
+  }
+
+  @override
+  String get consentAccept => 'Agree and continue';
+
+  @override
+  String get consentTermsChanged =>
+      'The terms were just updated. Please read them again, then agree.';
+
+  @override
+  String get consentFailed => 'Could not send. Please try again.';
+
+  @override
+  String get consentLoadFailed => 'Could not load the terms. Please try again.';
 
   @override
   String get inviteFailed =>
       'Could not accept the invitation. Please try again.';
-
-  @override
-  String get inviteConsentTitle => 'Data processing consent';
-
-  @override
-  String get inviteConsentBody =>
-      'To see your child\'s learning information, you need to agree to TeachHub\'s terms and personal data policy.';
-
-  @override
-  String get inviteConsentAccept => 'Agree and accept';
 
   @override
   String get settings => 'Settings';
@@ -472,4 +552,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get deleteAccountErrGeneric =>
       'Could not delete the account. Try again later.';
+
+  @override
+  String get consentLater => 'Later';
 }
