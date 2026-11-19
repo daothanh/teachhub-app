@@ -71,7 +71,7 @@ void main() {
     final repo = FakeClassesRepository()..active = [sampleClass()];
     final cubit = ClassesListCubit(repo);
     await cubit.load();
-    repo..listError = const ApiException.network();
+    repo.listError = const ApiException.network();
     await cubit.refresh();
     expect(cubit.state.items, hasLength(1));
     expect(cubit.state.load, ClassesLoad.ready);
