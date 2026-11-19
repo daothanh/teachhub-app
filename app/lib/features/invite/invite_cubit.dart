@@ -74,6 +74,7 @@ class InviteCubit extends Cubit<InviteState> {
   }
 
   /// `POST /consents { role: parent, termsVersion }` rồi nhận lại lời mời.
+  // TODO(S3-FL-12): `/consents` chưa có trong contracts/openapi.json; đưa vào hợp đồng Sprint 4 (S4-BE-05).
   Future<void> consentAndAccept() async {
     final version = state.consentTermsVersion;
     if (version == null) return;

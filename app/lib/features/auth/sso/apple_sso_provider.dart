@@ -9,6 +9,7 @@ import '../../../core/network/teachhub_headers_interceptor.dart';
 
 /// Sign in with Apple native (iOS), đổi `identityToken` lấy token TeachHub qua
 /// `POST /auth/sso/apple`.
+/// TODO(S1-FL-11): `/auth/sso/apple` chưa có trong contracts/openapi.json; đưa vào hợp đồng Sprint 2 (S2-BE-01).
 ///
 /// Apple nhận SHA-256 của nonce; API nhận nonce gốc để so với claim `nonce`
 /// trong token (spec §5.2a).

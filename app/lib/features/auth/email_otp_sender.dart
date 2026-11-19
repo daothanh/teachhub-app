@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 /// `POST /auth/otp/send` (công khai, giới hạn 60 giây/lần ở API).
+// TODO(S1-FL-11): ràng buộc 60 giây/lần chưa có trong contracts/openapi.json; thêm 429 + `retryAfterSec` vào hợp đồng.
 typedef EmailOtpSender = Future<void> Function(String email);
 
 EmailOtpSender emailOtpSender(Dio api) =>
