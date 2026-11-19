@@ -3,5 +3,169 @@
   "spaceTitle": "Giáo viên",
   "spaceComingSoon": "Không gian này đang được xây dựng.",
   "switchRole": "Đổi vai trò",
-  "offlineBanner": "Ngoại tuyến — thay đổi được lưu trên máy và tự đồng bộ khi có mạng."
+  "offlineBanner": "Ngoại tuyến — thay đổi được lưu trên máy và tự đồng bộ khi có mạng.",
+  "classesTitle": "Lớp học",
+  "classesTabActive": "Đang dạy",
+  "classesTabArchived": "Đã lưu trữ",
+  "classesEmpty": "Chưa có lớp nào",
+  "classesEmptyHint": "Tạo lớp đầu tiên để bắt đầu.",
+  "classesEmptyArchived": "Chưa có lớp lưu trữ",
+  "classesCreate": "Tạo lớp",
+  "classesRetry": "Thử lại",
+  "classesCancel": "Hủy",
+  "classesItemMeta": "{subject} · Khối {grade}",
+  "classesStudentCount": "{count, plural, other{{count} học viên}}",
+  "classesModeOffline": "Tại chỗ",
+  "classesModeOnline": "Trực tuyến",
+  "classesDetailTitle": "Chi tiết lớp",
+  "classesEdit": "Sửa lớp",
+  "classesArchive": "Lưu trữ lớp",
+  "classesArchiveConfirmTitle": "Lưu trữ lớp này?",
+  "classesArchiveConfirmBody": "Lớp sẽ ẩn khỏi danh sách và lịch. Dữ liệu vẫn được giữ.",
+  "classesArchivedBanner": "Lớp đã lưu trữ.",
+  "classesSectionInfo": "Thông tin",
+  "classesSectionSchedule": "Lịch lặp",
+  "classesSectionSessions": "Buổi sắp tới",
+  "classesSectionStudents": "Học viên",
+  "classesNoRules": "Chưa đặt lịch lặp.",
+  "classesNoSessions": "Chưa có buổi nào trong 2 tháng tới.",
+  "classesSessionsLoadFailed": "Không tải được danh sách buổi.",
+  "classesNoStudents": "Lớp chưa có học viên.",
+  "classesAddStudent": "Thêm học viên",
+  "classesLabelLocation": "Địa điểm",
+  "classesLabelCapacity": "Sĩ số tối đa",
+  "classesLabelStart": "Bắt đầu",
+  "classesLabelEnd": "Kết thúc",
+  "classesNoEnd": "Không kỳ hạn",
+  "classesRuleLine": "{day} · {start} · {minutes} phút",
+  "classesSessionLine": "{date} · {start}–{end}",
+  "classesSessionPlanned": "Dự kiến",
+  "classesSessionTaught": "Đã dạy",
+  "classesSessionCancelled": "Đã hủy",
+  "classesSessionMakeup": "Dạy bù",
+  "classesStudentPaused": "Tạm nghỉ",
+  "classesFormNewTitle": "Tạo lớp",
+  "classesFormEditTitle": "Sửa lớp",
+  "classesFieldName": "Tên lớp",
+  "classesFieldSubject": "Môn",
+  "classesFieldGrade": "Khối (1–12)",
+  "classesFieldMode": "Hình thức",
+  "classesFieldLocation": "Địa điểm",
+  "classesFieldCapacity": "Sĩ số tối đa (không bắt buộc)",
+  "classesFieldStart": "Ngày bắt đầu",
+  "classesFieldEnd": "Ngày kết thúc (không bắt buộc)",
+  "classesPickDate": "Chọn ngày",
+  "classesClearEnd": "Bỏ ngày kết thúc",
+  "classesSave": "Lưu",
+  "classesFormSaved": "Đã lưu lớp.",
+  "classesFormSavedSessions": "Đã lưu lớp. Đã tạo {count, plural, other{{count} buổi}}.",
+  "classesErrRequired": "Không được để trống.",
+  "classesErrGrade": "Khối từ 1 đến 12.",
+  "classesErrCapacity": "Sĩ số từ 1 đến 500.",
+  "classesErrEndBeforeStart": "Ngày kết thúc không được trước ngày bắt đầu.",
+  "classesErrRulesDuplicate": "Có hai buổi cùng thứ và giờ bắt đầu.",
+  "classesErrRulesOverflow": "Buổi học không được kéo qua 24:00.",
+  "classesErrRulesTooMany": "Tối đa 14 buổi mỗi tuần.",
+  "classesRulesTitle": "Lịch lặp hằng tuần",
+  "classesRuleAdd": "Thêm buổi",
+  "classesRuleRemove": "Xóa buổi này",
+  "classesRuleTime": "Giờ bắt đầu",
+  "classesRuleDuration": "Thời lượng (phút)",
+  "classesWeekday": "{day, select, 1{Thứ Hai} 2{Thứ Ba} 3{Thứ Tư} 4{Thứ Năm} 5{Thứ Sáu} 6{Thứ Bảy} other{Chủ nhật}}",
+  "classesWeekdayShort": "{day, select, 1{T2} 2{T3} 3{T4} 4{T5} 5{T6} 6{T7} other{CN}}",
+  "classesErrNetwork": "Không có mạng. Kiểm tra kết nối rồi thử lại.",
+  "classesErrPlanLimit": "Gói hiện tại đã hết hạn mức. Nâng cấp gói để thêm tiếp.",
+  "classesErrStale": "Dữ liệu vừa thay đổi. Tải lại rồi thử lại.",
+  "classesErrBusy": "Yêu cầu đang được xử lý. Chờ một chút.",
+  "classesErrForbidden": "Bạn không có quyền thực hiện việc này.",
+  "classesErrNotFound": "Không tìm thấy lớp này.",
+  "classesErrValidation": "Dữ liệu chưa hợp lệ. Kiểm tra lại các trường.",
+  "classesErrGeneric": "Có lỗi xảy ra. Thử lại sau.",
+  "classesErrEnrollConflict": "Lớp đã lưu trữ hoặc học viên đã nghỉ, không thể thêm.",
+  "classesPickerTitle": "Thêm học viên",
+  "classesPickerSearchHint": "Tìm theo họ tên",
+  "classesPickerTooShort": "Gõ ít nhất 2 ký tự để tìm.",
+  "classesPickerNone": "Không thấy học viên nào khớp.",
+  "classesPickerNoneHint": "Học viên mới được thêm ở mục Học viên.",
+  "classesEnrolled": "Đã thêm {name} vào lớp.",
+  "classesAlreadyEnrolled": "{name} đã có trong lớp.",
+  "@classesItemMeta": {
+    "placeholders": {
+      "subject": {
+        "type": "String"
+      },
+      "grade": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesStudentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesRuleLine": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesSessionLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesFormSavedSessions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesWeekday": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesWeekdayShort": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesEnrolled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesAlreadyEnrolled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "classesErrRulesDuration": "Thời lượng từ 15 đến 480 phút."
 }

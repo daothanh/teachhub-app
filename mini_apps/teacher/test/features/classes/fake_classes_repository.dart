@@ -1,0 +1,159 @@
+import 'package:teachhub_shared/teachhub_shared.dart';
+import 'package:teacher/features/classes/data/class_models.dart';
+import 'package:teacher/features/classes/data/classes_repository.dart';
+
+TeachClass sampleClass({
+  String id = 'c1',
+  String name = 'Toán 9A',
+  ClassStatus status = ClassStatus.active,
+  List<ScheduleRule> rules = const [],
+  int enrolled = 0,
+}) => TeachClass(
+  id: id,
+  name: name,
+  subject: 'Toán',
+  grade: 9,
+  mode: ClassMode.offline,
+  location: 'Nhà riêng',
+  capacity: 20,
+  startDate: '2026-12-14',
+  endDate: null,
+  status: status,
+  enrolledCount: enrolled,
+  scheduleRules: rules,
+  createdAt: '2026-12-01T00:00:00.000Z',
+);
+
+ApiException validationError(Map<String, List<String>> errors) => ApiException(
+  code: ApiErrorCode.validationFailed,
+  wireCode: 'VALIDATION_FAILED',
+  status: 422,
+  fieldErrors: errors,
+);
+
+ApiException apiError(ApiErrorCode c) =>
+    ApiException(code: c, wireCode: c.wire, status: c.http);
+
+/// Bản giả: mỗi thao tác chạy `onX` nếu có, không thì trả giá trị mặc định.
+class FakeClassesRepository implements ClassesRepository {
+  final calls = <String>[];
+  List<TeachClass> active = [];
+  List<TeachClass> archived = [];
+  TeachClass? current;
+  List<RosterEntry> rosterItems = [];
+  List<ClassSession> sessionItems = [];
+  List<StudentSummary> students = [];
+  Object? listError;
+  Object? getError;
+  Object? createError;
+  Object? updateError;
+  Object? archiveError;
+  Object? putRulesError;
+  Object? enrollError;
+  Object? sessionsError;
+  bool alreadyEnrolled = false;
+  ClassInput? lastInput;
+  List<ScheduleRule>? lastRules;
+  String? lastQuery;
+  ({String from, String to, String? classId})? lastSessionRange;
+
+  @override
+  Future<Paginated<TeachClass>> list({
+    ClassStatus status = ClassStatus.active,
+    int page = 1,
+  }) async {
+    calls.add('list:${status.name}:$page');
+    if (listError != null) throw listError!;
+    final items = status == ClassStatus.active ? active : archived;
+    return Paginated(items: items, total: items.length, page: 1, pageSize: 20);
+  }
+
+  @override
+  Future<TeachClass> get(String id) async {
+    calls.add('get:$id');
+    if (getError != null) throw getError!;
+    return current ?? sampleClass(id: id);
+  }
+
+  @override
+  Future<ClassCreated> create(ClassInput input) async {
+    calls.add('create');
+    lastInput = input;
+    if (createError != null) throw createError!;
+    final c = sampleClass(id: 'new', name: input.name);
+    current = c;
+    return ClassCreated(c, const []);
+  }
+
+  @override
+  Future<TeachClass> update(String id, ClassInput input) async {
+    calls.add('update:$id');
+    lastInput = input;
+    if (updateError != null) throw updateError!;
+    return current = sampleClass(id: id, name: input.name);
+  }
+
+  @override
+  Future<TeachClass> archive(String id) async {
+    calls.add('archive:$id');
+    if (archiveError != null) throw archiveError!;
+    return sampleClass(id: id, status: ClassStatus.archived);
+  }
+
+  @override
+  Future<List<RosterEntry>> roster(String id) async => rosterItems;
+
+  @override
+  Future<EnrollResult> enroll(String classId, String studentId) async {
+    calls.add('enroll:$classId:$studentId');
+    if (enrollError != null) throw enrollError!;
+    return EnrollResult(
+      Enrollment(
+        id: 'e1',
+        classId: classId,
+        studentId: studentId,
+        joinedOn: '2026-12-14',
+      ),
+      alreadyEnrolled: alreadyEnrolled,
+    );
+  }
+
+  @override
+  Future<Paginated<StudentSummary>> searchStudents(String q) async {
+    calls.add('search:$q');
+    lastQuery = q;
+    return Paginated(
+      items: students,
+      total: students.length,
+      page: 1,
+      pageSize: 20,
+    );
+  }
+
+  @override
+  Future<ScheduleRulesResult> putRules(
+    String classId,
+    List<ScheduleRule> rules,
+  ) async {
+    calls.add('putRules:$classId');
+    lastRules = rules;
+    if (putRulesError != null) throw putRulesError!;
+    return ScheduleRulesResult(
+      rules: rules,
+      sessionsGenerated: rules.length * 8,
+      sessionsRemoved: 0,
+    );
+  }
+
+  @override
+  Future<List<ClassSession>> sessions({
+    required String from,
+    required String to,
+    String? classId,
+  }) async {
+    calls.add('sessions');
+    lastSessionRange = (from: from, to: to, classId: classId);
+    if (sessionsError != null) throw sessionsError!;
+    return sessionItems;
+  }
+}

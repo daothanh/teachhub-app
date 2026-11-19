@@ -3,5 +3,169 @@
   "spaceTitle": "Teacher",
   "spaceComingSoon": "This space is under construction.",
   "switchRole": "Switch role",
-  "offlineBanner": "Offline — changes are saved on this device and sync when you are back online."
+  "offlineBanner": "Offline — changes are saved on this device and sync when you are back online.",
+  "classesTitle": "Classes",
+  "classesTabActive": "Active",
+  "classesTabArchived": "Archived",
+  "classesEmpty": "No classes yet",
+  "classesEmptyHint": "Create your first class to get started.",
+  "classesEmptyArchived": "No archived classes",
+  "classesCreate": "Create class",
+  "classesRetry": "Try again",
+  "classesCancel": "Cancel",
+  "classesItemMeta": "{subject} · Grade {grade}",
+  "classesStudentCount": "{count, plural, =1{1 student} other{{count} students}}",
+  "classesModeOffline": "In person",
+  "classesModeOnline": "Online",
+  "classesDetailTitle": "Class details",
+  "classesEdit": "Edit class",
+  "classesArchive": "Archive class",
+  "classesArchiveConfirmTitle": "Archive this class?",
+  "classesArchiveConfirmBody": "The class will be hidden from the list and the calendar. Its data is kept.",
+  "classesArchivedBanner": "This class is archived.",
+  "classesSectionInfo": "Details",
+  "classesSectionSchedule": "Weekly schedule",
+  "classesSectionSessions": "Upcoming sessions",
+  "classesSectionStudents": "Students",
+  "classesNoRules": "No weekly schedule yet.",
+  "classesNoSessions": "No sessions in the next two months.",
+  "classesSessionsLoadFailed": "Could not load the sessions.",
+  "classesNoStudents": "No students in this class yet.",
+  "classesAddStudent": "Add student",
+  "classesLabelLocation": "Location",
+  "classesLabelCapacity": "Capacity",
+  "classesLabelStart": "Starts",
+  "classesLabelEnd": "Ends",
+  "classesNoEnd": "Open-ended",
+  "classesRuleLine": "{day} · {start} · {minutes} min",
+  "classesSessionLine": "{date} · {start}–{end}",
+  "classesSessionPlanned": "Planned",
+  "classesSessionTaught": "Taught",
+  "classesSessionCancelled": "Cancelled",
+  "classesSessionMakeup": "Make-up",
+  "classesStudentPaused": "On break",
+  "classesFormNewTitle": "New class",
+  "classesFormEditTitle": "Edit class",
+  "classesFieldName": "Class name",
+  "classesFieldSubject": "Subject",
+  "classesFieldGrade": "Grade (1–12)",
+  "classesFieldMode": "Format",
+  "classesFieldLocation": "Location",
+  "classesFieldCapacity": "Capacity (optional)",
+  "classesFieldStart": "Start date",
+  "classesFieldEnd": "End date (optional)",
+  "classesPickDate": "Pick a date",
+  "classesClearEnd": "Clear end date",
+  "classesSave": "Save",
+  "classesFormSaved": "Class saved.",
+  "classesFormSavedSessions": "Class saved. {count, plural, =1{1 session} other{{count} sessions}} created.",
+  "classesErrRequired": "This is required.",
+  "classesErrGrade": "Grade must be 1 to 12.",
+  "classesErrCapacity": "Capacity must be 1 to 500.",
+  "classesErrEndBeforeStart": "The end date cannot be before the start date.",
+  "classesErrRulesDuplicate": "Two sessions share the same day and start time.",
+  "classesErrRulesOverflow": "A session cannot run past 24:00.",
+  "classesErrRulesTooMany": "At most 14 sessions per week.",
+  "classesRulesTitle": "Weekly schedule",
+  "classesRuleAdd": "Add session",
+  "classesRuleRemove": "Remove this session",
+  "classesRuleTime": "Start time",
+  "classesRuleDuration": "Duration (min)",
+  "classesWeekday": "{day, select, 1{Monday} 2{Tuesday} 3{Wednesday} 4{Thursday} 5{Friday} 6{Saturday} other{Sunday}}",
+  "classesWeekdayShort": "{day, select, 1{Mon} 2{Tue} 3{Wed} 4{Thu} 5{Fri} 6{Sat} other{Sun}}",
+  "classesErrNetwork": "No connection. Check your network and try again.",
+  "classesErrPlanLimit": "Your plan limit is reached. Upgrade to add more.",
+  "classesErrStale": "The data just changed. Reload and try again.",
+  "classesErrBusy": "Your request is still processing. Wait a moment.",
+  "classesErrForbidden": "You do not have permission to do this.",
+  "classesErrNotFound": "This class was not found.",
+  "classesErrValidation": "Some data is not valid. Check the fields.",
+  "classesErrGeneric": "Something went wrong. Try again later.",
+  "classesErrEnrollConflict": "The class is archived or the student has left, so they cannot be added.",
+  "classesPickerTitle": "Add student",
+  "classesPickerSearchHint": "Search by name",
+  "classesPickerTooShort": "Type at least 2 characters to search.",
+  "classesPickerNone": "No matching students.",
+  "classesPickerNoneHint": "New students are added from the Students section.",
+  "classesEnrolled": "{name} was added to the class.",
+  "classesAlreadyEnrolled": "{name} is already in the class.",
+  "@classesItemMeta": {
+    "placeholders": {
+      "subject": {
+        "type": "String"
+      },
+      "grade": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesStudentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesRuleLine": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesSessionLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesFormSavedSessions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesWeekday": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesWeekdayShort": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesEnrolled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesAlreadyEnrolled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "classesErrRulesDuration": "Duration must be 15 to 480 minutes."
 }

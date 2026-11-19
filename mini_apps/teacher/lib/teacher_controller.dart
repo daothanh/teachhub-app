@@ -8,6 +8,7 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 
 import 'data/local_db/teacher_database.dart';
 import 'data/local_db/teacher_local_data.dart';
+import 'features/classes/classes_routes.dart';
 import 'features/home/pages/teacher_home_page.dart';
 import 'l10n/l10n.dart';
 
@@ -34,6 +35,7 @@ class TeacherController {
       name: '$moduleId.home',
       builder: (context, state) => const TeacherHomePage(),
     ),
+    ...classesRoutes(moduleId),
   ];
 
   /// CSDL chỉ mở ở lần đầu cần (lazy): người dùng không có vai trò Giáo viên

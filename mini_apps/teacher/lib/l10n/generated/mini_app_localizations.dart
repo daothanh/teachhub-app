@@ -124,6 +124,522 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Ngoại tuyến — thay đổi được lưu trên máy và tự đồng bộ khi có mạng.'**
   String get offlineBanner;
+
+  /// No description provided for @classesTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp học'**
+  String get classesTitle;
+
+  /// No description provided for @classesTabActive.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang dạy'**
+  String get classesTabActive;
+
+  /// No description provided for @classesTabArchived.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu trữ'**
+  String get classesTabArchived;
+
+  /// No description provided for @classesEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có lớp nào'**
+  String get classesEmpty;
+
+  /// No description provided for @classesEmptyHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo lớp đầu tiên để bắt đầu.'**
+  String get classesEmptyHint;
+
+  /// No description provided for @classesEmptyArchived.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có lớp lưu trữ'**
+  String get classesEmptyArchived;
+
+  /// No description provided for @classesCreate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo lớp'**
+  String get classesCreate;
+
+  /// No description provided for @classesRetry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thử lại'**
+  String get classesRetry;
+
+  /// No description provided for @classesCancel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy'**
+  String get classesCancel;
+
+  /// No description provided for @classesItemMeta.
+  ///
+  /// In vi, this message translates to:
+  /// **'{subject} · Khối {grade}'**
+  String classesItemMeta(String subject, int grade);
+
+  /// No description provided for @classesStudentCount.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count, plural, other{{count} học viên}}'**
+  String classesStudentCount(int count);
+
+  /// No description provided for @classesModeOffline.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tại chỗ'**
+  String get classesModeOffline;
+
+  /// No description provided for @classesModeOnline.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trực tuyến'**
+  String get classesModeOnline;
+
+  /// No description provided for @classesDetailTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chi tiết lớp'**
+  String get classesDetailTitle;
+
+  /// No description provided for @classesEdit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa lớp'**
+  String get classesEdit;
+
+  /// No description provided for @classesArchive.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu trữ lớp'**
+  String get classesArchive;
+
+  /// No description provided for @classesArchiveConfirmTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu trữ lớp này?'**
+  String get classesArchiveConfirmTitle;
+
+  /// No description provided for @classesArchiveConfirmBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp sẽ ẩn khỏi danh sách và lịch. Dữ liệu vẫn được giữ.'**
+  String get classesArchiveConfirmBody;
+
+  /// No description provided for @classesArchivedBanner.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp đã lưu trữ.'**
+  String get classesArchivedBanner;
+
+  /// No description provided for @classesSectionInfo.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thông tin'**
+  String get classesSectionInfo;
+
+  /// No description provided for @classesSectionSchedule.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch lặp'**
+  String get classesSectionSchedule;
+
+  /// No description provided for @classesSectionSessions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi sắp tới'**
+  String get classesSectionSessions;
+
+  /// No description provided for @classesSectionStudents.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học viên'**
+  String get classesSectionStudents;
+
+  /// No description provided for @classesNoRules.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa đặt lịch lặp.'**
+  String get classesNoRules;
+
+  /// No description provided for @classesNoSessions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có buổi nào trong 2 tháng tới.'**
+  String get classesNoSessions;
+
+  /// No description provided for @classesSessionsLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được danh sách buổi.'**
+  String get classesSessionsLoadFailed;
+
+  /// No description provided for @classesNoStudents.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp chưa có học viên.'**
+  String get classesNoStudents;
+
+  /// No description provided for @classesAddStudent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm học viên'**
+  String get classesAddStudent;
+
+  /// No description provided for @classesLabelLocation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Địa điểm'**
+  String get classesLabelLocation;
+
+  /// No description provided for @classesLabelCapacity.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sĩ số tối đa'**
+  String get classesLabelCapacity;
+
+  /// No description provided for @classesLabelStart.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bắt đầu'**
+  String get classesLabelStart;
+
+  /// No description provided for @classesLabelEnd.
+  ///
+  /// In vi, this message translates to:
+  /// **'Kết thúc'**
+  String get classesLabelEnd;
+
+  /// No description provided for @classesNoEnd.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không kỳ hạn'**
+  String get classesNoEnd;
+
+  /// No description provided for @classesRuleLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{day} · {start} · {minutes} phút'**
+  String classesRuleLine(String day, String start, int minutes);
+
+  /// No description provided for @classesSessionLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{date} · {start}–{end}'**
+  String classesSessionLine(String date, String start, String end);
+
+  /// No description provided for @classesSessionPlanned.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dự kiến'**
+  String get classesSessionPlanned;
+
+  /// No description provided for @classesSessionTaught.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã dạy'**
+  String get classesSessionTaught;
+
+  /// No description provided for @classesSessionCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy'**
+  String get classesSessionCancelled;
+
+  /// No description provided for @classesSessionMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dạy bù'**
+  String get classesSessionMakeup;
+
+  /// No description provided for @classesStudentPaused.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạm nghỉ'**
+  String get classesStudentPaused;
+
+  /// No description provided for @classesFormNewTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo lớp'**
+  String get classesFormNewTitle;
+
+  /// No description provided for @classesFormEditTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa lớp'**
+  String get classesFormEditTitle;
+
+  /// No description provided for @classesFieldName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tên lớp'**
+  String get classesFieldName;
+
+  /// No description provided for @classesFieldSubject.
+  ///
+  /// In vi, this message translates to:
+  /// **'Môn'**
+  String get classesFieldSubject;
+
+  /// No description provided for @classesFieldGrade.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khối (1–12)'**
+  String get classesFieldGrade;
+
+  /// No description provided for @classesFieldMode.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hình thức'**
+  String get classesFieldMode;
+
+  /// No description provided for @classesFieldLocation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Địa điểm'**
+  String get classesFieldLocation;
+
+  /// No description provided for @classesFieldCapacity.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sĩ số tối đa (không bắt buộc)'**
+  String get classesFieldCapacity;
+
+  /// No description provided for @classesFieldStart.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày bắt đầu'**
+  String get classesFieldStart;
+
+  /// No description provided for @classesFieldEnd.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày kết thúc (không bắt buộc)'**
+  String get classesFieldEnd;
+
+  /// No description provided for @classesPickDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ngày'**
+  String get classesPickDate;
+
+  /// No description provided for @classesClearEnd.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ ngày kết thúc'**
+  String get classesClearEnd;
+
+  /// No description provided for @classesSave.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu'**
+  String get classesSave;
+
+  /// No description provided for @classesFormSaved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu lớp.'**
+  String get classesFormSaved;
+
+  /// No description provided for @classesFormSavedSessions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu lớp. Đã tạo {count, plural, other{{count} buổi}}.'**
+  String classesFormSavedSessions(int count);
+
+  /// No description provided for @classesErrRequired.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không được để trống.'**
+  String get classesErrRequired;
+
+  /// No description provided for @classesErrGrade.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khối từ 1 đến 12.'**
+  String get classesErrGrade;
+
+  /// No description provided for @classesErrCapacity.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sĩ số từ 1 đến 500.'**
+  String get classesErrCapacity;
+
+  /// No description provided for @classesErrEndBeforeStart.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày kết thúc không được trước ngày bắt đầu.'**
+  String get classesErrEndBeforeStart;
+
+  /// No description provided for @classesErrRulesDuplicate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Có hai buổi cùng thứ và giờ bắt đầu.'**
+  String get classesErrRulesDuplicate;
+
+  /// No description provided for @classesErrRulesOverflow.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi học không được kéo qua 24:00.'**
+  String get classesErrRulesOverflow;
+
+  /// No description provided for @classesErrRulesTooMany.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tối đa 14 buổi mỗi tuần.'**
+  String get classesErrRulesTooMany;
+
+  /// No description provided for @classesRulesTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch lặp hằng tuần'**
+  String get classesRulesTitle;
+
+  /// No description provided for @classesRuleAdd.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm buổi'**
+  String get classesRuleAdd;
+
+  /// No description provided for @classesRuleRemove.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa buổi này'**
+  String get classesRuleRemove;
+
+  /// No description provided for @classesRuleTime.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giờ bắt đầu'**
+  String get classesRuleTime;
+
+  /// No description provided for @classesRuleDuration.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thời lượng (phút)'**
+  String get classesRuleDuration;
+
+  /// No description provided for @classesWeekday.
+  ///
+  /// In vi, this message translates to:
+  /// **'{day, select, 1{Thứ Hai} 2{Thứ Ba} 3{Thứ Tư} 4{Thứ Năm} 5{Thứ Sáu} 6{Thứ Bảy} other{Chủ nhật}}'**
+  String classesWeekday(String day);
+
+  /// No description provided for @classesWeekdayShort.
+  ///
+  /// In vi, this message translates to:
+  /// **'{day, select, 1{T2} 2{T3} 3{T4} 4{T5} 5{T6} 6{T7} other{CN}}'**
+  String classesWeekdayShort(String day);
+
+  /// No description provided for @classesErrNetwork.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có mạng. Kiểm tra kết nối rồi thử lại.'**
+  String get classesErrNetwork;
+
+  /// No description provided for @classesErrPlanLimit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gói hiện tại đã hết hạn mức. Nâng cấp gói để thêm tiếp.'**
+  String get classesErrPlanLimit;
+
+  /// No description provided for @classesErrStale.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dữ liệu vừa thay đổi. Tải lại rồi thử lại.'**
+  String get classesErrStale;
+
+  /// No description provided for @classesErrBusy.
+  ///
+  /// In vi, this message translates to:
+  /// **'Yêu cầu đang được xử lý. Chờ một chút.'**
+  String get classesErrBusy;
+
+  /// No description provided for @classesErrForbidden.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn không có quyền thực hiện việc này.'**
+  String get classesErrForbidden;
+
+  /// No description provided for @classesErrNotFound.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tìm thấy lớp này.'**
+  String get classesErrNotFound;
+
+  /// No description provided for @classesErrValidation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dữ liệu chưa hợp lệ. Kiểm tra lại các trường.'**
+  String get classesErrValidation;
+
+  /// No description provided for @classesErrGeneric.
+  ///
+  /// In vi, this message translates to:
+  /// **'Có lỗi xảy ra. Thử lại sau.'**
+  String get classesErrGeneric;
+
+  /// No description provided for @classesErrEnrollConflict.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp đã lưu trữ hoặc học viên đã nghỉ, không thể thêm.'**
+  String get classesErrEnrollConflict;
+
+  /// No description provided for @classesPickerTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm học viên'**
+  String get classesPickerTitle;
+
+  /// No description provided for @classesPickerSearchHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tìm theo họ tên'**
+  String get classesPickerSearchHint;
+
+  /// No description provided for @classesPickerTooShort.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gõ ít nhất 2 ký tự để tìm.'**
+  String get classesPickerTooShort;
+
+  /// No description provided for @classesPickerNone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không thấy học viên nào khớp.'**
+  String get classesPickerNone;
+
+  /// No description provided for @classesPickerNoneHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học viên mới được thêm ở mục Học viên.'**
+  String get classesPickerNoneHint;
+
+  /// No description provided for @classesEnrolled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thêm {name} vào lớp.'**
+  String classesEnrolled(String name);
+
+  /// No description provided for @classesAlreadyEnrolled.
+  ///
+  /// In vi, this message translates to:
+  /// **'{name} đã có trong lớp.'**
+  String classesAlreadyEnrolled(String name);
+
+  /// No description provided for @classesErrRulesDuration.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thời lượng từ 15 đến 480 phút.'**
+  String get classesErrRulesDuration;
 }
 
 class _MiniAppLocalizationsDelegate
