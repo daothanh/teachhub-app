@@ -703,6 +703,96 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Đang ở vai trò {role}'**
   String roleSwitchedTo(String role);
+
+  /// No description provided for @waitlistTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đăng ký sớm cho Chủ trung tâm'**
+  String get waitlistTitle;
+
+  /// No description provided for @waitlistIntro.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính năng cho trung tâm sắp ra mắt. Để lại thông tin, chúng tôi sẽ liên hệ khi sẵn sàng.'**
+  String get waitlistIntro;
+
+  /// No description provided for @waitlistCenterName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tên trung tâm'**
+  String get waitlistCenterName;
+
+  /// No description provided for @waitlistCenterNameRequired.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập tên trung tâm.'**
+  String get waitlistCenterNameRequired;
+
+  /// No description provided for @waitlistTeacherCount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số giáo viên'**
+  String get waitlistTeacherCount;
+
+  /// No description provided for @waitlistTeacherCountInvalid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập số từ 1 đến 1000.'**
+  String get waitlistTeacherCountInvalid;
+
+  /// No description provided for @waitlistSubmit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi đăng ký'**
+  String get waitlistSubmit;
+
+  /// No description provided for @waitlistTrialHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trong lúc chờ, bạn có thể dùng thử với vai trò Giáo viên.'**
+  String get waitlistTrialHint;
+
+  /// No description provided for @waitlistTrialAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dùng thử vai trò Giáo viên'**
+  String get waitlistTrialAction;
+
+  /// No description provided for @waitlistSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã nhận đăng ký'**
+  String get waitlistSent;
+
+  /// No description provided for @waitlistSentBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cảm ơn bạn. Chúng tôi sẽ liên hệ sớm.'**
+  String get waitlistSentBody;
+
+  /// No description provided for @waitlistErrorBusy.
+  ///
+  /// In vi, this message translates to:
+  /// **'Yêu cầu đang xử lý. Thử lại sau giây lát.'**
+  String get waitlistErrorBusy;
+
+  /// No description provided for @waitlistErrorValidation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thông tin chưa hợp lệ. Kiểm tra lại các ô.'**
+  String get waitlistErrorValidation;
+
+  /// No description provided for @waitlistErrorNetwork.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có mạng. Thử lại sau.'**
+  String get waitlistErrorNetwork;
+
+  /// No description provided for @waitlistErrorGeneric.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa gửi được đăng ký. Thử lại sau.'**
+  String get waitlistErrorGeneric;
 }
 
 class _AppLocalizationsDelegate

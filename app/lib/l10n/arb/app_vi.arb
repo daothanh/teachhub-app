@@ -49,7 +49,13 @@
   "settingsThemeSystem": "Theo hệ thống",
   "logout": "Đăng xuất",
   "logoutPendingTitle": "Còn {count} buổi chưa đồng bộ",
-  "@logoutPendingTitle": { "placeholders": { "count": { "type": "int" } } },
+  "@logoutPendingTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "logoutUnreadableTitle": "Không đọc được dữ liệu chưa đồng bộ",
   "logoutUnreadableBody": "Nếu đăng xuất, dữ liệu trên máy sẽ bị xóa và có thể mất các buổi chưa đồng bộ.",
   "logoutWipeFailed": "Đã đăng xuất, nhưng chưa xóa hết dữ liệu trên máy. Ứng dụng sẽ thử lại lần mở sau.",
@@ -136,5 +142,20 @@
         "type": "String"
       }
     }
-  }
+  },
+  "waitlistTitle": "Đăng ký sớm cho Chủ trung tâm",
+  "waitlistIntro": "Tính năng cho trung tâm sắp ra mắt. Để lại thông tin, chúng tôi sẽ liên hệ khi sẵn sàng.",
+  "waitlistCenterName": "Tên trung tâm",
+  "waitlistCenterNameRequired": "Nhập tên trung tâm.",
+  "waitlistTeacherCount": "Số giáo viên",
+  "waitlistTeacherCountInvalid": "Nhập số từ 1 đến 1000.",
+  "waitlistSubmit": "Gửi đăng ký",
+  "waitlistTrialHint": "Trong lúc chờ, bạn có thể dùng thử với vai trò Giáo viên.",
+  "waitlistTrialAction": "Dùng thử vai trò Giáo viên",
+  "waitlistSent": "Đã nhận đăng ký",
+  "waitlistSentBody": "Cảm ơn bạn. Chúng tôi sẽ liên hệ sớm.",
+  "waitlistErrorBusy": "Yêu cầu đang xử lý. Thử lại sau giây lát.",
+  "waitlistErrorValidation": "Thông tin chưa hợp lệ. Kiểm tra lại các ô.",
+  "waitlistErrorNetwork": "Không có mạng. Thử lại sau.",
+  "waitlistErrorGeneric": "Chưa gửi được đăng ký. Thử lại sau."
 }

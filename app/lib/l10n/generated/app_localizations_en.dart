@@ -335,4 +335,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String roleSwitchedTo(String role) {
     return 'Now in the $role role';
   }
+
+  @override
+  String get waitlistTitle => 'Early sign-up for Center owners';
+
+  @override
+  String get waitlistIntro =>
+      'Center features are coming. Leave your details and we will contact you when ready.';
+
+  @override
+  String get waitlistCenterName => 'Center name';
+
+  @override
+  String get waitlistCenterNameRequired => 'Enter the center name.';
+
+  @override
+  String get waitlistTeacherCount => 'Number of teachers';
+
+  @override
+  String get waitlistTeacherCountInvalid => 'Enter a number from 1 to 1000.';
+
+  @override
+  String get waitlistSubmit => 'Send';
+
+  @override
+  String get waitlistTrialHint =>
+      'While you wait, you can try the Teacher role.';
+
+  @override
+  String get waitlistTrialAction => 'Try the Teacher role';
+
+  @override
+  String get waitlistSent => 'Request received';
+
+  @override
+  String get waitlistSentBody => 'Thank you. We will be in touch soon.';
+
+  @override
+  String get waitlistErrorBusy => 'Still processing. Try again in a moment.';
+
+  @override
+  String get waitlistErrorValidation =>
+      'Some details are invalid. Check the fields.';
+
+  @override
+  String get waitlistErrorNetwork => 'No connection. Try again later.';
+
+  @override
+  String get waitlistErrorGeneric => 'Could not send. Try again later.';
 }
