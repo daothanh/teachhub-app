@@ -60,8 +60,15 @@ typedef SyncTransport = Future<SyncResponse> Function(SyncRequest request);
 
 /// [sent]: số mutation đã rời outbox (applied/duplicate/stale); [rejected]: bị
 /// từ chối, giữ lại để hiện banner; [failed]: mutation của lô lỗi cả lô, giữ
-/// lại; [retryIn]: còn việc, thử lại sau.
-typedef SyncReport = ({int sent, int rejected, int failed, Duration? retryIn});
+/// lại; [blocked]: mutation bị bỏ qua vì lỗi không tự hết (401/403…), vẫn chờ
+/// gửi nhưng thử lại ngay cũng vô ích; [retryIn]: còn việc, thử lại sau.
+typedef SyncReport = ({
+  int sent,
+  int rejected,
+  int failed,
+  int blocked,
+  Duration? retryIn,
+});
 
 enum SyncEventKind {
   /// Server có bản mới hơn: bản cục bộ đã bị ghi đè.
@@ -202,9 +209,14 @@ class SyncEngine {
 
   Future<SyncReport> _drain() async {
     final t = _db.outboxMutations;
-    var sent = 0, rejected = 0, failed = 0;
-    SyncReport report(Duration? retryIn) =>
-        (sent: sent, rejected: rejected, failed: failed, retryIn: retryIn);
+    var sent = 0, rejected = 0, failed = 0, blocked = 0;
+    SyncReport report(Duration? retryIn) => (
+      sent: sent,
+      rejected: rejected,
+      failed: failed,
+      blocked: blocked,
+      retryIn: retryIn,
+    );
 
     // Buổi bỏ qua trong lượt này (lỗi không tự hết) để không chặn buổi khác.
     final skip = <String>{};
@@ -263,6 +275,7 @@ class SyncEngine {
         }
         // Lỗi không tự hết (403…): bỏ qua buổi này, chờ lần kích hoạt sau.
         skip.add(sessionId);
+        blocked += batch.length;
         continue;
       }
       if (response == null) return report(null); // bị stop() giữa chừng
