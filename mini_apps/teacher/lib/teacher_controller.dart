@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -13,13 +14,14 @@ import 'data/cache/session_cache.dart';
 import 'data/local_db/teacher_database.dart';
 import 'data/local_db/teacher_local_data.dart';
 import 'data/remote/teacher_api.dart';
+import 'data/sync/background_sync.dart';
 import 'data/sync/clock_skew.dart';
 import 'data/sync/connectivity.dart';
 import 'data/sync/sync_engine.dart';
-import 'data/sync/uuid.dart';
 import 'features/attendance/attendance_routes.dart';
 import 'features/attendance/data/attendance_repository.dart';
 import 'features/classes/classes_routes.dart';
+import 'features/offline/offline_banner_shell.dart';
 import 'features/onboarding/data/onboarding_models.dart';
 import 'features/onboarding/data/onboarding_repository.dart';
 import 'features/onboarding/pages/onboarding_page.dart';
@@ -45,7 +47,16 @@ class TeacherController {
   List<LocalizationsDelegate> get localizationsDelegates =>
       MiniAppLocalizations.localizationsDelegates;
 
+  /// Mọi route teacher nằm trong khung banner "Ngoại tuyến" (S3-FL-09).
   List<RouteBase> routes() => [
+    ShellRoute(
+      builder: (context, state, child) =>
+          OfflineBannerShell(path: state.uri.path, child: child),
+      routes: _pageRoutes(),
+    ),
+  ];
+
+  List<RouteBase> _pageRoutes() => [
     GoRoute(
       path: routePrefix,
       name: '$moduleId.home',
@@ -130,25 +141,18 @@ class TeacherController {
   /// Lệch đồng hồ máy/server dùng chung cho engine và cache.
   final clock = ClockSkew();
 
-  static const _deviceIdKey = 'teacher.device_id';
-
   /// Có khi đang đồng bộ; xem [startSync].
   SyncEngine? syncEngine;
   bool _syncWanted = false;
 
-  /// Mã thiết bị ổn định của máy này (không xóa khi đăng xuất: là của máy).
-  Future<TeacherApi> _api() async {
-    final keys = keyStoreOverride ?? SecureStore();
-    var id = await keys.read(_deviceIdKey);
-    if (id == null) {
-      id = newUuid();
-      await keys.write(_deviceIdKey, id);
-    }
-    return TeacherApi(
-      GetIt.I<Dio>(instanceName: TeachHubDiKey.api),
-      deviceId: id,
-    );
-  }
+  /// Shell cài móc hẹn/hủy đồng bộ nền (S3-FL-09); `null` = không có nền.
+  BackgroundSyncHooks? backgroundSync;
+  StreamSubscription<bool>? _pendingSub;
+
+  Future<TeacherApi> _api() => loadTeacherApi(
+    GetIt.I<Dio>(instanceName: TeachHubDiKey.api),
+    keyStoreOverride ?? SecureStore(),
+  );
 
   /// Cache buổi + học viên để UI đọc ngoại tuyến và làm mới từ API.
   Future<SessionCache> openSessionCache() async => SessionCache(
@@ -172,7 +176,19 @@ class TeacherController {
     final api = await _api();
     if (!_syncWanted) return; // stopSync() gọi trong lúc chờ
     enginesCreated++;
-    syncEngine = SyncEngine(db, api.sync, clock: clock)..start(onlineChanges());
+    final engine = syncEngine = SyncEngine(db, api.sync, clock: clock)
+      ..start(onlineChanges());
+    // Còn mutation chờ thì hẹn lượt đẩy nền (app bị kill vẫn gửi được).
+    _pendingSub = engine
+        .watchPending()
+        .map((n) => n > 0)
+        .distinct()
+        .listen(
+          (has) => unawaited(
+            (has ? backgroundSync?.schedule() : backgroundSync?.cancel()) ??
+                Future.value(),
+          ),
+        );
   }
 
   Future<void>? _starting;
@@ -199,6 +215,8 @@ class TeacherController {
     await _starting; // chờ lượt startSync đang dựng engine
     final engine = syncEngine;
     syncEngine = null;
+    await _pendingSub?.cancel();
+    _pendingSub = null;
     await engine?.stop();
   }
 
@@ -212,6 +230,7 @@ class TeacherController {
   /// đã mất). Vào lại màn chính của giáo viên thì [startSync] bật lại.
   Future<void> wipeLocalData() async {
     await stopSync();
+    await backgroundSync?.cancel();
     await localData.wipe();
   }
 

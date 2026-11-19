@@ -94,6 +94,8 @@ dependencies:
   firebase_messaging: ^16.4.1
   flutter_local_notifications: ^19.5.0
   url_launcher: ^6.3.0
+  # Đồng bộ nền outbox của teacher (Android WorkManager, iOS BGTaskScheduler); S3-FL-09.
+  workmanager: ^0.10.10
 
 dev_dependencies:
   flutter_test:

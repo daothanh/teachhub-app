@@ -98,6 +98,11 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
+		<string>processing</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>vn.dayhoc.app.sync-outbox</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
