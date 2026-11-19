@@ -3,5 +3,68 @@
   "spaceTitle": "Giáo viên",
   "spaceComingSoon": "Không gian này đang được xây dựng.",
   "switchRole": "Đổi vai trò",
-  "offlineBanner": "Ngoại tuyến — thay đổi được lưu trên máy và tự đồng bộ khi có mạng."
+  "offlineBanner": "Ngoại tuyến — thay đổi được lưu trên máy và tự đồng bộ khi có mạng.",
+  "studentsFormTitle": "Thêm học viên",
+  "studentsFullName": "Họ và tên",
+  "studentsFullNameRequired": "Nhập họ tên học viên.",
+  "studentsDob": "Ngày sinh (không bắt buộc)",
+  "studentsSchool": "Trường (không bắt buộc)",
+  "studentsNote": "Ghi chú (không bắt buộc)",
+  "studentsGuardianTitle": "Phụ huynh {n}",
+  "@studentsGuardianTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "studentsGuardianName": "Họ tên phụ huynh",
+  "studentsGuardianNameRequired": "Nhập họ tên phụ huynh.",
+  "studentsGuardianPhone": "Số điện thoại (không bắt buộc)",
+  "studentsGuardianPhoneInvalid": "Số điện thoại chưa đúng.",
+  "studentsAddGuardian": "Thêm phụ huynh",
+  "studentsRemoveGuardian": "Bỏ phụ huynh",
+  "studentsSave": "Lưu học viên",
+  "studentsSaving": "Đang lưu…",
+  "studentsDuplicateTitle": "Có phải cùng một em?",
+  "studentsDuplicateBody": "Đã có hồ sơ trùng họ tên và ngày sinh. Chọn đúng em, hoặc thêm em mới.",
+  "studentsDuplicateSame": "Đúng, là em này",
+  "studentsDuplicateNew": "Không, thêm em mới",
+  "studentsDuplicateCancel": "Quay lại sửa",
+  "studentsErrorLimit": "Gói hiện tại đã đủ số học viên. Nâng cấp để thêm.",
+  "studentsErrorBusy": "Yêu cầu đang xử lý. Thử lại sau giây lát.",
+  "studentsErrorValidation": "Thông tin chưa hợp lệ. Kiểm tra lại các ô.",
+  "studentsErrorNetwork": "Không có mạng. Thử lại sau.",
+  "studentsErrorGeneric": "Chưa lưu được học viên. Thử lại sau.",
+  "onboardingTitle": "Làm quen TeachHub",
+  "onboardingProgress": "Bước {n}/{total}",
+  "@onboardingProgress": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingStepCreateClass": "Tạo lớp đầu tiên",
+  "onboardingStepAddStudents": "Thêm học viên",
+  "onboardingStepSetSchedule": "Đặt lịch học",
+  "onboardingStepPayoutAccount": "Tài khoản nhận tiền",
+  "onboardingStepComplianceChecklist": "Việc cần làm theo quy định",
+  "onboardingSkip": "Để sau",
+  "onboardingMarkDone": "Xong bước này",
+  "onboardingPlaceholderBody": "Màn này đang được hoàn thiện.",
+  "onboardingPayoutBody": "Thêm tài khoản để nhận học phí. Tính năng sắp có.",
+  "onboardingComplianceBody": "Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.",
+  "onboardingDoneTitle": "Bạn đã xong phần làm quen",
+  "onboardingDoneBody": "Vào xem lớp và học viên của bạn.",
+  "onboardingFinish": "Vào TeachHub",
+  "onboardingLoadFailed": "Không tải được tiến độ. Thử lại.",
+  "onboardingRetry": "Thử lại",
+  "onboardingErrorBusy": "Yêu cầu đang xử lý. Thử lại sau giây lát.",
+  "onboardingErrorValidation": "Bước này chưa lưu được. Kiểm tra lại.",
+  "onboardingErrorNetwork": "Không có mạng. Thử lại sau.",
+  "onboardingErrorGeneric": "Chưa lưu được. Thử lại sau."
 }

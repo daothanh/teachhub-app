@@ -3,5 +3,68 @@
   "spaceTitle": "Teacher",
   "spaceComingSoon": "This space is under construction.",
   "switchRole": "Switch role",
-  "offlineBanner": "Offline — changes are saved on this device and sync when you are back online."
+  "offlineBanner": "Offline — changes are saved on this device and sync when you are back online.",
+  "studentsFormTitle": "Add student",
+  "studentsFullName": "Full name",
+  "studentsFullNameRequired": "Enter the student's name.",
+  "studentsDob": "Date of birth (optional)",
+  "studentsSchool": "School (optional)",
+  "studentsNote": "Note (optional)",
+  "studentsGuardianTitle": "Parent {n}",
+  "@studentsGuardianTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "studentsGuardianName": "Parent's name",
+  "studentsGuardianNameRequired": "Enter the parent's name.",
+  "studentsGuardianPhone": "Phone (optional)",
+  "studentsGuardianPhoneInvalid": "The phone number looks wrong.",
+  "studentsAddGuardian": "Add parent",
+  "studentsRemoveGuardian": "Remove parent",
+  "studentsSave": "Save student",
+  "studentsSaving": "Saving…",
+  "studentsDuplicateTitle": "Is this the same student?",
+  "studentsDuplicateBody": "A record with the same name and birth date exists. Pick the student, or add a new one.",
+  "studentsDuplicateSame": "Yes, same student",
+  "studentsDuplicateNew": "No, add as new",
+  "studentsDuplicateCancel": "Back to edit",
+  "studentsErrorLimit": "Your plan has no room for more students. Upgrade to add more.",
+  "studentsErrorBusy": "Still processing. Try again in a moment.",
+  "studentsErrorValidation": "Some details are invalid. Check the fields.",
+  "studentsErrorNetwork": "No connection. Try again later.",
+  "studentsErrorGeneric": "Could not save the student. Try again later.",
+  "onboardingTitle": "Get started with TeachHub",
+  "onboardingProgress": "Step {n}/{total}",
+  "@onboardingProgress": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingStepCreateClass": "Create your first class",
+  "onboardingStepAddStudents": "Add students",
+  "onboardingStepSetSchedule": "Set the schedule",
+  "onboardingStepPayoutAccount": "Payout account",
+  "onboardingStepComplianceChecklist": "Compliance checklist",
+  "onboardingSkip": "Later",
+  "onboardingMarkDone": "Done with this step",
+  "onboardingPlaceholderBody": "This screen is being finished.",
+  "onboardingPayoutBody": "Add an account to receive tuition. Coming soon.",
+  "onboardingComplianceBody": "See what to do to teach within the rules. Coming soon.",
+  "onboardingDoneTitle": "You are all set",
+  "onboardingDoneBody": "Go see your classes and students.",
+  "onboardingFinish": "Open TeachHub",
+  "onboardingLoadFailed": "Could not load progress. Try again.",
+  "onboardingRetry": "Retry",
+  "onboardingErrorBusy": "Still processing. Try again in a moment.",
+  "onboardingErrorValidation": "This step could not be saved. Check it.",
+  "onboardingErrorNetwork": "No connection. Try again later.",
+  "onboardingErrorGeneric": "Could not save. Try again later."
 }
