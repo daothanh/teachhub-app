@@ -6,7 +6,7 @@ import '../routing/app_routes.dart';
 ///
 /// `DeepLinkService` của `tasco_core` chỉ nhận scheme `tasco://` và không có
 /// host universal link, nên shell tự xử lý:
-/// - `https://teachhub.vn/i/<token>` và `teachhub://i/<token>` → `/invite/<token>`
+/// - `https://dayhoc.app/i/<token>` và `teachhub://i/<token>` → `/invite/<token>`
 /// - `teachhub://<route>` → route đó nếu một mini-app nhận nó.
 ///
 /// Mọi đích đều cần đăng nhập; URI lạ trả `null`.
@@ -16,7 +16,7 @@ class TeachHubDeepLinkResolver {
   /// Mini-app nào sở hữu đường dẫn (qua `ModuleManager`).
   final DeepLinkModuleResolver? moduleResolver;
 
-  static const _hosts = {'teachhub.vn', 'www.teachhub.vn'};
+  static const _hosts = {'dayhoc.app', 'www.dayhoc.app'};
   static final _invite = RegExp(r'^/i/([A-Za-z0-9_-]+)/?$');
 
   DeepLinkTarget? resolve(Uri uri) {

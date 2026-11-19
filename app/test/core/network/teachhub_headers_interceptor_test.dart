@@ -20,7 +20,7 @@ void main() {
 
   setUp(() {
     capture = _Capture();
-    dio = Dio(BaseOptions(baseUrl: 'https://api.teachhub.vn/v1'))
+    dio = Dio(BaseOptions(baseUrl: 'https://api.dayhoc.app/v1'))
       ..interceptors.addAll([
         TeachHubHeadersInterceptor(clientInfo: 'teachhub-app/1.0.0 (ios)'),
         capture,
@@ -55,7 +55,7 @@ void main() {
     await dio.post<void>('/push/register');
     expect(
       capture.requests.single.uri.toString(),
-      'https://api.teachhub.vn/v1/push/register',
+      'https://api.dayhoc.app/v1/push/register',
     );
   });
 

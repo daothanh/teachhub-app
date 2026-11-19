@@ -9,7 +9,7 @@ import '../../l10n/l10n.dart';
 import '../role_picker/membership_cubit.dart';
 import 'invite_cubit.dart';
 
-/// Nhận lời mời của giáo viên (link `teachhub.vn/i/<token>`).
+/// Nhận lời mời của giáo viên (link `dayhoc.app/i/<token>`).
 class InvitePage extends StatelessWidget {
   const InvitePage({super.key});
 
