@@ -40,26 +40,31 @@ class _OfflineBannerShellState extends State<OfflineBannerShell> {
 
   @override
   Widget build(BuildContext context) {
-    if (hasOwnOfflineBanner(widget.path)) return widget.child;
+    final own = hasOwnOfflineBanner(widget.path);
+    // Cấu trúc cây cố định dù có banner hay không: nếu không, đổi trạng thái
+    // mạng sẽ dựng lại Navigator của teacher và mất ngăn xếp màn/biểu mẫu.
     return StreamBuilder<bool>(
       stream: _online,
       builder: (context, snap) {
-        if (snap.data != false) return widget.child;
+        final offline = !own && snap.data == false;
         return Column(
           children: [
-            // Banner chiếm vùng tai thỏ; màn bên dưới bỏ phần đệm trên đó.
-            SafeArea(
-              bottom: false,
-              child: AppBanner(
-                tone: AppStatusTone.warning,
-                description: context.miniAppL10n.offlineBanner,
-                fullWidth: true,
-              ),
-            ),
+            if (offline)
+              // Banner chiếm vùng tai thỏ; màn bên dưới bỏ phần đệm trên đó.
+              SafeArea(
+                bottom: false,
+                child: AppBanner(
+                  tone: AppStatusTone.warning,
+                  description: context.miniAppL10n.offlineBanner,
+                  fullWidth: true,
+                ),
+              )
+            else
+              const SizedBox.shrink(),
             Expanded(
               child: MediaQuery.removePadding(
                 context: context,
-                removeTop: true,
+                removeTop: offline,
                 child: widget.child,
               ),
             ),

@@ -223,6 +223,13 @@ class TeacherController {
   Future<void> _resumeSync() => _syncWanted ? startSync() : Future.value();
 
   Future<int> pendingSyncCount() => localData.pendingSyncCount();
+
+  /// Sau đăng nhập: outbox còn dòng thì hẹn lại lượt nền ngay, không đợi vào
+  /// màn teacher (lịch có thể đã bị hủy khi hết phiên).
+  Future<void> rescheduleBackgroundIfPending() async {
+    if (await pendingSyncCount() > 0) await backgroundSync?.schedule();
+  }
+
   Future<int> failedSyncCount() => localData.failedSyncCount();
   Future<void> discardFailedSync() => localData.discardFailed();
 

@@ -109,4 +109,33 @@ void main() {
       expect(calls, contains('cancel'));
     },
   );
+
+  test('rescheduleBackgroundIfPending: chỉ hẹn khi outbox còn dòng', () async {
+    final calls = <String>[];
+    controller.backgroundSync = BackgroundSyncHooks(
+      schedule: () async => calls.add('schedule'),
+      cancel: () async => calls.add('cancel'),
+    );
+    addTearDown(() => controller.backgroundSync = null);
+    final tmp = await Directory.systemTemp.createTemp('resched');
+    addTearDown(() => tmp.delete(recursive: true));
+    controller.documentsDirectory = () async => tmp;
+    // Chưa có file CSDL → 0 dòng.
+    await controller.rescheduleBackgroundIfPending();
+    expect(calls, isEmpty);
+
+    final db = await GetIt.I.getAsync<TeacherDatabase>(
+      instanceName: TeacherController.databaseKey,
+    );
+    File('${tmp.path}/$teacherDatabaseFile').writeAsStringSync('x');
+    await enqueueAttendance(
+      db,
+      sessionId: '10000000-0000-4000-8000-000000000001',
+      studentId: '20000000-0000-4000-8000-000000000001',
+      status: 'absent',
+      clientUpdatedAt: DateTime.utc(2026, 11, 18, 9),
+    );
+    await controller.rescheduleBackgroundIfPending();
+    expect(calls, ['schedule']);
+  });
 }

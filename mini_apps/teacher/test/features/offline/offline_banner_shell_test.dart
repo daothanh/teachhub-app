@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:teacher/features/offline/offline_banner_shell.dart';
@@ -45,5 +47,51 @@ void main() {
     }
     expect(hasOwnOfflineBanner('/t/sessions/abc/attendance/history'), isFalse);
     expect(hasOwnOfflineBanner('/t/classes'), isFalse);
+  });
+
+  testWidgets('màn không có AppBar: nội dung nằm dưới banner, không bị che', (
+    tester,
+  ) async {
+    final online = StreamController<bool>();
+    addTearDown(online.close);
+    await pumpApp(
+      tester,
+      OfflineBannerShell(
+        path: '/t/classes',
+        online: online.stream,
+        child: const Scaffold(body: Text('không appbar')),
+      ),
+    );
+    online.add(false);
+    await tester.pumpAndSettle();
+    final bannerBottom = tester
+        .getBottomLeft(find.textContaining('Ngoại tuyến'))
+        .dy;
+    expect(
+      tester.getTopLeft(find.text('không appbar')).dy,
+      greaterThanOrEqualTo(bannerBottom - 1),
+    );
+  });
+
+  testWidgets('đổi trạng thái mạng không làm mất trạng thái của màn bên dưới', (
+    tester,
+  ) async {
+    final online = StreamController<bool>();
+    addTearDown(online.close);
+    await pumpApp(
+      tester,
+      OfflineBannerShell(
+        path: '/t/classes',
+        online: online.stream,
+        child: const Scaffold(body: TextField(key: Key('f'))),
+      ),
+    );
+    await tester.enterText(find.byKey(const Key('f')), 'đang nhập');
+    online.add(false);
+    await tester.pumpAndSettle();
+    expect(find.text('đang nhập'), findsOneWidget);
+    online.add(true);
+    await tester.pumpAndSettle();
+    expect(find.text('đang nhập'), findsOneWidget);
   });
 }

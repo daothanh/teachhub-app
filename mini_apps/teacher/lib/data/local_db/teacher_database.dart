@@ -126,15 +126,17 @@ class TeacherDatabase extends _$TeacherDatabase {
 
   /// Mở `teacher.sqlite` với khóa 256-bit lấy từ [keyStore] (Keychain/
   /// Keystore), sinh khóa ở lần mở đầu.
-  static Future<TeacherDatabase> openEncrypted(KeyValueStore keyStore) async {
-    final key = await databaseKey(keyStore);
-    return TeacherDatabase(
-      driftDatabase(
-        name: teacherDatabaseName,
-        native: DriftNativeOptions(setup: encryptionSetup(key)),
-      ),
-    );
-  }
+  static Future<TeacherDatabase> openEncrypted(KeyValueStore keyStore) async =>
+      openWithKey(await databaseKey(keyStore));
+
+  /// Mở với khóa đã có. Isolate nền dùng đường này (khóa đọc bằng
+  /// [readDatabaseKey]) để không bao giờ sinh khóa mới.
+  static TeacherDatabase openWithKey(String key) => TeacherDatabase(
+    driftDatabase(
+      name: teacherDatabaseName,
+      native: DriftNativeOptions(setup: encryptionSetup(key)),
+    ),
+  );
 }
 
 const _keyName = 'teacher.db_key';
@@ -182,6 +184,12 @@ Future<void> deleteTeacherDatabase(
   await keyStore.delete(_keyName);
 }
 
+/// Khóa đã lưu, hoặc `null` nếu chưa có / hỏng. Không sinh khóa.
+Future<String?> readDatabaseKey(KeyValueStore store) async {
+  final stored = await store.read(_keyName);
+  return stored != null && stored.length == 64 ? stored : null;
+}
+
 /// Khóa CSDL dạng hex 64 ký tự; sinh bằng CSPRNG và lưu ở lần đầu.
 Future<String> databaseKey(KeyValueStore store, {Random? random}) async {
   final stored = await store.read(_keyName);
@@ -202,4 +210,8 @@ void Function(CommonDatabase) encryptionSetup(String hexKey) => (db) {
     throw StateError('SQLite3MultipleCiphers is not bundled; refusing to open');
   }
   db.execute("PRAGMA hexkey = '$hexKey';");
+  // App và isolate nền có thể cùng mở file: WAL cho đọc/ghi song song, chờ
+  // tối đa 5 giây khi bị khóa thay vì lỗi SQLITE_BUSY.
+  db.execute('PRAGMA journal_mode = WAL;');
+  db.execute('PRAGMA busy_timeout = 5000;');
 };

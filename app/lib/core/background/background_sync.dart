@@ -2,16 +2,15 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tasco_auth/tasco_auth.dart';
 import 'package:tasco_core/tasco_core.dart';
 import 'package:tasco_storage/tasco_storage.dart';
 import 'package:teacher/teacher.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '../../features/auth/auth_config.dart';
 import '../../features/auth/teachhub_user.dart';
 import '../network/teachhub_headers_interceptor.dart';
 
@@ -21,6 +20,7 @@ const outboxSyncTask = 'vn.dayhoc.app.sync-outbox';
 
 const _apiUrlKey = 'apiUrl';
 const _pinsKey = 'pins';
+const _requirePinsKey = 'requirePins';
 const _userKey = 'user_info';
 
 bool get _supported => Platform.isAndroid || Platform.isIOS;
@@ -32,21 +32,41 @@ Future<void> initBackgroundSync() async {
   await Workmanager().initialize(teachHubBackgroundDispatcher);
 }
 
-/// Móc hẹn/hủy cho mini-app teacher. Hẹn một lượt khi có mạng (Android:
-/// WorkManager; iOS: BGProcessingTask); lỗi plugin chỉ ghi log, không chặn
-/// luồng chính. [apiUrl] và [pins] truyền qua `inputData` vì isolate nền không
-/// có `GetIt`/dotenv.
-BackgroundSyncHooks workmanagerSyncHooks({
+/// `inputData` của tác vụ: isolate nền không có `GetIt`/dotenv nên mang theo
+/// cấu hình mạng. [requirePins] = không phải development.
+@visibleForTesting
+Map<String, Object?> backgroundInput({
   required String apiUrl,
   required Set<String> pins,
-}) => BackgroundSyncHooks(
-  schedule: () => _guard(
-    () => Workmanager().registerOneOffTask(
+  required bool requirePins,
+}) => {
+  _apiUrlKey: apiUrl,
+  _pinsKey: pins.join(','),
+  _requirePinsKey: requirePins,
+};
+
+Future<void> _schedule(Map<String, Object?> input) =>
+    Workmanager().registerOneOffTask(
       outboxSyncTask,
       outboxSyncTask,
       constraints: Constraints(networkType: NetworkType.connected),
+      // Android: lượt đang chờ/đang chạy giữ nguyên, lượt chạy hỏng tự thử lại
+      // (backoff). iOS: BGTask chỉ chạy một lần nên [runBackgroundTask] tự hẹn
+      // lại khi còn dòng.
       existingWorkPolicy: ExistingWorkPolicy.keep,
-      inputData: {_apiUrlKey: apiUrl, _pinsKey: pins.join(',')},
+      inputData: input,
+    );
+
+/// Móc hẹn/hủy cho mini-app teacher. Lỗi plugin chỉ ghi log, không chặn luồng
+/// chính.
+BackgroundSyncHooks workmanagerSyncHooks({
+  required String apiUrl,
+  required Set<String> pins,
+  required bool requirePins,
+}) => BackgroundSyncHooks(
+  schedule: () => _guard(
+    () => _schedule(
+      backgroundInput(apiUrl: apiUrl, pins: pins, requirePins: requirePins),
     ),
   ),
   cancel: () => _guard(() => Workmanager().cancelByUniqueName(outboxSyncTask)),
@@ -64,92 +84,168 @@ Future<void> _guard(Future<void> Function() job) async {
 /// Điểm vào của isolate nền (cả Android lẫn iOS).
 @pragma('vm:entry-point')
 void teachHubBackgroundDispatcher() {
-  Workmanager().executeTask(
-    (task, input) => runBackgroundTask(
+  Workmanager().executeTask((task, input) {
+    final keys = SecureStore();
+    final tokens = TokenStore(keys);
+    return runBackgroundTask(
       task: task,
-      hasSession: _hasSession,
-      sync: () => _syncOutbox(input ?? const {}),
-    ),
-  );
+      hasSession: () async => await tokens.getAccessToken() != null,
+      sync: () => syncOutboxFromInput(
+        input ?? const {},
+        keys: keys,
+        accessToken: tokens.getAccessToken,
+        userId: _cachedUserId,
+        directory: getApplicationDocumentsDirectory,
+        clientInfo: TeachHubHeadersInterceptor.resolveClientInfo,
+      ),
+      cancel: () =>
+          _guard(() => Workmanager().cancelByUniqueName(outboxSyncTask)),
+      reschedule: () => _guard(() => _schedule(Map.of(input ?? const {}))),
+    );
+  });
 }
 
-/// Quyết định có chạy không, tách khỏi plugin để test. Chưa đăng nhập (hoặc
-/// đã đăng xuất, token bị xóa) thì không chạy và không xin thử lại. Trả về
-/// kết quả của [sync]: `false` để hệ điều hành thử lại.
+Future<String?> _cachedUserId() async {
+  final prefs = await SharedPreferences.getInstance();
+  final user = await JsonStore<TeachHubUser>(
+    store: SharedPrefsStore(prefs),
+    key: _userKey,
+    fromJson: TeachHubUser.fromJson,
+    toJson: (u) => u.toJson(),
+  ).read();
+  return user?.id;
+}
+
+/// Quyết định có chạy không, tách khỏi plugin để test. Trả `true` = xong (hệ
+/// điều hành không thử lại), `false` = thử lại.
+///
+/// Chưa đăng nhập → không chạy, không xin thử lại. Đọc Keychain lỗi (máy khóa
+/// màn hình, `WhenUnlocked`) → `false`: đợi lần sau. Còn dòng chờ trên iOS thì
+/// hẹn lại, vì BGTask không tự lặp.
 @visibleForTesting
 Future<bool> runBackgroundTask({
   required String task,
   required Future<bool> Function() hasSession,
-  required Future<bool> Function() sync,
+  required Future<BackgroundSyncOutcome> Function() sync,
+  required Future<void> Function() cancel,
+  required Future<void> Function() reschedule,
+  bool? isIOS,
 }) async {
   if (task != outboxSyncTask) return true;
-  if (!await hasSession()) return true;
-  return sync();
+  try {
+    if (!await hasSession()) return true;
+    switch (await sync()) {
+      case BackgroundSyncOutcome.done:
+        return true;
+      case BackgroundSyncOutcome.notAllowed:
+        await cancel();
+        return true;
+      case BackgroundSyncOutcome.retry:
+        if (isIOS ?? Platform.isIOS) await reschedule();
+        return false;
+    }
+  } catch (e) {
+    log('Đồng bộ nền bỏ lượt (${e.runtimeType})', name: 'background');
+    return false;
+  }
 }
 
-Future<bool> _hasSession() async {
-  final tokens = TokenStore(SecureStore());
-  return await tokens.getAccessToken() != null ||
-      await tokens.getRefreshToken() != null;
-}
-
-Future<bool> _syncOutbox(Map<String, dynamic> input) async {
-  WidgetsFlutterBinding.ensureInitialized();
+/// Phần thuần Dart của callback nền: dựng Dio rồi chạy một lượt. Thiếu cấu
+/// hình hoặc (ngoài development) thiếu pin thì không gửi gì.
+@visibleForTesting
+Future<BackgroundSyncOutcome> syncOutboxFromInput(
+  Map<String, dynamic> input, {
+  required KeyValueStore keys,
+  required Future<String?> Function() accessToken,
+  required Future<String?> Function() userId,
+  required Future<Directory> Function() directory,
+  required Future<String> Function() clientInfo,
+  @visibleForTesting
+  Future<BackgroundSyncOutcome> Function({
+    required Dio dio,
+    required KeyValueStore keys,
+    required Directory directory,
+    required Future<String?> Function() currentUserId,
+  })?
+  runner,
+}) async {
   final apiUrl = input[_apiUrlKey] as String?;
-  if (apiUrl == null || apiUrl.isEmpty) return true;
-  final pins = {
-    for (final p in (input[_pinsKey] as String? ?? '').split(','))
-      if (p.trim().isNotEmpty) p.trim(),
-  };
-  final keys = SecureStore();
-  final dio = await _buildBackgroundDio(apiUrl, pins);
-  return runOutboxSyncOnce(
+  if (apiUrl == null || apiUrl.isEmpty) return BackgroundSyncOutcome.done;
+  final Dio dio;
+  try {
+    dio = buildBackgroundDio(
+      apiUrl: apiUrl,
+      pins: {
+        for (final p in (input[_pinsKey] as String? ?? '').split(','))
+          if (p.trim().isNotEmpty) p.trim(),
+      },
+      requirePins: input[_requirePinsKey] != false,
+      accessToken: accessToken,
+      clientInfo: await clientInfo(),
+    );
+  } on StateError catch (e) {
+    log('Đồng bộ nền không chạy: ${e.message}', name: 'background');
+    return BackgroundSyncOutcome
+        .done; // fail-closed: không gửi qua TLS không pin
+  }
+  return (runner ?? _defaultRunner)(
     dio: dio,
     keys: keys,
-    directory: await getApplicationDocumentsDirectory(),
+    directory: await directory(),
+    currentUserId: userId,
   );
 }
 
-/// Client API cho isolate nền: cùng header và làm mới token như client của
-/// shell, nhưng không có overlay loading, alice hay `GetIt`.
-Future<Dio> _buildBackgroundDio(String apiUrl, Set<String> pins) async {
-  final adapter = pins.isEmpty
-      ? null
-      : CertificatePinning.adapter(allowedSha256: pins);
-  final tokens = TokenStore(SecureStore());
-  final bus = AuthEventBus();
-  final prefs = await SharedPreferences.getInstance();
-  final auth = DioAuthRepository<TeachHubUser>(
-    dio: Dio(NetworkDefaults.baseOptions(baseUrl: apiUrl)),
-    tokenStore: tokens,
-    config: teachHubAuthConfig,
-    userCache: JsonStore<TeachHubUser>(
-      store: SharedPrefsStore(prefs),
-      key: _userKey,
-      fromJson: TeachHubUser.fromJson,
-      toJson: (u) => u.toJson(),
-    ),
-    settingsStore: SharedPrefsStore(prefs),
-  );
-  final refresher = TokenRefresher(
-    refresh: () => auth.refreshToken(),
-    authEventBus: bus,
-  );
+Future<BackgroundSyncOutcome> _defaultRunner({
+  required Dio dio,
+  required KeyValueStore keys,
+  required Directory directory,
+  required Future<String?> Function() currentUserId,
+}) => runOutboxSyncOnce(
+  dio: dio,
+  keys: keys,
+  directory: directory,
+  currentUserId: currentUserId,
+);
+
+/// Client API cho isolate nền: cùng header như client của shell và Bearer là
+/// access token hiện có. KHÔNG làm mới token (làm mới ở isolate thứ hai sẽ
+/// đua với app, phát `sessionExpired`/xóa token): 401 chỉ là một lỗi, lượt này
+/// bỏ và hệ điều hành thử lại sau khi app mở. Ngoài development bắt buộc có
+/// pin chứng chỉ; thiếu thì ném [StateError].
+@visibleForTesting
+Dio buildBackgroundDio({
+  required String apiUrl,
+  required Set<String> pins,
+  required bool requirePins,
+  required Future<String?> Function() accessToken,
+  required String clientInfo,
+}) {
+  if (requirePins && pins.isEmpty) {
+    throw StateError('thiếu certificate pin cho API');
+  }
   final dio = Dio(NetworkDefaults.baseOptions(baseUrl: apiUrl));
-  if (adapter != null) dio.httpClientAdapter = adapter;
+  if (pins.isNotEmpty) {
+    dio.httpClientAdapter = CertificatePinning.adapter(allowedSha256: pins);
+  }
   dio.interceptors.addAll([
-    TeachHubHeadersInterceptor(
-      clientInfo: await TeachHubHeadersInterceptor.resolveClientInfo(),
-    ),
-    AuthInterceptor(
-      () => tokens.getAccessToken(),
-      () => refresher,
-      retryClient: AuthInterceptor.buildRetryClient(adapter: adapter),
-      authEventBus: bus,
-    ),
-    RetryInterceptor(
-      retryClient: RetryInterceptor.buildRetryClient(adapter: adapter),
+    TeachHubHeadersInterceptor(clientInfo: clientInfo),
+    InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final token = await accessToken();
+        if (token != null) options.headers['Authorization'] = 'Bearer $token';
+        handler.next(options);
+      },
     ),
   ]);
   return dio;
 }
+
+/// Khi nào hủy lịch nền theo trạng thái phiên. Không hủy ở state ban đầu
+/// (đang kiểm phiên lúc khởi động nguội: chưa biết là có hay không), chỉ khi
+/// vừa đăng xuất/hết phiên hoặc kiểm xong mà không có phiên.
+bool shouldCancelBackgroundSync({
+  required bool wasAuthenticated,
+  required bool isAuthenticated,
+  required bool sessionChecked,
+}) => !isAuthenticated && (wasAuthenticated || sessionChecked);

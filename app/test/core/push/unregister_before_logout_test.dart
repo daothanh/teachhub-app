@@ -24,4 +24,11 @@ void main() {
   test('không có director (development thiếu Firebase): bỏ qua', () async {
     await unregisterPushBeforeLogout(null);
   });
+
+  test('deleteFcmToken gọi xóa token và nuốt lỗi', () async {
+    var called = false;
+    await deleteFcmToken(delete: () async => called = true);
+    expect(called, isTrue);
+    await deleteFcmToken(delete: () async => throw Exception('no firebase'));
+  });
 }

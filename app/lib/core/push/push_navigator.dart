@@ -34,8 +34,8 @@ class PushNavigator {
   final void Function(String path) go;
 
   /// Chờ phiên và danh sách vai trò sẵn sàng (mở app từ thông báo lúc app
-  /// chưa chạy); `null` = luôn sẵn sàng.
-  final Future<void> Function()? whenReady;
+  /// chưa chạy); `null` = luôn sẵn sàng; `false` = quá hạn, chưa biết trạng thái.
+  final Future<bool> Function()? whenReady;
 
   /// Vai trò nhận từng loại thông báo khi payload không mang `membershipId`.
   static const _roleByType = {
@@ -44,7 +44,7 @@ class PushNavigator {
   };
 
   Future<void> handle(Map<String, dynamic> data) async {
-    await whenReady?.call();
+    final ready = whenReady == null ? true : await whenReady!();
     final type = _str(data['type']);
     final membershipId = _str(data['membershipId']);
     final deepLink = _str(data['deepLink']);
@@ -64,6 +64,12 @@ class PushNavigator {
     final target = deepLink == null ? null : _resolve(deepLink);
     final path = target?.path ?? role.rootRoute;
 
+    if (!ready) {
+      // Phiên chưa xác định kịp: không điều hướng bừa, để router mở khi xong.
+      PendingDeepLink.save(DeepLinkTarget(path: path));
+      return;
+    }
+
     if (!isAuthenticated()) {
       // Qua guard đăng nhập như deep link thường; đăng nhập xong router mở lại.
       PendingDeepLink.save(DeepLinkTarget(path: path));
@@ -71,7 +77,8 @@ class PushNavigator {
       return;
     }
 
-    if (active()?.role != role) {
+    // Chưa có vai trò đang mở (chưa chọn) thì không tự chọn thay người dùng.
+    if (active() != null && active()?.role != role) {
       final next =
           byId ?? memberships().where((m) => m.role == role).firstOrNull;
       if (next == null) {

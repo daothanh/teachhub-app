@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show visibleForTesting;
+
 import 'package:tasco_storage/tasco_storage.dart';
 
+import '../sync/background_flags.dart';
 import 'teacher_database.dart';
 
 /// Dữ liệu cục bộ của teacher gắn với phiên đăng nhập (spec §6.4): đếm buổi
@@ -77,6 +80,9 @@ class TeacherLocalData {
 
   Future<void> _wipe() async {
     await _keys.write(wipePendingKey, '1');
+    // Isolate nền thấy cờ trên và tự dừng; chờ ngắn cho nó đóng CSDL (quá hạn
+    // thì xóa luôn: nền không ghi gì sau khi cờ wipe đã đặt).
+    await _waitBackgroundIdle();
     await _pauseSync?.call();
     await _close();
     try {
@@ -88,6 +94,19 @@ class TeacherLocalData {
     }
     await _keys.delete(wipePendingKey);
   }
+
+  Future<void> _waitBackgroundIdle() async {
+    for (var i = 0; i < waitSteps; i++) {
+      if (!await isBackgroundRunning(_keys)) return;
+      await Future<void>.delayed(waitStep);
+    }
+  }
+
+  /// Chờ nền đóng CSDL tối đa [waitSteps] × [waitStep].
+  @visibleForTesting
+  int waitSteps = 25;
+  @visibleForTesting
+  Duration waitStep = const Duration(milliseconds: 200);
 
   /// Xóa nốt nếu lần xóa trước dở dang. Gọi khi khởi động.
   Future<void> retryPendingWipe() => _serial(_retry);

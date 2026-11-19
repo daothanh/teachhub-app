@@ -123,9 +123,36 @@ void main() {
       active: () => parent,
       select: (_) async {},
       go: (p) => order.add('go:$p'),
-      whenReady: () async => order.add('ready'),
+      whenReady: () async {
+        order.add('ready');
+        return true;
+      },
     );
     await nav.handle({'type': 'student_absent'});
     expect(order, ['ready', 'go:/p']);
+  });
+
+  test('quá hạn chờ phiên: lưu link chờ, không điều hướng', () async {
+    final h = _Harness();
+    final nav = PushNavigator(
+      resolve: (_) => null,
+      isAuthenticated: () => true,
+      memberships: () => h.memberships,
+      active: () => teacher,
+      select: (m) async => h.selected.add(m.id),
+      go: h.routes.add,
+      whenReady: () async => false,
+    );
+    await nav.handle({'type': 'student_absent'});
+    expect(h.routes, isEmpty);
+    expect(h.selected, isEmpty);
+    expect(PendingDeepLink.current?.path, '/p');
+  });
+
+  test('chưa có vai trò đang mở: không tự chọn thay người dùng', () async {
+    final h = _Harness(active: null);
+    await h.nav.handle({'type': 'student_absent'});
+    expect(h.selected, isEmpty);
+    expect(h.routes, ['/p']);
   });
 }
