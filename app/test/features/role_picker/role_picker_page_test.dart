@@ -1,3 +1,4 @@
+import 'package:app/core/routing/app_routes.dart';
 import 'package:app/core/theme/teachhub_theme.dart';
 import 'package:app/features/role_picker/membership_cubit.dart';
 import 'package:app/features/role_picker/role_picker_page.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
@@ -33,7 +35,7 @@ void main() {
     await tester.pumpWidget(
       ScreenUtilPlusInit(
         designSize: const Size(393, 852),
-        builder: (_, _) => MaterialApp(
+        builder: (_, _) => MaterialApp.router(
           locale: const Locale('vi'),
           theme: themes!.light,
           localizationsDelegates: const [
@@ -41,9 +43,20 @@ void main() {
             TascoUiKitLocalizations.delegate,
           ],
           supportedLocales: AppLocalizations.supportedLocales,
-          home: BlocProvider<MembershipCubit>.value(
-            value: cubit,
-            child: const RolePickerPage(),
+          routerConfig: GoRouter(
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (_, _) => BlocProvider<MembershipCubit>.value(
+                  value: cubit,
+                  child: const RolePickerPage(),
+                ),
+              ),
+              GoRoute(
+                path: AppRoutes.centerWaitlist,
+                builder: (_, _) => const Text('waitlist'),
+              ),
+            ],
           ),
         ),
       ),
@@ -62,13 +75,52 @@ void main() {
     await tester.pump();
     expect(find.text('Đã chọn'), findsOneWidget);
 
-    // Chủ trung tâm chưa mở: chạm không chọn được.
-    await tester.tap(find.text('Chủ trung tâm'));
-    await tester.pump();
-    expect(find.text('Đã chọn'), findsOneWidget);
-
     await tester.tap(cont());
     await tester.pump();
     expect(cubit.added, [MembershipRole.parent]);
+  });
+
+  testWidgets('T01c: chạm thẻ Chủ trung tâm mở màn đăng ký sớm (T01d)', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final cubit = _Cubit(await SharedPreferences.getInstance());
+    addTearDown(cubit.close);
+    final themes = await tester.runAsync(TeachHubTheme.load);
+    tester.view.physicalSize = const Size(390, 844) * 3;
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      ScreenUtilPlusInit(
+        designSize: const Size(393, 852),
+        builder: (_, _) => MaterialApp.router(
+          locale: const Locale('vi'),
+          theme: themes!.light,
+          localizationsDelegates: const [
+            ...AppLocalizations.localizationsDelegates,
+            TascoUiKitLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: GoRouter(
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (_, _) => BlocProvider<MembershipCubit>.value(
+                  value: cubit,
+                  child: const RolePickerPage(),
+                ),
+              ),
+              GoRoute(
+                path: AppRoutes.centerWaitlist,
+                builder: (_, _) => const Text('waitlist'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text('Chủ trung tâm'));
+    await tester.pumpAndSettle();
+    expect(find.text('waitlist'), findsOneWidget);
   });
 }

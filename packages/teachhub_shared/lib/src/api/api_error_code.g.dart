@@ -17,6 +17,7 @@ enum ApiErrorCode {
   forbidden('FORBIDDEN', 403),
   consentRequired('CONSENT_REQUIRED', 403),
   notFound('NOT_FOUND', 404),
+  studentPossibleDuplicate('STUDENT_POSSIBLE_DUPLICATE', 409),
   conflictStale('CONFLICT_STALE', 409),
   idempotencyInProgress('IDEMPOTENCY_IN_PROGRESS', 409),
   rateLimited('RATE_LIMITED', 429),

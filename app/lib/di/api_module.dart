@@ -10,6 +10,7 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../core/config/app_env.dart';
 import '../core/network/teachhub_headers_interceptor.dart';
+import '../core/network/teachhub_logging_interceptor.dart';
 import '../features/auth/teachhub_user.dart';
 
 /// HTTP inspector; `null` ở production.
@@ -89,7 +90,7 @@ List<Interceptor> apiInterceptors({
   ErrorInterceptor(loadingManager: loadingManager),
   authInterceptor,
   retryInterceptor,
-  LoggingInterceptor(),
+  TeachHubLoggingInterceptor(),
 ];
 
 Dio _buildDio(

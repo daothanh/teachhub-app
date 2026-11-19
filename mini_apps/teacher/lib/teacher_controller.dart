@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,10 @@ import 'data/local_db/teacher_database.dart';
 import 'data/local_db/teacher_local_data.dart';
 import 'features/classes/classes_routes.dart';
 import 'features/home/pages/teacher_home_page.dart';
+import 'features/onboarding/data/onboarding_repository.dart';
+import 'features/onboarding/pages/onboarding_page.dart';
+import 'features/students/data/student_repository.dart';
+import 'features/students/pages/student_form_page.dart';
 import 'l10n/l10n.dart';
 
 /// Mini-app không gian Giáo viên (spec §3.7), route gốc [TeachHubRoutes.teacher].
@@ -34,6 +39,18 @@ class TeacherController {
       path: routePrefix,
       name: '$moduleId.home',
       builder: (context, state) => const TeacherHomePage(),
+      routes: [
+        GoRoute(
+          path: 'onboarding',
+          name: '$moduleId.onboarding',
+          builder: (context, state) => const OnboardingPage(),
+        ),
+        GoRoute(
+          path: 'students/new',
+          name: '$moduleId.studentNew',
+          builder: (context, state) => const StudentFormPage(),
+        ),
+      ],
     ),
     ...classesRoutes(moduleId),
   ];
@@ -41,6 +58,7 @@ class TeacherController {
   /// CSDL chỉ mở ở lần đầu cần (lazy): người dùng không có vai trò Giáo viên
   /// không tạo file trên máy.
   Future<void> init() async {
+    _registerRepositories();
     if (GetIt.I.isRegistered<TeacherDatabase>(instanceName: databaseKey)) {
       return;
     }
@@ -49,6 +67,22 @@ class TeacherController {
       instanceName: databaseKey,
       dispose: (db) => db.close(),
     );
+  }
+
+  /// Repository gọi API qua `Dio` của host; lazy nên chưa cần `Dio` lúc init.
+  void _registerRepositories() {
+    final getIt = GetIt.I;
+    Dio api() => getIt<Dio>(instanceName: TeachHubDiKey.api);
+    if (!getIt.isRegistered<StudentRepository>()) {
+      getIt.registerLazySingleton<StudentRepository>(
+        () => DioStudentRepository(api()),
+      );
+    }
+    if (!getIt.isRegistered<OnboardingRepository>()) {
+      getIt.registerLazySingleton<OnboardingRepository>(
+        () => DioOnboardingRepository(api()),
+      );
+    }
   }
 
   /// CSDL gắn với phiên: đếm, xóa, đổi chủ (xem [TeacherLocalData]).

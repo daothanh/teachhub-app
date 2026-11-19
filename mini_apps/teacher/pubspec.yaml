@@ -25,10 +25,9 @@ dependencies:
     hosted: https://pub.vtii.vn
     version: ^5.2.7
   get_it: ^8.0.3
-  # Lớp học (S2-FL-07..11): Cubit + Dio dùng chung của host.
+  dio: ^5.7.0
   flutter_bloc: ^9.1.0
   equatable: ^2.0.7
-  dio: ^5.7.0
   # Điểm danh ngoại tuyến (spec §6.4, ADR-0001 của TeachHub).
   drift: ^2.32.0
   drift_flutter: ^0.3.1

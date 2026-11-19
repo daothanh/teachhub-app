@@ -334,4 +334,52 @@ class AppLocalizationsVi extends AppLocalizations {
   String roleSwitchedTo(String role) {
     return 'Đang ở vai trò $role';
   }
+
+  @override
+  String get waitlistTitle => 'Đăng ký sớm cho Chủ trung tâm';
+
+  @override
+  String get waitlistIntro =>
+      'Tính năng cho trung tâm sắp ra mắt. Để lại thông tin, chúng tôi sẽ liên hệ khi sẵn sàng.';
+
+  @override
+  String get waitlistCenterName => 'Tên trung tâm';
+
+  @override
+  String get waitlistCenterNameRequired => 'Nhập tên trung tâm.';
+
+  @override
+  String get waitlistTeacherCount => 'Số giáo viên';
+
+  @override
+  String get waitlistTeacherCountInvalid => 'Nhập số từ 1 đến 1000.';
+
+  @override
+  String get waitlistSubmit => 'Gửi đăng ký';
+
+  @override
+  String get waitlistTrialHint =>
+      'Trong lúc chờ, bạn có thể dùng thử với vai trò Giáo viên.';
+
+  @override
+  String get waitlistTrialAction => 'Dùng thử vai trò Giáo viên';
+
+  @override
+  String get waitlistSent => 'Đã nhận đăng ký';
+
+  @override
+  String get waitlistSentBody => 'Cảm ơn bạn. Chúng tôi sẽ liên hệ sớm.';
+
+  @override
+  String get waitlistErrorBusy => 'Yêu cầu đang xử lý. Thử lại sau giây lát.';
+
+  @override
+  String get waitlistErrorValidation =>
+      'Thông tin chưa hợp lệ. Kiểm tra lại các ô.';
+
+  @override
+  String get waitlistErrorNetwork => 'Không có mạng. Thử lại sau.';
+
+  @override
+  String get waitlistErrorGeneric => 'Chưa gửi được đăng ký. Thử lại sau.';
 }

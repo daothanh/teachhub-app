@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tasco_core/tasco_core.dart';
 import 'package:tasco_module/tasco_module.dart';
@@ -8,6 +9,8 @@ import 'package:tasco_utils/tasco_utils.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../../features/app_version/update_required_page.dart';
+import '../../features/center_waitlist/center_waitlist_page.dart';
+import '../../features/center_waitlist/center_waitlist_cubit.dart';
 import '../../features/auth/auth_cubit.dart';
 import '../../features/invite/invite_cubit.dart';
 import '../../features/invite/invite_page.dart';
@@ -75,6 +78,13 @@ GoRouter buildAppRouter({
       GoRoute(
         path: AppRoutes.rolePicker,
         builder: (_, _) => const RolePickerPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.centerWaitlist,
+        builder: (_, _) => BlocProvider(
+          create: (_) => GetIt.I<CenterWaitlistCubit>(),
+          child: const CenterWaitlistPage(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.settings,

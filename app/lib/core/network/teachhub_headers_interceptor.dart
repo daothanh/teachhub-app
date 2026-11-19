@@ -3,6 +3,9 @@ import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:teachhub_shared/teachhub_shared.dart' show uuidV4;
+
+export 'package:teachhub_shared/teachhub_shared.dart' show uuidV4;
 
 /// Gắn các header TeachHub API yêu cầu (spec §5.3):
 ///
@@ -38,14 +41,4 @@ class TeachHubHeadersInterceptor extends Interceptor {
     }
     handler.next(options);
   }
-}
-
-/// UUID phiên bản 4 (RFC 4122).
-String uuidV4(Random random) {
-  final bytes = List<int>.generate(16, (_) => random.nextInt(256));
-  bytes[6] = (bytes[6] & 0x0f) | 0x40;
-  bytes[8] = (bytes[8] & 0x3f) | 0x80;
-  final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
-  return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-'
-      '${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}';
 }

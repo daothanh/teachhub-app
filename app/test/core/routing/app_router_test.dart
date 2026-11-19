@@ -146,4 +146,35 @@ void main() {
       expect(r(AppRoutes.updateRequired, required: false), AppRoutes.splash);
     },
   );
+
+  test('/center-waitlist: đã đăng nhập, chưa có vai trò vẫn vào được', () {
+    expect(
+      _redirect(AppRoutes.centerWaitlist, _signedIn, _loaded(const [])),
+      isNull,
+    );
+    expect(
+      _redirect(AppRoutes.centerWaitlist, _signedOut, const MembershipState()),
+      AppRoutes.login,
+    );
+  });
+
+  test('/t/onboarding và /t/students/new cần quyền Giáo viên', () {
+    final parentOnly = _loaded(const [_parent], active: _parent);
+    for (final route in ['/t/onboarding', '/t/students/new']) {
+      expect(
+        _redirect(route, _signedIn, parentOnly),
+        AppRoutes.rolePicker,
+        reason: route,
+      );
+      expect(
+        _redirect(
+          route,
+          _signedIn,
+          _loaded(const [_teacher], active: _teacher),
+        ),
+        isNull,
+        reason: route,
+      );
+    }
+  });
 }
