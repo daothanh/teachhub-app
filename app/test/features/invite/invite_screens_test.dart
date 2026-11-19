@@ -170,6 +170,8 @@ void main() {
     final requesterLog = <String>[];
     setUp(requesterLog.clear);
 
+    DateTime clockNow = DateTime(2026, 12, 1, 8);
+
     GoRouter router({VoidCallback? onLinked}) => GoRouter(
       initialLocation: '/entry',
       routes: [
@@ -185,16 +187,18 @@ void main() {
               child: InviteEntryView(
                 onLinked: onLinked ?? () {},
                 requester: _Requester(requesterLog),
+                now: () => clockNow,
               ),
             ),
           ),
         ),
         GoRoute(
-          path: '/invite/:token',
-          builder: (_, s) => Text('card ${s.pathParameters['token']}'),
+          path: '/invite/card',
+          builder: (_, s) => Text('card ${s.extra} ${s.uri}'),
         ),
         GoRoute(path: '/invite/scan', builder: (_, _) => const Text('scanner')),
         _consentStub(),
+        GoRoute(path: '/other', builder: (_, _) => const Text('other')),
       ],
     );
 
@@ -217,7 +221,8 @@ void main() {
       );
       await tester.tap(find.text('Tiếp tục'));
       await tester.pumpAndSettle();
-      expect(find.text('card $_token'), findsOneWidget);
+      // Token đi qua extra, không nằm trong URI.
+      expect(find.text('card $_token /invite/card'), findsOneWidget);
     });
 
     testWidgets('nhập linh tinh → báo chưa nhận ra, không gọi API', (
@@ -257,6 +262,7 @@ void main() {
       repo.redeems.add(
         apiError(429, 'INVITE_CODE_LOCKED', details: {'retryAfterSec': 900}),
       );
+      clockNow = DateTime.now();
       await _pump(tester, router());
       await tester.enterText(find.byType(TextField), '7K3QZ9XM');
       await tester.tap(find.text('Tiếp tục'));
@@ -271,6 +277,47 @@ void main() {
       // Hủy Timer mở khóa còn treo của cubit.
       await tester.pumpWidget(const SizedBox());
     });
+
+    testWidgets(
+      'đang khóa: tắt cả nút quét QR, "còn N phút" giảm theo thời gian',
+      (tester) async {
+        clockNow = DateTime.now();
+        repo.redeems.add(
+          apiError(429, 'INVITE_CODE_LOCKED', details: {'retryAfterSec': 900}),
+        );
+        await _pump(tester, router());
+        await tester.enterText(find.byType(TextField), '7K3QZ9XM');
+        await tester.tap(find.text('Tiếp tục'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining('sau 15 phút'), findsOneWidget);
+        final scan = find.widgetWithIcon(FilledButton, Icons.qr_code_scanner);
+        expect(tester.widget<ButtonStyleButton>(scan).onPressed, isNull);
+
+        clockNow = clockNow.add(const Duration(minutes: 5));
+        await tester.pump(const Duration(seconds: 21));
+        expect(find.textContaining('sau 10 phút'), findsOneWidget);
+        await tester.pumpWidget(const SizedBox());
+      },
+    );
+
+    testWidgets(
+      'bị đẩy khỏi màn khi đang ở màn đồng ý: không gọi lại, không lỗi',
+      (tester) async {
+        repo.redeems.add(apiError(403, 'CONSENT_REQUIRED'));
+        await _pump(tester, router());
+        await tester.enterText(find.byType(TextField), '7K3QZ9XM');
+        await tester.tap(find.text('Tiếp tục'));
+        await tester.pumpAndSettle();
+        expect(find.text('đồng ý'), findsOneWidget);
+
+        // Router thay cả ngăn xếp (vd. điều khoản đổi giữa phiên): view bị hủy.
+        tester.element(find.text('đồng ý')).go('/other');
+        await tester.pumpAndSettle();
+        expect(find.text('other'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+        expect(repo.calls, ['redeem:7K3QZ9XM']);
+      },
+    );
 
     testWidgets('mã cần đồng ý điều khoản: đồng ý xong tự nhận lại', (
       tester,

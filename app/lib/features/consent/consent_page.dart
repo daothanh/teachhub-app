@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tasco_core/tasco_core.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../../l10n/l10n.dart';
@@ -9,7 +10,7 @@ import 'consent_cubit.dart';
 /// Màn đồng ý xử lý dữ liệu cho vai trò Phụ huynh (US-0.3 AC2, FR-0.14).
 ///
 /// Hai đường vào: guard của router (mở `/p/**` khi chưa đồng ý) → xong thì về
-/// `/p`; hoặc `push` từ luồng nhận lời mời → xong thì `pop(true)` để luồng đó
+/// link chờ (hoặc `/p`); hoặc `push` từ luồng nhận lời mời → xong thì `pop(true)` để luồng đó
 /// gọi lại. Thoát không đồng ý thì `pop` trả `null`.
 class ConsentPage extends StatefulWidget {
   const ConsentPage({super.key});
@@ -41,7 +42,8 @@ class _ConsentPageState extends State<ConsentPage> {
     if (context.canPop()) {
       context.pop(true);
     } else {
-      context.go(TeachHubRoutes.parent);
+      // Link chờ (deep link /p/x bị giữ lại lúc mở app) hoặc trang gốc Phụ huynh.
+      context.go(PendingDeepLink.consume()?.path ?? TeachHubRoutes.parent);
     }
   }
 

@@ -138,8 +138,10 @@ void main() {
       termsVersion: '2026-12-01',
     );
 
-    test('Phụ huynh chưa đồng ý: mọi route /p/** về màn đồng ý', () {
-      for (final consent in [const ConsentState(), required]) {
+    const failed = ConsentState(phase: ConsentPhase.failed);
+
+    test('Phụ huynh chưa đồng ý hoặc không đọc được: /p/** về màn đồng ý', () {
+      for (final consent in [required, failed]) {
         for (final route in ['/p', '/p/child/1']) {
           expect(
             _redirect(route, _signedIn, parentOnly, consent: consent),
@@ -148,6 +150,58 @@ void main() {
           );
         }
       }
+    });
+
+    test(
+      'chưa biết trạng thái (đang tải): giữ ở splash, không qua /consent',
+      () {
+        for (final consent in [
+          const ConsentState(),
+          const ConsentState(phase: ConsentPhase.loading),
+        ]) {
+          expect(
+            _redirect('/p/child/1', _signedIn, parentOnly, consent: consent),
+            AppRoutes.splash,
+          );
+          expect(
+            _redirect(
+              AppRoutes.splash,
+              _signedIn,
+              parentOnly,
+              consent: consent,
+            ),
+            isNull,
+          );
+        }
+      },
+    );
+
+    test('mở nguội, đã đồng ý: splash → /p thẳng, không qua /consent', () {
+      expect(_redirect(AppRoutes.splash, _signedIn, parentOnly), '/p');
+    });
+
+    test(
+      'deep link /p/x chờ: giữ link qua lúc tải; đã đồng ý thì tới /p/x',
+      () {
+        PendingDeepLink.save(const DeepLinkTarget(path: '/p/x'));
+        const loading = ConsentState(phase: ConsentPhase.loading);
+        expect(
+          _redirect(AppRoutes.splash, _signedIn, parentOnly, consent: loading),
+          isNull,
+        );
+        expect(PendingDeepLink.current?.path, '/p/x');
+        expect(_redirect(AppRoutes.splash, _signedIn, parentOnly), '/p/x');
+        expect(PendingDeepLink.current, isNull);
+      },
+    );
+
+    test('deep link /p/x chờ, chưa đồng ý: về /consent mà vẫn giữ link', () {
+      PendingDeepLink.save(const DeepLinkTarget(path: '/p/x'));
+      expect(
+        _redirect(AppRoutes.splash, _signedIn, parentOnly, consent: required),
+        AppRoutes.consent,
+      );
+      expect(PendingDeepLink.current?.path, '/p/x');
     });
 
     test('đã đồng ý thì vào được; màn đồng ý không bị chặn', () {
@@ -170,10 +224,10 @@ void main() {
       expect(_redirect('/pay', _signedIn, both, consent: required), isNull);
     });
 
-    test('mở app vào /p khi chưa đồng ý: splash → /p → màn đồng ý', () {
+    test('mở app vào /p khi chưa đồng ý: splash → màn đồng ý', () {
       expect(
         _redirect(AppRoutes.splash, _signedIn, parentOnly, consent: required),
-        '/p',
+        AppRoutes.consent,
       );
     });
   });

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:app/features/consent/consent_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -112,5 +114,65 @@ void main() {
     expect(c.state.accepted, isTrue);
     c.clear();
     expect(c.state.phase, ConsentPhase.unknown);
+  });
+
+  group('chống ghi đè lệch thứ tự (generation)', () {
+    Future<ConsentCubit> slow(Completer<Response<dynamic>> gate) async {
+      final dio = Dio();
+      dio.interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (o, h) async {
+            final r = await gate.future;
+            h.resolve(
+              Response(requestOptions: o, statusCode: 200, data: r.data),
+            );
+          },
+        ),
+      );
+      return ConsentCubit(dio);
+    }
+
+    test('load chậm trả về sau clear() bị bỏ', () async {
+      final gate = Completer<Response<dynamic>>();
+      final c = await slow(gate);
+      final pending = c.load();
+      c.clear();
+      gate.complete(
+        Response(requestOptions: RequestOptions(), data: _status('v1')),
+      );
+      await pending;
+      expect(c.state.phase, ConsentPhase.unknown);
+    });
+
+    test(
+      'load chậm trả về sau markAccepted() không hạ xuống required',
+      () async {
+        final gate = Completer<Response<dynamic>>();
+        final c = await slow(gate);
+        final pending = c.load();
+        c.markAccepted();
+        gate.complete(
+          Response(requestOptions: RequestOptions(), data: _status('v1')),
+        );
+        await pending;
+        expect(c.state.accepted, isTrue);
+      },
+    );
+
+    test('load chậm trả về sau markRequired() không ghi đè', () async {
+      final gate = Completer<Response<dynamic>>();
+      final c = await slow(gate);
+      final pending = c.load();
+      c.markRequired('v9');
+      gate.complete(
+        Response(
+          requestOptions: RequestOptions(),
+          data: _status('v1', accepted: true),
+        ),
+      );
+      await pending;
+      expect(c.state.termsVersion, 'v9');
+      expect(c.state.accepted, isFalse);
+    });
   });
 }

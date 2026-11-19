@@ -54,8 +54,13 @@ class ConsentCubit extends Cubit<ConsentState> {
 
   final Dio _api;
 
+  /// Số thế hệ: kết quả của lệnh gọi cũ (trước `clear`, `markAccepted`,
+  /// `markRequired` hay một `load` mới hơn) bị bỏ, không ghi đè trạng thái mới.
+  int _gen = 0;
+
   /// `GET /consents/status?role=parent`.
   Future<void> load() async {
+    final gen = ++_gen;
     emit(const ConsentState(phase: ConsentPhase.loading));
     try {
       final res = await _api.get<Map<String, dynamic>>(
@@ -67,14 +72,16 @@ class ConsentCubit extends Cubit<ConsentState> {
       if (data == null || version is! String) {
         throw const ApiException.unexpected();
       }
-      if (isClosed) return;
+      if (isClosed || gen != _gen) return;
       emit(
         data['accepted'] == true
             ? const ConsentState.accepted()
             : ConsentState(phase: ConsentPhase.required, termsVersion: version),
       );
     } catch (_) {
-      if (!isClosed) emit(const ConsentState(phase: ConsentPhase.failed));
+      if (!isClosed && gen == _gen) {
+        emit(const ConsentState(phase: ConsentPhase.failed));
+      }
     }
   }
 
@@ -83,15 +90,16 @@ class ConsentCubit extends Cubit<ConsentState> {
   Future<void> accept() async {
     final version = state.termsVersion;
     if (version == null || state.phase == ConsentPhase.accepting) return;
+    final gen = ++_gen;
     emit(ConsentState(phase: ConsentPhase.accepting, termsVersion: version));
     try {
       await _api.post<void>(
         '/consents',
         data: {'role': 'parent', 'termsVersion': version},
       );
-      if (!isClosed) emit(const ConsentState.accepted());
+      if (!isClosed && gen == _gen) emit(const ConsentState.accepted());
     } on DioException catch (e) {
-      if (isClosed) return;
+      if (isClosed || gen != _gen) return;
       if (apiException(e)?.status == 409) {
         await load();
         if (!isClosed && state.phase == ConsentPhase.required) {
@@ -118,14 +126,21 @@ class ConsentCubit extends Cubit<ConsentState> {
   /// Một API trả 403 `CONSENT_REQUIRED` (kể cả khi bản điều khoản đổi giữa phiên).
   void markRequired(String? termsVersion) {
     if (state.phase == ConsentPhase.accepting) return;
+    _gen++;
     emit(
       ConsentState(phase: ConsentPhase.required, termsVersion: termsVersion),
     );
   }
 
   /// Nhận lời mời thành công nghĩa là server đã coi là đã đồng ý.
-  void markAccepted() => emit(const ConsentState.accepted());
+  void markAccepted() {
+    _gen++;
+    emit(const ConsentState.accepted());
+  }
 
   /// Đăng xuất / đổi người dùng.
-  void clear() => emit(const ConsentState());
+  void clear() {
+    _gen++;
+    emit(const ConsentState());
+  }
 }

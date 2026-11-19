@@ -64,7 +64,11 @@ ModuleSlot _slot(String id, String prefix) => ModuleSlot(
   notificationTypes: const {},
   init: () async {},
   routes: () => [
-    GoRoute(path: prefix, builder: (_, _) => Text('mini-app $id')),
+    GoRoute(
+      path: prefix,
+      builder: (_, _) => Text('mini-app $id'),
+      routes: [GoRoute(path: 'x', builder: (_, _) => Text('mini-app $id x'))],
+    ),
   ],
   onNotification: (_, _) async {},
   dispose: () async {},
@@ -230,4 +234,38 @@ void defineSplashGuardTests() {
       );
     },
   );
+
+  testWidgets('mở nguội với link /p/x chờ, chưa đồng ý: đồng ý xong tới /p/x', (
+    tester,
+  ) async {
+    final router = await pump(tester);
+    PendingDeepLink.save(const DeepLinkTarget(path: '/p/x'));
+    addTearDown(PendingDeepLink.clear);
+    consent.clear(); // chưa biết trạng thái
+    auth.set(
+      AppAuthState.initial().copyWith(
+        statusCheckToken: LoadingStatus.success,
+        user: _user,
+      ),
+    );
+    memberships.set(
+      const MembershipState(
+        statusLoad: LoadingStatus.success,
+        memberships: [_parent],
+        active: _parent,
+      ),
+    );
+    await tester.pumpAndSettle();
+    // Còn chờ trạng thái đồng ý: ở splash, link chưa bị tiêu thụ.
+    expect(find.byType(SplashPage), findsOneWidget);
+    expect(PendingDeepLink.current?.path, '/p/x');
+
+    consent.markRequired('2026-12-01');
+    await tester.pumpAndSettle();
+    expect(find.byType(ConsentPage), findsOneWidget);
+
+    await tester.tap(find.text('Đồng ý và tiếp tục'));
+    await tester.pumpAndSettle();
+    expect(router.routeInformationProvider.value.uri.path, '/p/x');
+  });
 }

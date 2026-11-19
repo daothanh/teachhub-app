@@ -112,6 +112,16 @@ GoRouter buildAppRouter({
         path: AppRoutes.inviteScan,
         builder: (_, _) => const InviteScanPage(),
       ),
+      // Token đi qua `extra`, không nằm trong đường dẫn (không vào URL/log).
+      GoRoute(
+        path: AppRoutes.inviteCard,
+        redirect: (_, state) =>
+            state.extra is String ? null : AppRoutes.inviteEntry,
+        builder: (_, state) => BlocProvider(
+          create: (_) => inviteCubit(state.extra! as String),
+          child: const InvitePage(),
+        ),
+      ),
       GoRoute(
         path: AppRoutes.invitePattern,
         builder: (_, state) => BlocProvider(
@@ -161,21 +171,41 @@ String? resolveRedirect({
     return atSplash ? null : AppRoutes.splash;
   }
 
+  // Phụ huynh phải đồng ý điều khoản hiện hành mới vào trang của con (US-0.3
+  // AC2). Chưa biết trạng thái (đang tải) thì chờ ở splash; chỉ khi server nói
+  // chưa đồng ý (hoặc không đọc được) mới về màn đồng ý.
+  final isParent = memberships.permissions.contains(
+    MembershipRole.parent.permission,
+  );
+  bool inParentSpace(String path) =>
+      path == TeachHubRoutes.parent ||
+      path.startsWith('${TeachHubRoutes.parent}/');
+  final consentPending =
+      consent.phase == ConsentPhase.unknown ||
+      consent.phase == ConsentPhase.loading;
+  final consentBlocked =
+      consent.phase == ConsentPhase.required ||
+      consent.phase == ConsentPhase.accepting ||
+      consent.phase == ConsentPhase.failed;
+
   if (atSplash || atLogin) {
+    // Đích sẽ mở: link chờ nếu có, không thì không gian của vai trò đang mở.
+    final target =
+        PendingDeepLink.current?.path ??
+        memberships.active?.role.rootRoute ??
+        AppRoutes.rolePicker;
+    if (isParent && inParentSpace(target) && !consent.accepted) {
+      // Không tiêu thụ link chờ: màn đồng ý sẽ mở nó sau khi đồng ý.
+      if (consentPending) return atSplash ? null : AppRoutes.splash;
+      if (consentBlocked) return AppRoutes.consent;
+    }
     final pending = PendingDeepLink.consume();
     if (pending != null) return pending.path;
     return memberships.active?.role.rootRoute ?? AppRoutes.rolePicker;
   }
 
-  // Phụ huynh chưa đồng ý điều khoản hiện hành thì không vào trang của con
-  // (US-0.3 AC2). Trạng thái chưa biết cũng về màn đồng ý: màn đó tự tải.
-  final inParentSpace =
-      location == TeachHubRoutes.parent ||
-      location.startsWith('${TeachHubRoutes.parent}/');
-  if (inParentSpace &&
-      memberships.permissions.contains(MembershipRole.parent.permission) &&
-      !consent.accepted) {
-    return AppRoutes.consent;
+  if (isParent && inParentSpace(location) && !consent.accepted) {
+    return consentPending ? AppRoutes.splash : AppRoutes.consent;
   }
 
   final denied = permissionGuard.evaluate(

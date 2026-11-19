@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../../core/routing/app_routes.dart';
@@ -33,6 +34,7 @@ class _InvitePageState extends State<InvitePage> {
         context.go(TeachHubRoutes.parent);
       case InvitePhase.consentRequired:
         final agreed = await context.push<bool>(AppRoutes.consent);
+        if (!mounted) return;
         if (agreed == true) {
           await cubit.accept();
         } else {
@@ -51,11 +53,9 @@ class _InvitePageState extends State<InvitePage> {
     }
   }
 
-  String _date(DateTime d) {
-    String two(int n) => n.toString().padLeft(2, '0');
-    final t = d.toLocal();
-    return '${two(t.day)}/${two(t.month)}/${t.year}';
-  }
+  String _date(DateTime d) => DateFormat.yMd(
+    Localizations.localeOf(context).toString(),
+  ).format(d.toLocal());
 
   @override
   Widget build(BuildContext context) {

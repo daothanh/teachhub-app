@@ -72,7 +72,9 @@ class FamilyCubit extends Cubit<FamilyState> {
   final NotificationPermissionGate? _notifications;
 
   Future<void> load() async {
-    emit(state.copyWith(status: FamilyStatus.loading));
+    // Làm mới khi đã có dữ liệu thì giữ nguyên màn, không nháy vòng tải.
+    final first = state.status != FamilyStatus.ready;
+    if (first) emit(state.copyWith(status: FamilyStatus.loading));
     try {
       final students = await _repo.students();
       if (isClosed) return;
@@ -83,12 +85,14 @@ class FamilyCubit extends Cubit<FamilyState> {
           status: FamilyStatus.ready,
           students: students,
           selectedId: selected,
-          clearWeek: true,
+          clearWeek: selected != state.selectedId,
         ),
       );
       await Future.wait([_loadWeek(), refreshNotifications()]);
     } catch (_) {
-      if (!isClosed) emit(state.copyWith(status: FamilyStatus.failure));
+      if (!isClosed && first) {
+        emit(state.copyWith(status: FamilyStatus.failure));
+      }
     }
   }
 

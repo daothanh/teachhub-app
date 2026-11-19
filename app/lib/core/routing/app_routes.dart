@@ -9,6 +9,9 @@ abstract final class AppRoutes {
   static const updateRequired = '/update-required';
   static const inviteEntry = TeachHubRoutes.inviteEntry;
   static const inviteScan = '/invite/scan';
+
+  /// Thẻ lời mời mở từ P05; token truyền qua `extra`.
+  static const inviteCard = '/invite/card';
   static const consent = '/consent';
   static const invitePattern = '/invite/:token';
   static String invite(String token) => '/invite/$token';

@@ -189,4 +189,20 @@ void main() {
     expect(find.bySemanticsLabel(RegExp('Present: 3')), findsOneWidget);
     handle.dispose();
   });
+
+  testWidgets('kéo để làm mới: không nháy vòng tải, giữ nguyên card', (
+    tester,
+  ) async {
+    final repo = _FakeRepo([_child('a', 'Minh Anh')]);
+    await _pump(tester, repo);
+    expect(find.text('Present · 3'), findsOneWidget);
+
+    await tester.fling(find.byType(ListView), const Offset(0, 400), 1000);
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.text('Minh Anh'), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.text('Present · 3'), findsOneWidget);
+    expect(repo.weekCalls.length, 2);
+  });
 }

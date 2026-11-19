@@ -119,6 +119,15 @@ Future<void> bootstrap({required Env env}) async {
   final authCubit = GetIt.I<AppAuthCubit>();
   final membershipCubit = GetIt.I<MembershipCubit>();
   final consentCubit = GetIt.I<ConsentCubit>();
+  // Tải trạng thái đồng ý ngay khi biết có vai trò Phụ huynh, để mở app nguội
+  // không qua màn đồng ý và giữ link chờ.
+  membershipCubit.stream.listen((m) {
+    if (m.statusLoad == LoadingStatus.success &&
+        m.permissions.contains(MembershipRole.parent.permission) &&
+        consentCubit.state.phase == ConsentPhase.unknown) {
+      consentCubit.load();
+    }
+  });
   String? claimedUser;
   var wasAuthenticated = false;
   authCubit.stream.listen((state) async {

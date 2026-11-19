@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../../l10n/l10n.dart';
 import '../data/family_models.dart';
 
-String _two(int n) => n.toString().padLeft(2, '0');
-String _dm(DateTime d) => '${_two(d.day)}/${_two(d.month)}';
+String _dm(BuildContext context, DateTime d) =>
+    DateFormat.Md(Localizations.localeOf(context).toString()).format(d);
 
 /// Card chuyên cần tuần của con (P02, US-0.3 AC4).
 class AttendanceWeekCard extends StatelessWidget {
@@ -40,7 +41,10 @@ class AttendanceWeekCard extends StatelessWidget {
               ),
             ),
             Text(
-              l10n.attendanceWeekRange(_dm(week.weekStart), _dm(week.weekEnd)),
+              l10n.attendanceWeekRange(
+                _dm(context, week.weekStart),
+                _dm(context, week.weekEnd),
+              ),
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 12),
@@ -92,7 +96,9 @@ class _SessionRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
     final t = session.startsAt;
-    final when = '${_dm(t)} ${_two(t.hour)}:${_two(t.minute)}';
+    final when = DateFormat.Md(
+      Localizations.localeOf(context).toString(),
+    ).add_Hm().format(t);
     final title = session.isMakeup
         ? '${session.className} (${l10n.attendanceMakeup})'
         : session.className;

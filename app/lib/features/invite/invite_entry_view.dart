@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -20,10 +22,14 @@ class InviteEntryView extends StatefulWidget {
     super.key,
     required this.onLinked,
     this.requester = const InviteLinkRequester(),
+    this.now = DateTime.now,
   });
 
   final VoidCallback onLinked;
   final InviteLinkRequester requester;
+
+  /// Đồng hồ cho thông báo "còn N phút" (test thay được).
+  final DateTime Function() now;
 
   @override
   State<InviteEntryView> createState() => _InviteEntryViewState();
@@ -32,14 +38,22 @@ class InviteEntryView extends StatefulWidget {
 class _InviteEntryViewState extends State<InviteEntryView> {
   final _text = TextEditingController();
   bool _badInput = false;
+  Timer? _tick;
 
   @override
   void dispose() {
+    _tick?.cancel();
     _text.dispose();
     super.dispose();
   }
 
   Future<void> _submit(String raw) async {
+    // Đang khóa hoặc đang gửi: không làm gì, giữ nguyên nội dung đã nhập.
+    final phase = context.read<InviteEntryCubit>().state.phase;
+    if (phase == InviteEntryPhase.locked ||
+        phase == InviteEntryPhase.submitting) {
+      return;
+    }
     final input = InviteInput.parse(raw);
     setState(() => _badInput = input == null);
     switch (input) {
@@ -47,7 +61,7 @@ class _InviteEntryViewState extends State<InviteEntryView> {
         return;
       case InviteToken(:final value):
         _text.clear();
-        await context.push(AppRoutes.invite(value));
+        if (mounted) await context.push(AppRoutes.inviteCard, extra: value);
       case InviteCode(:final value):
         _text.clear();
         await context.read<InviteEntryCubit>().redeem(value);
@@ -70,11 +84,21 @@ class _InviteEntryViewState extends State<InviteEntryView> {
 
   Future<void> _onState(BuildContext context, InviteEntryState state) async {
     final cubit = context.read<InviteEntryCubit>();
+    _tick?.cancel();
+    // Cập nhật "còn N phút" theo thời gian khi đang khóa.
+    _tick = state.phase == InviteEntryPhase.locked
+        ? Timer.periodic(const Duration(seconds: 20), (_) {
+            if (mounted) setState(() {});
+          })
+        : null;
     switch (state.phase) {
       case InviteEntryPhase.accepted:
         widget.onLinked();
       case InviteEntryPhase.consentRequired:
         final agreed = await context.push<bool>(AppRoutes.consent);
+        // Bị đẩy sang màn khác trong lúc chờ (vd. điều khoản đổi giữa phiên ở
+        // /p): view và cubit đã đóng, bỏ mã thay vì gọi lại.
+        if (!mounted) return;
         if (agreed == true) {
           await cubit.redeem();
         } else {
@@ -102,7 +126,7 @@ class _InviteEntryViewState extends State<InviteEntryView> {
 
   int _minutesLeft(DateTime? until) {
     if (until == null) return 1;
-    final left = until.difference(DateTime.now()).inSeconds;
+    final left = until.difference(widget.now()).inSeconds;
     return left <= 0 ? 1 : (left / 60).ceil();
   }
 
@@ -133,7 +157,7 @@ class _InviteEntryViewState extends State<InviteEntryView> {
             Text(l10n.inviteEntryBody),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: busy ? null : _scan,
+              onPressed: busy || locked ? null : _scan,
               icon: const Icon(Icons.qr_code_scanner),
               label: Text(l10n.inviteScanQr),
             ),
