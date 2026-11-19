@@ -2,8 +2,8 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../../../l10n/l10n.dart';
 
-/// Thông điệp tiếng Việt theo mã lỗi (spec §5.6); `message` của server chỉ là
-/// dự phòng cho 422. [enroll] đổi lời 409 cho thao tác ghi danh.
+/// Thông điệp tiếng Việt theo mã lỗi (spec §5.6); `message` của server không hiển thị.
+/// [enroll] đổi lời 409 cho thao tác ghi danh.
 String classesErrorText(
   MiniAppLocalizations l10n,
   ApiException e, {
@@ -24,8 +24,7 @@ String classesErrorText(
     ApiErrorKind.forbidden => l10n.classesErrForbidden,
     ApiErrorKind.notFound => l10n.classesErrNotFound,
     ApiErrorKind.conflict => l10n.classesErrStale,
-    ApiErrorKind.validation =>
-      e.message?.isNotEmpty == true ? e.message! : l10n.classesErrValidation,
+    ApiErrorKind.validation => l10n.classesErrValidation,
     _ => l10n.classesErrGeneric,
   };
 }

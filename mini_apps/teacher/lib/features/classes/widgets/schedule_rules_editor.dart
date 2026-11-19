@@ -174,8 +174,8 @@ class _RuleCardState extends State<_RuleCard> {
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               onChanged: (v) {
-                final n = int.tryParse(v);
-                if (n != null) widget.onChanged(_with(durationMin: n));
+                // Ô trống = 0 để kiểm tra báo lỗi thời lượng, không giữ số cũ.
+                widget.onChanged(_with(durationMin: int.tryParse(v) ?? 0));
               },
             ),
             Align(

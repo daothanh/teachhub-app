@@ -26,7 +26,7 @@ void main() {
   });
   tearDown(GetIt.I.reset);
 
-  Future<List<bool?>> open(WidgetTester tester) async {
+  Future<List<bool?>> open(WidgetTester tester, {double scale = 1}) async {
     final results = <bool?>[];
     final router = await pumpRoutes(tester, [
       GoRoute(
@@ -120,5 +120,37 @@ void main() {
     await tester.tap(find.text('Nguyễn Văn An'));
     await tester.pumpAndSettle();
     expect(find.textContaining('học viên đã nghỉ'), findsOneWidget);
+  });
+
+  testWidgets('gõ liên tục chỉ gọi API một lần sau khi dừng gõ', (
+    tester,
+  ) async {
+    await open(tester);
+    for (final q in ['ng', 'ngu', 'nguy']) {
+      await tester.enterText(find.byType(EditableText), q);
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpAndSettle();
+    expect(repo.calls.where((c) => c.startsWith('search')), ['search:nguy']);
+  });
+
+  testWidgets('chữ 130% không vỡ (kết quả dài, lỗi)', (tester) async {
+    repo.students = [
+      const StudentSummary(
+        id: 's9',
+        fullName: 'Nguyễn Thị Hoàng Phương Anh Thư Khánh Linh',
+        school: 'Trường THCS Nguyễn Văn Trỗi quận Hải Châu',
+        schoolClass: '9A12',
+        status: 'active',
+      ),
+    ];
+    repo.enrollError = apiError(ApiErrorCode.conflictStale);
+    await open(tester, scale: 1.3);
+    await type(tester, 'nguyen');
+    await tester.tap(find.textContaining('Nguyễn Thị Hoàng'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('học viên đã nghỉ'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

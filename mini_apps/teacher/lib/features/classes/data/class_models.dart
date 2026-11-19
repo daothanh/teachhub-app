@@ -16,8 +16,12 @@ enum ClassStatus {
   active,
   archived;
 
-  static ClassStatus fromWire(String v) =>
-      values.firstWhere((m) => m.name == v, orElse: () => ClassStatus.active);
+  /// `status` lạ làm hỏng cả lớp (dễ hiện nhầm lớp lưu trữ là đang dạy):
+  /// ném [FormatException], repository đổi thành lỗi chung.
+  static ClassStatus fromWire(String v) => values.firstWhere(
+    (m) => m.name == v,
+    orElse: () => throw FormatException('status lạ: $v'),
+  );
 }
 
 /// Quy tắc lặp. `weekday` theo ISO 8601: 1 = Thứ Hai … 7 = Chủ nhật.
@@ -372,8 +376,8 @@ class ClassSession extends Equatable {
     classId: json['classId'] as String,
     className: json['className'] as String,
     sessionDate: json['sessionDate'] as String,
-    startsAt: DateTime.parse(json['startsAt'] as String),
-    endsAt: DateTime.parse(json['endsAt'] as String),
+    startsAt: json['startsAt'] as String,
+    endsAt: json['endsAt'] as String,
     status: SessionStatus.fromWire(json['status'] as String),
     isMakeup: json['isMakeup'] as bool,
   );
@@ -384,8 +388,21 @@ class ClassSession extends Equatable {
 
   /// Ngày theo múi giờ của tenant (`yyyy-MM-dd`).
   final String sessionDate;
-  final DateTime startsAt;
-  final DateTime endsAt;
+
+  /// ISO 8601 kèm offset của tenant, giữ nguyên chuỗi.
+  final String startsAt;
+  final String endsAt;
+
+  /// Giờ tường `HH:mm` đúng như server ghi (theo offset trong chuỗi), không đổi
+  /// sang múi giờ máy để ngày và giờ luôn khớp nhau.
+  String get startTime => _wallTime(startsAt);
+  String get endTime => _wallTime(endsAt);
+
+  static String _wallTime(String iso) {
+    final t = iso.indexOf('T');
+    return t < 0 || iso.length < t + 6 ? iso : iso.substring(t + 1, t + 6);
+  }
+
   final SessionStatus status;
   final bool isMakeup;
 

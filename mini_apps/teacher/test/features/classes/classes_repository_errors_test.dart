@@ -229,7 +229,26 @@ void _keyAndParseTests() {
       }
     });
 
-    test('enum lạ từ server không ném, rơi về mặc định', () async {
+    test('status lớp lạ → lỗi chung (không hiện nhầm là đang dạy)', () async {
+      rec.responseBody = {
+        'id': 'c1',
+        'name': 'n',
+        'subject': 's',
+        'grade': 9,
+        'mode': 'offline',
+        'location': null,
+        'capacity': null,
+        'startDate': '2026-12-14',
+        'endDate': null,
+        'status': 'frozen',
+        'enrolledCount': 0,
+        'scheduleRules': [],
+        'createdAt': '2026-12-01T00:00:00.000Z',
+      };
+      expect((await fail(repo.get('c1'))).kind, ApiErrorKind.server);
+    });
+
+    test('mode lạ không ném, rơi về mặc định', () async {
       rec.responseBody = {
         'id': 'c1',
         'name': 'n',
@@ -240,7 +259,7 @@ void _keyAndParseTests() {
         'capacity': null,
         'startDate': '2026-12-14',
         'endDate': null,
-        'status': 'frozen',
+        'status': 'active',
         'enrolledCount': 0,
         'scheduleRules': [],
         'createdAt': '2026-12-01T00:00:00.000Z',

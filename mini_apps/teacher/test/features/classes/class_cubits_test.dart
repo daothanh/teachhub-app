@@ -19,6 +19,79 @@ const _input = ClassInput(
 const _rule = ScheduleRule(weekday: 2, startTime: '18:00', durationMin: 90);
 
 void main() {
+  group('422 theo trường', () {
+    test('khóa rules.* gộp vào rules; khóa lạ → lỗi chung', () async {
+      final repo = FakeClassesRepository()
+        ..createError = validationError({
+          'rules.0.startTime': ['Giờ sai.'],
+          'rules.1.durationMin': ['Thời lượng sai.'],
+        });
+      final cubit = ClassFormCubit(repo);
+      await cubit.save(_input, const []);
+      expect(cubit.state.serverErrors['rules'], [
+        'Giờ sai.',
+        'Thời lượng sai.',
+      ]);
+      expect(cubit.state.error, isNull);
+
+      repo.createError = validationError({
+        'dates.end': ['Sai.'],
+        'name': ['Trùng.'],
+      });
+      await cubit.save(_input, const []);
+      expect(cubit.state.serverErrors.keys, ['name']);
+      expect(cubit.state.error, isNotNull);
+
+      repo.createError = validationError({
+        'zzz': ['Sai.'],
+      });
+      await cubit.save(_input, const []);
+      expect(cubit.state.serverErrors, isEmpty);
+      expect(cubit.state.error, isNotNull);
+      await cubit.close();
+    });
+
+    test('thời lượng 0 (ô trống) bị chặn ở máy', () async {
+      final repo = FakeClassesRepository();
+      final cubit = ClassFormCubit(repo);
+      await cubit.save(_input, const [
+        ScheduleRule(weekday: 2, startTime: '18:00', durationMin: 0),
+      ]);
+      expect(cubit.state.clientErrors['rules'], ClassFieldError.rulesDuration);
+      expect(repo.calls, isEmpty);
+      await cubit.close();
+    });
+  });
+
+  group('picker', () {
+    test(
+      'tìm mới không làm rơi enrollingId đang bay; kết quả cũ bị bỏ',
+      () async {
+        final repo = FakeClassesRepository();
+        final gate = Completer<void>();
+        final slow = _SlowEnroll(gate);
+        final cubit = StudentPickerCubit(slow, 'c1');
+        const a = StudentSummary(
+          id: 'a',
+          fullName: 'A',
+          school: null,
+          schoolClass: null,
+          status: 'active',
+        );
+        final f = cubit.enroll(a);
+        cubit.search('ab');
+        expect(cubit.state.enrollingId, 'a');
+        cubit.search('x');
+        expect(cubit.state.enrollingId, 'a');
+        expect(slow.calls.where((c) => c.startsWith('search')), isEmpty);
+        gate.complete();
+        await f;
+        expect(repo.calls, isEmpty);
+        await cubit.close();
+      },
+    );
+  });
+
   group('Idempotency-Key giữ nguyên cho cùng draft', () {
     test(
       'tạo lớp: lỗi mạng rồi thử lại dùng lại khóa; draft đổi thì khóa mới',
@@ -150,5 +223,20 @@ class _SlowRepository extends FakeClassesRepository {
   }) async {
     await gate.future;
     return super.create(input, idempotencyKey: idempotencyKey);
+  }
+}
+
+class _SlowEnroll extends FakeClassesRepository {
+  _SlowEnroll(this.gate);
+  final Completer<void> gate;
+
+  @override
+  Future<EnrollResult> enroll(
+    String classId,
+    String studentId, {
+    String? idempotencyKey,
+  }) async {
+    await gate.future;
+    return super.enroll(classId, studentId, idempotencyKey: idempotencyKey);
   }
 }

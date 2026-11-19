@@ -215,6 +215,24 @@ void main() {
     expect(results.single, isA<TeachClass>());
   });
 
+  testWidgets('ô thời lượng để trống: báo lỗi thời lượng, không gọi API', (
+    tester,
+  ) async {
+    await open(tester);
+    await fillBasics(tester);
+    await tester.enterText(_field('Địa điểm'), 'Nhà riêng');
+    await pickToday(tester, 'Ngày bắt đầu');
+    final add = find.widgetWithText(AppButton, 'Thêm buổi');
+    await _reveal(tester, add);
+    await tester.tap(add);
+    await tester.pumpAndSettle();
+    await tester.enterText(_field('Thời lượng (phút)'), '');
+    await save(tester);
+
+    expect(find.text('Thời lượng từ 15 đến 480 phút.'), findsOneWidget);
+    expect(repo.calls, isEmpty);
+  });
+
   testWidgets('hai buổi cùng thứ và giờ: lỗi quy tắc, không gọi API', (
     tester,
   ) async {

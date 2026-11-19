@@ -160,14 +160,40 @@ class ClassFormCubit extends Cubit<ClassFormState> {
       // `op` là lệnh đang dở khi lỗi; lỗi chắc chắn thì lần sau là lệnh mới.
       if (!e.retryable) _keys.done(op);
       if (isClosed) return;
+      final (fields, unknown) = _splitFieldErrors(e.fieldErrors);
       emit(
         state.copyWith(
           saving: false,
-          serverErrors: e.fieldErrors,
-          error: e.fieldErrors.isEmpty ? e : null,
+          serverErrors: fields,
+          // Không có trường nào nhận được lỗi thì báo chung, kẻo người dùng
+          // bấm Lưu mà không thấy gì.
+          error: fields.isEmpty || unknown ? e : null,
         ),
       );
     }
+  }
+
+  static const _knownFields = {
+    'name', 'subject', 'grade', 'mode', 'location', 'capacity', //
+    'startDate', 'endDate', 'rules', //
+  };
+
+  /// Gộp mọi khóa `rules*` (vd. `rules.0.startTime`) vào `rules`; khóa không
+  /// thuộc form đánh dấu `unknown` để hiện lỗi chung.
+  static (Map<String, List<String>>, bool) _splitFieldErrors(
+    Map<String, List<String>> raw,
+  ) {
+    final out = <String, List<String>>{};
+    var unknown = false;
+    for (final MapEntry(:key, :value) in raw.entries) {
+      final k = key.startsWith('rules') ? 'rules' : key;
+      if (_knownFields.contains(k)) {
+        out[k] = [...?out[k], ...value];
+      } else {
+        unknown = true;
+      }
+    }
+    return (out, unknown);
   }
 
   /// Lớp mới chưa có quy tắc và form cũng trống thì khỏi gọi `PUT`.

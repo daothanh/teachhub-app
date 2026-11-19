@@ -102,7 +102,14 @@ class ClassDetailCubit extends Cubit<ClassDetailState> {
             ? const []
             : await _repo.sessions(
                 from: isoDate(today),
-                to: isoDate(today.add(const Duration(days: sessionWindowDays))),
+                // Cộng theo lịch (không cộng 24h) để qua đổi giờ mùa hè vẫn đúng ngày.
+                to: isoDate(
+                  DateTime(
+                    today.year,
+                    today.month,
+                    today.day + sessionWindowDays,
+                  ),
+                ),
                 classId: classId,
               );
       } on ApiException {

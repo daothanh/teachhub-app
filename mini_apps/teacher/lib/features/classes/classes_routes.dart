@@ -39,7 +39,10 @@ List<RouteBase> classesRoutes(String moduleId) => [
     name: '$moduleId.classes.edit',
     builder: (context, state) => ClassFormPage(
       classId: state.pathParameters['id'],
-      initial: state.extra as TeachClass?,
+      initial: switch (state.extra) {
+        final TeachClass c => c,
+        _ => null,
+      },
     ),
   ),
   GoRoute(

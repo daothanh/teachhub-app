@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:teachhub_shared/teachhub_shared.dart';
 import 'package:teacher/features/classes/data/class_models.dart';
 import 'package:teacher/features/classes/data/classes_repository.dart';
@@ -47,6 +49,11 @@ class FakeClassesRepository implements ClassesRepository {
   List<ClassSession> sessionItems = [];
   List<StudentSummary> students = [];
   Object? listError;
+
+  /// Giả lập còn trang sau: `total` lớn hơn số mục; lỗi chỉ ở trang này.
+  int? listTotal;
+  int? listErrorPage;
+  Completer<void>? listGate;
   Object? getError;
   Object? createError;
   Object? updateError;
@@ -66,9 +73,17 @@ class FakeClassesRepository implements ClassesRepository {
     int page = 1,
   }) async {
     calls.add('list:${status.name}:$page');
-    if (listError != null) throw listError!;
+    await listGate?.future;
+    if (listError != null || listErrorPage == page) {
+      throw listError ?? const ApiException.network();
+    }
     final items = status == ClassStatus.active ? active : archived;
-    return Paginated(items: items, total: items.length, page: 1, pageSize: 20);
+    return Paginated(
+      items: items,
+      total: listTotal ?? items.length,
+      page: page,
+      pageSize: 20,
+    );
   }
 
   @override

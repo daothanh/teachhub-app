@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
@@ -37,6 +39,7 @@ class StudentPickerState extends Equatable {
     List<StudentSummary>? results,
     String? enrollingId,
     bool clearEnrolling = false,
+    bool clearError = false,
     ApiException? error,
     ({StudentSummary student, EnrollResult result})? done,
   }) => StudentPickerState(
@@ -44,7 +47,7 @@ class StudentPickerState extends Equatable {
     searching: searching ?? this.searching,
     results: results ?? this.results,
     enrollingId: clearEnrolling ? null : (enrollingId ?? this.enrollingId),
-    error: error,
+    error: clearError ? null : (error ?? this.error),
     done: done ?? this.done,
   );
 
@@ -68,27 +71,54 @@ class StudentPickerCubit extends Cubit<StudentPickerState> {
   final String classId;
   final DraftKeys _keys;
 
-  Future<void> search(String raw) async {
+  Timer? _debounce;
+
+  /// Thế hệ tìm kiếm: gõ tiếp thì kết quả của lần trước bị bỏ.
+  int _gen = 0;
+
+  static const debounceDuration = Duration(milliseconds: 300);
+
+  /// Gõ liên tục chỉ gọi API sau khi dừng [debounceDuration]. Không đụng tới
+  /// `enrollingId` của yêu cầu ghi danh đang bay.
+  void search(String raw) {
+    _debounce?.cancel();
+    final gen = ++_gen;
     final q = raw.trim();
     if (q.length < StudentPickerState.minQuery) {
-      emit(StudentPickerState(query: raw));
+      emit(
+        state.copyWith(
+          query: raw,
+          searching: false,
+          results: const [],
+          clearError: true,
+        ),
+      );
       return;
     }
-    emit(StudentPickerState(query: raw, searching: true));
+    emit(state.copyWith(query: raw, searching: true, clearError: true));
+    _debounce = Timer(debounceDuration, () => _run(q, gen));
+  }
+
+  Future<void> _run(String q, int gen) async {
     try {
       final p = await _repo.searchStudents(q);
-      // Bỏ kết quả cũ nếu người dùng đã gõ tiếp.
-      if (isClosed || state.query != raw) return;
-      emit(StudentPickerState(query: raw, results: p.items));
+      if (isClosed || gen != _gen) return;
+      emit(state.copyWith(searching: false, results: p.items));
     } on ApiException catch (e) {
-      if (isClosed || state.query != raw) return;
-      emit(StudentPickerState(query: raw, error: e));
+      if (isClosed || gen != _gen) return;
+      emit(state.copyWith(searching: false, results: const [], error: e));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _debounce?.cancel();
+    return super.close();
   }
 
   Future<void> enroll(StudentSummary s) async {
     if (state.enrollingId != null) return;
-    emit(state.copyWith(enrollingId: s.id));
+    emit(state.copyWith(enrollingId: s.id, clearError: true));
     final op = 'enroll:${s.id}';
     try {
       final r = await _repo.enroll(
@@ -98,7 +128,13 @@ class StudentPickerCubit extends Cubit<StudentPickerState> {
       );
       _keys.done(op);
       if (isClosed) return;
-      emit(state.copyWith(clearEnrolling: true, done: (student: s, result: r)));
+      emit(
+        state.copyWith(
+          clearEnrolling: true,
+          clearError: true,
+          done: (student: s, result: r),
+        ),
+      );
     } on ApiException catch (e) {
       if (!e.retryable) _keys.done(op);
       if (isClosed) return;

@@ -87,7 +87,7 @@ class _ClassesListView extends StatelessWidget {
                 final created = await context.push<TeachClass>(
                   ClassesRoutes.create,
                 );
-                if (created != null) cubit.load();
+                if (created != null) cubit.refresh();
               },
             ),
           ),
@@ -111,6 +111,16 @@ class _ClassList extends StatelessWidget {
       itemCount: state.items.length + more,
       itemBuilder: (context, i) {
         if (i == state.items.length) {
+          if (state.loadMoreFailed) {
+            return Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: AppButton(
+                label: l10n.classesRetry,
+                variant: AppButtonVariant.outlinePrimary,
+                onPressed: cubit.retryLoadMore,
+              ),
+            );
+          }
           WidgetsBinding.instance.addPostFrameCallback((_) => cubit.loadMore());
           return const Padding(
             padding: EdgeInsets.all(AppSpacing.lg),
@@ -123,7 +133,7 @@ class _ClassList extends StatelessWidget {
           child: AppCard.outlined(
             onTap: () async {
               await context.push(ClassesRoutes.detail(c.id));
-              cubit.load();
+              cubit.refresh();
             },
             title: c.name,
             subtitle: l10n.classesItemMeta(c.subject, c.grade),

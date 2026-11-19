@@ -52,7 +52,7 @@ class _ClassDetailView extends StatelessWidget {
                         ClassesRoutes.edit(cls.id),
                         extra: cls,
                       );
-                      if (saved != null) cubit.load();
+                      if (saved != null && context.mounted) cubit.load();
                     } else {
                       await _confirmArchive(context, cubit);
                     }
@@ -61,7 +61,12 @@ class _ClassDetailView extends StatelessWidget {
                     PopupMenuItem(value: 'edit', child: Text(l10n.classesEdit)),
                     PopupMenuItem(
                       value: 'archive',
-                      child: Text(l10n.classesArchive),
+                      child: Text(
+                        l10n.classesArchive,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -101,6 +106,9 @@ class _ClassDetailView extends StatelessWidget {
             child: Text(l10n.classesCancel),
           ),
           TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.error,
+            ),
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text(l10n.classesArchive),
           ),
@@ -123,75 +131,108 @@ class _Body extends StatelessWidget {
     final modeText = cls.mode == ClassMode.offline
         ? l10n.classesModeOffline
         : l10n.classesModeOnline;
-    return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      children: [
-        if (cls.archived)
-          AppBanner(
-            tone: AppStatusTone.warning,
-            description: l10n.classesArchivedBanner,
-            fullWidth: true,
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            0,
           ),
-        Text(
-          l10n.classesItemMeta(cls.subject, cls.grade),
-          style: text.titleMedium,
+          sliver: SliverList(
+            delegate: SliverChildListDelegate([
+              if (cls.archived)
+                AppBanner(
+                  tone: AppStatusTone.warning,
+                  description: l10n.classesArchivedBanner,
+                  fullWidth: true,
+                ),
+              Text(
+                l10n.classesItemMeta(cls.subject, cls.grade),
+                style: text.titleMedium,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              _Info(label: l10n.classesFieldMode, value: modeText),
+              if ((cls.location ?? '').isNotEmpty)
+                _Info(label: l10n.classesLabelLocation, value: cls.location!),
+              if (cls.capacity != null)
+                _Info(
+                  label: l10n.classesLabelCapacity,
+                  value: '${cls.capacity}',
+                ),
+              _Info(
+                label: l10n.classesLabelStart,
+                value: displayDate(cls.startDate),
+              ),
+              _Info(
+                label: l10n.classesLabelEnd,
+                value: cls.endDate == null
+                    ? l10n.classesNoEnd
+                    : displayDate(cls.endDate!),
+              ),
+              _Section(l10n.classesSectionSchedule),
+              if (cls.scheduleRules.isEmpty) Text(l10n.classesNoRules),
+              for (final r in cls.scheduleRules)
+                Text(
+                  l10n.classesRuleLine(
+                    l10n.classesWeekday('${r.weekday}'),
+                    r.startTime,
+                    r.durationMin,
+                  ),
+                ),
+              if (!cls.archived) ...[
+                _Section(l10n.classesSectionSessions),
+                if (state.sessionsError)
+                  Text(l10n.classesSessionsLoadFailed)
+                else if (state.sessions.isEmpty)
+                  Text(l10n.classesNoSessions),
+                for (final s in state.sessions) _SessionTile(session: s),
+              ],
+              _Section(l10n.classesSectionStudents),
+              if (state.roster.isEmpty) Text(l10n.classesNoStudents),
+            ]),
+          ),
         ),
-        const SizedBox(height: AppSpacing.sm),
-        _Info(label: l10n.classesFieldMode, value: modeText),
-        if ((cls.location ?? '').isNotEmpty)
-          _Info(label: l10n.classesLabelLocation, value: cls.location!),
-        if (cls.capacity != null)
-          _Info(label: l10n.classesLabelCapacity, value: '${cls.capacity}'),
-        _Info(label: l10n.classesLabelStart, value: displayDate(cls.startDate)),
-        _Info(
-          label: l10n.classesLabelEnd,
-          value: cls.endDate == null
-              ? l10n.classesNoEnd
-              : displayDate(cls.endDate!),
-        ),
-        _Section(l10n.classesSectionSchedule),
-        if (cls.scheduleRules.isEmpty) Text(l10n.classesNoRules),
-        for (final r in cls.scheduleRules)
-          Text(
-            l10n.classesRuleLine(
-              l10n.classesWeekday('${r.weekday}'),
-              r.startTime,
-              r.durationMin,
-            ),
-          ),
-        if (!cls.archived) ...[
-          _Section(l10n.classesSectionSessions),
-          if (state.sessionsError)
-            Text(l10n.classesSessionsLoadFailed)
-          else if (state.sessions.isEmpty)
-            Text(l10n.classesNoSessions),
-          for (final s in state.sessions) _SessionTile(session: s),
-        ],
-        _Section(l10n.classesSectionStudents),
-        if (state.roster.isEmpty) Text(l10n.classesNoStudents),
-        for (final e in state.roster)
-          AppListTile(
-            title: e.fullName,
-            trailingText: e.studentStatus == 'paused'
-                ? l10n.classesStudentPaused
-                : null,
-          ),
-        if (!cls.archived) ...[
-          const SizedBox(height: AppSpacing.md),
-          AppButton(
-            label: l10n.classesAddStudent,
-            variant: AppButtonVariant.outlinePrimary,
-            width: double.infinity,
-            onPressed: () async {
-              final done = await context.push<bool>(
-                ClassesRoutes.addStudent(cls.id),
+        // Danh sách học viên có thể dài: dựng theo nhu cầu.
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          sliver: SliverList.builder(
+            itemCount: state.roster.length,
+            itemBuilder: (context, i) {
+              final e = state.roster[i];
+              return AppListTile(
+                title: e.fullName,
+                trailingText: e.studentStatus == 'paused'
+                    ? l10n.classesStudentPaused
+                    : null,
               );
-              if (done == true && context.mounted) {
-                context.read<ClassDetailCubit>().load();
-              }
             },
           ),
-        ],
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate([
+              if (!cls.archived) ...[
+                const SizedBox(height: AppSpacing.md),
+                AppButton(
+                  label: l10n.classesAddStudent,
+                  variant: AppButtonVariant.outlinePrimary,
+                  width: double.infinity,
+                  onPressed: () async {
+                    final done = await context.push<bool>(
+                      ClassesRoutes.addStudent(cls.id),
+                    );
+                    if (done == true && context.mounted) {
+                      context.read<ClassDetailCubit>().load();
+                    }
+                  },
+                ),
+              ],
+            ]),
+          ),
+        ),
       ],
     );
   }
@@ -237,11 +278,6 @@ class _SessionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
-    String hm(DateTime t) {
-      final l = t.toLocal();
-      return '${l.hour.toString().padLeft(2, '0')}:${l.minute.toString().padLeft(2, '0')}';
-    }
-
     final status = switch (session.status) {
       SessionStatus.planned => l10n.classesSessionPlanned,
       SessionStatus.taught => l10n.classesSessionTaught,
@@ -250,8 +286,8 @@ class _SessionTile extends StatelessWidget {
     return AppListTile(
       title: l10n.classesSessionLine(
         displayDate(session.sessionDate),
-        hm(session.startsAt),
-        hm(session.endsAt),
+        session.startTime,
+        session.endTime,
       ),
       subtitle: session.isMakeup
           ? '$status · ${l10n.classesSessionMakeup}'

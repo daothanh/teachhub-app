@@ -183,36 +183,24 @@ Options? _key(String? key) =>
     key == null ? null : Options(headers: {'Idempotency-Key': key});
 
 /// Mọi lỗi ra ngoài là [ApiException]: lỗi Dio theo spec §5.6; lỗi đọc phản hồi
-/// (data null, sai kiểu, thiếu trường) thành lỗi máy chủ chung để Cubit không
-/// kẹt ở trạng thái đang tải.
-// shortcut: bản copy DioException → ApiException, thay bằng ApiException.fromDio
-// của teachhub_shared khi nhánh onboarding merge.
+/// (data null, sai kiểu, thiếu trường, `status` lạ) thành lỗi máy chủ chung để
+/// Cubit không kẹt ở trạng thái đang tải.
 Future<T> _call<T>(Future<T> Function() run) async {
   try {
     return await run();
-  } on ApiException {
-    rethrow;
-  } on DioException catch (e) {
-    final res = e.response;
-    // Dio gói lỗi ép kiểu thân phản hồi (không phải JSON object) vào `error`.
-    if (e.error is TypeError || e.error is FormatException) {
-      throw const ApiException(
-        code: ApiErrorCode.internalError,
-        wireCode: null,
-        status: 500,
-      );
-    }
-    if (res == null) throw const ApiException.network();
-    throw ApiException.fromResponse(
-      res.statusCode,
-      res.data,
-      retryAfterHeader: res.headers.value('retry-after'),
-    );
-  } on Object {
-    throw const ApiException(
-      code: ApiErrorCode.internalError,
-      wireCode: null,
-      status: 500,
-    );
+  } on Object catch (e) {
+    // Lỗi đọc thân phản hồi (Dio gói TypeError/FormatException vào `error`)
+    // không phải lỗi mạng dù không có response.
+    final parseFailure =
+        e is TypeError ||
+        e is FormatException ||
+        (e is DioException &&
+            (e.error is TypeError || e.error is FormatException));
+    throw (parseFailure ? null : ApiException.fromDio(e)) ??
+        const ApiException(
+          code: ApiErrorCode.internalError,
+          wireCode: null,
+          status: 500,
+        );
   }
 }

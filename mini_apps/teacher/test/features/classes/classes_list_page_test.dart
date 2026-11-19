@@ -67,4 +67,26 @@ void main() {
     await open(tester, scale: 1.3);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('tải trang tiếp lỗi: không gọi lại vô hạn, bấm Thử lại mới gọi', (
+    tester,
+  ) async {
+    repo
+      ..active = [sampleClass()]
+      ..listTotal = 40
+      ..listErrorPage = 2;
+    await open(tester);
+    await tester.pumpAndSettle();
+    expect(find.text('Thử lại'), findsOneWidget);
+    expect(repo.calls.where((c) => c == 'list:active:2'), hasLength(1));
+    // Dựng lại thêm vài khung hình vẫn không gọi lại.
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
+    expect(repo.calls.where((c) => c == 'list:active:2'), hasLength(1));
+
+    repo.listErrorPage = null;
+    await tester.tap(find.text('Thử lại'));
+    await tester.pumpAndSettle();
+    expect(repo.calls.where((c) => c == 'list:active:2'), hasLength(2));
+  });
 }

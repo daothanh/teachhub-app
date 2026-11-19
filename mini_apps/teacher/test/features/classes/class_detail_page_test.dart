@@ -45,8 +45,8 @@ void main() {
           classId: 'c1',
           className: 'Toán 9A',
           sessionDate: '2026-12-15',
-          startsAt: DateTime.utc(2026, 12, 15, 11),
-          endsAt: DateTime.utc(2026, 12, 15, 12, 30),
+          startsAt: '2026-12-15T18:00:00+07:00',
+          endsAt: '2026-12-15T19:30:00+07:00',
           status: SessionStatus.planned,
           isMakeup: false,
         ),
@@ -73,6 +73,8 @@ void main() {
     expect(find.text('Thứ Ba · 18:00 · 90 phút'), findsOneWidget);
     expect(find.text('Thứ Năm · 18:00 · 90 phút'), findsOneWidget);
     expect(find.text('Dự kiến'), findsOneWidget);
+    // Giờ tường theo offset của tenant, không đổi sang múi giờ máy.
+    expect(find.text('15/12/2026 · 18:00–19:30'), findsOneWidget);
     expect(find.text('Nguyễn Văn An'), findsOneWidget);
     // Cửa sổ buổi học đúng 62 ngày, theo lớp này.
     final r = repo.lastSessionRange!;
