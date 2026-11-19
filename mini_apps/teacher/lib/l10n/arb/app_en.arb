@@ -448,5 +448,160 @@
         "type": "String"
       }
     }
-  }
+  },
+  "studentsEditTitle": "Edit student",
+  "studentsGuardianRelation": "Relationship",
+  "studentsRelationFather": "Father",
+  "studentsRelationMother": "Mother",
+  "studentsRelationGuardian": "Guardian",
+  "inviteStatusNotInvited": "Not invited",
+  "inviteStatusInvited": "Invited",
+  "inviteStatusActivated": "Activated",
+  "inviteStatusExpired": "Expired",
+  "inviteShare": "Share link",
+  "inviteResend": "Resend link",
+  "rosterNoGuardians": "No parent yet. Tap the student name to add one.",
+  "rosterGuardianLine": "{relation}: {name}",
+  "@rosterGuardianLine": {
+    "placeholders": {
+      "relation": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterGuardianSemantics": "{who}, {status}",
+  "@rosterGuardianSemantics": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterEditSemantics": "Edit student {name}",
+  "@rosterEditSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteSheetFor": "Invite {guardian}, parent of {student}",
+  "@inviteSheetFor": {
+    "placeholders": {
+      "guardian": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteQrLabel": "Invitation QR code",
+  "inviteCodeLabel": "Code to type in",
+  "inviteCodeSemantics": "Invitation code: {code}",
+  "@inviteCodeSemantics": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteExpiryNote": "The link works for 7 days and the typed code for 48 hours.",
+  "inviteOldLinkNote": "This parent's previous link, if any, no longer works.",
+  "inviteShareMessage": "Hello {guardian}, I would like to invite you to follow {student}'s learning on TeachHub.\nOpen the link to accept: {url}\nOr enter code {code} in the TeachHub app (the code works for 48 hours).",
+  "@inviteShareMessage": {
+    "placeholders": {
+      "guardian": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      },
+      "url": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteAllEntry": "Invite all parents not yet activated",
+  "inviteAllTitle": "Invite class parents",
+  "inviteAllEmpty": "No parents left to invite.",
+  "inviteAllProgress": "Created {done}/{total} links",
+  "@inviteAllProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteAllHint": "Tap Share to send to each parent in turn. Parents with a valid invitation are skipped.",
+  "inviteAllPausedNetwork": "Stopped after repeated network errors. Check your connection, then tap Continue.",
+  "inviteAllPausedRate": "Stopped because of too many requests. Wait about {seconds} seconds, then tap Continue.",
+  "@inviteAllPausedRate": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteAllPausedRateNoWait": "Stopped because of too many requests. Wait a moment, then tap Continue.",
+  "inviteAllResume": "Continue",
+  "inviteAllWaiting": "Not created yet",
+  "inviteAllCreating": "Creating link…",
+  "inviteAllShareAgain": "Share again",
+  "inviteAllShowQr": "Show QR code",
+  "inviteAllSharedMark": "Share opened",
+  "sessionActionReschedule": "Reschedule",
+  "sessionActionCancel": "Cancel session",
+  "sessionActionMakeup": "Add makeup",
+  "sessionRescheduleTitle": "Reschedule session",
+  "sessionCancelTitle": "Cancel this session?",
+  "sessionCancelBody": "The class's parents will be notified that this session is cancelled.",
+  "sessionMakeupTitle": "Add makeup session",
+  "sessionPickDate": "Date",
+  "sessionPickTime": "Start time",
+  "sessionReasonLabel": "Reason (optional)",
+  "sessionConfirmReschedule": "Reschedule",
+  "sessionConfirmCancel": "Cancel session",
+  "sessionConfirmMakeup": "Add makeup",
+  "sessionClose": "Close",
+  "sessionErrPast": "The new time must be in the future.",
+  "sessionErrCancelled": "This session is cancelled, so it cannot be rescheduled.",
+  "sessionHasAttendanceTitle": "Attendance already taken",
+  "sessionHasAttendanceBody": "This session has attendance, so it cannot be cancelled yet. Open the attendance sheet to fix it, then cancel the session.",
+  "sessionOpenAttendance": "Open attendance",
+  "sessionDoneRescheduled": "Session rescheduled.",
+  "sessionDoneCancelled": "Session cancelled.",
+  "sessionDoneMakeup": "Makeup session added.",
+  "sessionActionsLabel": "Actions for session on {date} at {start}",
+  "@sessionActionsLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionCancelReasonLine": "Cancel reason: {reason}",
+  "@sessionCancelReasonLine": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "todaySettings": "Settings and account"
 }

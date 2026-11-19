@@ -1,3 +1,4 @@
+import 'package:teachhub_shared/teachhub_shared.dart';
 import 'package:teacher/features/students/data/contacts_service.dart';
 import 'package:teacher/features/onboarding/data/onboarding_models.dart';
 import 'package:teacher/features/onboarding/data/onboarding_repository.dart';
@@ -20,6 +21,35 @@ class FakeStudentRepository implements StudentRepository {
     final r = _results.removeAt(0);
     if (r is Student) return r;
     throw r;
+  }
+
+  /// Lệnh `PATCH`: (id, draft, khóa), kết quả lấy từ cùng hàng đợi.
+  final updates = <({String id, StudentDraft draft, String key})>[];
+
+  /// Hồ sơ trả về cho [find]; null thì ném 404.
+  Student? found;
+  final finds = <({String id, String classId, String status})>[];
+
+  @override
+  Future<Student> update(
+    String id,
+    StudentDraft draft, {
+    required String idempotencyKey,
+  }) async {
+    updates.add((id: id, draft: draft, key: idempotencyKey));
+    final r = _results.removeAt(0);
+    if (r is Student) return r;
+    throw r;
+  }
+
+  @override
+  Future<Student> find(
+    String id, {
+    required String classId,
+    String status = 'active',
+  }) async {
+    finds.add((id: id, classId: classId, status: status));
+    return found ?? (throw const ApiException.network());
   }
 }
 

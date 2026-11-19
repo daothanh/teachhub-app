@@ -448,5 +448,160 @@
         "type": "String"
       }
     }
-  }
+  },
+  "studentsEditTitle": "Sửa học viên",
+  "studentsGuardianRelation": "Quan hệ",
+  "studentsRelationFather": "Bố",
+  "studentsRelationMother": "Mẹ",
+  "studentsRelationGuardian": "Người giám hộ",
+  "inviteStatusNotInvited": "Chưa mời",
+  "inviteStatusInvited": "Đã mời",
+  "inviteStatusActivated": "Đã kích hoạt",
+  "inviteStatusExpired": "Hết hạn",
+  "inviteShare": "Chia sẻ link",
+  "inviteResend": "Gửi lại link",
+  "rosterNoGuardians": "Chưa có phụ huynh. Chạm tên em để thêm.",
+  "rosterGuardianLine": "{relation}: {name}",
+  "@rosterGuardianLine": {
+    "placeholders": {
+      "relation": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterGuardianSemantics": "{who}, {status}",
+  "@rosterGuardianSemantics": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterEditSemantics": "Sửa học viên {name}",
+  "@rosterEditSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteSheetFor": "Mời {guardian}, phụ huynh của {student}",
+  "@inviteSheetFor": {
+    "placeholders": {
+      "guardian": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteQrLabel": "Mã QR lời mời",
+  "inviteCodeLabel": "Mã nhập tay",
+  "inviteCodeSemantics": "Mã mời: {code}",
+  "@inviteCodeSemantics": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteExpiryNote": "Link dùng được 7 ngày, mã nhập tay dùng được 48 giờ.",
+  "inviteOldLinkNote": "Link cũ của phụ huynh này (nếu có) không dùng được nữa.",
+  "inviteShareMessage": "Chào {guardian}, mình mời bạn theo dõi việc học của {student} trên TeachHub.\nMở link để nhận lời mời: {url}\nHoặc nhập mã {code} trong ứng dụng TeachHub (mã dùng được 48 giờ).",
+  "@inviteShareMessage": {
+    "placeholders": {
+      "guardian": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      },
+      "url": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteAllEntry": "Mời tất cả phụ huynh chưa kích hoạt",
+  "inviteAllTitle": "Mời phụ huynh của lớp",
+  "inviteAllEmpty": "Không còn phụ huynh nào cần mời.",
+  "inviteAllProgress": "Đã tạo {done}/{total} link",
+  "@inviteAllProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteAllHint": "Bấm Chia sẻ để gửi lần lượt cho từng phụ huynh. Phụ huynh đang có lời mời còn hạn được bỏ qua.",
+  "inviteAllPausedNetwork": "Đã dừng vì lỗi mạng liên tiếp. Kiểm tra kết nối rồi bấm Tiếp tục.",
+  "inviteAllPausedRate": "Đã dừng vì gửi quá nhiều yêu cầu. Chờ khoảng {seconds} giây rồi bấm Tiếp tục.",
+  "@inviteAllPausedRate": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteAllPausedRateNoWait": "Đã dừng vì gửi quá nhiều yêu cầu. Chờ một lát rồi bấm Tiếp tục.",
+  "inviteAllResume": "Tiếp tục",
+  "inviteAllWaiting": "Chưa tạo",
+  "inviteAllCreating": "Đang tạo link…",
+  "inviteAllShareAgain": "Chia sẻ lại",
+  "inviteAllShowQr": "Xem mã QR",
+  "inviteAllSharedMark": "Đã mở chia sẻ",
+  "sessionActionReschedule": "Đổi giờ",
+  "sessionActionCancel": "Hủy buổi",
+  "sessionActionMakeup": "Tạo buổi bù",
+  "sessionRescheduleTitle": "Đổi giờ buổi học",
+  "sessionCancelTitle": "Hủy buổi học?",
+  "sessionCancelBody": "Phụ huynh của lớp sẽ nhận thông báo buổi này đã hủy.",
+  "sessionMakeupTitle": "Tạo buổi bù",
+  "sessionPickDate": "Ngày",
+  "sessionPickTime": "Giờ bắt đầu",
+  "sessionReasonLabel": "Lý do (không bắt buộc)",
+  "sessionConfirmReschedule": "Đổi giờ",
+  "sessionConfirmCancel": "Hủy buổi",
+  "sessionConfirmMakeup": "Tạo buổi bù",
+  "sessionClose": "Đóng",
+  "sessionErrPast": "Giờ mới phải ở tương lai.",
+  "sessionErrCancelled": "Buổi này đã hủy nên không đổi giờ được.",
+  "sessionHasAttendanceTitle": "Buổi đã có điểm danh",
+  "sessionHasAttendanceBody": "Buổi này đã có điểm danh nên chưa hủy được. Mở bảng điểm danh để sửa lại, rồi hủy buổi sau.",
+  "sessionOpenAttendance": "Mở điểm danh",
+  "sessionDoneRescheduled": "Đã đổi giờ buổi học.",
+  "sessionDoneCancelled": "Đã hủy buổi học.",
+  "sessionDoneMakeup": "Đã tạo buổi bù.",
+  "sessionActionsLabel": "Thao tác buổi {date} lúc {start}",
+  "@sessionActionsLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionCancelReasonLine": "Lý do hủy: {reason}",
+  "@sessionCancelReasonLine": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "todaySettings": "Cài đặt và tài khoản"
 }

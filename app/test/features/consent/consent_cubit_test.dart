@@ -175,4 +175,25 @@ void main() {
       expect(c.state.accepted, isFalse);
     });
   });
+
+  test(
+    'resetForNewUser: có vai Phụ huynh thì tải lại, không thì chỉ xóa',
+    () async {
+      final api = _Api({
+        'GET /consents/status': (o) => _r(o, 200, _status('v2')),
+      });
+      final c = ConsentCubit(Dio()..interceptors.add(api));
+      await c.load();
+      expect(c.state.phase, ConsentPhase.required);
+
+      c.resetForNewUser(hasParentRole: false);
+      expect(c.state.phase, ConsentPhase.unknown);
+      expect(api.calls, hasLength(1));
+
+      c.resetForNewUser(hasParentRole: true);
+      await pumpEventQueue();
+      expect(api.calls, hasLength(2));
+      expect(c.state.phase, ConsentPhase.required);
+    },
+  );
 }

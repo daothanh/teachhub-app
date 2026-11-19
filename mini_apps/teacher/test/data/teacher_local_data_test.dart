@@ -92,6 +92,23 @@ void main() {
     expect(await data.pendingSyncCount(), 0);
   });
 
+  test(
+    'markWipePending đặt cờ, retryPendingWipe xóa; clearWipePending bỏ cờ',
+    () async {
+      await addMutation('m-1');
+      await data.markWipePending();
+      expect(await keys.contains(TeacherLocalData.wipePendingKey), isTrue);
+      await data.clearWipePending();
+      expect(await keys.contains(TeacherLocalData.wipePendingKey), isFalse);
+      expect(dir.listSync(), isNotEmpty);
+
+      await data.markWipePending();
+      await data.retryPendingWipe();
+      expect(await keys.contains(TeacherLocalData.wipePendingKey), isFalse);
+      expect(dir.listSync(), isEmpty);
+    },
+  );
+
   test('xóa lỗi: cờ còn lại, retryPendingWipe xóa nốt', () async {
     await addMutation('m-1');
     keys.failDelete = true;

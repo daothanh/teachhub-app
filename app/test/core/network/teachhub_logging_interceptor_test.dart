@@ -34,8 +34,11 @@ void main() {
     final out = TeachHubLoggingInterceptor.redactBody([
       {'token': 'q3Zp8mT1xV0kLw5Hn2RcYb7JdFgSaE9uXoIiKtUeMhA'},
       {'code': '7K3QZ9XM'},
+      {'shortCode': 'ABCD2345', 'url': 'https://dayhoc.app/i#t=SECRETTOK'},
     ]);
     expect(out.toString(), isNot(contains('q3Zp')));
     expect(out.toString(), isNot(contains('7K3Q')));
+    expect(out.toString(), isNot(contains('ABCD2345')));
+    expect(out.toString(), isNot(contains('SECRETTOK')));
   });
 }

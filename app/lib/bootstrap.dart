@@ -141,7 +141,12 @@ Future<void> bootstrap({required Env env}) async {
         // Đổi người dùng thì link chờ của người trước không được mở cho người sau.
         if (claimedUser != null) {
           PendingDeepLink.clear();
-          consentCubit.clear();
+          final m = membershipCubit.state;
+          consentCubit.resetForNewUser(
+            hasParentRole:
+                m.statusLoad == LoadingStatus.success &&
+                m.permissions.contains(MembershipRole.parent.permission),
+          );
         }
         claimedUser = userId;
         try {
@@ -206,6 +211,8 @@ Future<void> bootstrap({required Env env}) async {
     },
     pendingCount: TeacherController.instance.pendingSyncCount,
     wipeLocalData: TeacherController.instance.wipeLocalData,
+    markWipePending: TeacherController.instance.markWipePending,
+    clearWipePending: TeacherController.instance.clearWipePending,
   );
   GetIt.I.registerSingleton<LogoutService>(logoutService);
   GetIt.I<AuthEventBus>().stream

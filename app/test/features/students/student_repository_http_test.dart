@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:teacher/features/students/data/student_models.dart';
 import 'package:teacher/features/students/data/student_repository.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
 
 class _Adapter implements HttpClientAdapter {
   _Adapter(this.status, this.body);
@@ -60,6 +61,7 @@ void main() {
       expect(body['confirmNew'], isTrue);
       expect((body['guardians'] as List).single, {
         'fullName': 'Hải',
+        'relation': 'guardian',
         'phone': '0912345678',
       });
     },
@@ -101,6 +103,52 @@ void main() {
     await expectLater(
       _repo(a).create(_draft, idempotencyKey: 'k'),
       throwsA(isA<Exception>()),
+    );
+  });
+
+  test(
+    'PATCH /students/:id: gửi đủ danh sách phụ huynh kèm id, quan hệ, khóa',
+    () async {
+      final a = _Adapter(200, {'id': 's1', 'fullName': 'Minh Anh'});
+      await _repo(a).update(
+        's1',
+        const StudentDraft(
+          fullName: 'Minh Anh',
+          guardians: [
+            GuardianDraft(
+              id: 'g1',
+              fullName: 'Lan',
+              relation: GuardianRelation.mother,
+              phone: '0912345678',
+            ),
+          ],
+        ),
+        idempotencyKey: 'key-2',
+      );
+      expect(a.seen!.method, 'PATCH');
+      expect(a.seen!.path, '/students/s1');
+      expect(a.seen!.headers['Idempotency-Key'], 'key-2');
+      final g = (a.seen!.data as Map)['guardians'] as List;
+      expect((g.single as Map)['id'], 'g1');
+      expect((g.single as Map)['relation'], 'mother');
+    },
+  );
+
+  test('find: tìm học viên trong danh sách lớp, không có thì 404', () async {
+    final a = _Adapter(200, {
+      'items': [
+        {'id': 's1', 'fullName': 'Minh Anh'},
+      ],
+      'total': 1,
+      'page': 1,
+      'pageSize': 100,
+    });
+    final s = await _repo(a).find('s1', classId: 'c1');
+    expect(s.fullName, 'Minh Anh');
+    expect(a.seen!.queryParameters['classId'], 'c1');
+    await expectLater(
+      _repo(a).find('zzz', classId: 'c1'),
+      throwsA(isA<ApiException>().having((e) => e.status, 'status', 404)),
     );
   });
 }

@@ -1444,6 +1444,377 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Lý do: {reason}'**
   String scheduleCancelReason(String reason);
+
+  /// No description provided for @studentsEditTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa học viên'**
+  String get studentsEditTitle;
+
+  /// No description provided for @studentsGuardianRelation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quan hệ'**
+  String get studentsGuardianRelation;
+
+  /// No description provided for @studentsRelationFather.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bố'**
+  String get studentsRelationFather;
+
+  /// No description provided for @studentsRelationMother.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mẹ'**
+  String get studentsRelationMother;
+
+  /// No description provided for @studentsRelationGuardian.
+  ///
+  /// In vi, this message translates to:
+  /// **'Người giám hộ'**
+  String get studentsRelationGuardian;
+
+  /// No description provided for @inviteStatusNotInvited.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa mời'**
+  String get inviteStatusNotInvited;
+
+  /// No description provided for @inviteStatusInvited.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã mời'**
+  String get inviteStatusInvited;
+
+  /// No description provided for @inviteStatusActivated.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã kích hoạt'**
+  String get inviteStatusActivated;
+
+  /// No description provided for @inviteStatusExpired.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hết hạn'**
+  String get inviteStatusExpired;
+
+  /// No description provided for @inviteShare.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chia sẻ link'**
+  String get inviteShare;
+
+  /// No description provided for @inviteResend.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi lại link'**
+  String get inviteResend;
+
+  /// No description provided for @rosterNoGuardians.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có phụ huynh. Chạm tên em để thêm.'**
+  String get rosterNoGuardians;
+
+  /// No description provided for @rosterGuardianLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{relation}: {name}'**
+  String rosterGuardianLine(String relation, String name);
+
+  /// No description provided for @rosterGuardianSemantics.
+  ///
+  /// In vi, this message translates to:
+  /// **'{who}, {status}'**
+  String rosterGuardianSemantics(String who, String status);
+
+  /// No description provided for @rosterEditSemantics.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa học viên {name}'**
+  String rosterEditSemantics(String name);
+
+  /// No description provided for @inviteSheetFor.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mời {guardian}, phụ huynh của {student}'**
+  String inviteSheetFor(String guardian, String student);
+
+  /// No description provided for @inviteQrLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã QR lời mời'**
+  String get inviteQrLabel;
+
+  /// No description provided for @inviteCodeLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã nhập tay'**
+  String get inviteCodeLabel;
+
+  /// No description provided for @inviteCodeSemantics.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã mời: {code}'**
+  String inviteCodeSemantics(String code);
+
+  /// No description provided for @inviteExpiryNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Link dùng được 7 ngày, mã nhập tay dùng được 48 giờ.'**
+  String get inviteExpiryNote;
+
+  /// No description provided for @inviteOldLinkNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Link cũ của phụ huynh này (nếu có) không dùng được nữa.'**
+  String get inviteOldLinkNote;
+
+  /// No description provided for @inviteShareMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chào {guardian}, mình mời bạn theo dõi việc học của {student} trên TeachHub.\nMở link để nhận lời mời: {url}\nHoặc nhập mã {code} trong ứng dụng TeachHub (mã dùng được 48 giờ).'**
+  String inviteShareMessage(
+    String guardian,
+    String student,
+    String url,
+    String code,
+  );
+
+  /// No description provided for @inviteAllEntry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mời tất cả phụ huynh chưa kích hoạt'**
+  String get inviteAllEntry;
+
+  /// No description provided for @inviteAllTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mời phụ huynh của lớp'**
+  String get inviteAllTitle;
+
+  /// No description provided for @inviteAllEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không còn phụ huynh nào cần mời.'**
+  String get inviteAllEmpty;
+
+  /// No description provided for @inviteAllProgress.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã tạo {done}/{total} link'**
+  String inviteAllProgress(int done, int total);
+
+  /// No description provided for @inviteAllHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bấm Chia sẻ để gửi lần lượt cho từng phụ huynh. Phụ huynh đang có lời mời còn hạn được bỏ qua.'**
+  String get inviteAllHint;
+
+  /// No description provided for @inviteAllPausedNetwork.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã dừng vì lỗi mạng liên tiếp. Kiểm tra kết nối rồi bấm Tiếp tục.'**
+  String get inviteAllPausedNetwork;
+
+  /// No description provided for @inviteAllPausedRate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã dừng vì gửi quá nhiều yêu cầu. Chờ khoảng {seconds} giây rồi bấm Tiếp tục.'**
+  String inviteAllPausedRate(int seconds);
+
+  /// No description provided for @inviteAllPausedRateNoWait.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã dừng vì gửi quá nhiều yêu cầu. Chờ một lát rồi bấm Tiếp tục.'**
+  String get inviteAllPausedRateNoWait;
+
+  /// No description provided for @inviteAllResume.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục'**
+  String get inviteAllResume;
+
+  /// No description provided for @inviteAllWaiting.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa tạo'**
+  String get inviteAllWaiting;
+
+  /// No description provided for @inviteAllCreating.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang tạo link…'**
+  String get inviteAllCreating;
+
+  /// No description provided for @inviteAllShareAgain.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chia sẻ lại'**
+  String get inviteAllShareAgain;
+
+  /// No description provided for @inviteAllShowQr.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem mã QR'**
+  String get inviteAllShowQr;
+
+  /// No description provided for @inviteAllSharedMark.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã mở chia sẻ'**
+  String get inviteAllSharedMark;
+
+  /// No description provided for @sessionActionReschedule.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi giờ'**
+  String get sessionActionReschedule;
+
+  /// No description provided for @sessionActionCancel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy buổi'**
+  String get sessionActionCancel;
+
+  /// No description provided for @sessionActionMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo buổi bù'**
+  String get sessionActionMakeup;
+
+  /// No description provided for @sessionRescheduleTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi giờ buổi học'**
+  String get sessionRescheduleTitle;
+
+  /// No description provided for @sessionCancelTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy buổi học?'**
+  String get sessionCancelTitle;
+
+  /// No description provided for @sessionCancelBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phụ huynh của lớp sẽ nhận thông báo buổi này đã hủy.'**
+  String get sessionCancelBody;
+
+  /// No description provided for @sessionMakeupTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo buổi bù'**
+  String get sessionMakeupTitle;
+
+  /// No description provided for @sessionPickDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày'**
+  String get sessionPickDate;
+
+  /// No description provided for @sessionPickTime.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giờ bắt đầu'**
+  String get sessionPickTime;
+
+  /// No description provided for @sessionReasonLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do (không bắt buộc)'**
+  String get sessionReasonLabel;
+
+  /// No description provided for @sessionConfirmReschedule.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi giờ'**
+  String get sessionConfirmReschedule;
+
+  /// No description provided for @sessionConfirmCancel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy buổi'**
+  String get sessionConfirmCancel;
+
+  /// No description provided for @sessionConfirmMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tạo buổi bù'**
+  String get sessionConfirmMakeup;
+
+  /// No description provided for @sessionClose.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đóng'**
+  String get sessionClose;
+
+  /// No description provided for @sessionErrPast.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giờ mới phải ở tương lai.'**
+  String get sessionErrPast;
+
+  /// No description provided for @sessionErrCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi này đã hủy nên không đổi giờ được.'**
+  String get sessionErrCancelled;
+
+  /// No description provided for @sessionHasAttendanceTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi đã có điểm danh'**
+  String get sessionHasAttendanceTitle;
+
+  /// No description provided for @sessionHasAttendanceBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi này đã có điểm danh nên chưa hủy được. Mở bảng điểm danh để sửa lại, rồi hủy buổi sau.'**
+  String get sessionHasAttendanceBody;
+
+  /// No description provided for @sessionOpenAttendance.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mở điểm danh'**
+  String get sessionOpenAttendance;
+
+  /// No description provided for @sessionDoneRescheduled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã đổi giờ buổi học.'**
+  String get sessionDoneRescheduled;
+
+  /// No description provided for @sessionDoneCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy buổi học.'**
+  String get sessionDoneCancelled;
+
+  /// No description provided for @sessionDoneMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã tạo buổi bù.'**
+  String get sessionDoneMakeup;
+
+  /// No description provided for @sessionActionsLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thao tác buổi {date} lúc {start}'**
+  String sessionActionsLabel(String date, String start);
+
+  /// No description provided for @sessionCancelReasonLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do hủy: {reason}'**
+  String sessionCancelReasonLine(String reason);
+
+  /// No description provided for @todaySettings.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cài đặt và tài khoản'**
+  String get todaySettings;
 }
 
 class _MiniAppLocalizationsDelegate

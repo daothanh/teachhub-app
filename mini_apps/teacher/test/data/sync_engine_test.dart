@@ -493,6 +493,72 @@ void main() {
     });
   });
 
+  group('deviceTime khi gửi lại', () {
+    // Đồng hồ máy tăng 1 phút mỗi lần đọc, để lô gom lại ở thời điểm khác.
+    late int reads;
+    late SyncEngine e;
+    setUp(() {
+      reads = 0;
+      e = SyncEngine(
+        db,
+        TeacherApi(server.dio(), deviceId: devId).sync,
+        random: _FixedRandom(1),
+        now: () =>
+            DateTime.utc(2026, 11, 18, 9).add(Duration(minutes: ++reads)),
+        newKey: () =>
+            '30000000-0000-4000-8000-${(++keyCounter).toString().padLeft(12, '0')}',
+      );
+    });
+    tearDown(() => e.stop());
+
+    test('cùng khóa (mất phản hồi): giữ nguyên deviceTime', () async {
+      await save(1);
+      server.dropNextResponse = true;
+      await e.drain();
+      await e.drain();
+      final [first, second] = server.syncRequests;
+      expect(second.key, first.key);
+      expect(second.body['deviceTime'], first.body['deviceTime']);
+    });
+
+    test(
+      'đổi khóa vì 422 IDEMPOTENCY_KEY_REUSED: đóng dấu deviceTime mới',
+      () async {
+        server.failSessionOnce[s1] = (422, 'IDEMPOTENCY_KEY_REUSED');
+        await save(1);
+        await e.drain();
+        final [first, second] = server.syncRequests;
+        expect(second.key, isNot(first.key));
+        expect(
+          DateTime.parse(
+            second.body['deviceTime']! as String,
+          ).isAfter(DateTime.parse(first.body['deviceTime']! as String)),
+          isTrue,
+        );
+      },
+    );
+
+    test(
+      'server bỏ sót mutation: lô gom lại có khóa và deviceTime mới',
+      () async {
+        await save(1);
+        await save(2);
+        server.skipIds.add(mid(2));
+        await e.drain();
+        server.skipIds.clear();
+        await e.drain();
+        final [first, second] = server.syncRequests;
+        expect(second.key, isNot(first.key));
+        expect(
+          DateTime.parse(
+            second.body['deviceTime']! as String,
+          ).isAfter(DateTime.parse(first.body['deviceTime']! as String)),
+          isTrue,
+        );
+      },
+    );
+  });
+
   test('enqueue lúc lô đang bay: dòng mới đi lô sau với khóa khác', () async {
     final gate = Completer<void>();
     final api = TeacherApi(server.dio(), deviceId: devId);

@@ -157,18 +157,57 @@ void main() {
   modelReads('Session', ClassSession.fromJson);
   modelReads('ScheduleRulesResult', ScheduleRulesResult.fromJson);
 
-  test(
-    'Roster: mỗi mục đọc đúng các trường',
-    () {
-      final item =
-          ((_schema('Roster')['properties'] as Map)['items'] as Map)['items']
-              as Map<String, dynamic>;
-      final spy = _Spy(_sample(item) as Map<String, dynamic>);
-      RosterEntry.fromJson(spy);
-      expect(spy.reads, _props(item));
-    },
-    skip: 'S4-FL-01: chưa đọc inviteStatus và guardians của hợp đồng Sprint 4',
-  );
+  test('Roster: mỗi mục đọc đúng các trường', () {
+    final item =
+        ((_schema('Roster')['properties'] as Map)['items'] as Map)['items']
+            as Map<String, dynamic>;
+    final spy = _Spy(_sample(item) as Map<String, dynamic>);
+    RosterEntry.fromJson(spy);
+    expect(spy.reads, _props(item));
+  });
+
+  modelReads('RosterGuardian', RosterGuardian.fromJson);
+  modelReads('LatestInvite', LatestInvite.fromJson);
+
+  test('Roster: đọc inviteStatus và phụ huynh kèm lời mời mới nhất', () {
+    final item = RosterEntry.fromJson({
+      'enrollmentId': 'e1',
+      'studentId': 's1',
+      'fullName': 'An',
+      'studentStatus': 'active',
+      'joinedOn': '2026-12-14',
+      'inviteStatus': 'expired',
+      'guardians': [
+        {
+          'id': 'g1',
+          'fullName': 'Hải',
+          'relation': 'father',
+          'inviteStatus': 'expired',
+          'latestInvite': {
+            'id': 'i1',
+            'expiresAt': '2026-12-21T09:00:00+07:00',
+          },
+        },
+        {
+          'id': 'g2',
+          'fullName': 'Lan',
+          'relation': 'mother',
+          'inviteStatus': 'not_invited',
+          'latestInvite': null,
+        },
+      ],
+    });
+    expect(item.inviteStatus, GuardianInviteStatus.expired);
+    expect(item.guardians.first.latestInvite!.id, 'i1');
+    expect(item.guardians.last.latestInvite, isNull);
+  });
+
+  test('enum GuardianInviteStatus khớp hợp đồng', () {
+    expect(
+      GuardianInviteStatus.values.map((e) => e.wire),
+      _schema('GuardianInviteStatus')['enum'],
+    );
+  });
 
   test('enum trong hợp đồng khớp enum của app', () {
     List<Object?> en(String schema, String prop) =>
@@ -209,6 +248,19 @@ void main() {
     expect(
       _props(body('/v1/classes/{id}', 'patch')),
       containsAll(input.toJson().keys),
+    );
+
+    // Lệnh đổi giờ / hủy / bù (US-2.2): khóa body khớp hợp đồng.
+    expect(
+      _props(_schema('RescheduleSessionRequest')),
+      containsAll(['startsAt', 'reason']),
+    );
+    expect(_props(_schema('CancelSessionRequest')), contains('reason'));
+    expect(_props(_schema('MakeupSessionRequest')), contains('startsAt'));
+    expect(
+      ((_schema('CancelSessionRequest')['properties'] as Map)['reason']
+          as Map)['maxLength'],
+      300,
     );
 
     final rule = body('/v1/classes/{id}/schedule-rules', 'put');
@@ -282,8 +334,15 @@ void main() {
           to: '2027-02-12',
           classId: 'c1',
         );
+        await repo.reschedule(
+          'x1',
+          startsAt: '2099-12-18T18:00:00+07:00',
+          reason: 'Bận',
+        );
+        await repo.cancel('x1', reason: 'Bận');
+        await repo.makeup('x1', startsAt: '2099-12-20T18:00:00+07:00');
 
-        expect(adapter.requests, hasLength(10));
+        expect(adapter.requests, hasLength(13));
         for (final r in adapter.requests) {
           _operation(r.method, r.path); // ném nếu hợp đồng không có
           expect(

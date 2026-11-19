@@ -796,4 +796,221 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String scheduleCancelReason(String reason) {
     return 'Reason: $reason';
   }
+
+  @override
+  String get studentsEditTitle => 'Edit student';
+
+  @override
+  String get studentsGuardianRelation => 'Relationship';
+
+  @override
+  String get studentsRelationFather => 'Father';
+
+  @override
+  String get studentsRelationMother => 'Mother';
+
+  @override
+  String get studentsRelationGuardian => 'Guardian';
+
+  @override
+  String get inviteStatusNotInvited => 'Not invited';
+
+  @override
+  String get inviteStatusInvited => 'Invited';
+
+  @override
+  String get inviteStatusActivated => 'Activated';
+
+  @override
+  String get inviteStatusExpired => 'Expired';
+
+  @override
+  String get inviteShare => 'Share link';
+
+  @override
+  String get inviteResend => 'Resend link';
+
+  @override
+  String get rosterNoGuardians =>
+      'No parent yet. Tap the student name to add one.';
+
+  @override
+  String rosterGuardianLine(String relation, String name) {
+    return '$relation: $name';
+  }
+
+  @override
+  String rosterGuardianSemantics(String who, String status) {
+    return '$who, $status';
+  }
+
+  @override
+  String rosterEditSemantics(String name) {
+    return 'Edit student $name';
+  }
+
+  @override
+  String inviteSheetFor(String guardian, String student) {
+    return 'Invite $guardian, parent of $student';
+  }
+
+  @override
+  String get inviteQrLabel => 'Invitation QR code';
+
+  @override
+  String get inviteCodeLabel => 'Code to type in';
+
+  @override
+  String inviteCodeSemantics(String code) {
+    return 'Invitation code: $code';
+  }
+
+  @override
+  String get inviteExpiryNote =>
+      'The link works for 7 days and the typed code for 48 hours.';
+
+  @override
+  String get inviteOldLinkNote =>
+      'This parent\'s previous link, if any, no longer works.';
+
+  @override
+  String inviteShareMessage(
+    String guardian,
+    String student,
+    String url,
+    String code,
+  ) {
+    return 'Hello $guardian, I would like to invite you to follow $student\'s learning on TeachHub.\nOpen the link to accept: $url\nOr enter code $code in the TeachHub app (the code works for 48 hours).';
+  }
+
+  @override
+  String get inviteAllEntry => 'Invite all parents not yet activated';
+
+  @override
+  String get inviteAllTitle => 'Invite class parents';
+
+  @override
+  String get inviteAllEmpty => 'No parents left to invite.';
+
+  @override
+  String inviteAllProgress(int done, int total) {
+    return 'Created $done/$total links';
+  }
+
+  @override
+  String get inviteAllHint =>
+      'Tap Share to send to each parent in turn. Parents with a valid invitation are skipped.';
+
+  @override
+  String get inviteAllPausedNetwork =>
+      'Stopped after repeated network errors. Check your connection, then tap Continue.';
+
+  @override
+  String inviteAllPausedRate(int seconds) {
+    return 'Stopped because of too many requests. Wait about $seconds seconds, then tap Continue.';
+  }
+
+  @override
+  String get inviteAllPausedRateNoWait =>
+      'Stopped because of too many requests. Wait a moment, then tap Continue.';
+
+  @override
+  String get inviteAllResume => 'Continue';
+
+  @override
+  String get inviteAllWaiting => 'Not created yet';
+
+  @override
+  String get inviteAllCreating => 'Creating link…';
+
+  @override
+  String get inviteAllShareAgain => 'Share again';
+
+  @override
+  String get inviteAllShowQr => 'Show QR code';
+
+  @override
+  String get inviteAllSharedMark => 'Share opened';
+
+  @override
+  String get sessionActionReschedule => 'Reschedule';
+
+  @override
+  String get sessionActionCancel => 'Cancel session';
+
+  @override
+  String get sessionActionMakeup => 'Add makeup';
+
+  @override
+  String get sessionRescheduleTitle => 'Reschedule session';
+
+  @override
+  String get sessionCancelTitle => 'Cancel this session?';
+
+  @override
+  String get sessionCancelBody =>
+      'The class\'s parents will be notified that this session is cancelled.';
+
+  @override
+  String get sessionMakeupTitle => 'Add makeup session';
+
+  @override
+  String get sessionPickDate => 'Date';
+
+  @override
+  String get sessionPickTime => 'Start time';
+
+  @override
+  String get sessionReasonLabel => 'Reason (optional)';
+
+  @override
+  String get sessionConfirmReschedule => 'Reschedule';
+
+  @override
+  String get sessionConfirmCancel => 'Cancel session';
+
+  @override
+  String get sessionConfirmMakeup => 'Add makeup';
+
+  @override
+  String get sessionClose => 'Close';
+
+  @override
+  String get sessionErrPast => 'The new time must be in the future.';
+
+  @override
+  String get sessionErrCancelled =>
+      'This session is cancelled, so it cannot be rescheduled.';
+
+  @override
+  String get sessionHasAttendanceTitle => 'Attendance already taken';
+
+  @override
+  String get sessionHasAttendanceBody =>
+      'This session has attendance, so it cannot be cancelled yet. Open the attendance sheet to fix it, then cancel the session.';
+
+  @override
+  String get sessionOpenAttendance => 'Open attendance';
+
+  @override
+  String get sessionDoneRescheduled => 'Session rescheduled.';
+
+  @override
+  String get sessionDoneCancelled => 'Session cancelled.';
+
+  @override
+  String get sessionDoneMakeup => 'Makeup session added.';
+
+  @override
+  String sessionActionsLabel(String date, String start) {
+    return 'Actions for session on $date at $start';
+  }
+
+  @override
+  String sessionCancelReasonLine(String reason) {
+    return 'Cancel reason: $reason';
+  }
+
+  @override
+  String get todaySettings => 'Settings and account';
 }

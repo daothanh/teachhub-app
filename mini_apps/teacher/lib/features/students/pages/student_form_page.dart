@@ -22,17 +22,20 @@ class StudentFormPage extends StatelessWidget {
   );
 }
 
-/// Form kèm cubit, dùng cho trang riêng và bước 2 của onboarding.
+/// Form kèm cubit, dùng cho trang riêng và bước 2 của onboarding. Có [initial]
+/// thì là form sửa học viên đó (S4-FL-01).
 class StudentFormScope extends StatelessWidget {
-  const StudentFormScope({super.key, required this.onSaved});
+  const StudentFormScope({super.key, required this.onSaved, this.initial});
 
   /// Gọi với id học viên vừa tạo hoặc hồ sơ có sẵn được chọn.
   final ValueChanged<String> onSaved;
+  final Student? initial;
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-    create: (_) => StudentFormCubit(GetIt.I<StudentRepository>()),
-    child: StudentFormView(onSaved: onSaved),
+    create: (_) =>
+        StudentFormCubit(GetIt.I<StudentRepository>(), studentId: initial?.id),
+    child: StudentFormView(onSaved: onSaved, initial: initial),
   );
 }
 
@@ -46,6 +49,18 @@ String studentErrorMessage(MiniAppLocalizations l10n, ApiException e) =>
     };
 
 class _GuardianControllers {
+  _GuardianControllers([GuardianDraft? from])
+    : id = from?.id,
+      email = from?.email,
+      relation = from?.relation ?? GuardianRelation.guardian {
+    name.text = from?.fullName ?? '';
+    phone.text = from?.phone ?? '';
+  }
+
+  /// Phụ huynh có sẵn (giữ `id`, `email` khi sửa); null = người mới.
+  final String? id;
+  final String? email;
+  GuardianRelation relation;
   final name = TextEditingController();
   final phone = TextEditingController();
   void dispose() {
@@ -55,9 +70,10 @@ class _GuardianControllers {
 }
 
 class StudentFormView extends StatefulWidget {
-  const StudentFormView({super.key, required this.onSaved});
+  const StudentFormView({super.key, required this.onSaved, this.initial});
 
   final ValueChanged<String> onSaved;
+  final Student? initial;
 
   @override
   State<StudentFormView> createState() => _StudentFormViewState();
@@ -74,6 +90,31 @@ class _StudentFormViewState extends State<StudentFormView> {
   final _note = TextEditingController();
   final _guardians = <_GuardianControllers>[];
   DateTime? _dobValue;
+
+  bool get _editing => widget.initial != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final s = widget.initial;
+    if (s == null) return;
+    _name.text = s.fullName;
+    _school.text = s.school ?? '';
+    _note.text = s.note ?? '';
+    _dobValue = s.dob == null ? null : DateTime.tryParse(s.dob!);
+    _guardians.addAll([for (final g in s.guardians) _GuardianControllers(g)]);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Chữ ngày sinh theo locale nên chỉ dựng được khi đã có context.
+    if (_dobValue != null && _dob.text.isEmpty) {
+      _dob.text = MaterialLocalizations.of(
+        context,
+      ).formatCompactDate(_dobValue!);
+    }
+  }
 
   @override
   void dispose() {
@@ -98,7 +139,13 @@ class _StudentFormViewState extends State<StudentFormView> {
     note: _trimmed(_note),
     guardians: [
       for (final g in _guardians)
-        GuardianDraft(fullName: g.name.text.trim(), phone: _trimmed(g.phone)),
+        GuardianDraft(
+          id: g.id,
+          email: g.email,
+          relation: g.relation,
+          fullName: g.name.text.trim(),
+          phone: _trimmed(g.phone),
+        ),
     ],
   );
 
@@ -210,15 +257,17 @@ class _StudentFormViewState extends State<StudentFormView> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  onPressed: locked ? null : _importFromContacts,
-                  icon: const Icon(Icons.contacts_outlined),
-                  label: Text(l10n.contactsAdd),
+              if (!_editing) ...[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    onPressed: locked ? null : _importFromContacts,
+                    icon: const Icon(Icons.contacts_outlined),
+                    label: Text(l10n.contactsAdd),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
+              ],
               AppTextFormField(
                 controller: _name,
                 label: l10n.studentsFullName,
@@ -254,13 +303,14 @@ class _StudentFormViewState extends State<StudentFormView> {
               ),
               for (final (i, g) in _guardians.indexed) ...[
                 const SizedBox(height: 16),
-                Row(
+                // Wrap để chữ 200% đẩy nút xuống dòng thay vì tràn.
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        l10n.studentsGuardianTitle(i + 1),
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
+                    Text(
+                      l10n.studentsGuardianTitle(i + 1),
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                     TextButton(
                       onPressed: locked
@@ -280,6 +330,12 @@ class _StudentFormViewState extends State<StudentFormView> {
                   validator: (v) => (v ?? '').trim().isEmpty
                       ? l10n.studentsGuardianNameRequired
                       : null,
+                ),
+                const SizedBox(height: 12),
+                _RelationChips(
+                  value: g.relation,
+                  enabled: !locked,
+                  onChanged: (r) => setState(() => g.relation = r),
                 ),
                 const SizedBox(height: 12),
                 AppTextFormField(
@@ -314,6 +370,113 @@ class _StudentFormViewState extends State<StudentFormView> {
           ),
         );
       },
+    );
+  }
+}
+
+/// Chọn quan hệ (bố, mẹ, người giám hộ). Dùng `Wrap` để xuống dòng khi chữ lớn.
+class _RelationChips extends StatelessWidget {
+  const _RelationChips({
+    required this.value,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  final GuardianRelation value;
+  final bool enabled;
+  final ValueChanged<GuardianRelation> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    return Semantics(
+      container: true,
+      label: l10n.studentsGuardianRelation,
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 4,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text(
+            l10n.studentsGuardianRelation,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          for (final r in GuardianRelation.values)
+            ChoiceChip(
+              label: Text(guardianRelationLabel(l10n, r)),
+              selected: value == r,
+              onSelected: enabled ? (_) => onChanged(r) : null,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+String guardianRelationLabel(MiniAppLocalizations l10n, GuardianRelation r) =>
+    switch (r) {
+      GuardianRelation.father => l10n.studentsRelationFather,
+      GuardianRelation.mother => l10n.studentsRelationMother,
+      GuardianRelation.guardian => l10n.studentsRelationGuardian,
+    };
+
+/// [T07] bản sửa: tải hồ sơ đầy đủ (SĐT, phụ huynh) rồi hiện form. Route
+/// `/t/students/:id/edit?classId=…`. Đóng với `true` khi đã lưu.
+class StudentEditPage extends StatefulWidget {
+  const StudentEditPage({
+    super.key,
+    required this.studentId,
+    required this.classId,
+    this.status = 'active',
+  });
+
+  final String studentId;
+  final String classId;
+  final String status;
+
+  @override
+  State<StudentEditPage> createState() => _StudentEditPageState();
+}
+
+class _StudentEditPageState extends State<StudentEditPage> {
+  late Future<Student> _student = _load();
+
+  Future<Student> _load() => GetIt.I<StudentRepository>().find(
+    widget.studentId,
+    classId: widget.classId,
+    status: widget.status,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.studentsEditTitle)),
+      body: FutureBuilder<Student>(
+        future: _student,
+        builder: (context, snap) {
+          if (snap.connectionState != ConnectionState.done) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final data = snap.data;
+          if (data == null) {
+            final e = snap.error;
+            return AppEmptyState(
+              message: e is ApiException
+                  ? studentErrorMessage(l10n, e)
+                  : l10n.studentsErrorGeneric,
+              action: AppButton(
+                label: l10n.classesRetry,
+                onPressed: () => setState(() => _student = _load()),
+              ),
+            );
+          }
+          return StudentFormScope(
+            initial: data,
+            onSaved: (_) => context.pop(true),
+          );
+        },
+      ),
     );
   }
 }

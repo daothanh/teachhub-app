@@ -473,5 +473,86 @@ class AppLocalizationsEn extends AppLocalizations {
   String get waitlistErrorGeneric => 'Could not send. Try again later.';
 
   @override
+  String get settingsAccount => 'Account';
+
+  @override
+  String get deleteAccountEntry => 'Delete account';
+
+  @override
+  String get deleteAccountEntrySubtitle =>
+      'Permanently delete your account and personal data';
+
+  @override
+  String get deleteAccountTitle => 'Delete account';
+
+  @override
+  String get deleteAccountWarnHeading => 'This cannot be undone';
+
+  @override
+  String deleteAccountWarnBody(String email) {
+    return 'The account $email and your personal data will be deleted. Signing in again with this email creates a new account with none of the old data. Financial records are kept as required by regulation.';
+  }
+
+  @override
+  String deleteAccountPendingWarn(int count) {
+    return 'This device has $count unsynced items (attendance, changes). Deleting the account will lose them.';
+  }
+
+  @override
+  String get deleteAccountUnreadableWarn =>
+      'Could not check for unsynced data on this device. If there is any, it will be lost.';
+
+  @override
+  String get deleteAccountSendCode => 'Send confirmation code';
+
+  @override
+  String get deleteAccountSending => 'Sending code…';
+
+  @override
+  String get deleteAccountCodeHeading => 'Enter the confirmation code';
+
+  @override
+  String deleteAccountCodeSent(String email) {
+    return 'A 6-digit code was sent to $email. It is valid for 5 minutes.';
+  }
+
+  @override
+  String get deleteAccountConfirm => 'Delete account permanently';
+
+  @override
+  String get deleteAccountDeleting => 'Deleting…';
+
+  @override
+  String get deleteAccountResend => 'Resend code';
+
+  @override
+  String get deleteAccountErrNetwork => 'No connection. Try again later.';
+
+  @override
+  String deleteAccountErrRateLimited(int seconds) {
+    return 'Too many codes requested. Try again in $seconds seconds.';
+  }
+
+  @override
+  String get deleteAccountErrRateLimitedNoTime =>
+      'Too many codes requested. Try again in a few minutes.';
+
+  @override
+  String get deleteAccountErrOwnerHasStaff =>
+      'You own a workspace that still has other teachers. Transfer ownership or remove them before deleting your account.';
+
+  @override
+  String get deleteAccountErrActiveClasses =>
+      'You still have active classes. Archive all classes before deleting your account.';
+
+  @override
+  String get deleteAccountErrStale =>
+      'Data just changed. Reopen this screen and try again.';
+
+  @override
+  String get deleteAccountErrGeneric =>
+      'Could not delete the account. Try again later.';
+
+  @override
   String get consentLater => 'Later';
 }

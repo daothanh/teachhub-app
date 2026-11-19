@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -142,5 +144,13 @@ class ConsentCubit extends Cubit<ConsentState> {
   void clear() {
     _gen++;
     emit(const ConsentState());
+  }
+
+  /// Đổi người dùng trực tiếp (không qua đăng xuất). Vai trò đã tải xong thì
+  /// listener membership không phát lại nên phải tải lại ở đây, kẻo phụ huynh
+  /// mới kẹt ở splash.
+  void resetForNewUser({required bool hasParentRole}) {
+    clear();
+    if (hasParentRole) unawaited(load());
   }
 }

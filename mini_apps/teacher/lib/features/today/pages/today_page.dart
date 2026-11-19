@@ -67,6 +67,11 @@ class _TodayViewState extends State<_TodayView> {
         title: chip ?? Text(l10n.spaceTitle),
         centerTitle: false,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: l10n.todaySettings,
+            onPressed: () => context.push(TeachHubRoutes.settings),
+          ),
           if (chip == null)
             TextButton(
               onPressed: () => context.go(TeachHubRoutes.rolePicker),
@@ -254,6 +259,11 @@ class _SessionCard extends StatelessWidget {
                   ),
                 ],
               ),
+              if (session.isMakeup)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xs),
+                  child: Chip(label: Text(l10n.scheduleMakeup)),
+                ),
               const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
@@ -269,6 +279,14 @@ class _SessionCard extends StatelessWidget {
                     ),
                 ],
               ),
+              if (session.cancelled && session.cancelReason != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xs),
+                  child: Text(
+                    l10n.scheduleCancelReason(session.cancelReason!),
+                    style: text.bodySmall,
+                  ),
+                ),
             ],
           ),
         ),

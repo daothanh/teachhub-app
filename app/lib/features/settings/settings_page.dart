@@ -109,6 +109,31 @@ class SettingsPage extends StatelessWidget {
             SizedBox(height: 8.h),
             _AboutSection(isDark: isDark),
             SizedBox(height: 20.h),
+
+            // ── Account ─────────────────────────────────────────────────
+            _SectionHeader(title: l10n.settingsAccount),
+            SizedBox(height: 8.h),
+            _SettingsCard(
+              isDark: isDark,
+              children: [
+                ListTile(
+                  key: const Key('delete_account_tile'),
+                  leading: Icon(
+                    Icons.delete_forever_outlined,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  title: Text(
+                    l10n.deleteAccountEntry,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  subtitle: Text(l10n.deleteAccountEntrySubtitle),
+                  onTap: () => context.push(AppRoutes.deleteAccount),
+                ),
+              ],
+            ),
+            SizedBox(height: 20.h),
             AppButton(
               label: l10n.logout,
               variant: AppButtonVariant.outlineDanger,
@@ -143,12 +168,15 @@ class _SectionHeader extends StatelessWidget {
           ),
         ),
         SizedBox(width: 8.w),
-        Text(
-          title,
-          // TeachHub/Section: 12/16, đậm, chữ phụ.
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+        // Expanded để tiêu đề xuống dòng khi chữ phóng 200%.
+        Expanded(
+          child: Text(
+            title,
+            // TeachHub/Section: 12/16, đậm, chữ phụ.
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ],

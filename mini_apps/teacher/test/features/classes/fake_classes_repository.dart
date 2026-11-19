@@ -26,6 +26,26 @@ TeachClass sampleClass({
   createdAt: '2026-12-01T00:00:00.000Z',
 );
 
+ClassSession sampleSession({
+  String id = 'x1',
+  SessionStatus status = SessionStatus.planned,
+  bool isMakeup = false,
+  String? makeupOf,
+  String? cancelReason,
+  String date = '2026-12-15',
+}) => ClassSession(
+  id: id,
+  classId: 'c1',
+  className: 'Toán 9A',
+  sessionDate: date,
+  startsAt: '${date}T18:00:00+07:00',
+  endsAt: '${date}T19:30:00+07:00',
+  status: status,
+  isMakeup: isMakeup,
+  makeupOf: makeupOf,
+  cancelReason: cancelReason,
+);
+
 ApiException validationError(Map<String, List<String>> errors) => ApiException(
   code: ApiErrorCode.validationFailed,
   wireCode: 'VALIDATION_FAILED',
@@ -127,6 +147,56 @@ class FakeClassesRepository implements ClassesRepository {
     if (archiveError != null) throw archiveError!;
     return sampleClass(id: id, status: ClassStatus.archived);
   }
+
+  /// Lỗi/kết quả cho 3 lệnh buổi học; `calls` ghi `reschedule:id:startsAt`…
+  Object? sessionActionError;
+  ClassSession? sessionActionResult;
+
+  Future<ClassSession> _sessionAction(
+    String call,
+    String id,
+    String? key,
+  ) async {
+    calls.add(call);
+    keys.add(key);
+    if (sessionActionError != null) throw sessionActionError!;
+    return sessionActionResult ??
+        sessionItems.firstWhere(
+          (s) => s.id == id,
+          orElse: () => sampleSession(),
+        );
+  }
+
+  @override
+  Future<ClassSession> reschedule(
+    String sessionId, {
+    required String startsAt,
+    String? reason,
+    String? idempotencyKey,
+  }) => _sessionAction(
+    'reschedule:$sessionId:$startsAt:${reason ?? ''}',
+    sessionId,
+    idempotencyKey,
+  );
+
+  @override
+  Future<ClassSession> cancel(
+    String sessionId, {
+    String? reason,
+    String? idempotencyKey,
+  }) => _sessionAction(
+    'cancel:$sessionId:${reason ?? ''}',
+    sessionId,
+    idempotencyKey,
+  );
+
+  @override
+  Future<ClassSession> makeup(
+    String sessionId, {
+    required String startsAt,
+    String? idempotencyKey,
+  }) =>
+      _sessionAction('makeup:$sessionId:$startsAt', sessionId, idempotencyKey);
 
   @override
   Future<List<RosterEntry>> roster(String id) async => rosterItems;

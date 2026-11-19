@@ -785,4 +785,219 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String scheduleCancelReason(String reason) {
     return 'Lý do: $reason';
   }
+
+  @override
+  String get studentsEditTitle => 'Sửa học viên';
+
+  @override
+  String get studentsGuardianRelation => 'Quan hệ';
+
+  @override
+  String get studentsRelationFather => 'Bố';
+
+  @override
+  String get studentsRelationMother => 'Mẹ';
+
+  @override
+  String get studentsRelationGuardian => 'Người giám hộ';
+
+  @override
+  String get inviteStatusNotInvited => 'Chưa mời';
+
+  @override
+  String get inviteStatusInvited => 'Đã mời';
+
+  @override
+  String get inviteStatusActivated => 'Đã kích hoạt';
+
+  @override
+  String get inviteStatusExpired => 'Hết hạn';
+
+  @override
+  String get inviteShare => 'Chia sẻ link';
+
+  @override
+  String get inviteResend => 'Gửi lại link';
+
+  @override
+  String get rosterNoGuardians => 'Chưa có phụ huynh. Chạm tên em để thêm.';
+
+  @override
+  String rosterGuardianLine(String relation, String name) {
+    return '$relation: $name';
+  }
+
+  @override
+  String rosterGuardianSemantics(String who, String status) {
+    return '$who, $status';
+  }
+
+  @override
+  String rosterEditSemantics(String name) {
+    return 'Sửa học viên $name';
+  }
+
+  @override
+  String inviteSheetFor(String guardian, String student) {
+    return 'Mời $guardian, phụ huynh của $student';
+  }
+
+  @override
+  String get inviteQrLabel => 'Mã QR lời mời';
+
+  @override
+  String get inviteCodeLabel => 'Mã nhập tay';
+
+  @override
+  String inviteCodeSemantics(String code) {
+    return 'Mã mời: $code';
+  }
+
+  @override
+  String get inviteExpiryNote =>
+      'Link dùng được 7 ngày, mã nhập tay dùng được 48 giờ.';
+
+  @override
+  String get inviteOldLinkNote =>
+      'Link cũ của phụ huynh này (nếu có) không dùng được nữa.';
+
+  @override
+  String inviteShareMessage(
+    String guardian,
+    String student,
+    String url,
+    String code,
+  ) {
+    return 'Chào $guardian, mình mời bạn theo dõi việc học của $student trên TeachHub.\nMở link để nhận lời mời: $url\nHoặc nhập mã $code trong ứng dụng TeachHub (mã dùng được 48 giờ).';
+  }
+
+  @override
+  String get inviteAllEntry => 'Mời tất cả phụ huynh chưa kích hoạt';
+
+  @override
+  String get inviteAllTitle => 'Mời phụ huynh của lớp';
+
+  @override
+  String get inviteAllEmpty => 'Không còn phụ huynh nào cần mời.';
+
+  @override
+  String inviteAllProgress(int done, int total) {
+    return 'Đã tạo $done/$total link';
+  }
+
+  @override
+  String get inviteAllHint =>
+      'Bấm Chia sẻ để gửi lần lượt cho từng phụ huynh. Phụ huynh đang có lời mời còn hạn được bỏ qua.';
+
+  @override
+  String get inviteAllPausedNetwork =>
+      'Đã dừng vì lỗi mạng liên tiếp. Kiểm tra kết nối rồi bấm Tiếp tục.';
+
+  @override
+  String inviteAllPausedRate(int seconds) {
+    return 'Đã dừng vì gửi quá nhiều yêu cầu. Chờ khoảng $seconds giây rồi bấm Tiếp tục.';
+  }
+
+  @override
+  String get inviteAllPausedRateNoWait =>
+      'Đã dừng vì gửi quá nhiều yêu cầu. Chờ một lát rồi bấm Tiếp tục.';
+
+  @override
+  String get inviteAllResume => 'Tiếp tục';
+
+  @override
+  String get inviteAllWaiting => 'Chưa tạo';
+
+  @override
+  String get inviteAllCreating => 'Đang tạo link…';
+
+  @override
+  String get inviteAllShareAgain => 'Chia sẻ lại';
+
+  @override
+  String get inviteAllShowQr => 'Xem mã QR';
+
+  @override
+  String get inviteAllSharedMark => 'Đã mở chia sẻ';
+
+  @override
+  String get sessionActionReschedule => 'Đổi giờ';
+
+  @override
+  String get sessionActionCancel => 'Hủy buổi';
+
+  @override
+  String get sessionActionMakeup => 'Tạo buổi bù';
+
+  @override
+  String get sessionRescheduleTitle => 'Đổi giờ buổi học';
+
+  @override
+  String get sessionCancelTitle => 'Hủy buổi học?';
+
+  @override
+  String get sessionCancelBody =>
+      'Phụ huynh của lớp sẽ nhận thông báo buổi này đã hủy.';
+
+  @override
+  String get sessionMakeupTitle => 'Tạo buổi bù';
+
+  @override
+  String get sessionPickDate => 'Ngày';
+
+  @override
+  String get sessionPickTime => 'Giờ bắt đầu';
+
+  @override
+  String get sessionReasonLabel => 'Lý do (không bắt buộc)';
+
+  @override
+  String get sessionConfirmReschedule => 'Đổi giờ';
+
+  @override
+  String get sessionConfirmCancel => 'Hủy buổi';
+
+  @override
+  String get sessionConfirmMakeup => 'Tạo buổi bù';
+
+  @override
+  String get sessionClose => 'Đóng';
+
+  @override
+  String get sessionErrPast => 'Giờ mới phải ở tương lai.';
+
+  @override
+  String get sessionErrCancelled => 'Buổi này đã hủy nên không đổi giờ được.';
+
+  @override
+  String get sessionHasAttendanceTitle => 'Buổi đã có điểm danh';
+
+  @override
+  String get sessionHasAttendanceBody =>
+      'Buổi này đã có điểm danh nên chưa hủy được. Mở bảng điểm danh để sửa lại, rồi hủy buổi sau.';
+
+  @override
+  String get sessionOpenAttendance => 'Mở điểm danh';
+
+  @override
+  String get sessionDoneRescheduled => 'Đã đổi giờ buổi học.';
+
+  @override
+  String get sessionDoneCancelled => 'Đã hủy buổi học.';
+
+  @override
+  String get sessionDoneMakeup => 'Đã tạo buổi bù.';
+
+  @override
+  String sessionActionsLabel(String date, String start) {
+    return 'Thao tác buổi $date lúc $start';
+  }
+
+  @override
+  String sessionCancelReasonLine(String reason) {
+    return 'Lý do hủy: $reason';
+  }
+
+  @override
+  String get todaySettings => 'Cài đặt và tài khoản';
 }

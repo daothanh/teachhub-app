@@ -74,6 +74,15 @@ class TeacherLocalData {
     return pendingOutboxCount(await _db());
   }
 
+  /// Đặt cờ xóa trước khi gọi `DELETE /me`: app chết sau khi server đã xóa thì
+  /// lần khởi động sau [retryPendingWipe] vẫn dọn máy.
+  Future<void> markWipePending() =>
+      _serial(() => _keys.write(wipePendingKey, '1'));
+
+  /// Bỏ cờ khi `DELETE /me` bị từ chối hẳn (tài khoản còn nguyên).
+  Future<void> clearWipePending() =>
+      _serial(() => _keys.delete(wipePendingKey));
+
   /// Xóa CSDL và khóa. Ghi cờ trước: lỗi giữa chừng thì [retryPendingWipe]
   /// xóa nốt ở lần sau. Gọi đồng thời nhiều lần chỉ chạy lần lượt.
   Future<void> wipe() => _serial(_wipe);

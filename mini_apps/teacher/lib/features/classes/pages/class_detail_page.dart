@@ -10,6 +10,8 @@ import '../cubit/classes_list_cubit.dart' show ClassesLoad;
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
 import '../widgets/classes_error_text.dart';
+import '../widgets/roster_tile.dart';
+import '../widgets/session_actions.dart';
 
 /// T06a: chi tiết lớp, quy tắc lặp, buổi sắp tới, học viên, lưu trữ.
 class ClassDetailPage extends StatelessWidget {
@@ -187,7 +189,8 @@ class _Body extends StatelessWidget {
                   Text(l10n.classesSessionsLoadFailed)
                 else if (state.sessions.isEmpty)
                   Text(l10n.classesNoSessions),
-                for (final s in state.sessions) _SessionTile(session: s),
+                for (final s in state.sessions)
+                  _SessionTile(session: s, all: state.sessions),
               ],
               _Section(l10n.classesSectionStudents),
               if (state.roster.isEmpty) Text(l10n.classesNoStudents),
@@ -199,15 +202,11 @@ class _Body extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           sliver: SliverList.builder(
             itemCount: state.roster.length,
-            itemBuilder: (context, i) {
-              final e = state.roster[i];
-              return AppListTile(
-                title: e.fullName,
-                trailingText: e.studentStatus == 'paused'
-                    ? l10n.classesStudentPaused
-                    : null,
-              );
-            },
+            itemBuilder: (context, i) => RosterTile(
+              classId: cls.id,
+              entry: state.roster[i],
+              onChanged: context.read<ClassDetailCubit>().load,
+            ),
           ),
         ),
         SliverPadding(
@@ -229,6 +228,25 @@ class _Body extends StatelessWidget {
                     }
                   },
                 ),
+                if (state.roster.any(
+                  (e) => e.guardians.any((g) => g.needsInvite),
+                ))
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.sm),
+                    child: AppButton(
+                      label: l10n.inviteAllEntry,
+                      variant: AppButtonVariant.outlinePrimary,
+                      width: double.infinity,
+                      onPressed: () async {
+                        await context.push<void>(
+                          ClassesRoutes.inviteAll(cls.id),
+                        );
+                        if (context.mounted) {
+                          context.read<ClassDetailCubit>().load();
+                        }
+                      },
+                    ),
+                  ),
               ],
             ]),
           ),
@@ -272,8 +290,9 @@ class _Info extends StatelessWidget {
 }
 
 class _SessionTile extends StatelessWidget {
-  const _SessionTile({required this.session});
+  const _SessionTile({required this.session, required this.all});
   final ClassSession session;
+  final List<ClassSession> all;
 
   @override
   Widget build(BuildContext context) {
@@ -283,15 +302,31 @@ class _SessionTile extends StatelessWidget {
       SessionStatus.taught => l10n.classesSessionTaught,
       SessionStatus.cancelled => l10n.classesSessionCancelled,
     };
-    return AppListTile(
+    final tile = AppListTile(
       title: l10n.classesSessionLine(
         displayDate(session.sessionDate),
         session.startTime,
         session.endTime,
       ),
-      subtitle: session.isMakeup
-          ? '$status · ${l10n.classesSessionMakeup}'
-          : status,
+      subtitle: [
+        if (session.isMakeup)
+          '$status · ${l10n.classesSessionMakeup}'
+        else
+          status,
+        if (session.status == SessionStatus.cancelled &&
+            session.cancelReason != null)
+          l10n.sessionCancelReasonLine(session.cancelReason!),
+      ].join('\n'),
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        tile,
+        Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: SessionActionBar(session: session, sessions: all),
+        ),
+      ],
     );
   }
 }

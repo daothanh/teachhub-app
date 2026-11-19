@@ -27,7 +27,10 @@ import 'features/onboarding/data/onboarding_repository.dart';
 import 'features/onboarding/pages/onboarding_page.dart';
 import 'features/schedule/data/schedule_repository.dart';
 import 'features/schedule/schedule_routes.dart';
+import 'features/invites/data/invite_repository.dart';
+import 'features/invites/data/invite_sharer.dart';
 import 'features/students/data/student_repository.dart';
+import 'features/students/students_routes.dart';
 import 'features/students/pages/student_form_page.dart';
 import 'features/today/pages/today_page.dart';
 import 'l10n/l10n.dart';
@@ -82,6 +85,7 @@ class TeacherController {
       ],
     ),
     ...classesRoutes(moduleId),
+    ...studentsRoutes(moduleId),
     ...attendanceRoutes(moduleId),
     ...scheduleRoutes(moduleId),
   ];
@@ -107,6 +111,16 @@ class TeacherController {
     if (!getIt.isRegistered<StudentRepository>()) {
       getIt.registerLazySingleton<StudentRepository>(
         () => DioStudentRepository(api()),
+      );
+    }
+    if (!getIt.isRegistered<InviteRepository>()) {
+      getIt.registerLazySingleton<InviteRepository>(
+        () => DioInviteRepository(api()),
+      );
+    }
+    if (!getIt.isRegistered<InviteSharer>()) {
+      getIt.registerLazySingleton<InviteSharer>(
+        () => const SharePlusInviteSharer(),
       );
     }
     if (!getIt.isRegistered<AttendanceRepository>()) {
@@ -248,6 +262,9 @@ class TeacherController {
     await backgroundSync?.cancel();
     await localData.wipe();
   }
+
+  Future<void> markWipePending() => localData.markWipePending();
+  Future<void> clearWipePending() => localData.clearWipePending();
 
   Future<void> retryPendingWipe() => localData.retryPendingWipe();
   Future<void> claimDatabaseFor(String userId) => localData.claimFor(userId);

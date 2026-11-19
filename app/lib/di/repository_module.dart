@@ -11,6 +11,7 @@ import '../features/center_waitlist/center_waitlist_repository.dart';
 import '../features/auth/auth_cubit.dart';
 import '../features/invite/invite_repository.dart';
 import '../features/auth/teachhub_user.dart';
+import '../features/settings/delete_account/account_repository.dart';
 
 Future<void> repositoryModule(GetIt getIt) async {
   getIt
@@ -27,6 +28,9 @@ Future<void> repositoryModule(GetIt getIt) async {
       () => DioCenterWaitlistRepository(
         getIt<Dio>(instanceName: TeachHubDiKey.api),
       ),
+    )
+    ..registerLazySingleton<AccountRepository>(
+      () => DioAccountRepository(getIt<Dio>(instanceName: TeachHubDiKey.api)),
     )
     ..registerLazySingleton<InviteRepository>(
       () => DioInviteRepository(getIt<Dio>(instanceName: TeachHubDiKey.api)),
