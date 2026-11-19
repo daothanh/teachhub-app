@@ -95,6 +95,18 @@ void main() {
     ]);
   });
 
+  test('refreshSessions lưu lý do hủy', () async {
+    server.sessions = [
+      {
+        ...session(s1, '2026-11-18', status: 'cancelled'),
+        'cancelReason': 'Nghỉ lễ',
+      },
+    ];
+    await cache.refreshSessions('2026-11-18', '2026-11-18');
+    final rows = await cache.watchSessions('2026-11-18', '2026-11-18').first;
+    expect(rows.single.cancelReason, 'Nghỉ lễ');
+  });
+
   test(
     'buổi biến mất khỏi server bị bỏ, trừ buổi còn mutation chưa gửi',
     () async {

@@ -405,5 +405,48 @@
   "contactsRowSaving": "Đang lưu…",
   "contactsRowFailed": "Chưa lưu được",
   "contactsRowDuplicate": "Có thể trùng hồ sơ",
-  "contactsRowReview": "Xem hồ sơ trùng"
+  "contactsRowReview": "Xem hồ sơ trùng",
+  "todayScheduleEntry": "Lịch",
+  "scheduleTitle": "Lịch",
+  "scheduleModeDay": "Ngày",
+  "scheduleModeWeek": "Tuần",
+  "schedulePrevious": "Trước",
+  "scheduleNext": "Sau",
+  "scheduleToday": "Hôm nay",
+  "scheduleDayHeading": "{weekday}, {date}",
+  "@scheduleDayHeading": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleWeekRange": "{from} – {to}",
+  "@scheduleWeekRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleOfflineBanner": "Đang ngoại tuyến. Lịch hiển thị là bản đã lưu gần nhất.",
+  "scheduleEmpty": "Không có buổi nào trong khoảng này",
+  "scheduleLoadFailed": "Chưa tải được lịch.",
+  "scheduleRetry": "Thử lại",
+  "scheduleCancelled": "Đã hủy",
+  "scheduleMakeup": "Buổi bù",
+  "scheduleCancelReason": "Lý do: {reason}",
+  "@scheduleCancelReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  }
 }

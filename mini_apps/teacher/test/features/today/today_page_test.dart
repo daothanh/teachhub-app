@@ -10,6 +10,7 @@ import 'package:teacher/features/attendance/data/attendance_repository.dart';
 import 'package:teacher/features/classes/classes_routes.dart';
 import 'package:teacher/features/onboarding/data/onboarding_models.dart';
 import 'package:teacher/features/onboarding/data/onboarding_repository.dart';
+import 'package:teacher/features/schedule/schedule_routes.dart';
 import 'package:teacher/features/today/pages/today_page.dart';
 import 'package:teacher/teacher.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
@@ -69,6 +70,10 @@ GoRouter routerFor(
         visited?.add(s.uri.toString());
         return const Text('onboarding-page');
       },
+    ),
+    GoRoute(
+      path: ScheduleRoutes.schedule,
+      builder: (_, _) => const Text('schedule-page'),
     ),
     GoRoute(
       path: ClassesRoutes.list,
@@ -221,6 +226,13 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('T05: có lối vào Lịch ngay trên màn Hôm nay', (tester) async {
+    await pumpRouter(tester, routerFor(FakeAttendanceRepository()));
+    await tester.tap(find.text('Lịch'));
+    await tester.pumpAndSettle();
+    expect(find.text('schedule-page'), findsOneWidget);
+  });
 
   testWidgets(
     'AC-4: có lối vào danh sách lớp và nút đổi vai trò khi chạy riêng',

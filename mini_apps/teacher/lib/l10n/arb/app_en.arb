@@ -405,5 +405,48 @@
   "contactsRowSaving": "Saving…",
   "contactsRowFailed": "Not saved",
   "contactsRowDuplicate": "Possible duplicate",
-  "contactsRowReview": "Review duplicate"
+  "contactsRowReview": "Review duplicate",
+  "todayScheduleEntry": "Schedule",
+  "scheduleTitle": "Schedule",
+  "scheduleModeDay": "Day",
+  "scheduleModeWeek": "Week",
+  "schedulePrevious": "Previous",
+  "scheduleNext": "Next",
+  "scheduleToday": "Today",
+  "scheduleDayHeading": "{weekday}, {date}",
+  "@scheduleDayHeading": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleWeekRange": "{from} – {to}",
+  "@scheduleWeekRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleOfflineBanner": "You're offline. This is the last saved schedule.",
+  "scheduleEmpty": "No sessions in this period",
+  "scheduleLoadFailed": "Could not load the schedule.",
+  "scheduleRetry": "Try again",
+  "scheduleCancelled": "Cancelled",
+  "scheduleMakeup": "Make-up session",
+  "scheduleCancelReason": "Reason: {reason}",
+  "@scheduleCancelReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  }
 }

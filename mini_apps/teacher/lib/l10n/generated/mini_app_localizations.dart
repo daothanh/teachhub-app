@@ -1348,6 +1348,102 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Xem hồ sơ trùng'**
   String get contactsRowReview;
+
+  /// No description provided for @todayScheduleEntry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch'**
+  String get todayScheduleEntry;
+
+  /// No description provided for @scheduleTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch'**
+  String get scheduleTitle;
+
+  /// No description provided for @scheduleModeDay.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày'**
+  String get scheduleModeDay;
+
+  /// No description provided for @scheduleModeWeek.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tuần'**
+  String get scheduleModeWeek;
+
+  /// No description provided for @schedulePrevious.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trước'**
+  String get schedulePrevious;
+
+  /// No description provided for @scheduleNext.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sau'**
+  String get scheduleNext;
+
+  /// No description provided for @scheduleToday.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hôm nay'**
+  String get scheduleToday;
+
+  /// No description provided for @scheduleDayHeading.
+  ///
+  /// In vi, this message translates to:
+  /// **'{weekday}, {date}'**
+  String scheduleDayHeading(String weekday, String date);
+
+  /// No description provided for @scheduleWeekRange.
+  ///
+  /// In vi, this message translates to:
+  /// **'{from} – {to}'**
+  String scheduleWeekRange(String from, String to);
+
+  /// No description provided for @scheduleOfflineBanner.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang ngoại tuyến. Lịch hiển thị là bản đã lưu gần nhất.'**
+  String get scheduleOfflineBanner;
+
+  /// No description provided for @scheduleEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có buổi nào trong khoảng này'**
+  String get scheduleEmpty;
+
+  /// No description provided for @scheduleLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa tải được lịch.'**
+  String get scheduleLoadFailed;
+
+  /// No description provided for @scheduleRetry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thử lại'**
+  String get scheduleRetry;
+
+  /// No description provided for @scheduleCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy'**
+  String get scheduleCancelled;
+
+  /// No description provided for @scheduleMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi bù'**
+  String get scheduleMakeup;
+
+  /// No description provided for @scheduleCancelReason.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do: {reason}'**
+  String scheduleCancelReason(String reason);
 }
 
 class _MiniAppLocalizationsDelegate
