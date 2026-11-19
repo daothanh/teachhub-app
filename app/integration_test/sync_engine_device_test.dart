@@ -15,6 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tasco_storage/tasco_storage.dart';
 import 'package:teacher/data/local_db/teacher_database.dart';
 import 'package:teacher/data/sync/connectivity.dart';
+import 'package:teacher/data/sync/enqueue_attendance.dart';
 import 'package:teacher/data/sync/sync_engine.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
@@ -57,15 +58,15 @@ class FakeEndpoint {
   Future<void> stop() async => _server?.close(force: true);
 }
 
-/// Transport tạm cho spike; S3-FL-08 dùng Dio `TeachHubDiKey.api`.
-SyncTransport httpTransport(HttpClient client, Uri endpoint) => (batch) async {
+/// Transport tối giản cho spike (HttpClient trần, không qua Dio của host).
+SyncTransport httpTransport(HttpClient client, Uri endpoint) => (req) async {
   try {
-    final req = await client.postUrl(endpoint);
-    req.headers.contentType = ContentType.json;
-    req.write(
+    final post = await client.postUrl(endpoint);
+    post.headers.contentType = ContentType.json;
+    post.write(
       jsonEncode({
         'mutations': [
-          for (final m in batch)
+          for (final m in req.mutations)
             {
               'clientMutationId': m.clientMutationId,
               'clientUpdatedAt': m.clientUpdatedAt.toIso8601String(),
@@ -74,18 +75,21 @@ SyncTransport httpTransport(HttpClient client, Uri endpoint) => (batch) async {
         ],
       }),
     );
-    final res = await req.close();
+    final res = await post.close();
     final body = jsonDecode(await utf8.decodeStream(res));
     if (res.statusCode != 200) {
       throw ApiException.fromResponse(res.statusCode, body);
     }
-    return {
-      for (final r in (body as Map)['results'] as List)
-        r['clientMutationId'] as String: (
-          result: SyncResult.values.byName(r['result'] as String),
-          errorCode: r['errorCode'] as String?,
-        ),
-    };
+    return SyncResponse(
+      serverTime: DateTime.now().toUtc(),
+      results: {
+        for (final r in (body as Map)['results'] as List)
+          r['clientMutationId'] as String: MutationResult(
+            SyncResult.values.byName(r['result'] as String),
+            errorCode: r['errorCode'] as String?,
+          ),
+      },
+    );
   } on IOException {
     throw const ApiException.network();
   }
@@ -131,17 +135,16 @@ void main() {
           'cm-${DateTime.now().microsecondsSinceEpoch}-$i',
       ];
       final sw = Stopwatch()..start();
-      await db.batch(
-        (b) => b.insertAll(db.outboxMutations, [
-          for (final (i, id) in ids.indexed)
-            OutboxMutationsCompanion.insert(
-              clientMutationId: id,
-              entity: 'attendance',
-              payload: jsonEncode({'studentId': 's$i', 'status': 'present'}),
-              clientUpdatedAt: DateTime.now().toUtc(),
-            ),
-        ]),
-      );
+      for (final (i, id) in ids.indexed) {
+        await enqueueAttendance(
+          db,
+          sessionId: 'session-1',
+          studentId: 's$i',
+          status: 'present',
+          clientUpdatedAt: DateTime.now().toUtc(),
+          clientMutationId: id,
+        );
+      }
       note(
         'đã lưu ${ids.length} mutation khi mất mạng (${sw.elapsedMilliseconds} ms)',
       );
