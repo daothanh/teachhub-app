@@ -205,10 +205,13 @@ class _RoleCard extends StatelessWidget {
     );
 
     if (comingSoon != null) {
-      return DashedBorder(
-        color: context.teachHubColors.warningBorder,
-        radius: tokens.cardRadius,
-        child: InkWell(borderRadius: radius, onTap: onTap, child: content),
+      return Semantics(
+        button: onTap != null,
+        child: DashedBorder(
+          color: context.teachHubColors.warningBorder,
+          radius: tokens.cardRadius,
+          child: InkWell(borderRadius: radius, onTap: onTap, child: content),
+        ),
       );
     }
     return Semantics(

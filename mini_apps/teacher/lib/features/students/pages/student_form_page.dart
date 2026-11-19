@@ -112,9 +112,7 @@ class _StudentFormViewState extends State<StudentFormView> {
     if (picked == null) return;
     setState(() {
       _dobValue = picked;
-      _dob.text =
-          '${picked.day.toString().padLeft(2, '0')}/'
-          '${picked.month.toString().padLeft(2, '0')}/${picked.year}';
+      _dob.text = MaterialLocalizations.of(context).formatCompactDate(picked);
     });
   }
 
@@ -127,6 +125,15 @@ class _StudentFormViewState extends State<StudentFormView> {
   Future<void> _showDuplicate(List<StudentCandidate> candidates) async {
     final cubit = context.read<StudentFormCubit>();
     final l10n = context.miniAppL10n;
+    // Chỉ nhận lần bấm đầu: tránh gửi hai lần khi bấm nhanh.
+    var acted = false;
+    void once(BuildContext ctx, VoidCallback action) {
+      if (acted) return;
+      acted = true;
+      Navigator.pop(ctx);
+      action();
+    }
+
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -138,37 +145,29 @@ class _StudentFormViewState extends State<StudentFormView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(l10n.studentsDuplicateBody),
-              for (final c in candidates)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(c.fullName),
-                  subtitle: Text(
-                    [c.dob, c.school].whereType<String>().join(' · '),
-                  ),
-                  trailing: TextButton(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      cubit.pickExisting(c);
-                    },
+              for (final c in candidates) ...[
+                const SizedBox(height: 12),
+                Text(c.fullName, style: Theme.of(ctx).textTheme.titleSmall),
+                Text([c.dob, c.school].whereType<String>().join(' · ')),
+                const SizedBox(height: 4),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () => once(ctx, () => cubit.pickExisting(c)),
                     child: Text(l10n.studentsDuplicateSame),
                   ),
                 ),
+              ],
             ],
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              cubit.dismissDuplicate();
-            },
+            onPressed: () => once(ctx, cubit.dismissDuplicate),
             child: Text(l10n.studentsDuplicateCancel),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              cubit.confirmNew();
-            },
+            onPressed: () => once(ctx, cubit.confirmNew),
             child: Text(l10n.studentsDuplicateNew),
           ),
         ],
@@ -196,6 +195,8 @@ class _StudentFormViewState extends State<StudentFormView> {
       },
       builder: (context, state) {
         final busy = state.status == StudentFormStatus.submitting;
+        // Đã lưu thì khóa form: bấm lại sẽ tạo học viên thứ hai.
+        final locked = state.status == StudentFormStatus.success;
         return Form(
           key: _formKey,
           child: ListView(
@@ -205,6 +206,7 @@ class _StudentFormViewState extends State<StudentFormView> {
                 controller: _name,
                 label: l10n.studentsFullName,
                 required: true,
+                enabled: !locked,
                 maxLength: 120,
                 validator: (v) => (v ?? '').trim().isEmpty
                     ? l10n.studentsFullNameRequired
@@ -215,17 +217,20 @@ class _StudentFormViewState extends State<StudentFormView> {
                 controller: _dob,
                 label: l10n.studentsDob,
                 readOnly: true,
+                enabled: !locked,
                 onTap: _pickDob,
               ),
               const SizedBox(height: 12),
               AppTextFormField(
                 controller: _school,
+                enabled: !locked,
                 label: l10n.studentsSchool,
                 maxLength: 120,
               ),
               const SizedBox(height: 12),
               AppTextFormField(
                 controller: _note,
+                enabled: !locked,
                 label: l10n.studentsNote,
                 maxLines: 3,
                 maxLength: 1000,
@@ -241,15 +246,18 @@ class _StudentFormViewState extends State<StudentFormView> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () => setState(() {
-                        _guardians.removeAt(i).dispose();
-                      }),
-                      child: Text(l10n.studentsRemoveGuardian),
+                      onPressed: locked
+                          ? null
+                          : () => setState(() {
+                              _guardians.removeAt(i).dispose();
+                            }),
+                      child: Text(l10n.studentsRemoveGuardian(i + 1)),
                     ),
                   ],
                 ),
                 AppTextFormField(
                   controller: g.name,
+                  enabled: !locked,
                   label: l10n.studentsGuardianName,
                   maxLength: 120,
                   validator: (v) => (v ?? '').trim().isEmpty
@@ -259,6 +267,7 @@ class _StudentFormViewState extends State<StudentFormView> {
                 const SizedBox(height: 12),
                 AppTextFormField(
                   controller: g.phone,
+                  enabled: !locked,
                   label: l10n.studentsGuardianPhone,
                   keyboardType: TextInputType.phone,
                   validator: (v) {
@@ -269,7 +278,7 @@ class _StudentFormViewState extends State<StudentFormView> {
                   },
                 ),
               ],
-              if (_guardians.length < _maxGuardians)
+              if (_guardians.length < _maxGuardians && !locked)
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton(
@@ -281,8 +290,8 @@ class _StudentFormViewState extends State<StudentFormView> {
               const SizedBox(height: 16),
               AppButton(
                 label: busy ? l10n.studentsSaving : l10n.studentsSave,
-                onPressed: busy ? null : _submit,
-                disabled: busy,
+                onPressed: busy || locked ? null : _submit,
+                disabled: busy || locked,
               ),
             ],
           ),

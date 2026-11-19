@@ -18,13 +18,16 @@ class _FakeRepo implements CenterWaitlistRepository {
   _FakeRepo([this.error]);
   final Object? error;
   final calls = <({String name, int count})>[];
+  final keys = <String>[];
 
   @override
   Future<void> join({
     required String centerName,
     required int teacherCount,
+    required String idempotencyKey,
   }) async {
     calls.add((name: centerName, count: teacherCount));
+    keys.add(idempotencyKey);
     if (error != null) throw error!;
   }
 }
@@ -139,6 +142,20 @@ void main() {
       expect(find.text('Gửi đăng ký'), findsOneWidget);
     });
   }
+
+  test(
+    'Idempotency-Key: thử lại cùng nội dung giữ khóa, đổi nội dung khóa mới',
+    () async {
+      final repo = _FakeRepo(const ApiException.network());
+      final cubit = CenterWaitlistCubit(repo);
+      addTearDown(cubit.close);
+      await cubit.submit(centerName: 'A', teacherCount: 3);
+      await cubit.submit(centerName: 'A', teacherCount: 3);
+      await cubit.submit(centerName: 'A', teacherCount: 4);
+      expect(repo.keys[0], repo.keys[1]);
+      expect(repo.keys[2], isNot(repo.keys[0]));
+    },
+  );
 
   testWidgets('"Dùng thử" có sẵn ngay trên form, không cần gửi', (
     tester,

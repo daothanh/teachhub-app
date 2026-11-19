@@ -23,7 +23,7 @@
   "studentsGuardianPhone": "Phone (optional)",
   "studentsGuardianPhoneInvalid": "The phone number looks wrong.",
   "studentsAddGuardian": "Add parent",
-  "studentsRemoveGuardian": "Remove parent",
+  "studentsRemoveGuardian": "Remove parent {n}",
   "studentsSave": "Save student",
   "studentsSaving": "Saving…",
   "studentsDuplicateTitle": "Is this the same student?",
@@ -66,5 +66,14 @@
   "onboardingErrorBusy": "Still processing. Try again in a moment.",
   "onboardingErrorValidation": "This step could not be saved. Check it.",
   "onboardingErrorNetwork": "No connection. Try again later.",
-  "onboardingErrorGeneric": "Could not save. Try again later."
+  "onboardingErrorGeneric": "Could not save. Try again later.",
+  "@studentsRemoveGuardian": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingCreateClassPending": "The class screen will be connected later.",
+  "onboardingStudentSaved": "Student saved. This step could not be recorded yet."
 }

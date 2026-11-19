@@ -24,26 +24,25 @@ class OnboardingPage extends StatelessWidget {
 
 /// Chỗ nối màn do nhánh `s2-fl-classes` làm (tạo lớp, đặt lịch).
 ///
-/// shortcut: placeholder chỉ có nút hoàn thành; sau khi merge s2-fl-classes thay
-/// bằng màn lớp (bước 1) và màn lịch (bước 3), gọi [onDone] khi người dùng lưu xong.
+/// shortcut: chưa có màn thật nên không có nút hoàn thành (không được ghi `done`
+/// khi chưa làm gì); sau khi merge s2-fl-classes thay bằng màn lớp (bước 1) và
+/// màn lịch (bước 3), truyền [onDone] để gọi khi người dùng lưu xong.
 class OnboardingPlaceholderStep extends StatelessWidget {
-  const OnboardingPlaceholderStep({
-    super.key,
-    required this.body,
-    required this.onDone,
-  });
+  const OnboardingPlaceholderStep({super.key, required this.body, this.onDone});
 
   final String body;
-  final VoidCallback onDone;
+  final VoidCallback? onDone;
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = context.miniAppL10n;
-    return AppEmptyState(
-      message: body,
-      action: AppButton(label: l10n.onboardingMarkDone, onPressed: onDone),
-    );
-  }
+  Widget build(BuildContext context) => AppEmptyState(
+    message: body,
+    action: onDone == null
+        ? null
+        : AppButton(
+            label: context.miniAppL10n.onboardingMarkDone,
+            onPressed: onDone,
+          ),
+  );
 }
 
 String _stepTitle(MiniAppLocalizations l10n, OnboardingStep s) => switch (s) {
@@ -127,7 +126,6 @@ class _StepBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
     final cubit = context.read<OnboardingCubit>();
-    void done() => cubit.complete(step);
     final total = OnboardingStep.values.length;
     return Column(
       children: [
@@ -156,21 +154,20 @@ class _StepBody extends StatelessWidget {
         Expanded(
           key: ValueKey(step),
           child: switch (step) {
-            OnboardingStep.addStudents => StudentFormScope(
-              onSaved: (_) => done(),
+            OnboardingStep.addStudents => _AddStudentsStep(
+              onSaved: () => cubit.complete(step),
             ),
-            OnboardingStep.createClass ||
+            OnboardingStep.createClass => OnboardingPlaceholderStep(
+              body: l10n.onboardingCreateClassPending,
+            ),
             OnboardingStep.setSchedule => OnboardingPlaceholderStep(
               body: l10n.onboardingPlaceholderBody,
-              onDone: done,
             ),
             OnboardingStep.payoutAccount => OnboardingPlaceholderStep(
               body: l10n.onboardingPayoutBody,
-              onDone: done,
             ),
             OnboardingStep.complianceChecklist => OnboardingPlaceholderStep(
               body: l10n.onboardingComplianceBody,
-              onDone: done,
             ),
           },
         ),
@@ -183,6 +180,54 @@ class _StepBody extends StatelessWidget {
                 variant: AppButtonVariant.outlinePrimary,
                 onPressed: saving ? null : () => cubit.skip(step),
               ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Bước 2: form học viên. Lưu xong form bị khóa; nếu ghi bước thất bại thì chỉ
+/// thử lại việc ghi bước, không gửi lại học viên.
+class _AddStudentsStep extends StatefulWidget {
+  const _AddStudentsStep({required this.onSaved});
+
+  final VoidCallback onSaved;
+
+  @override
+  State<_AddStudentsStep> createState() => _AddStudentsStepState();
+}
+
+class _AddStudentsStepState extends State<_AddStudentsStep> {
+  bool _saved = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    final state = context.watch<OnboardingCubit>().state;
+    final failed = _saved && !state.saving && state.error != null;
+    return Column(
+      children: [
+        Expanded(
+          child: StudentFormScope(
+            onSaved: (_) {
+              setState(() => _saved = true);
+              widget.onSaved();
+            },
+          ),
+        ),
+        if (failed)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Column(
+              children: [
+                Text(l10n.onboardingStudentSaved),
+                const SizedBox(height: 8),
+                AppButton(
+                  label: l10n.onboardingRetry,
+                  onPressed: widget.onSaved,
+                ),
+              ],
             ),
           ),
       ],

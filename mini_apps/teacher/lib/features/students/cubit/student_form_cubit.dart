@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:math';
+
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../data/student_models.dart';
@@ -33,13 +35,26 @@ class StudentFormCubit extends Cubit<StudentFormState> {
 
   final StudentRepository _repo;
   StudentDraft? _draft;
+  bool _confirmNew = false;
+  String? _key;
 
   Future<void> submit(StudentDraft draft, {bool confirmNew = false}) async {
     if (state.status == StudentFormStatus.submitting) return;
+    // Cùng nội dung thì giữ khóa để thử lại không tạo trùng; đổi nội dung hoặc
+    // xác nhận em mới thì khóa mới.
+    if (_key == null || draft != _draft || confirmNew != _confirmNew) {
+      _key = uuidV4(Random.secure());
+    }
     _draft = draft;
+    _confirmNew = confirmNew;
     emit(const StudentFormState(status: StudentFormStatus.submitting));
     try {
-      final student = await _repo.create(draft, confirmNew: confirmNew);
+      final student = await _repo.create(
+        draft,
+        idempotencyKey: _key!,
+        confirmNew: confirmNew,
+      );
+      if (isClosed) return;
       emit(
         StudentFormState(
           status: StudentFormStatus.success,
@@ -47,6 +62,7 @@ class StudentFormCubit extends Cubit<StudentFormState> {
         ),
       );
     } on StudentDuplicateException catch (e) {
+      if (isClosed) return;
       emit(
         StudentFormState(
           status: StudentFormStatus.duplicate,
@@ -54,6 +70,7 @@ class StudentFormCubit extends Cubit<StudentFormState> {
         ),
       );
     } on ApiException catch (e) {
+      if (isClosed) return;
       emit(StudentFormState(status: StudentFormStatus.failure, error: e));
     }
   }

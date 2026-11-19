@@ -7,11 +7,15 @@ import 'package:teacher/features/students/data/student_repository.dart';
 class FakeStudentRepository implements StudentRepository {
   FakeStudentRepository(this._results);
   final List<Object> _results;
-  final calls = <({StudentDraft draft, bool confirmNew})>[];
+  final calls = <({StudentDraft draft, bool confirmNew, String key})>[];
 
   @override
-  Future<Student> create(StudentDraft draft, {bool confirmNew = false}) async {
-    calls.add((draft: draft, confirmNew: confirmNew));
+  Future<Student> create(
+    StudentDraft draft, {
+    required String idempotencyKey,
+    bool confirmNew = false,
+  }) async {
+    calls.add((draft: draft, confirmNew: confirmNew, key: idempotencyKey));
     final r = _results.removeAt(0);
     if (r is Student) return r;
     throw r;

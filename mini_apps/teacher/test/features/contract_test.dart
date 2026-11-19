@@ -64,6 +64,8 @@ void main() {
       containsAll(draft.guardians.first.toJson().keys),
     );
     expect((_props(body)['guardians'] as Map)['maxItems'], 2);
+    // `id` của phụ huynh nghĩa là "cập nhật": tạo mới thì không được gửi.
+    expect(draft.guardians.first.toJson().containsKey('id'), isFalse);
   });
 
   test('chỉ họ tên: thân request không có khóa thừa', () {
@@ -105,5 +107,20 @@ void main() {
       OnboardingStep.values.where((s) => s != OnboardingStep.createClass),
       everyElement(predicate<OnboardingStep>((s) => s.skippable)),
     );
+  });
+
+  test('Onboarding: bước và trạng thái lạ từ server mới hơn không làm ném', () {
+    final parsed = Onboarding.fromJson({
+      'steps': [
+        {'step': 'create_class', 'status': 'done'},
+        {'step': 'add_students', 'status': 'pending'},
+        {'step': 'new_step_v2', 'status': 'pending'},
+        {'step': 'set_schedule', 'status': 'weird'},
+      ],
+      'currentStep': 'new_step_v2',
+    });
+    expect(parsed.steps.length, 3);
+    expect(parsed.steps[OnboardingStep.setSchedule], OnboardingStatus.pending);
+    expect(parsed.currentStep, OnboardingStep.addStudents);
   });
 }

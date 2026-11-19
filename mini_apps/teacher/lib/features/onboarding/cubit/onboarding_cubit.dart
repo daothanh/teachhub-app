@@ -36,13 +36,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   Future<void> load() async {
     emit(const OnboardingState());
     try {
-      emit(
-        OnboardingState(
-          load: OnboardingLoad.ready,
-          onboarding: await _repo.get(),
-        ),
-      );
+      final data = await _repo.get();
+      if (isClosed) return;
+      emit(OnboardingState(load: OnboardingLoad.ready, onboarding: data));
     } on ApiException catch (e) {
+      if (isClosed) return;
       emit(OnboardingState(load: OnboardingLoad.failure, error: e));
     }
   }
@@ -65,8 +63,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     );
     try {
       final next = await _repo.patchStep(step, status);
+      if (isClosed) return;
       emit(OnboardingState(load: OnboardingLoad.ready, onboarding: next));
     } on ApiException catch (e) {
+      if (isClosed) return;
       emit(
         OnboardingState(
           load: OnboardingLoad.ready,

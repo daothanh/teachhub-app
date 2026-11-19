@@ -32,14 +32,9 @@ class DioOnboardingRepository implements OnboardingRepository {
     try {
       return Onboarding.fromJson((await request()).data!);
     } on DioException catch (e) {
-      final res = e.response;
-      throw res == null
-          ? const ApiException.network()
-          : ApiException.fromResponse(
-              res.statusCode,
-              res.data,
-              retryAfterHeader: res.headers.value('retry-after'),
-            );
+      throw ApiException.fromDio(e)!;
+    } catch (_) {
+      throw const ApiException.unexpected();
     }
   }
 }

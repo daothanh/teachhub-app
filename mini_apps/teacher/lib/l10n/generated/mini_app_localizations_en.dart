@@ -60,7 +60,9 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get studentsAddGuardian => 'Add parent';
 
   @override
-  String get studentsRemoveGuardian => 'Remove parent';
+  String studentsRemoveGuardian(int n) {
+    return 'Remove parent $n';
+  }
 
   @override
   String get studentsSave => 'Save student';
@@ -169,4 +171,12 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get onboardingErrorGeneric => 'Could not save. Try again later.';
+
+  @override
+  String get onboardingCreateClassPending =>
+      'The class screen will be connected later.';
+
+  @override
+  String get onboardingStudentSaved =>
+      'Student saved. This step could not be recorded yet.';
 }

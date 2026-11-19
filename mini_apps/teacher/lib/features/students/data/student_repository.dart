@@ -10,8 +10,13 @@ class StudentDuplicateException implements Exception {
 }
 
 abstract class StudentRepository {
+  /// [idempotencyKey]: giữ nguyên khi thử lại cùng nội dung (do cubit quản).
   /// Lỗi API ném [ApiException]; trùng hồ sơ ném [StudentDuplicateException].
-  Future<Student> create(StudentDraft draft, {bool confirmNew = false});
+  Future<Student> create(
+    StudentDraft draft, {
+    required String idempotencyKey,
+    bool confirmNew = false,
+  });
 }
 
 class DioStudentRepository implements StudentRepository {
@@ -19,30 +24,37 @@ class DioStudentRepository implements StudentRepository {
   final Dio _api;
 
   @override
-  Future<Student> create(StudentDraft draft, {bool confirmNew = false}) async {
+  Future<Student> create(
+    StudentDraft draft, {
+    required String idempotencyKey,
+    bool confirmNew = false,
+  }) async {
     try {
       final res = await _api.post<Map<String, dynamic>>(
         '/students',
         data: draft.toJson(confirmNew: confirmNew),
+        options: Options(headers: {'Idempotency-Key': idempotencyKey}),
       );
       return Student.fromJson(res.data!);
     } on DioException catch (e) {
-      final res = e.response;
-      final err = res == null
-          ? const ApiException.network()
-          : ApiException.fromResponse(
-              res.statusCode,
-              res.data,
-              retryAfterHeader: res.headers.value('retry-after'),
-            );
+      final err = ApiException.fromDio(e)!;
       if (err.code == ApiErrorCode.studentPossibleDuplicate) {
-        final raw = err.details['candidates'] as List? ?? const [];
-        throw StudentDuplicateException([
-          for (final c in raw)
-            StudentCandidate.fromJson((c as Map).cast<String, dynamic>()),
-        ]);
+        throw StudentDuplicateException(_candidates(err));
       }
       throw err;
+    } catch (_) {
+      throw const ApiException.unexpected();
+    }
+  }
+
+  List<StudentCandidate> _candidates(ApiException err) {
+    try {
+      return [
+        for (final c in err.details['candidates'] as List? ?? const [])
+          StudentCandidate.fromJson((c as Map).cast<String, dynamic>()),
+      ];
+    } catch (_) {
+      throw const ApiException.unexpected();
     }
   }
 }

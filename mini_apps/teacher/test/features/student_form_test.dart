@@ -27,11 +27,16 @@ ApiException _api(int status, String code, {Map<String, Object?>? details}) =>
 Future<FakeStudentRepository> _open(
   WidgetTester tester,
   List<Object> results,
-  List<String> saved,
-) async {
+  List<String> saved, {
+  double textScale = 1,
+}) async {
   final repo = FakeStudentRepository(results);
   GetIt.I.registerSingleton<StudentRepository>(repo);
-  await pumpApp(tester, Scaffold(body: StudentFormScope(onSaved: saved.add)));
+  await pumpApp(
+    tester,
+    Scaffold(body: StudentFormScope(onSaved: saved.add)),
+    textScale: textScale,
+  );
   return repo;
 }
 
@@ -183,5 +188,80 @@ void main() {
     await _fillName(tester);
     await _save(tester);
     expect(find.text('Không có mạng. Thử lại sau.'), findsOneWidget);
+  });
+
+  testWidgets(
+    'Idempotency-Key: thử lại sau lỗi giữ khóa, đổi nội dung thì khóa mới',
+    (tester) async {
+      final repo = await _open(tester, [
+        const ApiException.network(),
+        const ApiException.network(),
+        const ApiException.network(),
+      ], []);
+      await _fillName(tester);
+      await _save(tester);
+      await _save(tester);
+      expect(repo.calls[1].key, repo.calls[0].key);
+
+      await tester.enterText(find.byType(EditableText).first, 'Minh Anh B');
+      await _save(tester);
+      expect(repo.calls[2].key, isNot(repo.calls[0].key));
+    },
+  );
+
+  testWidgets('confirmNew dùng khóa mới', (tester) async {
+    final repo = await _open(tester, [
+      const StudentDuplicateException([_candidate]),
+      _saved,
+    ], []);
+    await _fillName(tester);
+    await _save(tester);
+    await tester.tap(find.text('Không, thêm em mới'));
+    await tester.pumpAndSettle();
+    expect(repo.calls[1].key, isNot(repo.calls[0].key));
+  });
+
+  testWidgets('lưu xong thì khóa form, không gửi lần hai', (tester) async {
+    final repo = await _open(tester, [_saved], []);
+    await _fillName(tester);
+    await _save(tester);
+    await tester.tap(find.text('Lưu học viên'));
+    await tester.pumpAndSettle();
+    expect(repo.calls, hasLength(1));
+    expect(
+      tester.widget<EditableText>(find.byType(EditableText).first).readOnly,
+      isTrue,
+    );
+  });
+
+  testWidgets('nút xóa phụ huynh có số thứ tự', (tester) async {
+    await _open(tester, [], []);
+    await tester.tap(find.text('Thêm phụ huynh'));
+    await tester.pump();
+    expect(find.text('Xóa phụ huynh 1'), findsOneWidget);
+  });
+
+  testWidgets('chữ phóng 1.3 và 2 phụ huynh: không overflow', (tester) async {
+    await _open(tester, [], [], textScale: 1.3);
+    await tester.tap(find.text('Thêm phụ huynh'));
+    await tester.pump();
+    await tester.tap(find.text('Thêm phụ huynh'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('hộp thoại trùng ở chữ phóng 1.3 không overflow', (tester) async {
+    await _open(
+      tester,
+      [
+        const StudentDuplicateException([_candidate, _candidate]),
+      ],
+      [],
+      textScale: 1.3,
+    );
+    await _fillName(tester);
+    await _save(tester);
+    expect(find.text('Có phải cùng một em?'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

@@ -200,8 +200,8 @@ abstract class MiniAppLocalizations {
   /// No description provided for @studentsRemoveGuardian.
   ///
   /// In vi, this message translates to:
-  /// **'Bỏ phụ huynh'**
-  String get studentsRemoveGuardian;
+  /// **'Xóa phụ huynh {n}'**
+  String studentsRemoveGuardian(int n);
 
   /// No description provided for @studentsSave.
   ///
@@ -400,6 +400,18 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Chưa lưu được. Thử lại sau.'**
   String get onboardingErrorGeneric;
+
+  /// No description provided for @onboardingCreateClassPending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Màn tạo lớp sẽ được nối sau.'**
+  String get onboardingCreateClassPending;
+
+  /// No description provided for @onboardingStudentSaved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu học viên. Chưa ghi nhận được bước này.'**
+  String get onboardingStudentSaved;
 }
 
 class _MiniAppLocalizationsDelegate

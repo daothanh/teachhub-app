@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import 'api_error_code.dart';
 
 export 'api_error_code.dart';
@@ -77,6 +79,31 @@ class ApiException implements Exception {
       fieldErrors = const {},
       requestId = null,
       retryAfterHeader = null;
+
+  /// Phản hồi thành công nhưng sai hình dạng hợp đồng (thiếu body, sai kiểu).
+  const ApiException.unexpected()
+    : code = ApiErrorCode.unknown,
+      wireCode = null,
+      status = 500,
+      message = null,
+      details = const {},
+      fieldErrors = const {},
+      requestId = null,
+      retryAfterHeader = null;
+
+  /// Lỗi gọi API từ [DioException]: có phản hồi → đọc body lỗi; không có
+  /// (mất mạng, timeout) → [ApiException.network]; lỗi khác → `null`.
+  static ApiException? fromDio(Object? error) {
+    if (error is ApiException) return error;
+    if (error is! DioException) return null;
+    final response = error.response;
+    if (response == null) return const ApiException.network();
+    return ApiException.fromResponse(
+      response.statusCode,
+      response.data,
+      retryAfterHeader: response.headers.value('retry-after'),
+    );
+  }
 
   /// Đọc body lỗi; body không đúng định dạng vẫn ra một [ApiException] theo [status].
   factory ApiException.fromResponse(

@@ -37,17 +37,25 @@ void main() {
     expect(find.text('Để sau'), findsNothing);
   });
 
-  testWidgets('bước 1 xong thì sang bước 2 và nhúng form học viên', (
+  testWidgets('bước 1 placeholder: không có nút xong, không ghi done', (
     tester,
   ) async {
     final repo = await _open(
       tester,
       FakeOnboardingRepository(onboardingOf({})),
     );
-    await tester.tap(find.text('Xong bước này'));
-    await tester.pumpAndSettle();
+    expect(find.text('Màn tạo lớp sẽ được nối sau.'), findsOneWidget);
+    expect(find.text('Xong bước này'), findsNothing);
+    expect(repo.patches, isEmpty);
+  });
 
-    expect(repo.patches, [(OnboardingStep.createClass, _done)]);
+  testWidgets('bước 1 đã xong: bước 2 nhúng form học viên', (tester) async {
+    await _open(
+      tester,
+      FakeOnboardingRepository(
+        onboardingOf({OnboardingStep.createClass: _done}),
+      ),
+    );
     expect(find.text('Bước 2/5'), findsOneWidget);
     expect(find.textContaining('Họ và tên'), findsOneWidget);
     expect(find.text('Để sau'), findsOneWidget);
@@ -129,13 +137,13 @@ void main() {
 
   testWidgets('409 đang xử lý: thông báo thử lại', (tester) async {
     final repo = FakeOnboardingRepository(
-      onboardingOf({}),
+      onboardingOf({OnboardingStep.createClass: _done}),
       patchError: ApiException.fromResponse(409, {
         'code': 'IDEMPOTENCY_IN_PROGRESS',
       }),
     );
     await _open(tester, repo);
-    await tester.tap(find.text('Xong bước này'));
+    await tester.tap(find.text('Để sau'));
     await tester.pumpAndSettle();
     expect(
       find.text('Yêu cầu đang xử lý. Thử lại sau giây lát.'),
@@ -152,4 +160,55 @@ void main() {
     expect(find.text('Không tải được tiến độ. Thử lại.'), findsOneWidget);
     expect(find.text('Thử lại'), findsOneWidget);
   });
+
+  testWidgets('bước 3-5 placeholder chỉ có "Để sau", không có nút xong', (
+    tester,
+  ) async {
+    await _open(
+      tester,
+      FakeOnboardingRepository(
+        onboardingOf({
+          OnboardingStep.createClass: _done,
+          OnboardingStep.addStudents: _done,
+        }),
+      ),
+    );
+    expect(find.text('Bước 3/5'), findsOneWidget);
+    expect(find.text('Xong bước này'), findsNothing);
+    expect(find.text('Để sau'), findsOneWidget);
+  });
+
+  testWidgets(
+    'PATCH lỗi sau khi lưu học viên: khóa form, Thử lại chỉ gọi PATCH',
+    (tester) async {
+      final repo = FakeOnboardingRepository(
+        onboardingOf({OnboardingStep.createClass: _done}),
+        patchError: const ApiException.network(),
+      );
+      final students = FakeStudentRepository([
+        const Student(id: 's1', fullName: 'Minh Anh'),
+      ]);
+      await _open(tester, repo, students: students);
+      await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
+      await tester.tap(find.text('Lưu học viên'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Đã lưu học viên. Chưa ghi nhận được bước này.'),
+        findsOneWidget,
+      );
+      expect(find.text('Bước 2/5'), findsOneWidget);
+
+      repo.patchError = null;
+      await tester.tap(find.text('Thử lại'));
+      await tester.pumpAndSettle();
+
+      expect(students.calls, hasLength(1));
+      expect(repo.patches, [
+        (OnboardingStep.addStudents, _done),
+        (OnboardingStep.addStudents, _done),
+      ]);
+      expect(find.text('Bước 3/5'), findsOneWidget);
+    },
+  );
 }

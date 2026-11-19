@@ -23,21 +23,35 @@ enum OnboardingStatus {
   done,
   skipped;
 
+  /// Giá trị lạ (server mới hơn app) coi như chưa làm.
   static OnboardingStatus fromWire(String wire) =>
-      values.firstWhere((s) => s.name == wire);
+      values.where((s) => s.name == wire).firstOrNull ?? pending;
 }
 
 class Onboarding extends Equatable {
   const Onboarding({required this.steps, required this.currentStep});
 
-  factory Onboarding.fromJson(Map<String, dynamic> json) => Onboarding(
-    steps: {
-      for (final raw in json['steps'] as List)
-        OnboardingStep.fromWire((raw as Map)['step'] as String)!:
-            OnboardingStatus.fromWire(raw['status'] as String),
-    },
-    currentStep: OnboardingStep.fromWire(json['currentStep'] as String?),
-  );
+  /// Bước lạ (server mới hơn app) bị bỏ qua.
+  factory Onboarding.fromJson(Map<String, dynamic> json) {
+    final steps = <OnboardingStep, OnboardingStatus>{};
+    for (final raw in json['steps'] as List) {
+      final step = OnboardingStep.fromWire((raw as Map)['step'] as String);
+      if (step != null) {
+        steps[step] = OnboardingStatus.fromWire(raw['status'] as String);
+      }
+    }
+    final wire = json['currentStep'] as String?;
+    return Onboarding(
+      steps: steps,
+      currentStep: wire == null
+          ? null
+          : OnboardingStep.fromWire(wire) ??
+                steps.entries
+                    .where((e) => e.value == OnboardingStatus.pending)
+                    .firstOrNull
+                    ?.key,
+    );
+  }
 
   final Map<OnboardingStep, OnboardingStatus> steps;
 

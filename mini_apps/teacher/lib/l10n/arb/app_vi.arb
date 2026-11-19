@@ -23,7 +23,7 @@
   "studentsGuardianPhone": "Số điện thoại (không bắt buộc)",
   "studentsGuardianPhoneInvalid": "Số điện thoại chưa đúng.",
   "studentsAddGuardian": "Thêm phụ huynh",
-  "studentsRemoveGuardian": "Bỏ phụ huynh",
+  "studentsRemoveGuardian": "Xóa phụ huynh {n}",
   "studentsSave": "Lưu học viên",
   "studentsSaving": "Đang lưu…",
   "studentsDuplicateTitle": "Có phải cùng một em?",
@@ -66,5 +66,14 @@
   "onboardingErrorBusy": "Yêu cầu đang xử lý. Thử lại sau giây lát.",
   "onboardingErrorValidation": "Bước này chưa lưu được. Kiểm tra lại.",
   "onboardingErrorNetwork": "Không có mạng. Thử lại sau.",
-  "onboardingErrorGeneric": "Chưa lưu được. Thử lại sau."
+  "onboardingErrorGeneric": "Chưa lưu được. Thử lại sau.",
+  "@studentsRemoveGuardian": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingCreateClassPending": "Màn tạo lớp sẽ được nối sau.",
+  "onboardingStudentSaved": "Đã lưu học viên. Chưa ghi nhận được bước này."
 }

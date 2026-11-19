@@ -60,7 +60,9 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get studentsAddGuardian => 'Thêm phụ huynh';
 
   @override
-  String get studentsRemoveGuardian => 'Bỏ phụ huynh';
+  String studentsRemoveGuardian(int n) {
+    return 'Xóa phụ huynh $n';
+  }
 
   @override
   String get studentsSave => 'Lưu học viên';
@@ -168,4 +170,11 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get onboardingErrorGeneric => 'Chưa lưu được. Thử lại sau.';
+
+  @override
+  String get onboardingCreateClassPending => 'Màn tạo lớp sẽ được nối sau.';
+
+  @override
+  String get onboardingStudentSaved =>
+      'Đã lưu học viên. Chưa ghi nhận được bước này.';
 }
