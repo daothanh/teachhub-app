@@ -75,5 +75,47 @@
     }
   },
   "onboardingCreateClassPending": "The class screen will be connected later.",
-  "onboardingStudentSaved": "Student saved. This step could not be recorded yet."
+  "onboardingStudentSaved": "Student saved. This step could not be recorded yet.",
+  "contactsAdd": "Add from contacts",
+  "contactsTitle": "Add from contacts",
+  "contactsDeniedTitle": "No access to contacts",
+  "contactsDeniedBody": "TeachHub only reads your contacts when you tap Add from contacts, so you can pick students and parent numbers. You can still add each student by hand.",
+  "contactsAllow": "Allow again",
+  "contactsOpenSettings": "Open Settings",
+  "contactsManual": "Add by hand",
+  "contactsLoadFailed": "Could not read your contacts. Try again later.",
+  "contactsEmpty": "You have no contacts yet.",
+  "contactsNoPhone": "No phone number",
+  "contactsContinue": "Continue ({n})",
+  "@contactsContinue": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "contactsSaveAll": "Save {n} students",
+  "@contactsSaveAll": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "contactsDone": "Done",
+  "contactsBack": "Pick again",
+  "contactsRemoveRow": "Remove {name}",
+  "@contactsRemoveRow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "contactsReviewHint": "The contact name becomes the student name and the phone number becomes parent 1's number. Edit or remove rows before saving.",
+  "contactsRowSaved": "Saved",
+  "contactsRowSaving": "Saving…",
+  "contactsRowFailed": "Not saved",
+  "contactsRowDuplicate": "Possible duplicate",
+  "contactsRowReview": "Review duplicate"
 }

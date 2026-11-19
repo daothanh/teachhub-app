@@ -1,3 +1,4 @@
+import 'package:teacher/features/students/data/contacts_service.dart';
 import 'package:teacher/features/onboarding/data/onboarding_models.dart';
 import 'package:teacher/features/onboarding/data/onboarding_repository.dart';
 import 'package:teacher/features/students/data/student_models.dart';
@@ -61,4 +62,27 @@ class FakeOnboardingRepository implements OnboardingRepository {
       step: status,
     });
   }
+}
+
+class FakeContactsService implements ContactsService {
+  FakeContactsService({
+    this.access = ContactsAccess.granted,
+    this.contacts = const [],
+  });
+  ContactsAccess access;
+  final List<PickableContact> contacts;
+  int requests = 0;
+  int settingsOpened = 0;
+
+  @override
+  Future<ContactsAccess> requestAccess() async {
+    requests++;
+    return access;
+  }
+
+  @override
+  Future<List<PickableContact>> load() async => contacts;
+
+  @override
+  Future<void> openSettings() async => settingsOpened++;
 }
