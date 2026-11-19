@@ -17,6 +17,7 @@ typedef SessionDto = ({
   String status,
   bool isMakeup,
   int? tzOffsetMinutes,
+  String? cancelReason,
 });
 
 typedef AttendanceItemDto = ({
@@ -76,6 +77,7 @@ class TeacherApi {
           status: s['status'] as String,
           isMakeup: s['isMakeup'] as bool,
           tzOffsetMinutes: offsetMinutes(s['startsAt'] as String),
+          cancelReason: s['cancelReason'] as String?,
         ),
     ];
   });
