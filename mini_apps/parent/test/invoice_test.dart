@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
@@ -11,6 +14,7 @@ import 'package:parent/features/invoice/cubit/invoice_list_cubit.dart';
 import 'package:parent/features/invoice/data/invoice_models.dart';
 import 'package:parent/features/invoice/data/invoice_repository.dart';
 import 'package:parent/features/invoice/data/qr_image_saver.dart';
+import 'package:parent/features/invoice/widgets/invoice_format.dart';
 import 'package:parent/l10n/l10n.dart';
 import 'package:parent/parent.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -82,6 +86,28 @@ class _FakeInvoices implements InvoiceRepository {
     if (detailError != null) throw detailError!;
     return InvoiceDetail.fromJson(detailJson);
   }
+}
+
+/// Trang đầu trả ngay; trang có cursor chờ [gate].
+class _GatedInvoices implements InvoiceRepository {
+  late InvoicePage first;
+  late InvoicePage second;
+  final gate = Completer<void>();
+
+  @override
+  Future<InvoicePage> list({
+    String? cursor,
+    InvoiceStatus? status,
+    String? studentId,
+    int limit = 20,
+  }) async {
+    if (cursor == null) return first;
+    await gate.future;
+    return second;
+  }
+
+  @override
+  Future<InvoiceDetail> detail(String id) => throw UnimplementedError();
 }
 
 class _FakeSaver implements QrImageSaver {
@@ -197,6 +223,55 @@ void main() {
     });
   });
 
+  test('loadMore đang chờ rồi refresh: trang cũ không nối vào', () async {
+    final repo = _GatedInvoices()
+      ..first = _page([_json()], 'c2')
+      ..second = _page([_json(id: 'old')]);
+    final cubit = InvoiceListCubit(repo);
+    await cubit.load();
+    final more = cubit.loadMore();
+    await Future<void>.delayed(Duration.zero);
+    repo.first = _page([_json(id: 'fresh')]);
+    await cubit.load(keepFilter: true);
+    repo.gate.complete();
+    await more;
+    expect(cubit.state.items.map((i) => i.id), ['fresh']);
+    expect(cubit.state.loadingMore, isFalse);
+    await cubit.close();
+  });
+
+  test('formatVndFor: 150.000 đ, dấu chấm nghìn, chữ đ thường', () {
+    expect(formatVndFor('vi', 150000), '150.000 đ');
+    expect(formatVndFor('vi', -50000), '-50.000 đ');
+    expect(formatVndFor('vi', 0), '0 đ');
+  });
+
+  testWidgets('ảnh QR lưu: module nguyên px, viền trắng từ 4 module', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      final png = await renderQrPng('vietqr-payload-secret');
+      final codec = await ui.instantiateImageCodec(png.bytes);
+      final img = (await codec.getNextFrame()).image;
+      expect(img.width, (png.moduleCount + 8) * QrPng.px);
+      expect(img.height, img.width);
+      final rgba = (await img.toByteData())!;
+      bool white(int x, int y) =>
+          rgba.getUint32((y * img.width + x) * 4) == 0xFFFFFFFF;
+      final border = QrPng.quiet * QrPng.px;
+      for (var i = 0; i < img.width; i++) {
+        for (var d = 0; d < border; d++) {
+          expect(white(i, d), isTrue);
+          expect(white(i, img.width - 1 - d), isTrue);
+          expect(white(d, i), isTrue);
+          expect(white(img.width - 1 - d, i), isTrue);
+        }
+      }
+      // Ô định vị góc trên trái đen ngay sau viền.
+      expect(white(border, border), isFalse);
+    });
+  });
+
   group('InvoiceDetailCubit', () {
     test('chi tiết có QR và tài khoản nhận', () async {
       final cubit = InvoiceDetailCubit(_FakeInvoices(), _FakeSaver(), _id);
@@ -209,7 +284,8 @@ void main() {
 
     test('hóa đơn void: không QR, không payout, không lỗi', () async {
       final repo = _FakeInvoices()..detailJson = _json(voided: true);
-      final cubit = InvoiceDetailCubit(repo, _FakeSaver(), _id);
+      final saver = _FakeSaver();
+      final cubit = InvoiceDetailCubit(repo, saver, _id);
       await cubit.load();
       expect(cubit.state.status, InvoiceDetailStatus.ready);
       expect(cubit.state.invoice!.summary.status, InvoiceStatus.voided);
@@ -217,6 +293,7 @@ void main() {
       expect(cubit.state.invoice!.payout, isNull);
       await cubit.saveQr();
       expect(cubit.state.qrSave, QrSaveStatus.idle);
+      expect(saver.saved, isEmpty);
       await cubit.close();
     });
 
@@ -269,7 +346,7 @@ void main() {
         );
       await _pump(tester, repo, _FakeSaver());
       expect(
-        find.text('2 unpaid invoices, ₫2,000,000 in total'),
+        find.text('2 invoices not settled, 2,000,000 đ in total'),
         findsOneWidget,
       );
       await tester.tap(find.text('Tuition'));
@@ -277,6 +354,14 @@ void main() {
       expect(find.text('Invoices'), findsOneWidget);
       expect(find.text(_rowTitle), findsNWidgets(3));
       expect(find.text('Paid · Due $_due'), findsOneWidget);
+    });
+
+    testWidgets('card học phí còn trang sau: hiện "N+", không hiện tổng', (
+      tester,
+    ) async {
+      final repo = _FakeInvoices()..pages.add(_page([_json()], 'c2'));
+      await _pump(tester, repo, _FakeSaver());
+      expect(find.text('1+ invoices not settled'), findsOneWidget);
     });
 
     testWidgets('danh sách: bấm hóa đơn mở chi tiết với QR và tài khoản', (

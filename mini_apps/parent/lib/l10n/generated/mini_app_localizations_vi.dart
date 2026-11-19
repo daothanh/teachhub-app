@@ -102,11 +102,16 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String invoiceTuitionUnpaid(int count, String total) {
-    return '$count hóa đơn chưa thanh toán, tổng $total';
+    return '$count hóa đơn chưa tất toán, tổng $total';
   }
 
   @override
-  String get invoiceTuitionNone => 'Không có hóa đơn nào cần thanh toán.';
+  String invoiceTuitionUnpaidMore(int count) {
+    return '$count+ hóa đơn chưa tất toán';
+  }
+
+  @override
+  String get invoiceTuitionNone => 'Không có hóa đơn nào cần đóng.';
 
   @override
   String get invoiceTuitionOpen => 'Xem hóa đơn';
@@ -124,7 +129,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get invoiceStatusPending => 'Chờ xác nhận';
 
   @override
-  String get invoiceStatusPartial => 'Thanh toán một phần';
+  String get invoiceStatusPartial => 'Đã trả một phần';
 
   @override
   String get invoiceStatusPaid => 'Đã thanh toán';
@@ -163,7 +168,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get invoiceTotal => 'Tổng cộng';
 
   @override
-  String get invoiceVoidNotice => 'Hóa đơn này đã hủy, không cần chuyển khoản.';
+  String get invoiceVoidNotice => 'Hóa đơn đã hủy, bạn không cần chuyển khoản.';
 
   @override
   String get invoicePayTitle => 'Chuyển khoản';
@@ -179,10 +184,10 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get invoiceQrDenied =>
-      'Chưa có quyền lưu ảnh. Hãy cấp quyền trong Cài đặt.';
+      'Chưa có quyền lưu ảnh. Bạn có thể cấp quyền trong Cài đặt.';
 
   @override
-  String get invoiceQrFailed => 'Không lưu được ảnh QR. Vui lòng thử lại.';
+  String get invoiceQrFailed => 'Không lưu được ảnh QR. Hãy thử lại.';
 
   @override
   String get invoiceCopyNote => 'Sao chép nội dung chuyển khoản';
@@ -210,8 +215,8 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get invoiceNotFoundBody =>
-      'Hóa đơn không tồn tại hoặc bạn không có quyền xem.';
+      'Hóa đơn không tồn tại hoặc bạn không xem được.';
 
   @override
-  String get invoiceLoadFailed => 'Không tải được hóa đơn. Vui lòng thử lại.';
+  String get invoiceLoadFailed => 'Không tải được hóa đơn. Hãy thử lại.';
 }

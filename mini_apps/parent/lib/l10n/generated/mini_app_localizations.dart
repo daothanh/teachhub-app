@@ -266,13 +266,19 @@ abstract class MiniAppLocalizations {
   /// No description provided for @invoiceTuitionUnpaid.
   ///
   /// In vi, this message translates to:
-  /// **'{count} hóa đơn chưa thanh toán, tổng {total}'**
+  /// **'{count} hóa đơn chưa tất toán, tổng {total}'**
   String invoiceTuitionUnpaid(int count, String total);
+
+  /// No description provided for @invoiceTuitionUnpaidMore.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count}+ hóa đơn chưa tất toán'**
+  String invoiceTuitionUnpaidMore(int count);
 
   /// No description provided for @invoiceTuitionNone.
   ///
   /// In vi, this message translates to:
-  /// **'Không có hóa đơn nào cần thanh toán.'**
+  /// **'Không có hóa đơn nào cần đóng.'**
   String get invoiceTuitionNone;
 
   /// No description provided for @invoiceTuitionOpen.
@@ -308,7 +314,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @invoiceStatusPartial.
   ///
   /// In vi, this message translates to:
-  /// **'Thanh toán một phần'**
+  /// **'Đã trả một phần'**
   String get invoiceStatusPartial;
 
   /// No description provided for @invoiceStatusPaid.
@@ -374,7 +380,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @invoiceVoidNotice.
   ///
   /// In vi, this message translates to:
-  /// **'Hóa đơn này đã hủy, không cần chuyển khoản.'**
+  /// **'Hóa đơn đã hủy, bạn không cần chuyển khoản.'**
   String get invoiceVoidNotice;
 
   /// No description provided for @invoicePayTitle.
@@ -404,13 +410,13 @@ abstract class MiniAppLocalizations {
   /// No description provided for @invoiceQrDenied.
   ///
   /// In vi, this message translates to:
-  /// **'Chưa có quyền lưu ảnh. Hãy cấp quyền trong Cài đặt.'**
+  /// **'Chưa có quyền lưu ảnh. Bạn có thể cấp quyền trong Cài đặt.'**
   String get invoiceQrDenied;
 
   /// No description provided for @invoiceQrFailed.
   ///
   /// In vi, this message translates to:
-  /// **'Không lưu được ảnh QR. Vui lòng thử lại.'**
+  /// **'Không lưu được ảnh QR. Hãy thử lại.'**
   String get invoiceQrFailed;
 
   /// No description provided for @invoiceCopyNote.
@@ -464,13 +470,13 @@ abstract class MiniAppLocalizations {
   /// No description provided for @invoiceNotFoundBody.
   ///
   /// In vi, this message translates to:
-  /// **'Hóa đơn không tồn tại hoặc bạn không có quyền xem.'**
+  /// **'Hóa đơn không tồn tại hoặc bạn không xem được.'**
   String get invoiceNotFoundBody;
 
   /// No description provided for @invoiceLoadFailed.
   ///
   /// In vi, this message translates to:
-  /// **'Không tải được hóa đơn. Vui lòng thử lại.'**
+  /// **'Không tải được hóa đơn. Hãy thử lại.'**
   String get invoiceLoadFailed;
 }
 

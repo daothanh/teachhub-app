@@ -102,7 +102,12 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String invoiceTuitionUnpaid(int count, String total) {
-    return '$count unpaid invoices, $total in total';
+    return '$count invoices not settled, $total in total';
+  }
+
+  @override
+  String invoiceTuitionUnpaidMore(int count) {
+    return '$count+ invoices not settled';
   }
 
   @override

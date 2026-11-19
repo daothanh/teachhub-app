@@ -64,7 +64,7 @@
   "notificationBannerBody": "Nhận tin điểm danh và thay đổi lịch của con ngay khi giáo viên cập nhật.",
   "notificationBannerAction": "Bật thông báo",
   "invoiceTuitionTitle": "Học phí",
-  "invoiceTuitionUnpaid": "{count} hóa đơn chưa thanh toán, tổng {total}",
+  "invoiceTuitionUnpaid": "{count} hóa đơn chưa tất toán, tổng {total}",
   "@invoiceTuitionUnpaid": {
     "placeholders": {
       "count": {
@@ -75,13 +75,21 @@
       }
     }
   },
-  "invoiceTuitionNone": "Không có hóa đơn nào cần thanh toán.",
+  "invoiceTuitionUnpaidMore": "{count}+ hóa đơn chưa tất toán",
+  "@invoiceTuitionUnpaidMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invoiceTuitionNone": "Không có hóa đơn nào cần đóng.",
   "invoiceTuitionOpen": "Xem hóa đơn",
   "invoiceListTitle": "Hóa đơn",
   "invoiceFilterAll": "Tất cả",
   "invoiceStatusIssued": "Chưa thanh toán",
   "invoiceStatusPending": "Chờ xác nhận",
-  "invoiceStatusPartial": "Thanh toán một phần",
+  "invoiceStatusPartial": "Đã trả một phần",
   "invoiceStatusPaid": "Đã thanh toán",
   "invoiceStatusVoid": "Đã hủy",
   "invoiceStatusUnknown": "Khác",
@@ -116,13 +124,13 @@
   },
   "invoiceLinesTitle": "Các khoản",
   "invoiceTotal": "Tổng cộng",
-  "invoiceVoidNotice": "Hóa đơn này đã hủy, không cần chuyển khoản.",
+  "invoiceVoidNotice": "Hóa đơn đã hủy, bạn không cần chuyển khoản.",
   "invoicePayTitle": "Chuyển khoản",
   "invoiceQrHint": "Quét mã bằng app ngân hàng.",
   "invoiceSaveQr": "Lưu ảnh QR",
   "invoiceQrSaved": "Đã lưu ảnh QR.",
-  "invoiceQrDenied": "Chưa có quyền lưu ảnh. Hãy cấp quyền trong Cài đặt.",
-  "invoiceQrFailed": "Không lưu được ảnh QR. Vui lòng thử lại.",
+  "invoiceQrDenied": "Chưa có quyền lưu ảnh. Bạn có thể cấp quyền trong Cài đặt.",
+  "invoiceQrFailed": "Không lưu được ảnh QR. Hãy thử lại.",
   "invoiceCopyNote": "Sao chép nội dung chuyển khoản",
   "invoiceCopyAccount": "Sao chép số tài khoản",
   "invoiceCopied": "Đã sao chép.",
@@ -131,6 +139,6 @@
   "invoiceAccountName": "Chủ tài khoản",
   "invoiceTransferNote": "Nội dung chuyển khoản",
   "invoiceNotFound": "Không tìm thấy hóa đơn",
-  "invoiceNotFoundBody": "Hóa đơn không tồn tại hoặc bạn không có quyền xem.",
-  "invoiceLoadFailed": "Không tải được hóa đơn. Vui lòng thử lại."
+  "invoiceNotFoundBody": "Hóa đơn không tồn tại hoặc bạn không xem được.",
+  "invoiceLoadFailed": "Không tải được hóa đơn. Hãy thử lại."
 }

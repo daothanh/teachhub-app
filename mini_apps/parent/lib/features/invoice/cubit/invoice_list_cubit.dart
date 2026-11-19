@@ -44,12 +44,16 @@ class InvoiceListCubit extends Cubit<InvoiceListState> {
 
   final InvoiceRepository _repo;
 
+  /// Tăng mỗi lần [load]; kết quả [loadMore] mang token cũ bị bỏ.
+  int _generation = 0;
+
   Future<void> load({InvoiceStatus? filter, bool keepFilter = false}) async {
     final f = keepFilter ? state.filter : filter;
+    final gen = ++_generation;
     emit(InvoiceListState(filter: f));
     try {
       final page = await _repo.list(status: f);
-      if (isClosed || state.filter != f) return;
+      if (isClosed || gen != _generation) return;
       emit(
         InvoiceListState(
           status: InvoiceListStatus.ready,
@@ -59,7 +63,7 @@ class InvoiceListCubit extends Cubit<InvoiceListState> {
         ),
       );
     } catch (_) {
-      if (isClosed || state.filter != f) return;
+      if (isClosed || gen != _generation) return;
       emit(InvoiceListState(status: InvoiceListStatus.failure, filter: f));
     }
   }
@@ -68,6 +72,7 @@ class InvoiceListCubit extends Cubit<InvoiceListState> {
     final cursor = state.nextCursor;
     if (cursor == null || state.loadingMore) return;
     final f = state.filter;
+    final gen = _generation;
     emit(
       InvoiceListState(
         status: state.status,
@@ -79,8 +84,8 @@ class InvoiceListCubit extends Cubit<InvoiceListState> {
     );
     try {
       final page = await _repo.list(cursor: cursor, status: f);
-      // Đã đổi bộ lọc trong lúc chờ: bỏ trang cũ.
-      if (isClosed || state.filter != f) return;
+      // Đã tải lại hoặc đổi bộ lọc trong lúc chờ: bỏ trang cũ.
+      if (isClosed || gen != _generation) return;
       emit(
         InvoiceListState(
           status: state.status,
@@ -90,7 +95,7 @@ class InvoiceListCubit extends Cubit<InvoiceListState> {
         ),
       );
     } catch (_) {
-      if (isClosed || state.filter != f) return;
+      if (isClosed || gen != _generation) return;
       emit(
         InvoiceListState(
           status: state.status,

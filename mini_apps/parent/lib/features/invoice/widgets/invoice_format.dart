@@ -4,11 +4,12 @@ import 'package:intl/intl.dart';
 import '../../../l10n/l10n.dart';
 import '../data/invoice_models.dart';
 
-String formatVnd(BuildContext context, int amount) => NumberFormat.currency(
-  locale: Localizations.localeOf(context).toString(),
-  symbol: '₫',
-  decimalDigits: 0,
-).format(amount);
+/// `150.000 đ` (locale vi), `-50.000 đ` cho dòng giảm trừ.
+String formatVndFor(String locale, int amount) =>
+    '${NumberFormat.decimalPattern(locale).format(amount)} đ';
+
+String formatVnd(BuildContext context, int amount) =>
+    formatVndFor(Localizations.localeOf(context).toString(), amount);
 
 String formatDate(BuildContext context, DateTime d) =>
     DateFormat.yMd(Localizations.localeOf(context).toString()).format(d);

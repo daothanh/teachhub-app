@@ -19,8 +19,10 @@ class TuitionCard extends StatelessWidget {
     return BlocBuilder<TuitionCubit, TuitionState>(
       builder: (context, s) {
         if (!s.loaded) return const SizedBox.shrink();
-        final text = s.count == 0
+        final text = s.count == 0 && !s.hasMore
             ? l10n.invoiceTuitionNone
+            : s.hasMore
+            ? l10n.invoiceTuitionUnpaidMore(s.count)
             : l10n.invoiceTuitionUnpaid(s.count, formatVnd(context, s.total));
         return Card(
           margin: EdgeInsets.zero,

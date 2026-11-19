@@ -30,6 +30,34 @@ void main() {
     expect(out.toString(), isNot(contains('Hải')));
   });
 
+  test('che QR, tài khoản nhận tiền, tên con và số tiền của hóa đơn', () {
+    final out = TeachHubLoggingInterceptor.redactBody({
+      'id': 'i1',
+      'studentName': 'Minh Anh',
+      'totalAmount': 1500000,
+      'transferNote': 'TH 25K7Q9',
+      'qrPayload': '000201SECRETQR',
+      'payout': {'accountNo': '0011223344', 'accountName': 'NGUYEN VAN A'},
+      'status': 'issued',
+    });
+    expect(out, {
+      'id': 'i1',
+      'studentName': '***',
+      'totalAmount': '***',
+      'transferNote': '***',
+      'qrPayload': '***',
+      'payout': '***',
+      'status': 'issued',
+    });
+    expect(
+      TeachHubLoggingInterceptor.redactBody({
+        'accountNo': '1',
+        'accountName': 'x',
+      }),
+      {'accountNo': '***', 'accountName': '***'},
+    );
+  });
+
   test('che token mời và mã ngắn (bí mật, US-0.12)', () {
     final out = TeachHubLoggingInterceptor.redactBody([
       {'token': 'q3Zp8mT1xV0kLw5Hn2RcYb7JdFgSaE9uXoIiKtUeMhA'},

@@ -64,7 +64,7 @@
   "notificationBannerBody": "Get attendance and schedule updates for your child as soon as the teacher posts them.",
   "notificationBannerAction": "Turn on notifications",
   "invoiceTuitionTitle": "Tuition",
-  "invoiceTuitionUnpaid": "{count} unpaid invoices, {total} in total",
+  "invoiceTuitionUnpaid": "{count} invoices not settled, {total} in total",
   "@invoiceTuitionUnpaid": {
     "placeholders": {
       "count": {
@@ -72,6 +72,14 @@
       },
       "total": {
         "type": "String"
+      }
+    }
+  },
+  "invoiceTuitionUnpaidMore": "{count}+ invoices not settled",
+  "@invoiceTuitionUnpaidMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
       }
     }
   },

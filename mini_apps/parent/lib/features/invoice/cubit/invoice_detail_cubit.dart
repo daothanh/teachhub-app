@@ -67,7 +67,10 @@ class InvoiceDetailCubit extends Cubit<InvoiceDetailState> {
   Future<void> saveQr() async {
     final inv = state.invoice;
     final payload = inv?.qrPayload;
-    if (inv == null || payload == null || state.qrSave == QrSaveStatus.saving) {
+    if (inv == null ||
+        payload == null ||
+        inv.summary.status == InvoiceStatus.voided ||
+        state.qrSave == QrSaveStatus.saving) {
       return;
     }
     emit(state.copyWith(qrSave: QrSaveStatus.saving));
