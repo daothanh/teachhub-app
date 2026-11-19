@@ -49,6 +49,34 @@ Project (tài khoản Firebase của PO): `development` → `dayhoc-dev`, `stagi
 - iOS: `ios/config/<flavor>/GoogleService-Info.plist`. Build phase
   "Copy GoogleService-Info.plist" chép file đúng flavor vào app bundle; thiếu file chỉ in warning.
 
+### Việc Owner cần làm để bật push (S3-FL-04)
+
+Repo chưa có file cấu hình Firebase vì phải tạo trên console; agent không tạo project/app Firebase.
+Flavor `development` chạy được khi thiếu file: `bootstrap` ghi một dòng cảnh báo
+(`Firebase chưa cấu hình: bỏ qua đăng ký và nhận push`) và không đăng ký push. Staging/production dừng khi khởi động.
+
+1. Tạo app Android + iOS cho từng flavor trong project Firebase tương ứng (bảng trên), đúng applicationId/bundle id.
+2. Đặt `google-services.json` và `GoogleService-Info.plist` vào đúng đường dẫn ở trên (đã gitignore, không commit).
+3. Upload APNs key (Auth Key `.p8`) lên Firebase Cloud Messaging của từng project; bật Push Notifications cho 3 App ID.
+4. Android 13+: app chưa xin quyền `POST_NOTIFICATIONS`; thông báo hiện trên khay cần quyền này (xem ghi chú dưới).
+5. Thử trên máy thật (Android + iOS): đăng nhập → `POST /push/register`; đăng xuất → `POST /push/unregister`;
+   gửi push data-only `{notificationId, type: student_absent}` → chạm mở `/p` và tự đổi sang vai trò Phụ huynh.
+
+Push gửi tới thiết bị là data-only (hợp đồng `POST /push/register`), nên hệ điều hành không tự vẽ thông báo trên khay.
+Hiện chưa có code vẽ thông báo cục bộ từ payload; việc chạm thông báo → mở màn chỉ chạy khi thông báo đã hiện (vd. server
+thêm khối `notification` hoặc app vẽ bằng `flutter_local_notifications`). Cần Owner/BE chốt hướng trước khi phát hành.
+
+## Đồng bộ nền (S3-FL-09)
+
+- Android: `workmanager` (WorkManager) hẹn một tác vụ một-lần `vn.dayhoc.app.sync-outbox`, ràng buộc có mạng. Không cần khai thêm
+  trong `AndroidManifest.xml` (plugin tự gộp).
+- iOS: `BGProcessingTask` cùng định danh. `Info.plist` khai `UIBackgroundModes: processing` và
+  `BGTaskSchedulerPermittedIdentifiers` (`vn.dayhoc.app.sync-outbox`); `AppDelegate.swift` gọi
+  `WorkmanagerPlugin.registerLaunchHandlers()` và `setPluginRegistrantCallback`. Không cần bật thêm capability trong Apple Developer.
+- iOS quyết định lúc nào chạy (không đảm bảo thời điểm). Thử bằng Xcode: Debug → Simulate Background Fetch, hoặc lệnh LLDB
+  `e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"vn.dayhoc.app.sync-outbox"]`.
+- Callback nền chỉ chạy khi còn token đăng nhập; đăng xuất hoặc xóa dữ liệu thì hủy lịch.
+
 ## Google Sign-In (iOS)
 
 Mỗi flavor có bundle id riêng nên cần iOS OAuth client riêng. Điền 2 build setting của target
