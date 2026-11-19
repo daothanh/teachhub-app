@@ -16,6 +16,7 @@ import '../../features/invite/invite_cubit.dart';
 import '../../features/invite/invite_page.dart';
 import '../../features/role_picker/membership_cubit.dart';
 import '../../features/role_picker/role_picker_page.dart';
+import '../../features/settings/delete_account/delete_account_page.dart';
 import '../../features/settings/settings_page.dart';
 import '../../features/splash/splash_page.dart';
 import 'app_routes.dart';
@@ -89,6 +90,13 @@ GoRouter buildAppRouter({
       GoRoute(
         path: AppRoutes.settings,
         builder: (_, _) => const SettingsPage(),
+        routes: [
+          GoRoute(
+            path: 'delete-account',
+            builder: (_, _) =>
+                DeleteAccountScope(email: authCubit.state.user?.email ?? ''),
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoutes.invitePattern,

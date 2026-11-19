@@ -39,6 +39,10 @@ class LogoutService {
     }
   }
 
+  /// Số buổi chưa đồng bộ trên máy, `null` khi không đọc được (xóa tài khoản
+  /// dùng để cảnh báo trước khi gọi `DELETE /me`).
+  Future<int?> pendingCount() => _count();
+
   /// [confirmDiscard] nhận số buổi chưa đồng bộ, hoặc `null` khi không đọc
   /// được; trả `false` là ở lại (không đăng xuất, không xóa gì). Sau khi xác
   /// nhận, đếm lại: số tăng lên thì hỏi lại với số mới.

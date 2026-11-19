@@ -991,4 +991,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String sessionCancelReasonLine(String reason) {
     return 'Cancel reason: $reason';
   }
+
+  @override
+  String get todaySettings => 'Settings and account';
 }

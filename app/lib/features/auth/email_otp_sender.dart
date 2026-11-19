@@ -11,3 +11,12 @@ EmailOtpSender emailOtpSender(Dio api) =>
       // Endpoint công khai: AuthInterceptor không gắn token, không refresh.
       options: Options(extra: const {'requiresAuth': false}),
     );
+
+/// `POST /auth/otp/send` với `purpose = delete_account`: mã chỉ dùng được cho
+/// `DELETE /me` (mã đăng nhập không xóa được tài khoản và ngược lại).
+EmailOtpSender deleteAccountOtpSender(Dio api) =>
+    (email) => api.post<void>(
+      '/auth/otp/send',
+      data: {'email': email, 'purpose': 'delete_account'},
+      options: Options(extra: const {'requiresAuth': false}),
+    );

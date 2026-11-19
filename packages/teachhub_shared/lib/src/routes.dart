@@ -2,6 +2,9 @@
 /// route, spec §3.7).
 abstract final class TeachHubRoutes {
   static const rolePicker = '/role-picker';
+
+  /// Cài đặt của shell, gồm "Xóa tài khoản" (US-0.x, S4-FL-04).
+  static const settings = '/settings';
   static const teacher = '/t';
   static const parent = '/p';
   static const student = '/s';

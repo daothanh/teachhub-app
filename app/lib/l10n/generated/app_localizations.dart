@@ -805,6 +805,138 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Chưa gửi được đăng ký. Thử lại sau.'**
   String get waitlistErrorGeneric;
+
+  /// No description provided for @settingsAccount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản'**
+  String get settingsAccount;
+
+  /// No description provided for @deleteAccountEntry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tài khoản'**
+  String get deleteAccountEntry;
+
+  /// No description provided for @deleteAccountEntrySubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa vĩnh viễn tài khoản và dữ liệu cá nhân'**
+  String get deleteAccountEntrySubtitle;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tài khoản'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountWarnHeading.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hành động này không thể hoàn tác'**
+  String get deleteAccountWarnHeading;
+
+  /// No description provided for @deleteAccountWarnBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản {email} và dữ liệu cá nhân sẽ bị xóa. Đăng nhập lại bằng email này sẽ tạo tài khoản mới và không thấy dữ liệu cũ. Chứng từ tài chính được giữ lại theo quy định.'**
+  String deleteAccountWarnBody(String email);
+
+  /// No description provided for @deleteAccountPendingWarn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Máy này còn {count} mục chưa đồng bộ (điểm danh, thay đổi). Xóa tài khoản sẽ làm mất các dữ liệu đó.'**
+  String deleteAccountPendingWarn(int count);
+
+  /// No description provided for @deleteAccountUnreadableWarn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không kiểm tra được dữ liệu chưa đồng bộ trên máy này. Nếu có, dữ liệu đó sẽ mất.'**
+  String get deleteAccountUnreadableWarn;
+
+  /// No description provided for @deleteAccountSendCode.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi mã xác nhận'**
+  String get deleteAccountSendCode;
+
+  /// No description provided for @deleteAccountSending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang gửi mã…'**
+  String get deleteAccountSending;
+
+  /// No description provided for @deleteAccountCodeHeading.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập mã xác nhận'**
+  String get deleteAccountCodeHeading;
+
+  /// No description provided for @deleteAccountCodeSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã 6 số đã gửi tới {email}. Mã dùng được trong 5 phút.'**
+  String deleteAccountCodeSent(String email);
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tài khoản vĩnh viễn'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @deleteAccountDeleting.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang xóa…'**
+  String get deleteAccountDeleting;
+
+  /// No description provided for @deleteAccountResend.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi lại mã'**
+  String get deleteAccountResend;
+
+  /// No description provided for @deleteAccountErrNetwork.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có mạng. Thử lại sau.'**
+  String get deleteAccountErrNetwork;
+
+  /// No description provided for @deleteAccountErrRateLimited.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi mã quá nhiều lần. Thử lại sau {seconds} giây.'**
+  String deleteAccountErrRateLimited(int seconds);
+
+  /// No description provided for @deleteAccountErrRateLimitedNoTime.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi mã quá nhiều lần. Thử lại sau ít phút.'**
+  String get deleteAccountErrRateLimitedNoTime;
+
+  /// No description provided for @deleteAccountErrOwnerHasStaff.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đang là chủ không gian còn giáo viên khác. Hãy chuyển quyền hoặc gỡ họ khỏi không gian trước khi xóa tài khoản.'**
+  String get deleteAccountErrOwnerHasStaff;
+
+  /// No description provided for @deleteAccountErrActiveClasses.
+  ///
+  /// In vi, this message translates to:
+  /// **'Còn lớp đang hoạt động. Hãy lưu trữ hết các lớp trước khi xóa tài khoản.'**
+  String get deleteAccountErrActiveClasses;
+
+  /// No description provided for @deleteAccountErrStale.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dữ liệu vừa thay đổi. Mở lại màn này rồi thử lại.'**
+  String get deleteAccountErrStale;
+
+  /// No description provided for @deleteAccountErrGeneric.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa xóa được tài khoản. Thử lại sau.'**
+  String get deleteAccountErrGeneric;
 }
 
 class _AppLocalizationsDelegate

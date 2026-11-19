@@ -390,4 +390,84 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get waitlistErrorGeneric => 'Chưa gửi được đăng ký. Thử lại sau.';
+
+  @override
+  String get settingsAccount => 'Tài khoản';
+
+  @override
+  String get deleteAccountEntry => 'Xóa tài khoản';
+
+  @override
+  String get deleteAccountEntrySubtitle =>
+      'Xóa vĩnh viễn tài khoản và dữ liệu cá nhân';
+
+  @override
+  String get deleteAccountTitle => 'Xóa tài khoản';
+
+  @override
+  String get deleteAccountWarnHeading => 'Hành động này không thể hoàn tác';
+
+  @override
+  String deleteAccountWarnBody(String email) {
+    return 'Tài khoản $email và dữ liệu cá nhân sẽ bị xóa. Đăng nhập lại bằng email này sẽ tạo tài khoản mới và không thấy dữ liệu cũ. Chứng từ tài chính được giữ lại theo quy định.';
+  }
+
+  @override
+  String deleteAccountPendingWarn(int count) {
+    return 'Máy này còn $count mục chưa đồng bộ (điểm danh, thay đổi). Xóa tài khoản sẽ làm mất các dữ liệu đó.';
+  }
+
+  @override
+  String get deleteAccountUnreadableWarn =>
+      'Không kiểm tra được dữ liệu chưa đồng bộ trên máy này. Nếu có, dữ liệu đó sẽ mất.';
+
+  @override
+  String get deleteAccountSendCode => 'Gửi mã xác nhận';
+
+  @override
+  String get deleteAccountSending => 'Đang gửi mã…';
+
+  @override
+  String get deleteAccountCodeHeading => 'Nhập mã xác nhận';
+
+  @override
+  String deleteAccountCodeSent(String email) {
+    return 'Mã 6 số đã gửi tới $email. Mã dùng được trong 5 phút.';
+  }
+
+  @override
+  String get deleteAccountConfirm => 'Xóa tài khoản vĩnh viễn';
+
+  @override
+  String get deleteAccountDeleting => 'Đang xóa…';
+
+  @override
+  String get deleteAccountResend => 'Gửi lại mã';
+
+  @override
+  String get deleteAccountErrNetwork => 'Không có mạng. Thử lại sau.';
+
+  @override
+  String deleteAccountErrRateLimited(int seconds) {
+    return 'Gửi mã quá nhiều lần. Thử lại sau $seconds giây.';
+  }
+
+  @override
+  String get deleteAccountErrRateLimitedNoTime =>
+      'Gửi mã quá nhiều lần. Thử lại sau ít phút.';
+
+  @override
+  String get deleteAccountErrOwnerHasStaff =>
+      'Bạn đang là chủ không gian còn giáo viên khác. Hãy chuyển quyền hoặc gỡ họ khỏi không gian trước khi xóa tài khoản.';
+
+  @override
+  String get deleteAccountErrActiveClasses =>
+      'Còn lớp đang hoạt động. Hãy lưu trữ hết các lớp trước khi xóa tài khoản.';
+
+  @override
+  String get deleteAccountErrStale =>
+      'Dữ liệu vừa thay đổi. Mở lại màn này rồi thử lại.';
+
+  @override
+  String get deleteAccountErrGeneric => 'Chưa xóa được tài khoản. Thử lại sau.';
 }

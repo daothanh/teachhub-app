@@ -978,4 +978,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String sessionCancelReasonLine(String reason) {
     return 'Lý do hủy: $reason';
   }
+
+  @override
+  String get todaySettings => 'Cài đặt và tài khoản';
 }

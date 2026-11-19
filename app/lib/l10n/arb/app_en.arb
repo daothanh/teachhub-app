@@ -117,5 +117,55 @@
   "waitlistErrorBusy": "Still processing. Try again in a moment.",
   "waitlistErrorValidation": "Some details are invalid. Check the fields.",
   "waitlistErrorNetwork": "No connection. Try again later.",
-  "waitlistErrorGeneric": "Could not send. Try again later."
+  "waitlistErrorGeneric": "Could not send. Try again later.",
+  "settingsAccount": "Account",
+  "deleteAccountEntry": "Delete account",
+  "deleteAccountEntrySubtitle": "Permanently delete your account and personal data",
+  "deleteAccountTitle": "Delete account",
+  "deleteAccountWarnHeading": "This cannot be undone",
+  "deleteAccountWarnBody": "The account {email} and your personal data will be deleted. Signing in again with this email creates a new account with none of the old data. Financial records are kept as required by regulation.",
+  "@deleteAccountWarnBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountPendingWarn": "This device has {count} unsynced items (attendance, changes). Deleting the account will lose them.",
+  "@deleteAccountPendingWarn": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteAccountUnreadableWarn": "Could not check for unsynced data on this device. If there is any, it will be lost.",
+  "deleteAccountSendCode": "Send confirmation code",
+  "deleteAccountSending": "Sending code…",
+  "deleteAccountCodeHeading": "Enter the confirmation code",
+  "deleteAccountCodeSent": "A 6-digit code was sent to {email}. It is valid for 5 minutes.",
+  "@deleteAccountCodeSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountConfirm": "Delete account permanently",
+  "deleteAccountDeleting": "Deleting…",
+  "deleteAccountResend": "Resend code",
+  "deleteAccountErrNetwork": "No connection. Try again later.",
+  "deleteAccountErrRateLimited": "Too many codes requested. Try again in {seconds} seconds.",
+  "@deleteAccountErrRateLimited": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteAccountErrRateLimitedNoTime": "Too many codes requested. Try again in a few minutes.",
+  "deleteAccountErrOwnerHasStaff": "You own a workspace that still has other teachers. Transfer ownership or remove them before deleting your account.",
+  "deleteAccountErrActiveClasses": "You still have active classes. Archive all classes before deleting your account.",
+  "deleteAccountErrStale": "Data just changed. Reopen this screen and try again.",
+  "deleteAccountErrGeneric": "Could not delete the account. Try again later."
 }

@@ -186,6 +186,26 @@ void main() {
       expect(calls, ['logout', 'wipe']);
     });
 
+    testWidgets('mục "Xóa tài khoản" nằm trong cài đặt, chữ 200% không vỡ', (
+      tester,
+    ) async {
+      await _setupGetIt();
+      tester.view.physicalSize = const Size(390, 1200) * 3;
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: _wrap(GetIt.I<AppAuthCubit>()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Xóa tài khoản'));
+      expect(find.text('Tài khoản'), findsOneWidget);
+      expect(find.text('Xóa tài khoản'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('wipe failure after logout shows a snackbar', (tester) async {
       await _setupGetIt();
       GetIt.I.registerSingleton<LogoutService>(

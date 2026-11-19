@@ -590,5 +590,6 @@
         "type": "String"
       }
     }
-  }
+  },
+  "todaySettings": "Settings and account"
 }

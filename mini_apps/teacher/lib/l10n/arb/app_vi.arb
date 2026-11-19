@@ -590,5 +590,6 @@
         "type": "String"
       }
     }
-  }
+  },
+  "todaySettings": "Cài đặt và tài khoản"
 }

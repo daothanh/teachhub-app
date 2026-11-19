@@ -1779,6 +1779,12 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Lý do hủy: {reason}'**
   String sessionCancelReasonLine(String reason);
+
+  /// No description provided for @todaySettings.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cài đặt và tài khoản'**
+  String get todaySettings;
 }
 
 class _MiniAppLocalizationsDelegate
