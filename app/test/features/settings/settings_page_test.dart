@@ -186,6 +186,40 @@ void main() {
       expect(calls, ['logout', 'wipe']);
     });
 
+    testWidgets('wipe failure after logout shows a snackbar', (tester) async {
+      await _setupGetIt();
+      GetIt.I.registerSingleton<LogoutService>(
+        LogoutService(
+          logout: () async {},
+          pendingCount: () async => 0,
+          wipeLocalData: () async => throw StateError('disk'),
+        ),
+      );
+      await tester.pumpWidget(_wrap(GetIt.I<AppAuthCubit>()));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Đăng xuất'));
+      await tester.tap(find.text('Đăng xuất'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('chưa xóa hết dữ liệu'), findsOneWidget);
+    });
+
+    testWidgets('unreadable outbox shows its own warning', (tester) async {
+      await _setupGetIt();
+      GetIt.I.registerSingleton<LogoutService>(
+        LogoutService(
+          logout: () async {},
+          pendingCount: () async => throw StateError('key lost'),
+          wipeLocalData: () async {},
+        ),
+      );
+      await tester.pumpWidget(_wrap(GetIt.I<AppAuthCubit>()));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Đăng xuất'));
+      await tester.tap(find.text('Đăng xuất'));
+      await tester.pumpAndSettle();
+      expect(find.text('Không đọc được dữ liệu chưa đồng bộ'), findsOneWidget);
+    });
+
     testWidgets('renders all four sections with l10n labels', (tester) async {
       await _setupGetIt();
       final cubit = GetIt.I<AppAuthCubit>();

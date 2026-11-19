@@ -165,6 +165,17 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get logoutUnreadableTitle => 'Không đọc được dữ liệu chưa đồng bộ';
+
+  @override
+  String get logoutUnreadableBody =>
+      'Nếu đăng xuất, dữ liệu trên máy sẽ bị xóa và có thể mất các buổi chưa đồng bộ.';
+
+  @override
+  String get logoutWipeFailed =>
+      'Đã đăng xuất, nhưng chưa xóa hết dữ liệu trên máy. Ứng dụng sẽ thử lại lần mở sau.';
+
+  @override
   String get logoutPendingBody =>
       'Đăng xuất bây giờ sẽ xóa các buổi này khỏi máy. Hãy kết nối mạng để đồng bộ trước.';
 

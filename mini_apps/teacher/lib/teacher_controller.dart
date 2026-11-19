@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +7,7 @@ import 'package:tasco_storage/tasco_storage.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import 'data/local_db/teacher_database.dart';
+import 'data/local_db/teacher_local_data.dart';
 import 'features/home/pages/teacher_home_page.dart';
 import 'l10n/l10n.dart';
 
@@ -50,27 +49,21 @@ class TeacherController {
     );
   }
 
-  /// Số buổi chưa đồng bộ (đăng xuất cần biết, spec §6.4). Chưa có file CSDL
-  /// thì là 0 và không tạo file.
-  Future<int> pendingSyncCount() async {
-    final dir = await getApplicationDocumentsDirectory();
-    if (!File('${dir.path}/teacher.sqlite').existsSync()) return 0;
-    final db = await GetIt.I.getAsync<TeacherDatabase>(
-      instanceName: databaseKey,
-    );
-    return pendingOutboxCount(db);
-  }
+  /// CSDL gắn với phiên: đếm, xóa, đổi chủ (xem [TeacherLocalData]).
+  late final localData = TeacherLocalData(
+    keyStore: SecureStore(),
+    directory: getApplicationDocumentsDirectory,
+    // Lấy qua GetIt mỗi lần, không giữ instance: xóa xong đăng ký lại.
+    database: () =>
+        GetIt.I.getAsync<TeacherDatabase>(instanceName: databaseKey),
+    close: dispose,
+    reopen: init,
+  );
 
-  /// Đóng rồi xóa CSDL `teacher` và khóa của nó. Chỉ gọi khi outbox trống hoặc
-  /// người dùng đã xác nhận bỏ dữ liệu chưa đồng bộ. CSDL mở lại lười khi cần.
-  Future<void> wipeLocalData() async {
-    await dispose();
-    await deleteTeacherDatabase(
-      SecureStore(),
-      await getApplicationDocumentsDirectory(),
-    );
-    await init();
-  }
+  Future<int> pendingSyncCount() => localData.pendingSyncCount();
+  Future<void> wipeLocalData() => localData.wipe();
+  Future<void> retryPendingWipe() => localData.retryPendingWipe();
+  Future<void> claimDatabaseFor(String userId) => localData.claimFor(userId);
 
   Future<void> dispose() async {
     if (GetIt.I.isRegistered<TeacherDatabase>(instanceName: databaseKey)) {

@@ -89,13 +89,33 @@ Future<void> bootstrap({required Env env}) async {
   // 5. Phiên + vai trò. Nghe trước initSession để không lỡ lần khôi phục phiên.
   final authCubit = GetIt.I<AppAuthCubit>();
   final membershipCubit = GetIt.I<MembershipCubit>();
-  authCubit.stream.listen((state) {
+  String? claimedUser;
+  authCubit.stream.listen((state) async {
     if (state.isAuthenticated) {
+      // Người khác đăng nhập trên máy còn CSDL của người trước thì xóa trước
+      // khi vào mini-app (chặn tải vai trò tới khi xong).
+      final userId = state.user?.id;
+      if (userId != null && userId != claimedUser) {
+        claimedUser = userId;
+        try {
+          await TeacherController.instance.claimDatabaseFor(userId);
+        } catch (e, st) {
+          log(
+            'Teacher DB claim failed',
+            name: 'bootstrap',
+            error: e,
+            stackTrace: st,
+          );
+        }
+      }
       if (membershipCubit.state.statusLoad == LoadingStatus.initial) {
         membershipCubit.load();
       }
-    } else if (membershipCubit.state.statusLoad != LoadingStatus.initial) {
-      membershipCubit.clear();
+    } else {
+      claimedUser = null;
+      if (membershipCubit.state.statusLoad != LoadingStatus.initial) {
+        membershipCubit.clear();
+      }
     }
   });
   // Đăng xuất xóa CSDL teacher khi outbox trống; phiên hết hạn đi cùng đường đó.
@@ -107,12 +127,16 @@ Future<void> bootstrap({required Env env}) async {
   GetIt.I.registerSingleton<LogoutService>(logoutService);
   GetIt.I<AuthEventBus>().stream
       .where((e) => e == AuthEvent.sessionExpired)
-      .listen(
-        (_) => logoutService.onSessionExpired().catchError((Object e, st) {
-          log('Wipe after session expiry failed: $e', name: 'bootstrap');
-          return false;
-        }),
-      );
+      .listen((_) => unawaited(logoutService.onSessionExpired()));
+  // Lần xóa trước dở dang (lỗi đĩa, app bị tắt) thì xóa nốt.
+  unawaited(
+    TeacherController.instance.retryPendingWipe().catchError((
+      Object e,
+      StackTrace st,
+    ) {
+      log('Retry wipe failed', name: 'bootstrap', error: e, stackTrace: st);
+    }),
+  );
   unawaited(authCubit.initSession());
 
   // 6. Router.

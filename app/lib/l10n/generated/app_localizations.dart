@@ -392,6 +392,24 @@ abstract class AppLocalizations {
   /// **'Còn {count} buổi chưa đồng bộ'**
   String logoutPendingTitle(int count);
 
+  /// No description provided for @logoutUnreadableTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không đọc được dữ liệu chưa đồng bộ'**
+  String get logoutUnreadableTitle;
+
+  /// No description provided for @logoutUnreadableBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nếu đăng xuất, dữ liệu trên máy sẽ bị xóa và có thể mất các buổi chưa đồng bộ.'**
+  String get logoutUnreadableBody;
+
+  /// No description provided for @logoutWipeFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã đăng xuất, nhưng chưa xóa hết dữ liệu trên máy. Ứng dụng sẽ thử lại lần mở sau.'**
+  String get logoutWipeFailed;
+
   /// No description provided for @logoutPendingBody.
   ///
   /// In vi, this message translates to:

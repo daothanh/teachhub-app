@@ -10,14 +10,15 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 /// Đối chiếu mô hình auth/membership với `contracts/openapi.json` (bản chép từ
 /// teachhub-backend, cập nhật bằng `dart run tool/sync_openapi.dart` trong
 /// packages/teachhub_shared). Hợp đồng đổi tên trường mà app chưa theo → đỏ.
+final _openapi =
+    jsonDecode(
+          File(
+            '../packages/teachhub_shared/contracts/openapi.json',
+          ).readAsStringSync(),
+        )
+        as Map<String, dynamic>;
 final _schemas =
-    ((jsonDecode(
-              File(
-                '../packages/teachhub_shared/contracts/openapi.json',
-              ).readAsStringSync(),
-            )
-            as Map)['components']['schemas']
-        as Map<String, dynamic>);
+    (_openapi['components'] as Map)['schemas'] as Map<String, dynamic>;
 
 Set<String> _props(String schema) =>
     ((_schemas[schema] as Map)['properties'] as Map).keys
@@ -72,6 +73,54 @@ void main() {
     expect(MembershipRole.values.map((r) => r.wire), roles);
   });
 
+  // required + kiểu: null chỉ được phép ở trường schema khai `null`.
+  const types = {
+    'User': {
+      'id': 'string',
+      'email': 'string',
+      'displayName': ['string', 'null'],
+      'permissions': 'array',
+    },
+    'Membership': {
+      'id': 'string',
+      'role': 'string',
+      'label': 'string',
+      'tenantId': ['string', 'null'],
+      'studentId': ['string', 'null'],
+    },
+  };
+  for (final MapEntry(key: schema, value: expected) in types.entries) {
+    test('$schema: required và kiểu trường khớp hợp đồng', () {
+      final def = _schemas[schema] as Map;
+      expect((def['required'] as List).toSet(), _props(schema));
+      final props = def['properties'] as Map;
+      for (final MapEntry(key: name, value: type) in expected.entries) {
+        expect((props[name] as Map)['type'], type, reason: '$schema.$name');
+      }
+      expect(
+        (((_schemas['User'] as Map)['properties'] as Map)['permissions']
+            as Map)['items'],
+        {'type': 'string'},
+      );
+    });
+  }
+
+  test('trường khai nullable nhận null, app không ném', () {
+    final user = {
+      ..._sample('User', {'permissions': <String>[]}),
+      'displayName': null,
+    };
+    expect(TeachHubUser.fromJson(user).displayName, isNull);
+    final m = {
+      ..._sample('Membership', {'role': 'parent'}),
+      'tenantId': null,
+      'studentId': null,
+    };
+    final membership = Membership.fromJson(m)!;
+    expect(membership.tenantId, isNull);
+    expect(membership.studentId, isNull);
+  });
+
   test('phản hồi login/SSO: app đọc `user`, tasco_auth đọc token', () {
     final login = _loginBody();
     expect(login['required'], contains('user'));
@@ -88,14 +137,7 @@ void main() {
 }
 
 Map<String, dynamic> _loginBody() {
-  final paths =
-      (jsonDecode(
-                File(
-                  '../packages/teachhub_shared/contracts/openapi.json',
-                ).readAsStringSync(),
-              )
-              as Map)['paths']
-          as Map;
+  final paths = _openapi['paths'] as Map;
   return paths['/v1/auth/login']['post']['responses']['200']['content']['application/json']['schema']
       as Map<String, dynamic>;
 }

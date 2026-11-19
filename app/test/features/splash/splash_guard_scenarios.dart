@@ -110,7 +110,7 @@ void defineSplashGuardTests() {
   }
 
   testWidgets('chưa đăng nhập: splash rồi về màn đăng nhập', (tester) async {
-    await pump(tester);
+    final router = await pump(tester);
     // Đang kiểm phiên: ở splash.
     expect(find.byType(SplashPage), findsOneWidget);
 
@@ -119,6 +119,7 @@ void defineSplashGuardTests() {
     );
     await tester.pumpAndSettle();
     expect(find.text('màn đăng nhập'), findsOneWidget);
+    expect(router.routeInformationProvider.value.uri.path, AppRoutes.login);
   });
 
   testWidgets('đăng nhập nhưng chưa có vai trò: màn chọn vai trò', (
@@ -147,7 +148,7 @@ void defineSplashGuardTests() {
   testWidgets('đã có vai trò: vào đúng mini-app của vai trò đang mở', (
     tester,
   ) async {
-    await pump(tester);
+    final router = await pump(tester);
     auth.set(
       AppAuthState.initial().copyWith(
         statusCheckToken: LoadingStatus.success,
@@ -163,5 +164,9 @@ void defineSplashGuardTests() {
     );
     await tester.pumpAndSettle();
     expect(find.text('mini-app teacher'), findsOneWidget);
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      TeachHubRoutes.teacher,
+    );
   });
 }

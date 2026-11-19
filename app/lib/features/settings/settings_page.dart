@@ -16,30 +16,45 @@ import '../../l10n/l10n.dart';
 
 // ── Settings Page ─────────────────────────────────────────────────────────────
 
-/// Đăng xuất; còn buổi chưa đồng bộ thì hỏi trước (spec §6.4).
-Future<void> _logout(BuildContext context) {
+/// Đăng xuất; còn buổi chưa đồng bộ (hoặc không đọc được) thì hỏi trước
+/// (spec §6.4).
+Future<void> _logout(BuildContext context) async {
   final l10n = AppLocalizations.of(context);
-  return GetIt.I<LogoutService>().logout(
-    confirmDiscard: (pending) async =>
-        await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(l10n.logoutPendingTitle(pending)),
-            content: Text(l10n.logoutPendingBody),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: Text(l10n.logoutPendingCancel),
+  final messenger = ScaffoldMessenger.of(context);
+  final result = await GetIt.I<LogoutService>().logout(
+    confirmDiscard: (pending) async {
+      if (!context.mounted) return false;
+      return await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text(
+                pending == null
+                    ? l10n.logoutUnreadableTitle
+                    : l10n.logoutPendingTitle(pending),
               ),
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: Text(l10n.logoutPendingConfirm),
+              content: Text(
+                pending == null
+                    ? l10n.logoutUnreadableBody
+                    : l10n.logoutPendingBody,
               ),
-            ],
-          ),
-        ) ??
-        false,
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(l10n.logoutPendingCancel),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(l10n.logoutPendingConfirm),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+    },
   );
+  if (result == LogoutResult.wipeFailed) {
+    messenger.showSnackBar(SnackBar(content: Text(l10n.logoutWipeFailed)));
+  }
 }
 
 class SettingsPage extends StatelessWidget {

@@ -56,7 +56,7 @@ class TeacherDatabase extends _$TeacherDatabase {
     final key = await databaseKey(keyStore);
     return TeacherDatabase(
       driftDatabase(
-        name: 'teacher',
+        name: teacherDatabaseName,
         native: DriftNativeOptions(setup: encryptionSetup(key)),
       ),
     );
@@ -64,6 +64,10 @@ class TeacherDatabase extends _$TeacherDatabase {
 }
 
 const _keyName = 'teacher.db_key';
+
+/// Tên CSDL cho `driftDatabase`; file trên máy là [teacherDatabaseFile].
+const teacherDatabaseName = 'teacher';
+const teacherDatabaseFile = '$teacherDatabaseName.sqlite';
 
 /// Số mutation còn trong outbox (kể cả bị từ chối) = số buổi chưa đồng bộ.
 Future<int> pendingOutboxCount(TeacherDatabase db) =>
@@ -77,7 +81,7 @@ Future<void> deleteTeacherDatabase(
   Directory dir,
 ) async {
   for (final suffix in ['', '-wal', '-shm', '-journal']) {
-    final file = File('${dir.path}/teacher.sqlite$suffix');
+    final file = File('${dir.path}/$teacherDatabaseFile$suffix');
     if (file.existsSync()) await file.delete();
   }
   await keyStore.delete(_keyName);

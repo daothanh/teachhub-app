@@ -1,0 +1,94 @@
+import 'dart:async';
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:tasco_storage/tasco_storage.dart';
+
+import 'teacher_database.dart';
+
+/// Dữ liệu cục bộ của teacher gắn với phiên đăng nhập (spec §6.4): đếm buổi
+/// chưa đồng bộ, xóa khi đăng xuất, và không để người đăng nhập sau thấy dữ
+/// liệu của người trước. Mọi thao tác chạy tuần tự qua một hàng đợi.
+class TeacherLocalData {
+  TeacherLocalData({
+    required KeyValueStore keyStore,
+    required Future<Directory> Function() directory,
+    required Future<TeacherDatabase> Function() database,
+    required Future<void> Function() close,
+    required Future<void> Function() reopen,
+  }) : _keys = keyStore,
+       _dir = directory,
+       _db = database,
+       _close = close,
+       _reopen = reopen;
+
+  final KeyValueStore _keys;
+  final Future<Directory> Function() _dir;
+  final Future<TeacherDatabase> Function() _db;
+  final Future<void> Function() _close;
+  final Future<void> Function() _reopen;
+
+  static const ownerKey = 'teacher.db_owner';
+
+  /// Có ở đây = lần xóa trước chưa xong, phải xóa nốt trước khi dùng tiếp.
+  static const wipePendingKey = 'teacher.wipe_pending';
+
+  Future<void> _tail = Future.value();
+  Future<T> _serial<T>(Future<T> Function() job) {
+    final run = _tail.then((_) => job());
+    _tail = run.then<void>((_) {}, onError: (_) {});
+    return run;
+  }
+
+  /// Số buổi chưa đồng bộ. Chưa có file CSDL thì 0 và không tạo file.
+  Future<int> pendingSyncCount() => _serial(_count);
+
+  Future<int> _count() async {
+    final dir = await _dir();
+    if (!File('${dir.path}/$teacherDatabaseFile').existsSync()) return 0;
+    return pendingOutboxCount(await _db());
+  }
+
+  /// Xóa CSDL và khóa. Ghi cờ trước: lỗi giữa chừng thì [retryPendingWipe]
+  /// xóa nốt ở lần sau. Gọi đồng thời nhiều lần chỉ chạy lần lượt.
+  Future<void> wipe() => _serial(_wipe);
+
+  Future<void> _wipe() async {
+    await _keys.write(wipePendingKey, '1');
+    await _close();
+    try {
+      await deleteTeacherDatabase(_keys, await _dir());
+      await _keys.delete(ownerKey);
+    } finally {
+      await _reopen(); // lỗi xóa vẫn để mini-app dùng lại được CSDL
+    }
+    await _keys.delete(wipePendingKey);
+  }
+
+  /// Xóa nốt nếu lần xóa trước dở dang. Gọi khi khởi động.
+  Future<void> retryPendingWipe() => _serial(_retry);
+
+  Future<void> _retry() async {
+    if (await _keys.contains(wipePendingKey)) await _wipe();
+  }
+
+  /// Gọi khi [userId] đăng nhập, trước khi vào mini-app. CSDL còn của người
+  /// khác thì xóa: token của họ đã mất nên outbox đó không đồng bộ hợp lệ
+  /// được, và dữ liệu có tên học sinh không được lộ cho người sau.
+  Future<void> claimFor(String userId) => _serial(() async {
+    await _retry();
+    final owner = await _keys.read(ownerKey);
+    if (owner != null && owner != userId) {
+      int? lost;
+      try {
+        lost = await _count();
+      } catch (_) {}
+      log(
+        'Teacher DB của người dùng khác, xóa (bỏ ${lost ?? 'không rõ'} mutation chưa đồng bộ)',
+        name: 'teacher',
+      );
+      await _wipe();
+    }
+    await _keys.write(ownerKey, userId);
+  });
+}

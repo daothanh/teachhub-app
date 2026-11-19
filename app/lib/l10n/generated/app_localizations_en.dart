@@ -165,6 +165,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get logoutUnreadableTitle => 'Can\'t read unsynced data';
+
+  @override
+  String get logoutUnreadableBody =>
+      'If you log out, data on this device is deleted and unsynced sessions may be lost.';
+
+  @override
+  String get logoutWipeFailed =>
+      'Logged out, but some data on this device wasn\'t deleted. The app will retry next time it opens.';
+
+  @override
   String get logoutPendingBody =>
       'Logging out now deletes them from this device. Connect to the internet to sync first.';
 
