@@ -16,11 +16,14 @@ import 'data/sync/clock_skew.dart';
 import 'data/sync/connectivity.dart';
 import 'data/sync/sync_engine.dart';
 import 'data/sync/uuid.dart';
-import 'features/home/pages/teacher_home_page.dart';
+import 'features/attendance/attendance_routes.dart';
+import 'features/attendance/data/attendance_repository.dart';
+import 'features/onboarding/data/onboarding_models.dart';
 import 'features/onboarding/data/onboarding_repository.dart';
 import 'features/onboarding/pages/onboarding_page.dart';
 import 'features/students/data/student_repository.dart';
 import 'features/students/pages/student_form_page.dart';
+import 'features/today/pages/today_page.dart';
 import 'l10n/l10n.dart';
 
 /// Mini-app không gian Giáo viên (spec §3.7), route gốc [TeachHubRoutes.teacher].
@@ -44,12 +47,17 @@ class TeacherController {
     GoRoute(
       path: routePrefix,
       name: '$moduleId.home',
-      builder: (context, state) => const TeacherHomePage(),
+      builder: (context, state) => const TodayPage(),
       routes: [
         GoRoute(
           path: 'onboarding',
           name: '$moduleId.onboarding',
-          builder: (context, state) => const OnboardingPage(),
+          builder: (context, state) => OnboardingPage(
+            // `?step=` mở đúng một bước (thẻ nhắc ở T03), không thì bước dở.
+            initialStep: OnboardingStep.fromWire(
+              state.uri.queryParameters['step'],
+            ),
+          ),
         ),
         GoRoute(
           path: 'students/new',
@@ -59,6 +67,7 @@ class TeacherController {
       ],
     ),
     ...classesRoutes(moduleId),
+    ...attendanceRoutes(moduleId),
   ];
 
   /// CSDL chỉ mở ở lần đầu cần (lazy): người dùng không có vai trò Giáo viên
@@ -82,6 +91,20 @@ class TeacherController {
     if (!getIt.isRegistered<StudentRepository>()) {
       getIt.registerLazySingleton<StudentRepository>(
         () => DioStudentRepository(api()),
+      );
+    }
+    if (!getIt.isRegistered<AttendanceRepository>()) {
+      getIt.registerLazySingleton<AttendanceRepository>(
+        () => DriftAttendanceRepository(
+          database: () =>
+              getIt.getAsync<TeacherDatabase>(instanceName: databaseKey),
+          api: _api,
+          engine: () async {
+            await startSync();
+            return syncEngine;
+          },
+          clock: clock,
+        ),
       );
     }
     if (!getIt.isRegistered<OnboardingRepository>()) {
@@ -179,7 +202,14 @@ class TeacherController {
   Future<int> pendingSyncCount() => localData.pendingSyncCount();
   Future<int> failedSyncCount() => localData.failedSyncCount();
   Future<void> discardFailedSync() => localData.discardFailed();
-  Future<void> wipeLocalData() => localData.wipe();
+
+  /// Đăng xuất: dừng đồng bộ trước rồi xóa (không để engine chạy lại với phiên
+  /// đã mất). Vào lại màn chính của giáo viên thì [startSync] bật lại.
+  Future<void> wipeLocalData() async {
+    await stopSync();
+    await localData.wipe();
+  }
+
   Future<void> retryPendingWipe() => localData.retryPendingWipe();
   Future<void> claimDatabaseFor(String userId) => localData.claimFor(userId);
 
