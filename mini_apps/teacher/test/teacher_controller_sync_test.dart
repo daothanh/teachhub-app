@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -50,6 +52,23 @@ void main() {
       await controller.stopSync();
       await starting;
       expect(controller.syncEngine, isNull);
+    },
+  );
+
+  test(
+    'wipeLocalData: dừng đồng bộ trước khi xóa, sau đó không còn engine',
+    () async {
+      final tmp = await Directory.systemTemp.createTemp('wipe');
+      addTearDown(() => tmp.delete(recursive: true));
+      controller.documentsDirectory = () async => tmp;
+      await controller.startSync();
+      expect(controller.syncEngine, isNotNull);
+
+      await controller.wipeLocalData();
+
+      expect(controller.syncEngine, isNull);
+      // Chỉ màn chính bật lại engine: xóa xong không được tự dựng.
+      expect(controller.enginesCreated, 1);
     },
   );
 }

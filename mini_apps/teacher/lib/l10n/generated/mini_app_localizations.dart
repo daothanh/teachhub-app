@@ -107,12 +107,6 @@ abstract class MiniAppLocalizations {
   /// **'Giáo viên'**
   String get spaceTitle;
 
-  /// No description provided for @spaceComingSoon.
-  ///
-  /// In vi, this message translates to:
-  /// **'Không gian này đang được xây dựng.'**
-  String get spaceComingSoon;
-
   /// No description provided for @switchRole.
   ///
   /// In vi, this message translates to:
@@ -940,6 +934,294 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Đã lưu học viên. Chưa ghi nhận được bước này.'**
   String get onboardingStudentSaved;
+
+  /// No description provided for @todayTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hôm nay'**
+  String get todayTitle;
+
+  /// No description provided for @todayEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hôm nay không có buổi học'**
+  String get todayEmpty;
+
+  /// No description provided for @todayEmptyHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi học theo lịch của các lớp sẽ hiện ở đây.'**
+  String get todayEmptyHint;
+
+  /// No description provided for @todayClassesEntry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp học'**
+  String get todayClassesEntry;
+
+  /// No description provided for @todaySessionAttended.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã điểm danh'**
+  String get todaySessionAttended;
+
+  /// No description provided for @todaySessionNotAttended.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa điểm danh'**
+  String get todaySessionNotAttended;
+
+  /// No description provided for @todaySessionCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy'**
+  String get todaySessionCancelled;
+
+  /// No description provided for @todayTakeAttendance.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điểm danh'**
+  String get todayTakeAttendance;
+
+  /// No description provided for @todayPending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chờ đồng bộ ({count})'**
+  String todayPending(int count);
+
+  /// No description provided for @todayRefreshFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa làm mới được. Kéo xuống để thử lại.'**
+  String get todayRefreshFailed;
+
+  /// No description provided for @todaySessionSemantics.
+  ///
+  /// In vi, this message translates to:
+  /// **'{className}, {time}, {status}'**
+  String todaySessionSemantics(String className, String time, String status);
+
+  /// No description provided for @todayOnboardingTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bước làm quen bạn đã để sau'**
+  String get todayOnboardingTitle;
+
+  /// No description provided for @todayOnboardingOpen.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mở bước {step}'**
+  String todayOnboardingOpen(String step);
+
+  /// No description provided for @attendanceTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điểm danh'**
+  String get attendanceTitle;
+
+  /// No description provided for @attendanceStatusPresent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Có mặt'**
+  String get attendanceStatusPresent;
+
+  /// No description provided for @attendanceStatusLate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đi muộn'**
+  String get attendanceStatusLate;
+
+  /// No description provided for @attendanceStatusExcused.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vắng có phép'**
+  String get attendanceStatusExcused;
+
+  /// No description provided for @attendanceStatusUnexcused.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vắng không phép'**
+  String get attendanceStatusUnexcused;
+
+  /// No description provided for @attendanceStudentSemantics.
+  ///
+  /// In vi, this message translates to:
+  /// **'{name}, {status}. Chạm để đổi trạng thái'**
+  String attendanceStudentSemantics(String name, String status);
+
+  /// No description provided for @attendanceSave.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu'**
+  String get attendanceSave;
+
+  /// No description provided for @attendanceSaving.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang lưu…'**
+  String get attendanceSaving;
+
+  /// No description provided for @attendanceSaveFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa lưu được. Thử lại.'**
+  String get attendanceSaveFailed;
+
+  /// No description provided for @attendanceLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được danh sách học viên.'**
+  String get attendanceLoadFailed;
+
+  /// No description provided for @attendanceRetry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thử lại'**
+  String get attendanceRetry;
+
+  /// No description provided for @attendanceEmptyRoster.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp này chưa có học viên.'**
+  String get attendanceEmptyRoster;
+
+  /// No description provided for @attendanceReadOnlyCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi này đã hủy nên chỉ xem được.'**
+  String get attendanceReadOnlyCancelled;
+
+  /// No description provided for @attendanceReadOnlyWindow.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi này quá 7 ngày nên chỉ xem, không sửa được.'**
+  String get attendanceReadOnlyWindow;
+
+  /// No description provided for @attendanceOfflineNotice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang ngoại tuyến. Thay đổi lưu trên máy và gửi khi có mạng.'**
+  String get attendanceOfflineNotice;
+
+  /// No description provided for @attendanceNoteLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi chú'**
+  String get attendanceNoteLabel;
+
+  /// No description provided for @attendanceNoteToggle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi chú cho {name}'**
+  String attendanceNoteToggle(String name);
+
+  /// No description provided for @attendanceRejectedWindow.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã quá hạn sửa 7 ngày nên thay đổi này không được nhận.'**
+  String get attendanceRejectedWindow;
+
+  /// No description provided for @attendanceRejectedPlan.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gói hiện tại chỉ cho xem nên thay đổi này không được nhận.'**
+  String get attendanceRejectedPlan;
+
+  /// No description provided for @attendanceRejectedNotFound.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học viên không còn trong buổi này nên thay đổi không được nhận.'**
+  String get attendanceRejectedNotFound;
+
+  /// No description provided for @attendanceRejectedGeneric.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thay đổi này không được nhận.'**
+  String get attendanceRejectedGeneric;
+
+  /// No description provided for @attendanceBatchNotFound.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi này không còn tồn tại nên chưa gửi được điểm danh.'**
+  String get attendanceBatchNotFound;
+
+  /// No description provided for @attendanceBatchCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi này đã hủy nên chưa gửi được điểm danh.'**
+  String get attendanceBatchCancelled;
+
+  /// No description provided for @attendanceBatchGeneric.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa gửi được điểm danh của buổi này.'**
+  String get attendanceBatchGeneric;
+
+  /// No description provided for @attendanceDiscard.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ thay đổi bị từ chối'**
+  String get attendanceDiscard;
+
+  /// No description provided for @attendanceHistory.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhật ký sửa'**
+  String get attendanceHistory;
+
+  /// No description provided for @historyTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhật ký sửa'**
+  String get historyTitle;
+
+  /// No description provided for @historyEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi này chưa có lần sửa nào.'**
+  String get historyEmpty;
+
+  /// No description provided for @historyLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được nhật ký.'**
+  String get historyLoadFailed;
+
+  /// No description provided for @historyLoadMore.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem thêm'**
+  String get historyLoadMore;
+
+  /// No description provided for @historyChangedBy.
+  ///
+  /// In vi, this message translates to:
+  /// **'{who} · {time}'**
+  String historyChangedBy(String who, String time);
+
+  /// No description provided for @historyUnknownUser.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không rõ người sửa'**
+  String get historyUnknownUser;
+
+  /// No description provided for @historyFirst.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điểm danh lần đầu'**
+  String get historyFirst;
+
+  /// No description provided for @historyNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi chú: {note}'**
+  String historyNote(String note);
+
+  /// No description provided for @historyNoNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'không có ghi chú'**
+  String get historyNoNote;
 
   /// No description provided for @contactsAdd.
   ///

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
@@ -15,12 +17,15 @@ import 'data/sync/clock_skew.dart';
 import 'data/sync/connectivity.dart';
 import 'data/sync/sync_engine.dart';
 import 'data/sync/uuid.dart';
+import 'features/attendance/attendance_routes.dart';
+import 'features/attendance/data/attendance_repository.dart';
 import 'features/classes/classes_routes.dart';
-import 'features/home/pages/teacher_home_page.dart';
+import 'features/onboarding/data/onboarding_models.dart';
 import 'features/onboarding/data/onboarding_repository.dart';
 import 'features/onboarding/pages/onboarding_page.dart';
 import 'features/students/data/student_repository.dart';
 import 'features/students/pages/student_form_page.dart';
+import 'features/today/pages/today_page.dart';
 import 'l10n/l10n.dart';
 
 /// Mini-app không gian Giáo viên (spec §3.7), route gốc [TeachHubRoutes.teacher].
@@ -44,12 +49,17 @@ class TeacherController {
     GoRoute(
       path: routePrefix,
       name: '$moduleId.home',
-      builder: (context, state) => const TeacherHomePage(),
+      builder: (context, state) => const TodayPage(),
       routes: [
         GoRoute(
           path: 'onboarding',
           name: '$moduleId.onboarding',
-          builder: (context, state) => const OnboardingPage(),
+          builder: (context, state) => OnboardingPage(
+            // `?step=` mở đúng một bước (thẻ nhắc ở T03), không thì bước dở.
+            initialStep: OnboardingStep.fromWire(
+              state.uri.queryParameters['step'],
+            ),
+          ),
         ),
         GoRoute(
           path: 'students/new',
@@ -59,6 +69,7 @@ class TeacherController {
       ],
     ),
     ...classesRoutes(moduleId),
+    ...attendanceRoutes(moduleId),
   ];
 
   /// CSDL chỉ mở ở lần đầu cần (lazy): người dùng không có vai trò Giáo viên
@@ -84,6 +95,18 @@ class TeacherController {
         () => DioStudentRepository(api()),
       );
     }
+    if (!getIt.isRegistered<AttendanceRepository>()) {
+      getIt.registerLazySingleton<AttendanceRepository>(
+        () => DriftAttendanceRepository(
+          database: () =>
+              getIt.getAsync<TeacherDatabase>(instanceName: databaseKey),
+          api: _api,
+          engine: () async => syncEngine,
+          startSync: startSync,
+          clock: clock,
+        ),
+      );
+    }
     if (!getIt.isRegistered<OnboardingRepository>()) {
       getIt.registerLazySingleton<OnboardingRepository>(
         () => DioOnboardingRepository(api()),
@@ -93,8 +116,8 @@ class TeacherController {
 
   /// CSDL gắn với phiên: đếm, xóa, đổi chủ (xem [TeacherLocalData]).
   late final localData = TeacherLocalData(
-    keyStore: SecureStore(),
-    directory: getApplicationDocumentsDirectory,
+    keyStore: keyStoreOverride ?? SecureStore(),
+    directory: () => documentsDirectory(),
     // Lấy qua GetIt mỗi lần, không giữ instance: xóa xong đăng ký lại.
     database: () =>
         GetIt.I.getAsync<TeacherDatabase>(instanceName: databaseKey),
@@ -158,6 +181,11 @@ class TeacherController {
   @visibleForTesting
   int enginesCreated = 0;
 
+  /// Thư mục chứa file CSDL; test thay bằng thư mục tạm.
+  @visibleForTesting
+  Future<Directory> Function() documentsDirectory =
+      getApplicationDocumentsDirectory;
+
   /// Thay kho khóa thật (Keychain/Keystore) trong test.
   @visibleForTesting
   KeyValueStore? keyStoreOverride;
@@ -179,7 +207,14 @@ class TeacherController {
   Future<int> pendingSyncCount() => localData.pendingSyncCount();
   Future<int> failedSyncCount() => localData.failedSyncCount();
   Future<void> discardFailedSync() => localData.discardFailed();
-  Future<void> wipeLocalData() => localData.wipe();
+
+  /// Đăng xuất: dừng đồng bộ trước rồi xóa (không để engine chạy lại với phiên
+  /// đã mất). Vào lại màn chính của giáo viên thì [startSync] bật lại.
+  Future<void> wipeLocalData() async {
+    await stopSync();
+    await localData.wipe();
+  }
+
   Future<void> retryPendingWipe() => localData.retryPendingWipe();
   Future<void> claimDatabaseFor(String userId) => localData.claimFor(userId);
 

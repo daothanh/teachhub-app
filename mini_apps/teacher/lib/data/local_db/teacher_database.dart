@@ -57,6 +57,10 @@ class CachedSessions extends Table {
   TextColumn get status => text()();
   BoolColumn get isMakeup => boolean()();
 
+  /// v4: offset UTC của tenant (phút) lấy từ `startsAt` của server, để hiện giờ
+  /// tường đúng khi ngoại tuyến. null ở dòng cũ: dùng giờ máy.
+  IntColumn get tzOffsetMinutes => integer().nullable()();
+
   /// Chỉ có sau khi tải điểm danh của buổi; null = chưa tải danh sách.
   BoolColumn get canEdit => boolean().nullable()();
   DateTimeColumn get editableUntil => dateTime().nullable()();
@@ -89,7 +93,7 @@ class TeacherDatabase extends _$TeacherDatabase {
   TeacherDatabase(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   /// Chỉ thêm (expand), không xóa/đổi tên cột — giống quy ước migration backend.
   /// Mỗi bước có test trong test/data/teacher_migration_test.dart.
@@ -112,6 +116,10 @@ class TeacherDatabase extends _$TeacherDatabase {
         await customStatement(
           'DELETE FROM outbox_mutations WHERE session_id IS NULL',
         );
+      }
+      // from < 3: createTable ở trên đã tạo bảng với cột này.
+      if (from == 3) {
+        await m.addColumn(cachedSessions, cachedSessions.tzOffsetMinutes);
       }
     },
   );

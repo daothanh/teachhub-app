@@ -36,6 +36,9 @@ class FakeTeachHubServer implements HttpClientAdapter {
   List<Map<String, Object?>> sessions = [];
   final attendance = <String, Map<String, Object?>>{};
 
+  /// Nhật ký sửa theo buổi, chia trang; `cursor` là số thứ tự trang.
+  final histories = <String, List<List<Map<String, Object?>>>>{};
+
   /// Mọi request POST tới `/attendance/sync`, đúng thứ tự.
   final syncRequests = <({String key, Map<String, Object?> body})>[];
 
@@ -89,6 +92,18 @@ class FakeTeachHubServer implements HttpClientAdapter {
     }
     if (options.method == 'GET' && options.path == '/sessions') {
       return _json(200, {'items': sessions});
+    }
+    final hist = RegExp(
+      r'^/sessions/([^/]+)/attendance/history$',
+    ).firstMatch(options.path);
+    if (options.method == 'GET' && hist != null) {
+      final pages = histories[hist.group(1)];
+      if (pages == null) return _error(404, 'NOT_FOUND');
+      final i = int.parse(options.queryParameters['cursor'] as String? ?? '0');
+      return _json(200, {
+        'items': pages[i],
+        'nextCursor': i + 1 < pages.length ? '${i + 1}' : null,
+      });
     }
     final get = RegExp(
       r'^/sessions/([^/]+)/attendance$',

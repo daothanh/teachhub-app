@@ -1,7 +1,6 @@
 {
   "@@locale": "vi",
   "spaceTitle": "Giáo viên",
-  "spaceComingSoon": "Không gian này đang được xây dựng.",
   "switchRole": "Đổi vai trò",
   "offlineBanner": "Ngoại tuyến — thay đổi được lưu trên máy và tự đồng bộ khi có mạng.",
   "classesTitle": "Lớp học",
@@ -256,6 +255,115 @@
   },
   "onboardingCreateClassPending": "Màn tạo lớp sẽ được nối sau.",
   "onboardingStudentSaved": "Đã lưu học viên. Chưa ghi nhận được bước này.",
+  "todayTitle": "Hôm nay",
+  "todayEmpty": "Hôm nay không có buổi học",
+  "todayEmptyHint": "Buổi học theo lịch của các lớp sẽ hiện ở đây.",
+  "todayClassesEntry": "Lớp học",
+  "todaySessionAttended": "Đã điểm danh",
+  "todaySessionNotAttended": "Chưa điểm danh",
+  "todaySessionCancelled": "Đã hủy",
+  "todayTakeAttendance": "Điểm danh",
+  "todayPending": "Chờ đồng bộ ({count})",
+  "@todayPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "todayRefreshFailed": "Chưa làm mới được. Kéo xuống để thử lại.",
+  "todaySessionSemantics": "{className}, {time}, {status}",
+  "@todaySessionSemantics": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "todayOnboardingTitle": "Bước làm quen bạn đã để sau",
+  "todayOnboardingOpen": "Mở bước {step}",
+  "@todayOnboardingOpen": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "attendanceTitle": "Điểm danh",
+  "attendanceStatusPresent": "Có mặt",
+  "attendanceStatusLate": "Đi muộn",
+  "attendanceStatusExcused": "Vắng có phép",
+  "attendanceStatusUnexcused": "Vắng không phép",
+  "attendanceStudentSemantics": "{name}, {status}. Chạm để đổi trạng thái",
+  "@attendanceStudentSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "attendanceSave": "Lưu",
+  "attendanceSaving": "Đang lưu…",
+  "attendanceSaveFailed": "Chưa lưu được. Thử lại.",
+  "attendanceLoadFailed": "Không tải được danh sách học viên.",
+  "attendanceRetry": "Thử lại",
+  "attendanceEmptyRoster": "Lớp này chưa có học viên.",
+  "attendanceReadOnlyCancelled": "Buổi này đã hủy nên chỉ xem được.",
+  "attendanceReadOnlyWindow": "Buổi này quá 7 ngày nên chỉ xem, không sửa được.",
+  "attendanceOfflineNotice": "Đang ngoại tuyến. Thay đổi lưu trên máy và gửi khi có mạng.",
+  "attendanceNoteLabel": "Ghi chú",
+  "attendanceNoteToggle": "Ghi chú cho {name}",
+  "@attendanceNoteToggle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "attendanceRejectedWindow": "Đã quá hạn sửa 7 ngày nên thay đổi này không được nhận.",
+  "attendanceRejectedPlan": "Gói hiện tại chỉ cho xem nên thay đổi này không được nhận.",
+  "attendanceRejectedNotFound": "Học viên không còn trong buổi này nên thay đổi không được nhận.",
+  "attendanceRejectedGeneric": "Thay đổi này không được nhận.",
+  "attendanceBatchNotFound": "Buổi này không còn tồn tại nên chưa gửi được điểm danh.",
+  "attendanceBatchCancelled": "Buổi này đã hủy nên chưa gửi được điểm danh.",
+  "attendanceBatchGeneric": "Chưa gửi được điểm danh của buổi này.",
+  "attendanceDiscard": "Bỏ thay đổi bị từ chối",
+  "attendanceHistory": "Nhật ký sửa",
+  "historyTitle": "Nhật ký sửa",
+  "historyEmpty": "Buổi này chưa có lần sửa nào.",
+  "historyLoadFailed": "Không tải được nhật ký.",
+  "historyLoadMore": "Xem thêm",
+  "historyChangedBy": "{who} · {time}",
+  "@historyChangedBy": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "historyUnknownUser": "Không rõ người sửa",
+  "historyFirst": "Điểm danh lần đầu",
+  "historyNote": "Ghi chú: {note}",
+  "@historyNote": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "historyNoNote": "không có ghi chú",
   "contactsAdd": "Thêm từ danh bạ",
   "contactsTitle": "Thêm từ danh bạ",
   "contactsDeniedTitle": "Chưa có quyền đọc danh bạ",

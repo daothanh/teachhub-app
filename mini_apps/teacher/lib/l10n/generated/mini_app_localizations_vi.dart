@@ -12,9 +12,6 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get spaceTitle => 'Giáo viên';
 
   @override
-  String get spaceComingSoon => 'Không gian này đang được xây dựng.';
-
-  @override
   String get switchRole => 'Đổi vai trò';
 
   @override
@@ -497,6 +494,171 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   @override
   String get onboardingStudentSaved =>
       'Đã lưu học viên. Chưa ghi nhận được bước này.';
+
+  @override
+  String get todayTitle => 'Hôm nay';
+
+  @override
+  String get todayEmpty => 'Hôm nay không có buổi học';
+
+  @override
+  String get todayEmptyHint => 'Buổi học theo lịch của các lớp sẽ hiện ở đây.';
+
+  @override
+  String get todayClassesEntry => 'Lớp học';
+
+  @override
+  String get todaySessionAttended => 'Đã điểm danh';
+
+  @override
+  String get todaySessionNotAttended => 'Chưa điểm danh';
+
+  @override
+  String get todaySessionCancelled => 'Đã hủy';
+
+  @override
+  String get todayTakeAttendance => 'Điểm danh';
+
+  @override
+  String todayPending(int count) {
+    return 'Chờ đồng bộ ($count)';
+  }
+
+  @override
+  String get todayRefreshFailed => 'Chưa làm mới được. Kéo xuống để thử lại.';
+
+  @override
+  String todaySessionSemantics(String className, String time, String status) {
+    return '$className, $time, $status';
+  }
+
+  @override
+  String get todayOnboardingTitle => 'Bước làm quen bạn đã để sau';
+
+  @override
+  String todayOnboardingOpen(String step) {
+    return 'Mở bước $step';
+  }
+
+  @override
+  String get attendanceTitle => 'Điểm danh';
+
+  @override
+  String get attendanceStatusPresent => 'Có mặt';
+
+  @override
+  String get attendanceStatusLate => 'Đi muộn';
+
+  @override
+  String get attendanceStatusExcused => 'Vắng có phép';
+
+  @override
+  String get attendanceStatusUnexcused => 'Vắng không phép';
+
+  @override
+  String attendanceStudentSemantics(String name, String status) {
+    return '$name, $status. Chạm để đổi trạng thái';
+  }
+
+  @override
+  String get attendanceSave => 'Lưu';
+
+  @override
+  String get attendanceSaving => 'Đang lưu…';
+
+  @override
+  String get attendanceSaveFailed => 'Chưa lưu được. Thử lại.';
+
+  @override
+  String get attendanceLoadFailed => 'Không tải được danh sách học viên.';
+
+  @override
+  String get attendanceRetry => 'Thử lại';
+
+  @override
+  String get attendanceEmptyRoster => 'Lớp này chưa có học viên.';
+
+  @override
+  String get attendanceReadOnlyCancelled => 'Buổi này đã hủy nên chỉ xem được.';
+
+  @override
+  String get attendanceReadOnlyWindow =>
+      'Buổi này quá 7 ngày nên chỉ xem, không sửa được.';
+
+  @override
+  String get attendanceOfflineNotice =>
+      'Đang ngoại tuyến. Thay đổi lưu trên máy và gửi khi có mạng.';
+
+  @override
+  String get attendanceNoteLabel => 'Ghi chú';
+
+  @override
+  String attendanceNoteToggle(String name) {
+    return 'Ghi chú cho $name';
+  }
+
+  @override
+  String get attendanceRejectedWindow =>
+      'Đã quá hạn sửa 7 ngày nên thay đổi này không được nhận.';
+
+  @override
+  String get attendanceRejectedPlan =>
+      'Gói hiện tại chỉ cho xem nên thay đổi này không được nhận.';
+
+  @override
+  String get attendanceRejectedNotFound =>
+      'Học viên không còn trong buổi này nên thay đổi không được nhận.';
+
+  @override
+  String get attendanceRejectedGeneric => 'Thay đổi này không được nhận.';
+
+  @override
+  String get attendanceBatchNotFound =>
+      'Buổi này không còn tồn tại nên chưa gửi được điểm danh.';
+
+  @override
+  String get attendanceBatchCancelled =>
+      'Buổi này đã hủy nên chưa gửi được điểm danh.';
+
+  @override
+  String get attendanceBatchGeneric => 'Chưa gửi được điểm danh của buổi này.';
+
+  @override
+  String get attendanceDiscard => 'Bỏ thay đổi bị từ chối';
+
+  @override
+  String get attendanceHistory => 'Nhật ký sửa';
+
+  @override
+  String get historyTitle => 'Nhật ký sửa';
+
+  @override
+  String get historyEmpty => 'Buổi này chưa có lần sửa nào.';
+
+  @override
+  String get historyLoadFailed => 'Không tải được nhật ký.';
+
+  @override
+  String get historyLoadMore => 'Xem thêm';
+
+  @override
+  String historyChangedBy(String who, String time) {
+    return '$who · $time';
+  }
+
+  @override
+  String get historyUnknownUser => 'Không rõ người sửa';
+
+  @override
+  String get historyFirst => 'Điểm danh lần đầu';
+
+  @override
+  String historyNote(String note) {
+    return 'Ghi chú: $note';
+  }
+
+  @override
+  String get historyNoNote => 'không có ghi chú';
 
   @override
   String get contactsAdd => 'Thêm từ danh bạ';

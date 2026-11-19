@@ -36,7 +36,7 @@ và có thể đóng gói **SQLite3MultipleCiphers** (sqlite3mc) thay SQLite g�
 | --- | --- |
 | File không đọc được khi thiếu/sai khóa; không còn chuỗi plaintext | Có test (`test/data/teacher_database_test.dart`) |
 | `client_mutation_id` duy nhất trong outbox | Có test |
-| Export schema | `drift_schemas/drift_schema_v1.json` đến `drift_schema_v3.json` (`dart run drift_dev schema dump …`) |
+| Export schema | `drift_schemas/drift_schema_v1.json` đến `drift_schema_v4.json` (`dart run drift_dev schema dump …`) |
 | Nâng cấp schema v1 → v2 | **Đạt** — `test/data/teacher_migration_test.dart`: `SchemaVerifier` khớp schema v2; nâng cấp trên **file mã hóa** có dữ liệu v1 → dữ liệu còn, cột mới có mặc định |
 | Build + chạy trên máy Android thật | **Đạt** 18/11/2026 — OPPO CPH2577 (Android 13, tầm trung), `app/integration_test/teacher_db_device_test.dart` |
 | File trên máy đã mã hóa | **Đạt** — 16 byte đầu là dữ liệu ngẫu nhiên, không phải `SQLite format 3` |
@@ -105,3 +105,8 @@ lâu hơn (lần chạy trên chờ 8 s) — chấp nhận được vì sự ki�
 - Mọi lệnh `flutter build/run/test` của app tải và biên dịch sqlite3mc qua build hook.
 - Đổi tên khóa `teacher.db_key` hoặc mất Keychain ⇒ không mở được CSDL cũ; khi đó xóa
   file và tải lại từ server (dữ liệu nguồn ở server, trừ outbox chưa đồng bộ).
+
+## Schema v4 (S3-FL-01)
+
+- v4 thêm cột `cached_sessions.tz_offset_minutes` (offset UTC của tenant, lấy từ `startsAt`). Drift chỉ lưu thời điểm tuyệt đối, nên không có cột này thì ngoại tuyến không hiện được giờ tường của tenant. Dòng cũ để null và dùng giờ máy.
+- Migration: `from == 3` mới `addColumn`, vì `createTable` ở bước v3 đã tạo bảng với cột mới. Có test v3 → v4 và v1/v2 → v4.

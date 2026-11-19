@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../sync/sync_engine.dart';
@@ -15,6 +16,7 @@ typedef SessionDto = ({
   DateTime endsAt,
   String status,
   bool isMakeup,
+  int? tzOffsetMinutes,
 });
 
 typedef AttendanceItemDto = ({
@@ -24,6 +26,19 @@ typedef AttendanceItemDto = ({
   String? note,
   DateTime? clientUpdatedAt,
 });
+
+typedef HistorySnapshotDto = ({String status, String? note});
+
+typedef HistoryItemDto = ({
+  String id,
+  String studentName,
+  String? changedByName,
+  DateTime changedAt,
+  HistorySnapshotDto? before,
+  HistorySnapshotDto? after,
+});
+
+typedef HistoryPageDto = ({List<HistoryItemDto> items, String? nextCursor});
 
 /// `GET /sessions/{id}/attendance`.
 typedef AttendanceDto = ({
@@ -60,6 +75,7 @@ class TeacherApi {
           endsAt: DateTime.parse(s['endsAt'] as String),
           status: s['status'] as String,
           isMakeup: s['isMakeup'] as bool,
+          tzOffsetMinutes: offsetMinutes(s['startsAt'] as String),
         ),
     ];
   });
@@ -95,6 +111,8 @@ class TeacherApi {
         'deviceId': deviceId,
         'deviceTime': req.deviceTime.toUtc().toIso8601String(),
         'sessionId': req.sessionId,
+        // Lưu điểm danh = buổi đã dạy; buổi đã dạy thì server bỏ qua cờ.
+        'markSessionTaught': true,
         'mutations': [
           for (final m in req.mutations)
             {
@@ -127,6 +145,44 @@ class TeacherApi {
     );
   });
 
+  /// Offset UTC (phút) ở cuối chuỗi ISO 8601 (`+07:00`, `Z`); null nếu không có.
+  @visibleForTesting
+  static int? offsetMinutes(String iso) {
+    if (iso.endsWith('Z')) return 0;
+    final m = RegExp(r'([+-])(\d\d):?(\d\d)$').firstMatch(iso);
+    if (m == null) return null;
+    final v = int.parse(m[2]!) * 60 + int.parse(m[3]!);
+    return m[1] == '-' ? -v : v;
+  }
+
+  /// `GET /sessions/{id}/attendance/history`, mới nhất trước.
+  Future<HistoryPageDto> history(String sessionId, {String? cursor}) =>
+      _call(() async {
+        final res = await _dio.get<Object?>(
+          '/sessions/$sessionId/attendance/history',
+          queryParameters: {'cursor': ?cursor, 'limit': 20},
+        );
+        final m = _map(res.data);
+        return (
+          items: [
+            for (final i in (m['items'] as List).cast<Map>())
+              (
+                id: i['id'] as String,
+                studentName: i['studentName'] as String,
+                changedByName: i['changedByName'] as String?,
+                changedAt: DateTime.parse(i['changedAt'] as String),
+                before: _snapshot(i['before']),
+                after: _snapshot(i['after']),
+              ),
+          ],
+          nextCursor: m['nextCursor'] as String?,
+        );
+      });
+
+  static HistorySnapshotDto? _snapshot(Object? v) => v is Map
+      ? (status: v['status'] as String, note: v['note'] as String?)
+      : null;
+
   static DateTime? _date(Object? v) => v == null ? null : DateTime.parse('$v');
 
   static Map _map(Object? data) =>
@@ -136,25 +192,12 @@ class TeacherApi {
     try {
       return await run();
     } on DioException catch (e) {
-      final res = e.response;
-      if (res == null) throw const ApiException.network();
-      throw ApiException.fromResponse(
-        res.statusCode,
-        res.data,
-        retryAfterHeader: res.headers.value('retry-after'),
-      );
+      throw ApiException.fromDio(e) ?? const ApiException.unexpected();
     } on FormatException {
-      throw _badResponse();
+      throw const ApiException.unexpected();
     } on TypeError {
       // Ép kiểu trong lúc đọc JSON sai hợp đồng (thiếu trường, sai kiểu).
-      throw _badResponse();
+      throw const ApiException.unexpected();
     }
   }
-
-  /// 200 nhưng thân không đúng hợp đồng: coi như lỗi server, thử lại sau.
-  static ApiException _badResponse() => const ApiException(
-    code: ApiErrorCode.unknown,
-    wireCode: 'BAD_RESPONSE',
-    status: 502,
-  );
 }

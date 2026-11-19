@@ -13,12 +13,15 @@ import '../data/onboarding_repository.dart';
 
 /// [T02] Khung onboarding 5 bước. Route `/t/onboarding`.
 class OnboardingPage extends StatelessWidget {
-  const OnboardingPage({super.key});
+  const OnboardingPage({super.key, this.initialStep});
+
+  /// Mở đúng bước này (thẻ nhắc bước đã bỏ qua); null = bước đang dở.
+  final OnboardingStep? initialStep;
 
   @override
   Widget build(BuildContext context) => BlocProvider(
     create: (_) => OnboardingCubit(GetIt.I<OnboardingRepository>())..load(),
-    child: const OnboardingView(),
+    child: OnboardingView(initialStep: initialStep),
   );
 }
 
@@ -54,7 +57,9 @@ String _stepTitle(MiniAppLocalizations l10n, OnboardingStep s) => switch (s) {
 };
 
 class OnboardingView extends StatelessWidget {
-  const OnboardingView({super.key});
+  const OnboardingView({super.key, this.initialStep});
+
+  final OnboardingStep? initialStep;
 
   @override
   Widget build(BuildContext context) {
@@ -77,34 +82,42 @@ class OnboardingView extends StatelessWidget {
       builder: (context, state) {
         final cubit = context.read<OnboardingCubit>();
         final data = state.onboarding;
-        final step = data?.currentStep;
-        return Scaffold(
-          appBar: AppBar(title: Text(l10n.onboardingTitle)),
-          body: switch (state.load) {
-            OnboardingLoad.loading => const Center(
-              child: CircularProgressIndicator(),
-            ),
-            OnboardingLoad.failure => AppEmptyState(
-              message: l10n.onboardingLoadFailed,
-              action: AppButton(
-                label: l10n.onboardingRetry,
-                onPressed: cubit.load,
-              ),
-            ),
-            OnboardingLoad.ready when step == null => AppEmptyState(
-              message: l10n.onboardingDoneTitle,
-              subMessage: l10n.onboardingDoneBody,
-              action: AppButton(
-                label: l10n.onboardingFinish,
-                onPressed: () => context.go(TeachHubRoutes.teacher),
-              ),
-            ),
-            OnboardingLoad.ready => _StepBody(
-              data: data!,
-              step: step!,
-              saving: state.saving,
-            ),
+        final step = initialStep ?? data?.currentStep;
+        return BlocListener<OnboardingCubit, OnboardingState>(
+          // Mở một bước riêng: lưu hoặc bỏ qua xong thì quay lại màn trước.
+          listenWhen: (a, b) =>
+              initialStep != null && a.saving && !b.saving && b.error == null,
+          listener: (context, _) {
+            if (context.canPop()) context.pop();
           },
+          child: Scaffold(
+            appBar: AppBar(title: Text(l10n.onboardingTitle)),
+            body: switch (state.load) {
+              OnboardingLoad.loading => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              OnboardingLoad.failure => AppEmptyState(
+                message: l10n.onboardingLoadFailed,
+                action: AppButton(
+                  label: l10n.onboardingRetry,
+                  onPressed: cubit.load,
+                ),
+              ),
+              OnboardingLoad.ready when step == null => AppEmptyState(
+                message: l10n.onboardingDoneTitle,
+                subMessage: l10n.onboardingDoneBody,
+                action: AppButton(
+                  label: l10n.onboardingFinish,
+                  onPressed: () => context.go(TeachHubRoutes.teacher),
+                ),
+              ),
+              OnboardingLoad.ready => _StepBody(
+                data: data!,
+                step: step!,
+                saving: state.saving,
+              ),
+            },
+          ),
         );
       },
     );
