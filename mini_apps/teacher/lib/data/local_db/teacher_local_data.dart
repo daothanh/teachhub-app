@@ -16,7 +16,11 @@ class TeacherLocalData {
     required Future<TeacherDatabase> Function() database,
     required Future<void> Function() close,
     required Future<void> Function() reopen,
-  }) : _keys = keyStore,
+    Future<void> Function()? pauseSync,
+    Future<void> Function()? resumeSync,
+  }) : _pauseSync = pauseSync,
+       _resumeSync = resumeSync,
+       _keys = keyStore,
        _dir = directory,
        _db = database,
        _close = close,
@@ -27,6 +31,11 @@ class TeacherLocalData {
   final Future<TeacherDatabase> Function() _db;
   final Future<void> Function() _close;
   final Future<void> Function() _reopen;
+
+  /// Dừng SyncEngine và chờ lượt đang chạy xong, trước khi đóng CSDL; chạy
+  /// lại sau khi mở lại CSDL. Không để sync ghi vào CSDL đang bị xóa.
+  final Future<void> Function()? _pauseSync;
+  final Future<void> Function()? _resumeSync;
 
   static const ownerKey = 'teacher.db_owner';
 
@@ -55,12 +64,14 @@ class TeacherLocalData {
 
   Future<void> _wipe() async {
     await _keys.write(wipePendingKey, '1');
+    await _pauseSync?.call();
     await _close();
     try {
       await deleteTeacherDatabase(_keys, await _dir());
       await _keys.delete(ownerKey);
     } finally {
       await _reopen(); // lỗi xóa vẫn để mini-app dùng lại được CSDL
+      await _resumeSync?.call();
     }
     await _keys.delete(wipePendingKey);
   }
