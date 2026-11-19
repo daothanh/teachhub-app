@@ -27,16 +27,69 @@ class OutboxMutations extends Table {
 
   /// v2: mã lỗi lần gửi gần nhất (không lưu body/PII).
   TextColumn get lastError => text().nullable()();
+
+  /// v3: buổi và học viên của mutation (null ở dòng cũ của bản spike v2 —
+  /// SyncEngine bỏ qua dòng đó). Mỗi lô gửi lên server là một buổi.
+  TextColumn get sessionId => text().nullable()();
+  TextColumn get studentId => text().nullable()();
+
+  /// v3: `Idempotency-Key` và `deviceTime` của lô đã gom các dòng này. Lưu lại để
+  /// gửi lại sau khi mất phản hồi (kể cả sau khi app bị kill) vẫn đúng khóa và
+  /// đúng thân request, server mới nhận ra là cùng lô.
+  TextColumn get batchKey => text().nullable()();
+  DateTimeColumn get batchDeviceTime => dateTime().nullable()();
+}
+
+/// v3: buổi học trong cache ngoại tuyến (`GET /sessions`, `GET /sessions/{id}/attendance`).
+/// Chỉ cột tối thiểu theo ADR-0001: không SĐT, ngày sinh, phụ huynh.
+@DataClassName('CachedSession')
+class CachedSessions extends Table {
+  TextColumn get id => text()();
+  TextColumn get classId => text()();
+  TextColumn get className => text()();
+
+  /// Ngày buổi học theo múi giờ tenant, `yyyy-MM-dd`.
+  TextColumn get sessionDate => text()();
+  DateTimeColumn get startsAt => dateTime()();
+  DateTimeColumn get endsAt => dateTime()();
+
+  /// `planned` | `taught` | `cancelled`.
+  TextColumn get status => text()();
+  BoolColumn get isMakeup => boolean()();
+
+  /// Chỉ có sau khi tải điểm danh của buổi; null = chưa tải danh sách.
+  BoolColumn get canEdit => boolean().nullable()();
+  DateTimeColumn get editableUntil => dateTime().nullable()();
+  DateTimeColumn get rosterFetchedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+/// v3: học viên của buổi và trạng thái điểm danh đã biết (tên là PII, CSDL đã mã hóa).
+@DataClassName('CachedAttendance')
+class CachedAttendances extends Table {
+  TextColumn get sessionId => text()();
+  TextColumn get studentId => text()();
+  TextColumn get fullName => text()();
+
+  /// `present` | `late` | `excused` | `unexcused`; null = chưa điểm danh.
+  TextColumn get status => text().nullable()();
+  TextColumn get note => text().nullable()();
+  DateTimeColumn get clientUpdatedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {sessionId, studentId};
 }
 
 /// CSDL cục bộ của mini-app `teacher`, mã hóa bằng SQLite3MultipleCiphers
 /// (docs/adr/0001-encrypted-local-database.md).
-@DriftDatabase(tables: [OutboxMutations])
+@DriftDatabase(tables: [OutboxMutations, CachedSessions, CachedAttendances])
 class TeacherDatabase extends _$TeacherDatabase {
   TeacherDatabase(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   /// Chỉ thêm (expand), không xóa/đổi tên cột — giống quy ước migration backend.
   /// Mỗi bước có test trong test/data/teacher_migration_test.dart.
@@ -46,6 +99,14 @@ class TeacherDatabase extends _$TeacherDatabase {
       if (from < 2) {
         await m.addColumn(outboxMutations, outboxMutations.attemptCount);
         await m.addColumn(outboxMutations, outboxMutations.lastError);
+      }
+      if (from < 3) {
+        await m.addColumn(outboxMutations, outboxMutations.sessionId);
+        await m.addColumn(outboxMutations, outboxMutations.studentId);
+        await m.addColumn(outboxMutations, outboxMutations.batchKey);
+        await m.addColumn(outboxMutations, outboxMutations.batchDeviceTime);
+        await m.createTable(cachedSessions);
+        await m.createTable(cachedAttendances);
       }
     },
   );
