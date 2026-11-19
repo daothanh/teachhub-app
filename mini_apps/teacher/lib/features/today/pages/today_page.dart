@@ -12,6 +12,7 @@ import '../../attendance/data/attendance_models.dart';
 import '../../attendance/data/attendance_repository.dart';
 import '../../classes/classes_routes.dart';
 import '../../onboarding/data/onboarding_models.dart';
+import '../../schedule/schedule_routes.dart';
 import '../../onboarding/data/onboarding_repository.dart';
 import '../cubit/today_cubit.dart';
 
@@ -146,6 +147,13 @@ class _TodayList extends StatelessWidget {
         else
           for (final session in s.sessions) _SessionCard(session: session),
         const SizedBox(height: AppSpacing.md),
+        AppButton(
+          label: l10n.todayScheduleEntry,
+          variant: AppButtonVariant.outlinePrimary,
+          width: double.infinity,
+          onPressed: () => context.push(ScheduleRoutes.schedule),
+        ),
+        const SizedBox(height: AppSpacing.sm),
         AppButton(
           label: l10n.todayClassesEntry,
           variant: AppButtonVariant.outlinePrimary,

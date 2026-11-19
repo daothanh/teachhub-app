@@ -35,23 +35,26 @@ void main() {
     },
   );
 
-  test('v3 → v5: buổi cũ giữ nguyên, cột offset và lý do hủy mới là null', () async {
-    final schema = await verifier.schemaAt(3);
-    final old = v3.DatabaseAtV3(schema.newConnection());
-    await old.customStatement(
-      "INSERT INTO cached_sessions (id, class_id, class_name, session_date, starts_at, ends_at, status, is_makeup) "
-      "VALUES ('s-1', 'c-1', 'Toán 9', '2026-11-19', 1794960000, 1794963600, 'planned', 0)",
-    );
-    await old.close();
+  test(
+    'v3 → v5: buổi cũ giữ nguyên, cột offset và lý do hủy mới là null',
+    () async {
+      final schema = await verifier.schemaAt(3);
+      final old = v3.DatabaseAtV3(schema.newConnection());
+      await old.customStatement(
+        "INSERT INTO cached_sessions (id, class_id, class_name, session_date, starts_at, ends_at, status, is_makeup) "
+        "VALUES ('s-1', 'c-1', 'Toán 9', '2026-11-19', 1794960000, 1794963600, 'planned', 0)",
+      );
+      await old.close();
 
-    final db = TeacherDatabase(schema.newConnection());
-    addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 5);
-    final rows = await db.select(db.cachedSessions).get();
-    expect(rows.single.className, 'Toán 9');
-    expect(rows.single.tzOffsetMinutes, isNull);
-    expect(rows.single.cancelReason, isNull);
-  });
+      final db = TeacherDatabase(schema.newConnection());
+      addTearDown(db.close);
+      await verifier.migrateAndValidate(db, 5);
+      final rows = await db.select(db.cachedSessions).get();
+      expect(rows.single.className, 'Toán 9');
+      expect(rows.single.tzOffsetMinutes, isNull);
+      expect(rows.single.cancelReason, isNull);
+    },
+  );
 
   test('v4 → v5: buổi giữ nguyên offset, thêm cột lý do hủy', () async {
     final schema = await verifier.schemaAt(4);
