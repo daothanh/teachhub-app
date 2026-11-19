@@ -64,6 +64,7 @@ class ClassesListCubit extends Cubit<ClassesListState> {
       final p = await _repo.list(
         status: arch ? ClassStatus.archived : ClassStatus.active,
       );
+      if (isClosed) return;
       emit(
         ClassesListState(
           load: ClassesLoad.ready,
@@ -88,6 +89,7 @@ class ClassesListCubit extends Cubit<ClassesListState> {
         status: state.archived ? ClassStatus.archived : ClassStatus.active,
         page: state.page + 1,
       );
+      if (isClosed) return;
       emit(
         state.copyWith(
           items: [...state.items, ...p.items],
@@ -98,6 +100,7 @@ class ClassesListCubit extends Cubit<ClassesListState> {
       );
     } on ApiException {
       // Giữ danh sách đã có; người dùng kéo xuống thử lại.
+      if (isClosed) return;
       emit(state.copyWith(loadingMore: false));
     }
   }

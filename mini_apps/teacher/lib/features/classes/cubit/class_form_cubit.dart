@@ -4,6 +4,7 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
+import '../data/draft_keys.dart';
 
 class ClassFormState extends Equatable {
   const ClassFormState({
@@ -68,21 +69,30 @@ class ClassFormState extends Equatable {
 /// Nếu lệnh thứ hai lỗi, lớp đã tồn tại: [ClassFormState.initial] được gán
 /// để lần bấm Lưu sau chuyển sang `PATCH`, không tạo lớp thứ hai.
 class ClassFormCubit extends Cubit<ClassFormState> {
-  ClassFormCubit(this._repo, {TeachClass? initial, this.classId})
-    : super(
-        ClassFormState(
-          initial: initial,
-          loading: initial == null && classId != null,
-        ),
-      );
+  ClassFormCubit(
+    this._repo, {
+    TeachClass? initial,
+    this.classId,
+    DraftKeys? keys,
+  }) : _keys = keys ?? DraftKeys(),
+       super(
+         ClassFormState(
+           initial: initial,
+           loading: initial == null && classId != null,
+         ),
+       );
   final ClassesRepository _repo;
   final String? classId;
+  final DraftKeys _keys;
 
   Future<void> load() async {
     if (!state.loading) return;
     try {
-      emit(ClassFormState(initial: await _repo.get(classId!)));
+      final c = await _repo.get(classId!);
+      if (isClosed) return;
+      emit(ClassFormState(initial: c));
     } on ApiException catch (e) {
+      if (isClosed) return;
       emit(ClassFormState(loading: true, error: e));
     }
   }
@@ -102,21 +112,43 @@ class ClassFormCubit extends Cubit<ClassFormState> {
       ),
     );
     var existing = state.initial;
+    // Mỗi lệnh ghi một khóa theo draft: bấm Lưu lại sau lỗi mạng dùng lại khóa.
+    final body = input.toJson().toString();
+    var op = 'create';
     try {
       int? generated;
       if (existing == null) {
-        existing = (await _repo.create(input)).value;
+        existing = (await _repo.create(
+          input,
+          idempotencyKey: _keys.of('create', body),
+        )).value;
+        _keys.done('create');
+        if (isClosed) return;
         emit(state.copyWith(initial: existing));
       } else {
-        existing = await _repo.update(existing.id, input);
+        op = 'update';
+        existing = await _repo.update(
+          existing.id,
+          input,
+          idempotencyKey: _keys.of('update', '${existing.id}|$body'),
+        );
+        _keys.done('update');
+        if (isClosed) return;
         emit(state.copyWith(initial: existing));
       }
       if (_rulesChanged(existing, rules)) {
+        op = 'rules';
         generated = (await _repo.putRules(
           existing.id,
           rules,
+          idempotencyKey: _keys.of(
+            'rules',
+            '${existing.id}|${rules.map((r) => r.signature).join(',')}',
+          ),
         )).sessionsGenerated;
+        _keys.done('rules');
       }
+      if (isClosed) return;
       emit(
         state.copyWith(
           saving: false,
@@ -125,6 +157,9 @@ class ClassFormCubit extends Cubit<ClassFormState> {
         ),
       );
     } on ApiException catch (e) {
+      // `op` là lệnh đang dở khi lỗi; lỗi chắc chắn thì lần sau là lệnh mới.
+      if (!e.retryable) _keys.done(op);
+      if (isClosed) return;
       emit(
         state.copyWith(
           saving: false,

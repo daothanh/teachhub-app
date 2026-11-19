@@ -640,6 +640,18 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Thời lượng từ 15 đến 480 phút.'**
   String get classesErrRulesDuration;
+
+  /// No description provided for @classesRuleN.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi {n}'**
+  String classesRuleN(int n);
+
+  /// No description provided for @classesRuleRemoveN.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa buổi {n}'**
+  String classesRuleRemoveN(int n);
 }
 
 class _MiniAppLocalizationsDelegate

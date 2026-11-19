@@ -4,6 +4,7 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
+import '../data/draft_keys.dart';
 import 'classes_list_cubit.dart' show ClassesLoad;
 
 class ClassDetailState extends Equatable {
@@ -68,12 +69,18 @@ class ClassDetailState extends Equatable {
 
 /// Chi tiết lớp (T06a): thông tin, quy tắc lặp, buổi sắp tới, học viên.
 class ClassDetailCubit extends Cubit<ClassDetailState> {
-  ClassDetailCubit(this._repo, this.classId, {DateTime Function()? now})
-    : _now = now ?? DateTime.now,
-      super(const ClassDetailState());
+  ClassDetailCubit(
+    this._repo,
+    this.classId, {
+    DateTime Function()? now,
+    DraftKeys? keys,
+  }) : _now = now ?? DateTime.now,
+       _keys = keys ?? DraftKeys(),
+       super(const ClassDetailState());
   final ClassesRepository _repo;
   final String classId;
   final DateTime Function() _now;
+  final DraftKeys _keys;
 
   /// Cửa sổ buổi học: hôm nay + 61 ngày = đúng 62 ngày, trần của `GET /sessions`.
   static const sessionWindowDays = 61;
@@ -86,6 +93,7 @@ class ClassDetailCubit extends Cubit<ClassDetailState> {
         _repo.get(classId),
         _repo.roster(classId),
       ]);
+      if (isClosed) return;
       final cls = results[0] as TeachClass;
       var sessions = const <ClassSession>[];
       var sessionsError = false;
@@ -100,6 +108,7 @@ class ClassDetailCubit extends Cubit<ClassDetailState> {
       } on ApiException {
         sessionsError = true;
       }
+      if (isClosed) return;
       emit(
         ClassDetailState(
           load: ClassesLoad.ready,
@@ -110,6 +119,7 @@ class ClassDetailCubit extends Cubit<ClassDetailState> {
         ),
       );
     } on ApiException catch (e) {
+      if (isClosed) return;
       emit(ClassDetailState(load: ClassesLoad.failure, error: e));
     }
   }
@@ -119,9 +129,17 @@ class ClassDetailCubit extends Cubit<ClassDetailState> {
     if (state.archiving) return;
     emit(state.copyWith(archiving: true));
     try {
-      final cls = await _repo.archive(classId);
+      final cls = await _repo.archive(
+        classId,
+        idempotencyKey: _keys.of('archive', classId),
+      );
+      _keys.done('archive');
+      if (isClosed) return;
       emit(state.copyWith(cls: cls, sessions: const [], archiving: false));
     } on ApiException catch (e) {
+      // Lỗi chắc chắn (409, 403…) thì lần sau là lệnh mới; lỗi mạng giữ khóa.
+      if (!e.retryable) _keys.done('archive');
+      if (isClosed) return;
       emit(state.copyWith(archiving: false, actionError: e));
     }
   }

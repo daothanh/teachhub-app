@@ -335,4 +335,14 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get classesErrRulesDuration => 'Duration must be 15 to 480 minutes.';
+
+  @override
+  String classesRuleN(int n) {
+    return 'Session $n';
+  }
+
+  @override
+  String classesRuleRemoveN(int n) {
+    return 'Remove session $n';
+  }
 }

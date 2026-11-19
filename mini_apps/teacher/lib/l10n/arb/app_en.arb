@@ -167,5 +167,21 @@
       }
     }
   },
-  "classesErrRulesDuration": "Duration must be 15 to 480 minutes."
+  "classesErrRulesDuration": "Duration must be 15 to 480 minutes.",
+  "classesRuleN": "Session {n}",
+  "@classesRuleN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classesRuleRemoveN": "Remove session {n}",
+  "@classesRuleRemoveN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }

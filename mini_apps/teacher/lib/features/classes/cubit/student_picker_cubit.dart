@@ -4,6 +4,7 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
+import '../data/draft_keys.dart';
 
 class StudentPickerState extends Equatable {
   const StudentPickerState({
@@ -60,10 +61,12 @@ class StudentPickerState extends Equatable {
 
 /// Chọn hồ sơ học viên có sẵn để ghi danh vào lớp (S2-FL-11). Không tạo hồ sơ.
 class StudentPickerCubit extends Cubit<StudentPickerState> {
-  StudentPickerCubit(this._repo, this.classId)
-    : super(const StudentPickerState());
+  StudentPickerCubit(this._repo, this.classId, {DraftKeys? keys})
+    : _keys = keys ?? DraftKeys(),
+      super(const StudentPickerState());
   final ClassesRepository _repo;
   final String classId;
+  final DraftKeys _keys;
 
   Future<void> search(String raw) async {
     final q = raw.trim();
@@ -75,10 +78,10 @@ class StudentPickerCubit extends Cubit<StudentPickerState> {
     try {
       final p = await _repo.searchStudents(q);
       // Bỏ kết quả cũ nếu người dùng đã gõ tiếp.
-      if (state.query != raw) return;
+      if (isClosed || state.query != raw) return;
       emit(StudentPickerState(query: raw, results: p.items));
     } on ApiException catch (e) {
-      if (state.query != raw) return;
+      if (isClosed || state.query != raw) return;
       emit(StudentPickerState(query: raw, error: e));
     }
   }
@@ -86,10 +89,19 @@ class StudentPickerCubit extends Cubit<StudentPickerState> {
   Future<void> enroll(StudentSummary s) async {
     if (state.enrollingId != null) return;
     emit(state.copyWith(enrollingId: s.id));
+    final op = 'enroll:${s.id}';
     try {
-      final r = await _repo.enroll(classId, s.id);
+      final r = await _repo.enroll(
+        classId,
+        s.id,
+        idempotencyKey: _keys.of(op, '$classId|${s.id}'),
+      );
+      _keys.done(op);
+      if (isClosed) return;
       emit(state.copyWith(clearEnrolling: true, done: (student: s, result: r)));
     } on ApiException catch (e) {
+      if (!e.retryable) _keys.done(op);
+      if (isClosed) return;
       emit(state.copyWith(clearEnrolling: true, error: e));
     }
   }

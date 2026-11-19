@@ -55,11 +55,12 @@ void main() {
   });
   tearDown(GetIt.I.reset);
 
-  Future<void> open(WidgetTester tester) async {
+  Future<void> open(WidgetTester tester, {double scale = 1}) async {
     final router = await pumpRoutes(
       tester,
       classesRoutes('teacher'),
       initial: ClassesRoutes.detail('c1'),
+      textScale: scale,
     );
     addTearDown(router.dispose);
   }
@@ -124,5 +125,11 @@ void main() {
     await open(tester);
     expect(find.text('Không tải được danh sách buổi.'), findsOneWidget);
     expect(find.text('Nguyễn Văn An'), findsOneWidget);
+  });
+
+  testWidgets('chữ 130% không vỡ', (tester) async {
+    await open(tester, scale: 1.3);
+    expect(find.text('Nguyễn Văn An'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

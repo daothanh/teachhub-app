@@ -20,8 +20,16 @@ Finder _field(String label) =>
     find.descendant(of: _input(label), matching: find.byType(EditableText));
 
 /// Danh sách dựng lười: cuộn tới khi widget được dựng rồi mới thao tác.
-Future<void> _reveal(WidgetTester tester, Finder f) => tester
-    .scrollUntilVisible(f, 300, scrollable: find.byType(Scrollable).first);
+Future<void> _reveal(WidgetTester tester, Finder f) async {
+  await tester.scrollUntilVisible(
+    f,
+    300,
+    scrollable: find.byType(Scrollable).first,
+  );
+  // Widget mới dựng trong vùng đệm chưa chắc đã nằm trong màn hình.
+  await tester.ensureVisible(f);
+  await tester.pumpAndSettle();
+}
 
 void main() {
   late FakeClassesRepository repo;
@@ -254,15 +262,22 @@ void main() {
     ]);
   });
 
-  testWidgets('chữ 130%: form dài cuộn được, không tràn', (tester) async {
+  testWidgets('chữ 130%: form có lỗi và nhiều buổi vẫn không tràn', (
+    tester,
+  ) async {
     await open(tester, scale: 1.3);
-    final add = find.widgetWithText(AppButton, 'Thêm buổi');
-    await _reveal(tester, add);
-    await tester.tap(add);
-    await tester.pumpAndSettle();
+    for (var i = 0; i < 2; i++) {
+      final add = find.widgetWithText(AppButton, 'Thêm buổi');
+      await _reveal(tester, add);
+      await tester.tap(add);
+      await tester.pumpAndSettle();
+    }
+    await save(tester); // hiện đủ lỗi ở trường và lỗi quy tắc trùng
+    expect(find.text('Có hai buổi cùng thứ và giờ bắt đầu.'), findsOneWidget);
     expect(tester.takeException(), isNull);
-    await _reveal(tester, find.widgetWithText(AppButton, 'Lưu'));
-    expect(tester.takeException(), isNull);
+    // Mỗi nút Xóa có nhãn riêng theo số buổi.
+    expect(find.bySemanticsLabel('Xóa buổi 1'), findsOneWidget);
+    expect(find.bySemanticsLabel('Xóa buổi 2'), findsOneWidget);
   });
 
   testWidgets('sửa lớp chỉ truyền classId: tải lớp rồi điền form', (

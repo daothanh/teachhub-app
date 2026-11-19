@@ -12,18 +12,30 @@ abstract class ClassesRepository {
     int page = 1,
   });
   Future<TeachClass> get(String id);
-  Future<ClassCreated> create(ClassInput input);
-  Future<TeachClass> update(String id, ClassInput input);
-  Future<TeachClass> archive(String id);
+
+  /// Các lệnh ghi nhận [idempotencyKey]: cùng khóa = cùng một lệnh (gửi lại
+  /// sau lỗi mạng không tạo bản trùng). `null` thì host tự sinh cho POST/PATCH.
+  Future<ClassCreated> create(ClassInput input, {String? idempotencyKey});
+  Future<TeachClass> update(
+    String id,
+    ClassInput input, {
+    String? idempotencyKey,
+  });
+  Future<TeachClass> archive(String id, {String? idempotencyKey});
   Future<List<RosterEntry>> roster(String id);
-  Future<EnrollResult> enroll(String classId, String studentId);
+  Future<EnrollResult> enroll(
+    String classId,
+    String studentId, {
+    String? idempotencyKey,
+  });
 
   /// Tìm không dấu theo họ tên; `q` tối thiểu 2 ký tự.
   Future<Paginated<StudentSummary>> searchStudents(String q);
   Future<ScheduleRulesResult> putRules(
     String classId,
-    List<ScheduleRule> rules,
-  );
+    List<ScheduleRule> rules, {
+    String? idempotencyKey,
+  });
 
   /// Tối đa 62 ngày (`from`, `to` gồm cả hai đầu), không phân trang.
   Future<List<ClassSession>> sessions({
@@ -63,28 +75,39 @@ class DioClassesRepository implements ClassesRepository {
   });
 
   @override
-  Future<ClassCreated> create(ClassInput input) => _call(() async {
-    final r = await _dio.post<Map<String, dynamic>>(
-      '/classes',
-      data: input.toJson(),
-    );
-    return ClassCreated.fromJson(r.data!);
-  });
+  Future<ClassCreated> create(ClassInput input, {String? idempotencyKey}) =>
+      _call(() async {
+        final r = await _dio.post<Map<String, dynamic>>(
+          '/classes',
+          data: input.toJson(),
+          options: _key(idempotencyKey),
+        );
+        return ClassCreated.fromJson(r.data!);
+      });
 
   @override
-  Future<TeachClass> update(String id, ClassInput input) => _call(() async {
+  Future<TeachClass> update(
+    String id,
+    ClassInput input, {
+    String? idempotencyKey,
+  }) => _call(() async {
     final r = await _dio.patch<Map<String, dynamic>>(
       '/classes/$id',
       data: input.toJson(),
+      options: _key(idempotencyKey),
     );
     return TeachClass.fromJson(r.data!);
   });
 
   @override
-  Future<TeachClass> archive(String id) => _call(() async {
-    final r = await _dio.post<Map<String, dynamic>>('/classes/$id/archive');
-    return TeachClass.fromJson(r.data!);
-  });
+  Future<TeachClass> archive(String id, {String? idempotencyKey}) =>
+      _call(() async {
+        final r = await _dio.post<Map<String, dynamic>>(
+          '/classes/$id/archive',
+          options: _key(idempotencyKey),
+        );
+        return TeachClass.fromJson(r.data!);
+      });
 
   @override
   Future<List<RosterEntry>> roster(String id) => _call(() async {
@@ -96,17 +119,21 @@ class DioClassesRepository implements ClassesRepository {
   });
 
   @override
-  Future<EnrollResult> enroll(String classId, String studentId) =>
-      _call(() async {
-        final r = await _dio.post<Map<String, dynamic>>(
-          '/classes/$classId/enrollments',
-          data: {'studentId': studentId},
-        );
-        return EnrollResult(
-          Enrollment.fromJson(r.data!),
-          alreadyEnrolled: r.statusCode == 200,
-        );
-      });
+  Future<EnrollResult> enroll(
+    String classId,
+    String studentId, {
+    String? idempotencyKey,
+  }) => _call(() async {
+    final r = await _dio.post<Map<String, dynamic>>(
+      '/classes/$classId/enrollments',
+      data: {'studentId': studentId},
+      options: _key(idempotencyKey),
+    );
+    return EnrollResult(
+      Enrollment.fromJson(r.data!),
+      alreadyEnrolled: r.statusCode == 200,
+    );
+  });
 
   @override
   Future<Paginated<StudentSummary>> searchStudents(String q) => _call(() async {
@@ -120,13 +147,17 @@ class DioClassesRepository implements ClassesRepository {
   @override
   Future<ScheduleRulesResult> putRules(
     String classId,
-    List<ScheduleRule> rules,
-  ) => _call(() async {
+    List<ScheduleRule> rules, {
+    String? idempotencyKey,
+  }) => _call(() async {
+    // Interceptor của host chỉ tự gắn khóa cho POST/PATCH; PUT này hợp đồng
+    // cũng bắt buộc khóa nên cubit luôn truyền vào.
     final r = await _dio.put<Map<String, dynamic>>(
       '/classes/$classId/schedule-rules',
       data: {
         'rules': [for (final x in rules) x.toJson()],
       },
+      options: _key(idempotencyKey),
     );
     return ScheduleRulesResult.fromJson(r.data!);
   });
@@ -148,17 +179,40 @@ class DioClassesRepository implements ClassesRepository {
   });
 }
 
-/// Đổi lỗi Dio thành [ApiException] (spec §5.6); lỗi khác giữ nguyên.
+Options? _key(String? key) =>
+    key == null ? null : Options(headers: {'Idempotency-Key': key});
+
+/// Mọi lỗi ra ngoài là [ApiException]: lỗi Dio theo spec §5.6; lỗi đọc phản hồi
+/// (data null, sai kiểu, thiếu trường) thành lỗi máy chủ chung để Cubit không
+/// kẹt ở trạng thái đang tải.
+// shortcut: bản copy DioException → ApiException, thay bằng ApiException.fromDio
+// của teachhub_shared khi nhánh onboarding merge.
 Future<T> _call<T>(Future<T> Function() run) async {
   try {
     return await run();
+  } on ApiException {
+    rethrow;
   } on DioException catch (e) {
     final res = e.response;
+    // Dio gói lỗi ép kiểu thân phản hồi (không phải JSON object) vào `error`.
+    if (e.error is TypeError || e.error is FormatException) {
+      throw const ApiException(
+        code: ApiErrorCode.internalError,
+        wireCode: null,
+        status: 500,
+      );
+    }
     if (res == null) throw const ApiException.network();
     throw ApiException.fromResponse(
       res.statusCode,
       res.data,
       retryAfterHeader: res.headers.value('retry-after'),
+    );
+  } on Object {
+    throw const ApiException(
+      code: ApiErrorCode.internalError,
+      wireCode: null,
+      status: 500,
     );
   }
 }

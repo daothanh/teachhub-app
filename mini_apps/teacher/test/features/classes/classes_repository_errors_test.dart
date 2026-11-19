@@ -46,6 +46,8 @@ DioClassesRepository _repo(
 );
 
 void main() {
+  _keyAndParseTests();
+
   test('422 có errors theo trường → ApiException.fieldErrors', () async {
     final e =
         await _repo(422, {
@@ -88,5 +90,164 @@ void main() {
           onError: (Object e) => e as ApiException,
         );
     expect(e.kind, ApiErrorKind.network);
+  });
+}
+
+/// Giống interceptor header của host: chỉ gắn khóa khi chưa có (`putIfAbsent`).
+class _HostLikeHeaders extends Interceptor {
+  @override
+  void onRequest(RequestOptions o, RequestInterceptorHandler h) {
+    if (const {'POST', 'PATCH'}.contains(o.method)) {
+      o.headers.putIfAbsent('Idempotency-Key', () => 'host-generated');
+    }
+    h.next(o);
+  }
+}
+
+class _Recorder implements HttpClientAdapter {
+  final requests = <RequestOptions>[];
+  Object? responseBody = {};
+  int status = 200;
+
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
+    requests.add(options);
+    return ResponseBody.fromString(
+      jsonEncode(responseBody),
+      status,
+      headers: {
+        Headers.contentTypeHeader: ['application/json'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+void _keyAndParseTests() {
+  late _Recorder rec;
+  late DioClassesRepository repo;
+  setUp(() {
+    rec = _Recorder();
+    repo = DioClassesRepository(
+      Dio(BaseOptions(baseUrl: 'http://x/v1'))
+        ..httpClientAdapter = rec
+        ..interceptors.add(_HostLikeHeaders()),
+    );
+  });
+
+  test(
+    'khóa truyền vào được giữ qua interceptor; không truyền thì host sinh',
+    () async {
+      rec.responseBody = {'error': 'x'};
+      rec.status = 422;
+      for (final key in ['k-1', 'k-1', null]) {
+        await repo
+            .archive('c1', idempotencyKey: key)
+            .then<void>((_) {}, onError: (_) {});
+      }
+      expect(rec.requests.map((r) => r.headers['Idempotency-Key']), [
+        'k-1',
+        'k-1',
+        'host-generated',
+      ]);
+    },
+  );
+
+  test(
+    'PUT schedule-rules mang khóa dù interceptor host chỉ lo POST/PATCH',
+    () async {
+      rec.responseBody = {
+        'rules': [],
+        'sessionsGenerated': 0,
+        'sessionsRemoved': 0,
+      };
+      await repo.putRules('c1', const [], idempotencyKey: 'k-put');
+      expect(rec.requests.single.method, 'PUT');
+      expect(rec.requests.single.headers['Idempotency-Key'], 'k-put');
+      expect(rec.requests.single.data, {'rules': []});
+    },
+  );
+
+  test(
+    'body tạo lớp đúng hợp đồng: lớp trực tuyến không gửi địa điểm',
+    () async {
+      rec.status = 422;
+      rec.responseBody = {
+        'code': 'VALIDATION_FAILED',
+        'errors': {
+          'name': ['x'],
+        },
+      };
+      await repo
+          .create(
+            const ClassInput(
+              name: ' Toán ',
+              subject: 'Toán',
+              grade: 9,
+              mode: ClassMode.online,
+              location: 'bỏ',
+              startDate: '2026-12-14',
+            ),
+            idempotencyKey: 'k',
+          )
+          .then<void>((_) {}, onError: (_) {});
+      expect(rec.requests.single.data, {
+        'name': 'Toán',
+        'subject': 'Toán',
+        'grade': 9,
+        'mode': 'online',
+        'location': null,
+        'capacity': null,
+        'startDate': '2026-12-14',
+        'endDate': null,
+      });
+    },
+  );
+
+  group('phản hồi sai định dạng → ApiException chung, không ném lỗi lạ', () {
+    Future<ApiException> fail(Future<Object?> f) => f.then<ApiException>(
+      (_) => throw StateError('phải ném ApiException'),
+      onError: (Object e) => e as ApiException,
+    );
+
+    test('thân rỗng, thiếu trường, sai kiểu', () async {
+      for (final body in <Object?>[
+        null,
+        {},
+        {'id': 1},
+        [],
+      ]) {
+        rec.responseBody = body;
+        final e = await fail(repo.get('c1'));
+        expect(e.kind, ApiErrorKind.server, reason: '$body');
+      }
+    });
+
+    test('enum lạ từ server không ném, rơi về mặc định', () async {
+      rec.responseBody = {
+        'id': 'c1',
+        'name': 'n',
+        'subject': 's',
+        'grade': 9,
+        'mode': 'hybrid-moi',
+        'location': null,
+        'capacity': null,
+        'startDate': '2026-12-14',
+        'endDate': null,
+        'status': 'frozen',
+        'enrolledCount': 0,
+        'scheduleRules': [],
+        'createdAt': '2026-12-01T00:00:00.000Z',
+      };
+      final c = await repo.get('c1');
+      expect(c.mode, ClassMode.offline);
+      expect(c.status, ClassStatus.active);
+    });
   });
 }

@@ -167,5 +167,21 @@
       }
     }
   },
-  "classesErrRulesDuration": "Thời lượng từ 15 đến 480 phút."
+  "classesErrRulesDuration": "Thời lượng từ 15 đến 480 phút.",
+  "classesRuleN": "Buổi {n}",
+  "@classesRuleN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classesRuleRemoveN": "Xóa buổi {n}",
+  "@classesRuleRemoveN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -37,6 +37,9 @@ ApiException apiError(ApiErrorCode c) =>
 /// Bản giả: mỗi thao tác chạy `onX` nếu có, không thì trả giá trị mặc định.
 class FakeClassesRepository implements ClassesRepository {
   final calls = <String>[];
+
+  /// Khóa idempotency của từng lệnh ghi, theo thứ tự gọi.
+  final keys = <String?>[];
   List<TeachClass> active = [];
   List<TeachClass> archived = [];
   TeachClass? current;
@@ -76,8 +79,12 @@ class FakeClassesRepository implements ClassesRepository {
   }
 
   @override
-  Future<ClassCreated> create(ClassInput input) async {
+  Future<ClassCreated> create(
+    ClassInput input, {
+    String? idempotencyKey,
+  }) async {
     calls.add('create');
+    keys.add(idempotencyKey);
     lastInput = input;
     if (createError != null) throw createError!;
     final c = sampleClass(id: 'new', name: input.name);
@@ -86,16 +93,22 @@ class FakeClassesRepository implements ClassesRepository {
   }
 
   @override
-  Future<TeachClass> update(String id, ClassInput input) async {
+  Future<TeachClass> update(
+    String id,
+    ClassInput input, {
+    String? idempotencyKey,
+  }) async {
     calls.add('update:$id');
+    keys.add(idempotencyKey);
     lastInput = input;
     if (updateError != null) throw updateError!;
     return current = sampleClass(id: id, name: input.name);
   }
 
   @override
-  Future<TeachClass> archive(String id) async {
+  Future<TeachClass> archive(String id, {String? idempotencyKey}) async {
     calls.add('archive:$id');
+    keys.add(idempotencyKey);
     if (archiveError != null) throw archiveError!;
     return sampleClass(id: id, status: ClassStatus.archived);
   }
@@ -104,8 +117,13 @@ class FakeClassesRepository implements ClassesRepository {
   Future<List<RosterEntry>> roster(String id) async => rosterItems;
 
   @override
-  Future<EnrollResult> enroll(String classId, String studentId) async {
+  Future<EnrollResult> enroll(
+    String classId,
+    String studentId, {
+    String? idempotencyKey,
+  }) async {
     calls.add('enroll:$classId:$studentId');
+    keys.add(idempotencyKey);
     if (enrollError != null) throw enrollError!;
     return EnrollResult(
       Enrollment(
@@ -133,9 +151,11 @@ class FakeClassesRepository implements ClassesRepository {
   @override
   Future<ScheduleRulesResult> putRules(
     String classId,
-    List<ScheduleRule> rules,
-  ) async {
+    List<ScheduleRule> rules, {
+    String? idempotencyKey,
+  }) async {
     calls.add('putRules:$classId');
+    keys.add(idempotencyKey);
     lastRules = rules;
     if (putRulesError != null) throw putRulesError!;
     return ScheduleRulesResult(

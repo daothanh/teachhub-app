@@ -330,4 +330,14 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get classesErrRulesDuration => 'Thời lượng từ 15 đến 480 phút.';
+
+  @override
+  String classesRuleN(int n) {
+    return 'Buổi $n';
+  }
+
+  @override
+  String classesRuleRemoveN(int n) {
+    return 'Xóa buổi $n';
+  }
 }

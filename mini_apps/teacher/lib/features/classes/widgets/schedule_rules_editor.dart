@@ -34,6 +34,7 @@ class ScheduleRulesEditor extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         for (final (i, r) in rules.indexed)
           _RuleCard(
+            number: i + 1,
             key: ValueKey(i),
             rule: r,
             onChanged: (n) => onChanged([...rules]..[i] = n),
@@ -69,10 +70,12 @@ class ScheduleRulesEditor extends StatelessWidget {
 class _RuleCard extends StatefulWidget {
   const _RuleCard({
     super.key,
+    required this.number,
     required this.rule,
     required this.onChanged,
     required this.onRemove,
   });
+  final int number;
   final ScheduleRule rule;
   final ValueChanged<ScheduleRule> onChanged;
   final VoidCallback onRemove;
@@ -138,6 +141,11 @@ class _RuleCardState extends State<_RuleCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              l10n.classesRuleN(widget.number),
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            const SizedBox(height: AppSpacing.sm),
             Wrap(
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
@@ -146,7 +154,8 @@ class _RuleCardState extends State<_RuleCard> {
                   AppChoiceChip(
                     label: l10n.classesWeekdayShort('$d'),
                     selected: widget.rule.weekday == d,
-                    semanticLabel: l10n.classesWeekday('$d'),
+                    semanticLabel:
+                        '${l10n.classesRuleN(widget.number)}, ${l10n.classesWeekday('$d')}',
                     onTap: () => widget.onChanged(_with(weekday: d)),
                   ),
               ],
@@ -171,9 +180,16 @@ class _RuleCardState extends State<_RuleCard> {
             ),
             Align(
               alignment: AlignmentDirectional.centerEnd,
-              child: TextButton(
-                onPressed: widget.onRemove,
-                child: Text(l10n.classesRuleRemove),
+              // Nhãn riêng từng buổi để trình đọc màn hình phân biệt các nút Xóa.
+              child: Semantics(
+                label: l10n.classesRuleRemoveN(widget.number),
+                button: true,
+                excludeSemantics: true,
+                onTap: widget.onRemove,
+                child: TextButton(
+                  onPressed: widget.onRemove,
+                  child: Text(l10n.classesRuleRemove),
+                ),
               ),
             ),
           ],
