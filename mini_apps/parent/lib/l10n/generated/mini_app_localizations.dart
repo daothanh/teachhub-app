@@ -107,17 +107,155 @@ abstract class MiniAppLocalizations {
   /// **'Phụ huynh'**
   String get spaceTitle;
 
-  /// No description provided for @spaceComingSoon.
-  ///
-  /// In vi, this message translates to:
-  /// **'Không gian này đang được xây dựng.'**
-  String get spaceComingSoon;
-
   /// No description provided for @switchRole.
   ///
   /// In vi, this message translates to:
   /// **'Đổi vai trò'**
   String get switchRole;
+
+  /// No description provided for @parentNoInviteTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cần lời mời từ giáo viên'**
+  String get parentNoInviteTitle;
+
+  /// No description provided for @parentNoInviteBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giáo viên sẽ gửi link, mã hoặc mã QR để kết nối với lớp của con.'**
+  String get parentNoInviteBody;
+
+  /// No description provided for @parentAddInvite.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm lời mời'**
+  String get parentAddInvite;
+
+  /// No description provided for @parentLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được thông tin của con. Vui lòng thử lại.'**
+  String get parentLoadFailed;
+
+  /// No description provided for @parentRetry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thử lại'**
+  String get parentRetry;
+
+  /// No description provided for @parentPickChild.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn con'**
+  String get parentPickChild;
+
+  /// No description provided for @parentChildClasses.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp: {classes}'**
+  String parentChildClasses(String classes);
+
+  /// No description provided for @parentNoClasses.
+  ///
+  /// In vi, this message translates to:
+  /// **'Con chưa ghi danh lớp nào.'**
+  String get parentNoClasses;
+
+  /// No description provided for @attendanceWeekTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyên cần tuần này'**
+  String get attendanceWeekTitle;
+
+  /// No description provided for @attendanceWeekRange.
+  ///
+  /// In vi, this message translates to:
+  /// **'{start} – {end}'**
+  String attendanceWeekRange(String start, String end);
+
+  /// No description provided for @attendancePresent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Có mặt'**
+  String get attendancePresent;
+
+  /// No description provided for @attendanceLate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đi muộn'**
+  String get attendanceLate;
+
+  /// No description provided for @attendanceExcused.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vắng có phép'**
+  String get attendanceExcused;
+
+  /// No description provided for @attendanceUnexcused.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vắng không phép'**
+  String get attendanceUnexcused;
+
+  /// No description provided for @attendanceNotRecorded.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa điểm danh'**
+  String get attendanceNotRecorded;
+
+  /// No description provided for @attendanceUpcoming.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sắp học'**
+  String get attendanceUpcoming;
+
+  /// No description provided for @attendanceCount.
+  ///
+  /// In vi, this message translates to:
+  /// **'{label}: {count}'**
+  String attendanceCount(String label, int count);
+
+  /// No description provided for @attendanceNoSessions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tuần này chưa có buổi học.'**
+  String get attendanceNoSessions;
+
+  /// No description provided for @attendanceCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi đã hủy'**
+  String get attendanceCancelled;
+
+  /// No description provided for @attendanceMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi bù'**
+  String get attendanceMakeup;
+
+  /// No description provided for @attendanceSessionLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{className}, {when}'**
+  String attendanceSessionLine(String className, String when);
+
+  /// No description provided for @notificationBannerTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bật thông báo'**
+  String get notificationBannerTitle;
+
+  /// No description provided for @notificationBannerBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhận tin điểm danh và thay đổi lịch của con ngay khi giáo viên cập nhật.'**
+  String get notificationBannerBody;
+
+  /// No description provided for @notificationBannerAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bật thông báo'**
+  String get notificationBannerAction;
 }
 
 class _MiniAppLocalizationsDelegate

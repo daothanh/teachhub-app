@@ -21,6 +21,10 @@ dependencies:
     version: ^5.2.7
   teachhub_shared:
     path: ../../packages/teachhub_shared
+  get_it: ^8.0.3
+  dio: ^5.7.0
+  flutter_bloc: ^9.1.0
+  equatable: ^2.0.7
 
 dev_dependencies:
   flutter_test:
