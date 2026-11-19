@@ -27,6 +27,19 @@ typedef AttendanceItemDto = ({
   DateTime? clientUpdatedAt,
 });
 
+typedef HistorySnapshotDto = ({String status, String? note});
+
+typedef HistoryItemDto = ({
+  String id,
+  String studentName,
+  String? changedByName,
+  DateTime changedAt,
+  HistorySnapshotDto? before,
+  HistorySnapshotDto? after,
+});
+
+typedef HistoryPageDto = ({List<HistoryItemDto> items, String? nextCursor});
+
 /// `GET /sessions/{id}/attendance`.
 typedef AttendanceDto = ({
   String sessionId,
@@ -98,6 +111,8 @@ class TeacherApi {
         'deviceId': deviceId,
         'deviceTime': req.deviceTime.toUtc().toIso8601String(),
         'sessionId': req.sessionId,
+        // Lưu điểm danh = buổi đã dạy; buổi đã dạy thì server bỏ qua cờ.
+        'markSessionTaught': true,
         'mutations': [
           for (final m in req.mutations)
             {
@@ -139,6 +154,34 @@ class TeacherApi {
     final v = int.parse(m[2]!) * 60 + int.parse(m[3]!);
     return m[1] == '-' ? -v : v;
   }
+
+  /// `GET /sessions/{id}/attendance/history`, mới nhất trước.
+  Future<HistoryPageDto> history(String sessionId, {String? cursor}) =>
+      _call(() async {
+        final res = await _dio.get<Object?>(
+          '/sessions/$sessionId/attendance/history',
+          queryParameters: {'cursor': ?cursor, 'limit': 20},
+        );
+        final m = _map(res.data);
+        return (
+          items: [
+            for (final i in (m['items'] as List).cast<Map>())
+              (
+                id: i['id'] as String,
+                studentName: i['studentName'] as String,
+                changedByName: i['changedByName'] as String?,
+                changedAt: DateTime.parse(i['changedAt'] as String),
+                before: _snapshot(i['before']),
+                after: _snapshot(i['after']),
+              ),
+          ],
+          nextCursor: m['nextCursor'] as String?,
+        );
+      });
+
+  static HistorySnapshotDto? _snapshot(Object? v) => v is Map
+      ? (status: v['status'] as String, note: v['note'] as String?)
+      : null;
 
   static DateTime? _date(Object? v) => v == null ? null : DateTime.parse('$v');
 
