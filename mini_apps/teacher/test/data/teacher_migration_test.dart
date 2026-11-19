@@ -9,20 +9,39 @@ import 'package:teacher/data/local_db/teacher_database.dart';
 
 import '../generated_migrations/schema.dart';
 import '../generated_migrations/schema_v1.dart' as v1;
+import '../generated_migrations/schema_v2.dart' as v2;
 
 void main() {
   late SchemaVerifier verifier;
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  test('v1 → v2: cấu trúc sau nâng cấp khớp schema v2 đã export', () async {
+  test(
+    'v2 → v3: cấu trúc khớp schema v3, dòng outbox spike (không buổi) bị bỏ',
+    () async {
+      final schema = await verifier.schemaAt(2);
+      final old = v2.DatabaseAtV2(schema.newConnection());
+      await old.customStatement(
+        "INSERT INTO outbox_mutations (client_mutation_id, entity, payload, client_updated_at, attempt_count) "
+        "VALUES ('m-1', 'attendance', '{}', 1794960000, 3)",
+      );
+      await old.close();
+
+      final db = TeacherDatabase(schema.newConnection());
+      addTearDown(db.close);
+      await verifier.migrateAndValidate(db, 3);
+      expect(await db.select(db.outboxMutations).get(), isEmpty);
+    },
+  );
+
+  test('v1 → v3 một mạch', () async {
     final connection = await verifier.startAt(1);
     final db = TeacherDatabase(connection);
     addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 2);
+    await verifier.migrateAndValidate(db, 3);
   });
 
   test(
-    'v1 → v2 trên file mã hóa: dữ liệu outbox còn nguyên, cột mới có mặc định',
+    'v1 → v3 trên file mã hóa: mở được, bảng mới có mặt, dòng không buổi bị bỏ',
     () async {
       final dir = Directory.systemTemp.createTempSync('teacher_mig');
       addTearDown(() => dir.deleteSync(recursive: true));
@@ -41,9 +60,9 @@ void main() {
       final db = TeacherDatabase(open());
       addTearDown(db.close);
       final rows = await db.select(db.outboxMutations).get();
-      expect(rows.single.clientMutationId, 'm-1');
-      expect(rows.single.attemptCount, 0);
-      expect(rows.single.lastError, isNull);
+      // Dòng v1 không có buổi/học viên: migration v3 bỏ, nhưng file mã hóa vẫn mở được.
+      expect(rows, isEmpty);
+      expect(await db.select(db.cachedSessions).get(), isEmpty);
     },
   );
 
