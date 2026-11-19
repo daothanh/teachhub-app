@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:parent/features/family/data/family_models.dart';
 import 'package:parent/features/family/data/family_repository.dart';
+import 'package:parent/features/invoice/data/invoice_models.dart';
+import 'package:parent/features/invoice/data/invoice_repository.dart';
 import 'package:parent/l10n/l10n.dart';
 import 'package:parent/parent.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
@@ -60,6 +62,19 @@ class _FakeRepo implements FamilyRepository {
   }
 }
 
+class _NoInvoices implements InvoiceRepository {
+  @override
+  Future<InvoicePage> list({
+    String? cursor,
+    InvoiceStatus? status,
+    String? studentId,
+    int limit = 20,
+  }) async => const InvoicePage(items: [], nextCursor: null);
+
+  @override
+  Future<InvoiceDetail> detail(String id) => throw UnimplementedError();
+}
+
 class _Gate implements NotificationPermissionGate {
   bool enabled = false;
   @override
@@ -76,11 +91,13 @@ Future<void> _pump(
 }) async {
   final c = ParentController.instance
     ..familyRepository = repo
+    ..invoiceRepository = _NoInvoices()
     ..notifications = gate
     ..noInviteBuilder = (context, onLinked) => const Text('p05-embedded');
   addTearDown(() {
     c
       ..familyRepository = null
+      ..invoiceRepository = null
       ..notifications = null
       ..noInviteBuilder = null;
   });

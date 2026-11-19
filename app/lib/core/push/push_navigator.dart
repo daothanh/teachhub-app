@@ -41,7 +41,12 @@ class PushNavigator {
   static const _roleByType = {
     'student_absent': MembershipRole.parent,
     'student_absent_correction': MembershipRole.parent,
+    'invoice_issued': MembershipRole.parent,
   };
+
+  /// Màn đích riêng của loại thông báo khi payload không mang `deepLink`
+  /// (push data-only chỉ có `notificationId` và `type`, không có id hóa đơn).
+  static const _routeByType = {'invoice_issued': TeachHubRoutes.parentInvoices};
 
   Future<void> handle(Map<String, dynamic> data) async {
     final ready = whenReady == null ? true : await whenReady!();
@@ -62,7 +67,7 @@ class PushNavigator {
     // shortcut: màn chi tiết của con phía phụ huynh chưa có, `student_absent*`
     // mở trang chủ /p; thay bằng route chi tiết khi có P02 (S4-FL-08).
     final target = deepLink == null ? null : _resolve(deepLink);
-    final path = target?.path ?? role.rootRoute;
+    final path = target?.path ?? _routeByType[type] ?? role.rootRoute;
 
     if (!ready) {
       // Phiên chưa xác định kịp: không điều hướng bừa, để router mở khi xong.

@@ -256,6 +256,228 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Bật thông báo'**
   String get notificationBannerAction;
+
+  /// No description provided for @invoiceTuitionTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học phí'**
+  String get invoiceTuitionTitle;
+
+  /// No description provided for @invoiceTuitionUnpaid.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count} hóa đơn chưa đóng xong, tổng {total}'**
+  String invoiceTuitionUnpaid(int count, String total);
+
+  /// No description provided for @invoiceTuitionUnpaidMore.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count}+ hóa đơn chưa đóng xong'**
+  String invoiceTuitionUnpaidMore(int count);
+
+  /// No description provided for @invoiceTuitionNone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có hóa đơn nào cần đóng.'**
+  String get invoiceTuitionNone;
+
+  /// No description provided for @invoiceTuitionOpen.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem hóa đơn'**
+  String get invoiceTuitionOpen;
+
+  /// No description provided for @invoiceListTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn'**
+  String get invoiceListTitle;
+
+  /// No description provided for @invoiceFilterAll.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tất cả'**
+  String get invoiceFilterAll;
+
+  /// No description provided for @invoiceStatusIssued.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa thanh toán'**
+  String get invoiceStatusIssued;
+
+  /// No description provided for @invoiceStatusPending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chờ xác nhận'**
+  String get invoiceStatusPending;
+
+  /// No description provided for @invoiceStatusPartial.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã trả một phần'**
+  String get invoiceStatusPartial;
+
+  /// No description provided for @invoiceStatusPaid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thanh toán'**
+  String get invoiceStatusPaid;
+
+  /// No description provided for @invoiceStatusVoid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy'**
+  String get invoiceStatusVoid;
+
+  /// No description provided for @invoiceStatusUnknown.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khác'**
+  String get invoiceStatusUnknown;
+
+  /// No description provided for @invoiceEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có hóa đơn nào.'**
+  String get invoiceEmpty;
+
+  /// No description provided for @invoiceLoadMore.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem thêm'**
+  String get invoiceLoadMore;
+
+  /// No description provided for @invoiceRowSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'{student}, kỳ {month}'**
+  String invoiceRowSubtitle(String student, String month);
+
+  /// No description provided for @invoiceDue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hạn {date}'**
+  String invoiceDue(String date);
+
+  /// No description provided for @invoiceCodeLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã {code}'**
+  String invoiceCodeLabel(String code);
+
+  /// No description provided for @invoiceLinesTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Các khoản'**
+  String get invoiceLinesTitle;
+
+  /// No description provided for @invoiceTotal.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tổng cộng'**
+  String get invoiceTotal;
+
+  /// No description provided for @invoiceVoidNotice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn đã hủy, bạn không cần chuyển khoản.'**
+  String get invoiceVoidNotice;
+
+  /// No description provided for @invoicePayTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển khoản'**
+  String get invoicePayTitle;
+
+  /// No description provided for @invoiceQrHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quét mã bằng app ngân hàng.'**
+  String get invoiceQrHint;
+
+  /// No description provided for @invoiceSaveQr.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu ảnh QR'**
+  String get invoiceSaveQr;
+
+  /// No description provided for @invoiceQrSaved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu ảnh QR.'**
+  String get invoiceQrSaved;
+
+  /// No description provided for @invoiceQrDenied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có quyền lưu ảnh. Mở Cài đặt để cho phép.'**
+  String get invoiceQrDenied;
+
+  /// No description provided for @invoiceQrFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không lưu được ảnh QR. Hãy thử lại.'**
+  String get invoiceQrFailed;
+
+  /// No description provided for @invoiceCopyNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sao chép nội dung chuyển khoản'**
+  String get invoiceCopyNote;
+
+  /// No description provided for @invoiceCopyAccount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sao chép số tài khoản'**
+  String get invoiceCopyAccount;
+
+  /// No description provided for @invoiceCopied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã sao chép.'**
+  String get invoiceCopied;
+
+  /// No description provided for @invoiceBank.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngân hàng'**
+  String get invoiceBank;
+
+  /// No description provided for @invoiceAccountNo.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tài khoản'**
+  String get invoiceAccountNo;
+
+  /// No description provided for @invoiceAccountName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chủ tài khoản'**
+  String get invoiceAccountName;
+
+  /// No description provided for @invoiceTransferNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nội dung chuyển khoản'**
+  String get invoiceTransferNote;
+
+  /// No description provided for @invoiceNotFound.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tìm thấy hóa đơn'**
+  String get invoiceNotFound;
+
+  /// No description provided for @invoiceNotFoundBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn không tồn tại hoặc bạn không xem được.'**
+  String get invoiceNotFoundBody;
+
+  /// No description provided for @invoiceLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được hóa đơn. Hãy thử lại.'**
+  String get invoiceLoadFailed;
 }
 
 class _MiniAppLocalizationsDelegate

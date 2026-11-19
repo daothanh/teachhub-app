@@ -62,5 +62,83 @@
   },
   "notificationBannerTitle": "Bật thông báo",
   "notificationBannerBody": "Nhận tin điểm danh và thay đổi lịch của con ngay khi giáo viên cập nhật.",
-  "notificationBannerAction": "Bật thông báo"
+  "notificationBannerAction": "Bật thông báo",
+  "invoiceTuitionTitle": "Học phí",
+  "invoiceTuitionUnpaid": "{count} hóa đơn chưa đóng xong, tổng {total}",
+  "@invoiceTuitionUnpaid": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceTuitionUnpaidMore": "{count}+ hóa đơn chưa đóng xong",
+  "@invoiceTuitionUnpaidMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invoiceTuitionNone": "Không có hóa đơn nào cần đóng.",
+  "invoiceTuitionOpen": "Xem hóa đơn",
+  "invoiceListTitle": "Hóa đơn",
+  "invoiceFilterAll": "Tất cả",
+  "invoiceStatusIssued": "Chưa thanh toán",
+  "invoiceStatusPending": "Chờ xác nhận",
+  "invoiceStatusPartial": "Đã trả một phần",
+  "invoiceStatusPaid": "Đã thanh toán",
+  "invoiceStatusVoid": "Đã hủy",
+  "invoiceStatusUnknown": "Khác",
+  "invoiceEmpty": "Chưa có hóa đơn nào.",
+  "invoiceLoadMore": "Xem thêm",
+  "invoiceRowSubtitle": "{student}, kỳ {month}",
+  "@invoiceRowSubtitle": {
+    "placeholders": {
+      "student": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceDue": "Hạn {date}",
+  "@invoiceDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceCodeLabel": "Mã {code}",
+  "@invoiceCodeLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceLinesTitle": "Các khoản",
+  "invoiceTotal": "Tổng cộng",
+  "invoiceVoidNotice": "Hóa đơn đã hủy, bạn không cần chuyển khoản.",
+  "invoicePayTitle": "Chuyển khoản",
+  "invoiceQrHint": "Quét mã bằng app ngân hàng.",
+  "invoiceSaveQr": "Lưu ảnh QR",
+  "invoiceQrSaved": "Đã lưu ảnh QR.",
+  "invoiceQrDenied": "Chưa có quyền lưu ảnh. Mở Cài đặt để cho phép.",
+  "invoiceQrFailed": "Không lưu được ảnh QR. Hãy thử lại.",
+  "invoiceCopyNote": "Sao chép nội dung chuyển khoản",
+  "invoiceCopyAccount": "Sao chép số tài khoản",
+  "invoiceCopied": "Đã sao chép.",
+  "invoiceBank": "Ngân hàng",
+  "invoiceAccountNo": "Số tài khoản",
+  "invoiceAccountName": "Chủ tài khoản",
+  "invoiceTransferNote": "Nội dung chuyển khoản",
+  "invoiceNotFound": "Không tìm thấy hóa đơn",
+  "invoiceNotFoundBody": "Hóa đơn không tồn tại hoặc bạn không xem được.",
+  "invoiceLoadFailed": "Không tải được hóa đơn. Hãy thử lại."
 }

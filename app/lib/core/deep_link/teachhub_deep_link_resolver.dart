@@ -1,4 +1,5 @@
 import 'package:tasco_core/tasco_core.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../routing/app_routes.dart';
 
@@ -7,6 +8,7 @@ import '../routing/app_routes.dart';
 /// `DeepLinkService` của `tasco_core` chỉ nhận scheme `tasco://` và không có
 /// host universal link, nên shell tự xử lý:
 /// - `https://dayhoc.app/i/<token>` và `teachhub://i/<token>` → `/invite/<token>`
+/// - `teachhub://invoices/<id>` (thông báo hóa đơn) → `/p/invoices/<id>`
 /// - `teachhub://<route>` → route đó nếu một mini-app nhận nó.
 ///
 /// Mọi đích đều cần đăng nhập; URI lạ trả `null`.
@@ -18,6 +20,7 @@ class TeachHubDeepLinkResolver {
 
   static const _hosts = {'dayhoc.app', 'www.dayhoc.app'};
   static final _invite = RegExp(r'^/i/([A-Za-z0-9_-]+)/?$');
+  static final _invoice = RegExp(r'^/invoices/([A-Za-z0-9-]+)/?$');
 
   DeepLinkTarget? resolve(Uri uri) {
     final scheme = uri.scheme.toLowerCase();
@@ -33,6 +36,13 @@ class TeachHubDeepLinkResolver {
     final invite = _invite.firstMatch(path);
     if (invite != null) {
       return DeepLinkTarget(path: AppRoutes.invite(invite.group(1)!));
+    }
+
+    final invoice = _invoice.firstMatch(path);
+    if (invoice != null) {
+      return DeepLinkTarget(
+        path: '${TeachHubRoutes.parentInvoices}/${invoice.group(1)!}',
+      );
     }
 
     final match = moduleResolver?.call(path);

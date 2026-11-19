@@ -7,6 +7,9 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 import '../../../l10n/l10n.dart';
 import '../../family/cubit/family_cubit.dart';
 import '../../family/widgets/attendance_week_card.dart';
+import '../../invoice/cubit/tuition_cubit.dart';
+import '../../invoice/data/invoice_repository.dart';
+import '../../invoice/widgets/tuition_card.dart';
 
 /// Dựng P05; gọi `onLinked` khi vừa nhận lời mời để P02 tải lại danh sách con.
 typedef NoInviteBuilder =
@@ -16,9 +19,16 @@ typedef NoInviteBuilder =
 /// bật thông báo. Chưa có con nào (chưa nhận lời mời) thì hiện P05 do host gắn
 /// qua [noInviteBuilder] (mini-app không import host).
 class ParentHomePage extends StatelessWidget {
-  const ParentHomePage({super.key, this.noInviteBuilder});
+  const ParentHomePage({
+    super.key,
+    this.noInviteBuilder,
+    required this.invoiceRepository,
+  });
 
   final NoInviteBuilder? noInviteBuilder;
+
+  /// Nguồn dữ liệu cho card học phí.
+  final InvoiceRepository Function() invoiceRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +68,9 @@ class ParentHomePage extends StatelessWidget {
             FamilyStatus.ready when !hasChildren => _NoInvite(
               builder: noInviteBuilder,
             ),
-            FamilyStatus.ready => const _Children(),
+            FamilyStatus.ready => _Children(
+              invoiceRepository: invoiceRepository,
+            ),
           },
         );
       },
@@ -94,7 +106,9 @@ class _NoInvite extends StatelessWidget {
 }
 
 class _Children extends StatelessWidget {
-  const _Children();
+  const _Children({required this.invoiceRepository});
+
+  final InvoiceRepository Function() invoiceRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +169,15 @@ class _Children extends StatelessWidget {
                 )
               else if (state.week != null)
                 AttendanceWeekCard(week: state.week!),
+              const SizedBox(height: 16),
+              if (child != null)
+                // Tải lại khi đổi con (key theo id con).
+                BlocProvider(
+                  key: ValueKey(child.id),
+                  create: (_) =>
+                      TuitionCubit(invoiceRepository(), child.id)..load(),
+                  child: const TuitionCard(),
+                ),
             ],
           ),
         );
