@@ -33,7 +33,7 @@ class TuitionCubit extends Cubit<TuitionState> {
   Future<void> load() async {
     try {
       // shortcut: chỉ đọc trang đầu 50 hóa đơn mới nhất của con, hiện "N+"
-      // khi còn trang sau; "chưa tất toán" vì tổng là totalAmount, chưa trừ
+      // khi còn trang sau; "chưa đóng xong" vì tổng là totalAmount, chưa trừ
       // phần đã trả. Sửa khi có paidAmount và endpoint tổng hợp (Sprint 6).
       final page = await _repo.list(studentId: studentId, limit: 50);
       if (isClosed) return;

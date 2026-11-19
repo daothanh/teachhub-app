@@ -64,7 +64,7 @@
   "notificationBannerBody": "Nhận tin điểm danh và thay đổi lịch của con ngay khi giáo viên cập nhật.",
   "notificationBannerAction": "Bật thông báo",
   "invoiceTuitionTitle": "Học phí",
-  "invoiceTuitionUnpaid": "{count} hóa đơn chưa tất toán, tổng {total}",
+  "invoiceTuitionUnpaid": "{count} hóa đơn chưa đóng xong, tổng {total}",
   "@invoiceTuitionUnpaid": {
     "placeholders": {
       "count": {
@@ -75,7 +75,7 @@
       }
     }
   },
-  "invoiceTuitionUnpaidMore": "{count}+ hóa đơn chưa tất toán",
+  "invoiceTuitionUnpaidMore": "{count}+ hóa đơn chưa đóng xong",
   "@invoiceTuitionUnpaidMore": {
     "placeholders": {
       "count": {
@@ -129,7 +129,7 @@
   "invoiceQrHint": "Quét mã bằng app ngân hàng.",
   "invoiceSaveQr": "Lưu ảnh QR",
   "invoiceQrSaved": "Đã lưu ảnh QR.",
-  "invoiceQrDenied": "Chưa có quyền lưu ảnh. Bạn có thể cấp quyền trong Cài đặt.",
+  "invoiceQrDenied": "Chưa có quyền lưu ảnh. Mở Cài đặt để cho phép.",
   "invoiceQrFailed": "Không lưu được ảnh QR. Hãy thử lại.",
   "invoiceCopyNote": "Sao chép nội dung chuyển khoản",
   "invoiceCopyAccount": "Sao chép số tài khoản",

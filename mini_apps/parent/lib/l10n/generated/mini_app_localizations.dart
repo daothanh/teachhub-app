@@ -266,13 +266,13 @@ abstract class MiniAppLocalizations {
   /// No description provided for @invoiceTuitionUnpaid.
   ///
   /// In vi, this message translates to:
-  /// **'{count} hóa đơn chưa tất toán, tổng {total}'**
+  /// **'{count} hóa đơn chưa đóng xong, tổng {total}'**
   String invoiceTuitionUnpaid(int count, String total);
 
   /// No description provided for @invoiceTuitionUnpaidMore.
   ///
   /// In vi, this message translates to:
-  /// **'{count}+ hóa đơn chưa tất toán'**
+  /// **'{count}+ hóa đơn chưa đóng xong'**
   String invoiceTuitionUnpaidMore(int count);
 
   /// No description provided for @invoiceTuitionNone.
@@ -410,7 +410,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @invoiceQrDenied.
   ///
   /// In vi, this message translates to:
-  /// **'Chưa có quyền lưu ảnh. Bạn có thể cấp quyền trong Cài đặt.'**
+  /// **'Chưa có quyền lưu ảnh. Mở Cài đặt để cho phép.'**
   String get invoiceQrDenied;
 
   /// No description provided for @invoiceQrFailed.

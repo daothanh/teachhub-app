@@ -102,12 +102,12 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String invoiceTuitionUnpaid(int count, String total) {
-    return '$count hóa đơn chưa tất toán, tổng $total';
+    return '$count hóa đơn chưa đóng xong, tổng $total';
   }
 
   @override
   String invoiceTuitionUnpaidMore(int count) {
-    return '$count+ hóa đơn chưa tất toán';
+    return '$count+ hóa đơn chưa đóng xong';
   }
 
   @override
@@ -184,7 +184,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get invoiceQrDenied =>
-      'Chưa có quyền lưu ảnh. Bạn có thể cấp quyền trong Cài đặt.';
+      'Chưa có quyền lưu ảnh. Mở Cài đặt để cho phép.';
 
   @override
   String get invoiceQrFailed => 'Không lưu được ảnh QR. Hãy thử lại.';
