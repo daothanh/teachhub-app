@@ -1,6 +1,66 @@
 {
   "@@locale": "en",
   "spaceTitle": "Parent",
-  "spaceComingSoon": "This space is under construction.",
-  "switchRole": "Switch role"
+  "switchRole": "Switch role",
+  "parentNoInviteTitle": "You need an invitation from a teacher",
+  "parentNoInviteBody": "The teacher sends a link, a code or a QR code to connect you to your child's class.",
+  "parentAddInvite": "Add invitation",
+  "parentLoadFailed": "Could not load your child's information. Please try again.",
+  "parentRetry": "Try again",
+  "parentPickChild": "Choose child",
+  "parentChildClasses": "Classes: {classes}",
+  "@parentChildClasses": {
+    "placeholders": {
+      "classes": {
+        "type": "String"
+      }
+    }
+  },
+  "parentNoClasses": "Your child is not enrolled in any class.",
+  "attendanceWeekTitle": "Attendance this week",
+  "attendanceWeekRange": "{start} – {end}",
+  "@attendanceWeekRange": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "attendancePresent": "Present",
+  "attendanceLate": "Late",
+  "attendanceExcused": "Excused absence",
+  "attendanceUnexcused": "Unexcused absence",
+  "attendanceNotRecorded": "Not recorded",
+  "attendanceUpcoming": "Upcoming",
+  "attendanceCount": "{label}: {count}",
+  "@attendanceCount": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "attendanceNoSessions": "No classes this week.",
+  "attendanceCancelled": "Cancelled",
+  "attendanceMakeup": "Make-up class",
+  "attendanceSessionLine": "{className}, {when}",
+  "@attendanceSessionLine": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationBannerTitle": "Turn on notifications",
+  "notificationBannerBody": "Get attendance and schedule updates for your child as soon as the teacher posts them.",
+  "notificationBannerAction": "Turn on notifications"
 }

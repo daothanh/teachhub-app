@@ -9,6 +9,7 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 import '../features/auth/auth_config.dart';
 import '../features/center_waitlist/center_waitlist_repository.dart';
 import '../features/auth/auth_cubit.dart';
+import '../features/invite/invite_repository.dart';
 import '../features/auth/teachhub_user.dart';
 
 Future<void> repositoryModule(GetIt getIt) async {
@@ -26,6 +27,9 @@ Future<void> repositoryModule(GetIt getIt) async {
       () => DioCenterWaitlistRepository(
         getIt<Dio>(instanceName: TeachHubDiKey.api),
       ),
+    )
+    ..registerLazySingleton<InviteRepository>(
+      () => DioInviteRepository(getIt<Dio>(instanceName: TeachHubDiKey.api)),
     )
     ..registerLazySingleton<PushRepository>(
       () => PushRepositoryImpl(

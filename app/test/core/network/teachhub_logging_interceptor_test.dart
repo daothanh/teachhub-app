@@ -29,4 +29,13 @@ void main() {
     });
     expect(out.toString(), isNot(contains('Hải')));
   });
+
+  test('che token mời và mã ngắn (bí mật, US-0.12)', () {
+    final out = TeachHubLoggingInterceptor.redactBody([
+      {'token': 'q3Zp8mT1xV0kLw5Hn2RcYb7JdFgSaE9uXoIiKtUeMhA'},
+      {'code': '7K3QZ9XM'},
+    ]);
+    expect(out.toString(), isNot(contains('q3Zp')));
+    expect(out.toString(), isNot(contains('7K3Q')));
+  });
 }

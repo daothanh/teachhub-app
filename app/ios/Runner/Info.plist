@@ -68,6 +68,12 @@
 	</array>
 	<key>NSContactsUsageDescription</key>
 	<string>TeachHub đọc danh bạ khi bạn chọn Thêm từ danh bạ, để tạo học viên và lưu số của phụ huynh. Danh bạ không được dùng cho việc nào khác.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>TeachHub dùng camera để quét mã QR lời mời của giáo viên. Camera không được dùng cho việc nào khác.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>zalo</string>
+	</array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>TeachHub dùng Face ID để xác thực khi bạn mở khoá chế độ phụ huynh.</string>
 	<key>CFBundleURLTypes</key>

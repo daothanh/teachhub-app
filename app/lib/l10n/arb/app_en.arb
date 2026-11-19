@@ -21,13 +21,68 @@
   "roleStudent": "Student",
   "roleAddFailed": "Could not add the role. Please try again.",
   "inviteTitle": "Class invitation",
-  "inviteBody": "A teacher invited you to connect with your child's class.",
   "inviteAccept": "Accept invitation",
-  "inviteInvalid": "This invitation does not exist or has expired.",
+  "inviteCardTitle": "Invitation from {teacher}",
+  "@inviteCardTitle": {
+    "placeholders": {
+      "teacher": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteCardBody": "{teacher} invites you to see {student}'s learning information. The link is valid until {expires}.",
+  "@inviteCardBody": {
+    "placeholders": {
+      "teacher": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      },
+      "expires": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteInvalid": "This invitation link has expired or can no longer be used. Message the teacher for a new link.",
+  "inviteEntryTitle": "You need an invitation from a teacher",
+  "inviteEntryBody": "Your child's teacher will send you a link, a code or a QR code. The app cannot search for students by name, school or phone number.",
+  "inviteScanQr": "Scan QR code",
+  "inviteInputLabel": "Paste the link or enter the invitation code",
+  "inviteInputSubmit": "Continue",
+  "inviteInputBad": "Link or code not recognised. Paste the whole link, or enter the 8-character code.",
+  "inviteCodeInvalid": "The code is wrong or has expired. Message the teacher for a new code.",
+  "inviteCodeLocked": "Too many wrong attempts. Try again in {minutes} minutes.",
+  "@inviteCodeLocked": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteRateLimited": "You are going too fast, please try again later.",
+  "inviteAskTeacher": "Message the teacher for a link",
+  "inviteAskMessage": "Hello, I am a parent. Could you please resend the TeachHub invitation link so I can see my child's information? Thank you.",
+  "inviteAskCopied": "Message copied. Paste it into Zalo to send it to the teacher.",
+  "inviteScanTitle": "Scan the invitation QR code",
+  "inviteScanHint": "Point the camera at the QR code.",
+  "inviteScanDenied": "The app is not allowed to use the camera. You can paste the link or enter the code instead.",
+  "inviteScanNotInvite": "This QR code is not a TeachHub invitation.",
+  "consentTitle": "Consent to data processing",
+  "consentBody": "To see your child's learning information, you need to agree that TeachHub processes your and your child's personal data under the terms and privacy policy.",
+  "consentVersion": "Terms version: {version}",
+  "@consentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "consentAccept": "Agree and continue",
+  "consentTermsChanged": "The terms were just updated. Please read them again, then agree.",
+  "consentFailed": "Could not send. Please try again.",
+  "consentLoadFailed": "Could not load the terms. Please try again.",
   "inviteFailed": "Could not accept the invitation. Please try again.",
-  "inviteConsentTitle": "Data processing consent",
-  "inviteConsentBody": "To see your child's learning information, you need to agree to TeachHub's terms and personal data policy.",
-  "inviteConsentAccept": "Agree and accept",
   "settings": "Settings",
   "settingsAbout": "About",
   "settingsAboutApp": "Application",
@@ -117,5 +172,6 @@
   "waitlistErrorBusy": "Still processing. Try again in a moment.",
   "waitlistErrorValidation": "Some details are invalid. Check the fields.",
   "waitlistErrorNetwork": "No connection. Try again later.",
-  "waitlistErrorGeneric": "Could not send. Try again later."
+  "waitlistErrorGeneric": "Could not send. Try again later.",
+  "consentLater": "Later"
 }

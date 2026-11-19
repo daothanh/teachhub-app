@@ -12,8 +12,12 @@ import '../../features/app_version/update_required_page.dart';
 import '../../features/center_waitlist/center_waitlist_page.dart';
 import '../../features/center_waitlist/center_waitlist_cubit.dart';
 import '../../features/auth/auth_cubit.dart';
+import '../../features/consent/consent_cubit.dart';
+import '../../features/consent/consent_page.dart';
 import '../../features/invite/invite_cubit.dart';
+import '../../features/invite/invite_entry_view.dart';
 import '../../features/invite/invite_page.dart';
+import '../../features/invite/invite_scan_page.dart';
 import '../../features/role_picker/membership_cubit.dart';
 import '../../features/role_picker/role_picker_page.dart';
 import '../../features/settings/settings_page.dart';
@@ -29,11 +33,13 @@ final Map<String, Set<String>> roleRoutePermissions = {
 ///
 /// Thứ tự kiểm tra (spec §8.7): phiên bản tối thiểu → kiểm phiên → đăng nhập (mặc định mọi route
 /// cần đăng nhập) → tải vai trò → chưa có vai trò thì chọn vai trò →
+/// đã đồng ý xử lý dữ liệu (`/p/**`, vai trò Phụ huynh) →
 /// `PermissionGuard` theo vai trò cho `/t`, `/p`, `/s`.
 GoRouter buildAppRouter({
   required ModuleManager moduleManager,
   required AppAuthCubit authCubit,
   required MembershipCubit membershipCubit,
+  required ConsentCubit consentCubit,
   required Widget Function() loginPage,
   required InviteCubit Function(String token) inviteCubit,
   ValueListenable<bool>? updateRequired,
@@ -57,6 +63,7 @@ GoRouter buildAppRouter({
     refreshListenable: Listenable.merge([
       GoRouterRefreshStream(authCubit.stream),
       GoRouterRefreshStream(membershipCubit.stream),
+      GoRouterRefreshStream(consentCubit.stream),
       ?updateRequired,
     ]),
     onException: (_, _, router) => router.go(AppRoutes.splash),
@@ -64,6 +71,7 @@ GoRouter buildAppRouter({
       location: state.matchedLocation,
       auth: authCubit.state,
       memberships: membershipCubit.state,
+      consent: consentCubit.state,
       authGuard: authGuard,
       permissionGuard: permissionGuard,
       updateRequired: updateRequired?.value ?? false,
@@ -91,6 +99,30 @@ GoRouter buildAppRouter({
         builder: (_, _) => const SettingsPage(),
       ),
       GoRoute(
+        path: AppRoutes.consent,
+        builder: (_, _) =>
+            BlocProvider.value(value: consentCubit, child: const ConsentPage()),
+      ),
+      GoRoute(
+        path: AppRoutes.inviteEntry,
+        builder: (_, _) => const InviteEntryPage(),
+      ),
+      // Phải đứng trước `invitePattern`, nếu không `scan` bị hiểu là token.
+      GoRoute(
+        path: AppRoutes.inviteScan,
+        builder: (_, _) => const InviteScanPage(),
+      ),
+      // Token đi qua `extra`, không nằm trong đường dẫn (không vào URL/log).
+      GoRoute(
+        path: AppRoutes.inviteCard,
+        redirect: (_, state) =>
+            state.extra is String ? null : AppRoutes.inviteEntry,
+        builder: (_, state) => BlocProvider(
+          create: (_) => inviteCubit(state.extra! as String),
+          child: const InvitePage(),
+        ),
+      ),
+      GoRoute(
         path: AppRoutes.invitePattern,
         builder: (_, state) => BlocProvider(
           create: (_) => inviteCubit(state.pathParameters['token']!),
@@ -108,6 +140,7 @@ String? resolveRedirect({
   required String location,
   required AppAuthState auth,
   required MembershipState memberships,
+  required ConsentState consent,
   required RouteGuard authGuard,
   required RouteGuard permissionGuard,
   bool updateRequired = false,
@@ -138,10 +171,41 @@ String? resolveRedirect({
     return atSplash ? null : AppRoutes.splash;
   }
 
+  // Phụ huynh phải đồng ý điều khoản hiện hành mới vào trang của con (US-0.3
+  // AC2). Chưa biết trạng thái (đang tải) thì chờ ở splash; chỉ khi server nói
+  // chưa đồng ý (hoặc không đọc được) mới về màn đồng ý.
+  final isParent = memberships.permissions.contains(
+    MembershipRole.parent.permission,
+  );
+  bool inParentSpace(String path) =>
+      path == TeachHubRoutes.parent ||
+      path.startsWith('${TeachHubRoutes.parent}/');
+  final consentPending =
+      consent.phase == ConsentPhase.unknown ||
+      consent.phase == ConsentPhase.loading;
+  final consentBlocked =
+      consent.phase == ConsentPhase.required ||
+      consent.phase == ConsentPhase.accepting ||
+      consent.phase == ConsentPhase.failed;
+
   if (atSplash || atLogin) {
+    // Đích sẽ mở: link chờ nếu có, không thì không gian của vai trò đang mở.
+    final target =
+        PendingDeepLink.current?.path ??
+        memberships.active?.role.rootRoute ??
+        AppRoutes.rolePicker;
+    if (isParent && inParentSpace(target) && !consent.accepted) {
+      // Không tiêu thụ link chờ: màn đồng ý sẽ mở nó sau khi đồng ý.
+      if (consentPending) return atSplash ? null : AppRoutes.splash;
+      if (consentBlocked) return AppRoutes.consent;
+    }
     final pending = PendingDeepLink.consume();
     if (pending != null) return pending.path;
     return memberships.active?.role.rootRoute ?? AppRoutes.rolePicker;
+  }
+
+  if (isParent && inParentSpace(location) && !consent.accepted) {
+    return consentPending ? AppRoutes.splash : AppRoutes.consent;
   }
 
   final denied = permissionGuard.evaluate(

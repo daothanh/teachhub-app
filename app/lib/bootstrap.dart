@@ -42,7 +42,11 @@ import 'features/auth/logout_service.dart';
 import 'features/auth/pages/login_page.dart';
 import 'features/auth/sso/apple_sso_provider.dart';
 import 'features/auth/sso/google_sso_provider.dart';
+import 'core/push/fcm_notification_permission.dart';
+import 'features/consent/consent_cubit.dart';
 import 'features/invite/invite_cubit.dart';
+import 'features/invite/invite_entry_view.dart';
+import 'features/invite/invite_repository.dart';
 import 'features/role_picker/membership_cubit.dart';
 
 Future<void> bootstrap({required Env env}) async {
@@ -114,6 +118,16 @@ Future<void> bootstrap({required Env env}) async {
   // 5. Phiên + vai trò. Nghe trước initSession để không lỡ lần khôi phục phiên.
   final authCubit = GetIt.I<AppAuthCubit>();
   final membershipCubit = GetIt.I<MembershipCubit>();
+  final consentCubit = GetIt.I<ConsentCubit>();
+  // Tải trạng thái đồng ý ngay khi biết có vai trò Phụ huynh, để mở app nguội
+  // không qua màn đồng ý và giữ link chờ.
+  membershipCubit.stream.listen((m) {
+    if (m.statusLoad == LoadingStatus.success &&
+        m.permissions.contains(MembershipRole.parent.permission) &&
+        consentCubit.state.phase == ConsentPhase.unknown) {
+      consentCubit.load();
+    }
+  });
   String? claimedUser;
   var wasAuthenticated = false;
   authCubit.stream.listen((state) async {
@@ -125,7 +139,10 @@ Future<void> bootstrap({required Env env}) async {
       final userId = state.user?.id;
       if (userId != null && userId != claimedUser) {
         // Đổi người dùng thì link chờ của người trước không được mở cho người sau.
-        if (claimedUser != null) PendingDeepLink.clear();
+        if (claimedUser != null) {
+          PendingDeepLink.clear();
+          consentCubit.clear();
+        }
         claimedUser = userId;
         try {
           await TeacherController.instance.claimDatabaseFor(userId);
@@ -172,6 +189,7 @@ Future<void> bootstrap({required Env env}) async {
       if (membershipCubit.state.statusLoad != LoadingStatus.initial) {
         membershipCubit.clear();
       }
+      consentCubit.clear();
     }
   });
   // Đăng xuất xóa CSDL teacher khi outbox trống; phiên hết hạn đi cùng đường đó.
@@ -214,6 +232,12 @@ Future<void> bootstrap({required Env env}) async {
     platform: Platform.isIOS ? 'ios' : 'android',
   );
   unawaited(versionGate.check());
+  // P02 của parent hiện P05 khi chưa có con; banner bật thông báo dùng FCM.
+  ParentController.instance.noInviteBuilder = (_, onLinked) =>
+      embeddedInviteEntry(onLinked);
+  if (firebaseReady) {
+    ParentController.instance.notifications = FcmNotificationPermission();
+  }
   final router = buildAppRouter(
     moduleManager: moduleManager,
     authCubit: authCubit,
@@ -224,8 +248,13 @@ Future<void> bootstrap({required Env env}) async {
       apple: AppleSsoProvider(),
       isIOS: Platform.isIOS,
     ),
-    inviteCubit: (token) =>
-        InviteCubit(api: api, memberships: membershipCubit, token: token),
+    consentCubit: consentCubit,
+    inviteCubit: (token) => InviteCubit(
+      repository: GetIt.I<InviteRepository>(),
+      memberships: membershipCubit,
+      consent: consentCubit,
+      token: token,
+    ),
     updateRequired: versionGate,
     navigatorKey: alice?.getNavigatorKey(),
   );

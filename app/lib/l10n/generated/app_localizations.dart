@@ -224,47 +224,173 @@ abstract class AppLocalizations {
   /// **'Lời mời tham gia lớp'**
   String get inviteTitle;
 
-  /// No description provided for @inviteBody.
-  ///
-  /// In vi, this message translates to:
-  /// **'Giáo viên đã mời bạn kết nối với lớp học của con.'**
-  String get inviteBody;
-
   /// No description provided for @inviteAccept.
   ///
   /// In vi, this message translates to:
   /// **'Nhận lời mời'**
   String get inviteAccept;
 
+  /// No description provided for @inviteCardTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lời mời từ {teacher}'**
+  String inviteCardTitle(String teacher);
+
+  /// No description provided for @inviteCardBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'{teacher} mời bạn xem thông tin học tập của {student}. Link còn hiệu lực tới {expires}.'**
+  String inviteCardBody(String teacher, String student, String expires);
+
   /// No description provided for @inviteInvalid.
   ///
   /// In vi, this message translates to:
-  /// **'Lời mời không tồn tại hoặc đã hết hạn.'**
+  /// **'Link mời hết hạn hoặc không còn dùng được. Hãy nhắn giáo viên xin link mới.'**
   String get inviteInvalid;
+
+  /// No description provided for @inviteEntryTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cần lời mời từ giáo viên'**
+  String get inviteEntryTitle;
+
+  /// No description provided for @inviteEntryBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giáo viên của con sẽ gửi cho bạn link, mã hoặc mã QR. Ứng dụng không tìm học sinh theo tên, trường hay số điện thoại.'**
+  String get inviteEntryBody;
+
+  /// No description provided for @inviteScanQr.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quét mã QR'**
+  String get inviteScanQr;
+
+  /// No description provided for @inviteInputLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dán link hoặc nhập mã mời'**
+  String get inviteInputLabel;
+
+  /// No description provided for @inviteInputSubmit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục'**
+  String get inviteInputSubmit;
+
+  /// No description provided for @inviteInputBad.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa nhận ra link hoặc mã. Hãy dán cả link, hoặc nhập mã gồm 8 ký tự.'**
+  String get inviteInputBad;
+
+  /// No description provided for @inviteCodeInvalid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã không đúng hoặc đã hết hạn. Hãy nhắn giáo viên xin mã mới.'**
+  String get inviteCodeInvalid;
+
+  /// No description provided for @inviteCodeLocked.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đã nhập sai quá nhiều lần. Thử lại sau {minutes} phút.'**
+  String inviteCodeLocked(int minutes);
+
+  /// No description provided for @inviteRateLimited.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn thao tác quá nhanh, vui lòng thử lại sau.'**
+  String get inviteRateLimited;
+
+  /// No description provided for @inviteAskTeacher.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắn giáo viên xin link'**
+  String get inviteAskTeacher;
+
+  /// No description provided for @inviteAskMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chào thầy/cô, tôi là phụ huynh. Nhờ thầy/cô gửi lại link mời TeachHub để tôi xem thông tin của con. Cảm ơn thầy/cô.'**
+  String get inviteAskMessage;
+
+  /// No description provided for @inviteAskCopied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã sao chép tin nhắn. Hãy dán vào Zalo để gửi cho giáo viên.'**
+  String get inviteAskCopied;
+
+  /// No description provided for @inviteScanTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quét mã QR lời mời'**
+  String get inviteScanTitle;
+
+  /// No description provided for @inviteScanHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đưa mã QR vào khung hình.'**
+  String get inviteScanHint;
+
+  /// No description provided for @inviteScanDenied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ứng dụng chưa được dùng camera. Bạn có thể dán link hoặc nhập mã thay thế.'**
+  String get inviteScanDenied;
+
+  /// No description provided for @inviteScanNotInvite.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã QR này không phải lời mời TeachHub.'**
+  String get inviteScanNotInvite;
+
+  /// No description provided for @consentTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đồng ý xử lý dữ liệu'**
+  String get consentTitle;
+
+  /// No description provided for @consentBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Để xem thông tin học tập của con, bạn cần đồng ý để TeachHub xử lý dữ liệu cá nhân của bạn và của con theo điều khoản và chính sách bảo mật.'**
+  String get consentBody;
+
+  /// No description provided for @consentVersion.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phiên bản điều khoản: {version}'**
+  String consentVersion(String version);
+
+  /// No description provided for @consentAccept.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đồng ý và tiếp tục'**
+  String get consentAccept;
+
+  /// No description provided for @consentTermsChanged.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điều khoản vừa được cập nhật. Vui lòng đọc lại rồi đồng ý.'**
+  String get consentTermsChanged;
+
+  /// No description provided for @consentFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa gửi được. Vui lòng thử lại.'**
+  String get consentFailed;
+
+  /// No description provided for @consentLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được điều khoản. Vui lòng thử lại.'**
+  String get consentLoadFailed;
 
   /// No description provided for @inviteFailed.
   ///
   /// In vi, this message translates to:
   /// **'Không nhận được lời mời. Vui lòng thử lại.'**
   String get inviteFailed;
-
-  /// No description provided for @inviteConsentTitle.
-  ///
-  /// In vi, this message translates to:
-  /// **'Đồng ý xử lý dữ liệu'**
-  String get inviteConsentTitle;
-
-  /// No description provided for @inviteConsentBody.
-  ///
-  /// In vi, this message translates to:
-  /// **'Để xem thông tin học tập của con, bạn cần đồng ý với điều khoản và chính sách xử lý dữ liệu cá nhân của TeachHub.'**
-  String get inviteConsentBody;
-
-  /// No description provided for @inviteConsentAccept.
-  ///
-  /// In vi, this message translates to:
-  /// **'Đồng ý và nhận lời mời'**
-  String get inviteConsentAccept;
 
   /// No description provided for @settings.
   ///
@@ -805,6 +931,12 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Chưa gửi được đăng ký. Thử lại sau.'**
   String get waitlistErrorGeneric;
+
+  /// No description provided for @consentLater.
+  ///
+  /// In vi, this message translates to:
+  /// **'Để sau'**
+  String get consentLater;
 }
 
 class _AppLocalizationsDelegate

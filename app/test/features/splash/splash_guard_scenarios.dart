@@ -6,6 +6,8 @@ import 'package:app/core/routing/app_router.dart';
 import 'package:app/core/routing/app_routes.dart';
 import 'package:app/features/auth/auth_cubit.dart';
 import 'package:app/features/auth/teachhub_user.dart';
+import 'package:app/features/consent/consent_cubit.dart';
+import 'package:app/features/consent/consent_page.dart';
 import 'package:app/features/role_picker/membership_cubit.dart';
 import 'package:app/features/role_picker/role_picker_page.dart';
 import 'package:app/features/splash/splash_page.dart';
@@ -29,6 +31,12 @@ const _teacher = Membership(
   id: 'm-t',
   role: MembershipRole.tenantOwner,
   label: 'Giáo viên',
+);
+
+const _parent = Membership(
+  id: 'm-p',
+  role: MembershipRole.parent,
+  label: 'Phụ huynh',
 );
 
 class _NoRepo implements AuthRepository<TeachHubUser> {
@@ -56,7 +64,11 @@ ModuleSlot _slot(String id, String prefix) => ModuleSlot(
   notificationTypes: const {},
   init: () async {},
   routes: () => [
-    GoRoute(path: prefix, builder: (_, _) => Text('mini-app $id')),
+    GoRoute(
+      path: prefix,
+      builder: (_, _) => Text('mini-app $id'),
+      routes: [GoRoute(path: 'x', builder: (_, _) => Text('mini-app $id x'))],
+    ),
   ],
   onNotification: (_, _) async {},
   dispose: () async {},
@@ -65,6 +77,8 @@ ModuleSlot _slot(String id, String prefix) => ModuleSlot(
 void defineSplashGuardTests() {
   late _Auth auth;
   late _Memberships memberships;
+  late ConsentCubit consent;
+  final consentCalls = <String>[];
 
   Future<GoRouter> pump(WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
@@ -72,6 +86,20 @@ void defineSplashGuardTests() {
     memberships = _Memberships(await SharedPreferences.getInstance());
     addTearDown(auth.close);
     addTearDown(memberships.close);
+    // Các kịch bản splash không xét đồng ý: coi như đã đồng ý.
+    consentCalls.clear();
+    consent = ConsentCubit(
+      Dio()
+        ..interceptors.add(
+          InterceptorsWrapper(
+            onRequest: (o, h) {
+              consentCalls.add('${o.method} ${o.path}');
+              h.resolve(Response(requestOptions: o, statusCode: 201));
+            },
+          ),
+        ),
+    )..markAccepted();
+    addTearDown(consent.close);
     final manager = ModuleManager()
       ..register(_slot('teacher', TeachHubRoutes.teacher))
       ..register(_slot('parent', TeachHubRoutes.parent))
@@ -81,6 +109,7 @@ void defineSplashGuardTests() {
       moduleManager: manager,
       authCubit: auth,
       membershipCubit: memberships,
+      consentCubit: consent,
       loginPage: () => const Text('màn đăng nhập'),
       inviteCubit: (_) => throw UnimplementedError(),
     );
@@ -168,5 +197,75 @@ void defineSplashGuardTests() {
       router.routeInformationProvider.value.uri.path,
       TeachHubRoutes.teacher,
     );
+  });
+
+  testWidgets(
+    'Phụ huynh: 403 CONSENT_REQUIRED giữa phiên đưa về màn đồng ý, đồng ý xong về /p',
+    (tester) async {
+      final router = await pump(tester);
+      auth.set(
+        AppAuthState.initial().copyWith(
+          statusCheckToken: LoadingStatus.success,
+          user: _user,
+        ),
+      );
+      memberships.set(
+        const MembershipState(
+          statusLoad: LoadingStatus.success,
+          memberships: [_parent],
+          active: _parent,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('mini-app parent'), findsOneWidget);
+
+      consent.markRequired('2026-12-01');
+      await tester.pumpAndSettle();
+      expect(find.byType(ConsentPage), findsOneWidget);
+      expect(router.routeInformationProvider.value.uri.path, AppRoutes.consent);
+
+      await tester.tap(find.text('Đồng ý và tiếp tục'));
+      await tester.pumpAndSettle();
+      expect(consentCalls, ['POST /consents']);
+      expect(find.text('mini-app parent'), findsOneWidget);
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        TeachHubRoutes.parent,
+      );
+    },
+  );
+
+  testWidgets('mở nguội với link /p/x chờ, chưa đồng ý: đồng ý xong tới /p/x', (
+    tester,
+  ) async {
+    final router = await pump(tester);
+    PendingDeepLink.save(const DeepLinkTarget(path: '/p/x'));
+    addTearDown(PendingDeepLink.clear);
+    consent.clear(); // chưa biết trạng thái
+    auth.set(
+      AppAuthState.initial().copyWith(
+        statusCheckToken: LoadingStatus.success,
+        user: _user,
+      ),
+    );
+    memberships.set(
+      const MembershipState(
+        statusLoad: LoadingStatus.success,
+        memberships: [_parent],
+        active: _parent,
+      ),
+    );
+    await tester.pumpAndSettle();
+    // Còn chờ trạng thái đồng ý: ở splash, link chưa bị tiêu thụ.
+    expect(find.byType(SplashPage), findsOneWidget);
+    expect(PendingDeepLink.current?.path, '/p/x');
+
+    consent.markRequired('2026-12-01');
+    await tester.pumpAndSettle();
+    expect(find.byType(ConsentPage), findsOneWidget);
+
+    await tester.tap(find.text('Đồng ý và tiếp tục'));
+    await tester.pumpAndSettle();
+    expect(router.routeInformationProvider.value.uri.path, '/p/x');
   });
 }
