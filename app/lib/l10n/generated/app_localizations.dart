@@ -170,6 +170,18 @@ abstract class AppLocalizations {
   /// **'Đăng nhập không thành công. Vui lòng thử lại.'**
   String get loginFailed;
 
+  /// No description provided for @loginUnavailable.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hệ thống đang bận, vui lòng thử lại sau ít phút.'**
+  String get loginUnavailable;
+
+  /// No description provided for @loginEmailRequiresOtp.
+  ///
+  /// In vi, this message translates to:
+  /// **'Email này cần đăng nhập bằng mã OTP. Nhập email bên dưới để nhận mã.'**
+  String get loginEmailRequiresOtp;
+
   /// No description provided for @splashLoadFailed.
   ///
   /// In vi, this message translates to:

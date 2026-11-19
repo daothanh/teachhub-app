@@ -45,6 +45,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginFailed => 'Sign-in failed. Please try again.';
 
   @override
+  String get loginUnavailable =>
+      'The service is busy, please try again in a few minutes.';
+
+  @override
+  String get loginEmailRequiresOtp =>
+      'This email needs a one-time code to sign in. Enter it below to get a code.';
+
+  @override
   String get splashLoadFailed => 'Could not load your roles.';
 
   @override

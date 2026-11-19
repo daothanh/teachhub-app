@@ -162,6 +162,12 @@ class _LoginPageState extends State<LoginPage> {
   static String _errorMessage(AppLocalizations l10n, Object? error) =>
       switch (apiException(error)?.code) {
         ApiErrorCode.rateLimited => l10n.loginRateLimited,
+        ApiErrorCode.serviceUnavailable => l10n.loginUnavailable,
+        // Apple/Google không đủ thẩm quyền với email này: chỉ còn OTP email.
+        ApiErrorCode.unauthenticated
+            when apiException(error)?.details['reason'] ==
+                'EMAIL_REQUIRES_OTP' =>
+          l10n.loginEmailRequiresOtp,
         _ => l10n.loginFailed,
       };
 

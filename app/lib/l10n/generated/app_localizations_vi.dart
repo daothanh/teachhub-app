@@ -47,6 +47,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loginFailed => 'Đăng nhập không thành công. Vui lòng thử lại.';
 
   @override
+  String get loginUnavailable =>
+      'Hệ thống đang bận, vui lòng thử lại sau ít phút.';
+
+  @override
+  String get loginEmailRequiresOtp =>
+      'Email này cần đăng nhập bằng mã OTP. Nhập email bên dưới để nhận mã.';
+
+  @override
   String get splashLoadFailed => 'Không tải được vai trò của bạn.';
 
   @override

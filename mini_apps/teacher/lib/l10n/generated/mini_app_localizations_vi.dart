@@ -497,4 +497,75 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   @override
   String get onboardingStudentSaved =>
       'Đã lưu học viên. Chưa ghi nhận được bước này.';
+
+  @override
+  String get contactsAdd => 'Thêm từ danh bạ';
+
+  @override
+  String get contactsTitle => 'Thêm từ danh bạ';
+
+  @override
+  String get contactsDeniedTitle => 'Chưa có quyền đọc danh bạ';
+
+  @override
+  String get contactsDeniedBody =>
+      'TeachHub chỉ đọc danh bạ khi bạn bấm Thêm từ danh bạ, để chọn học viên và số của phụ huynh. Bạn vẫn có thể nhập từng học viên bằng tay.';
+
+  @override
+  String get contactsAllow => 'Cho phép lại';
+
+  @override
+  String get contactsOpenSettings => 'Mở Cài đặt';
+
+  @override
+  String get contactsManual => 'Nhập tay';
+
+  @override
+  String get contactsLoadFailed => 'Không đọc được danh bạ. Thử lại sau.';
+
+  @override
+  String get contactsEmpty => 'Danh bạ chưa có liên hệ nào.';
+
+  @override
+  String get contactsNoPhone => 'Chưa có số điện thoại';
+
+  @override
+  String contactsContinue(int n) {
+    return 'Tiếp tục ($n)';
+  }
+
+  @override
+  String contactsSaveAll(int n) {
+    return 'Lưu $n học viên';
+  }
+
+  @override
+  String get contactsDone => 'Xong';
+
+  @override
+  String get contactsBack => 'Chọn lại';
+
+  @override
+  String contactsRemoveRow(String name) {
+    return 'Bỏ $name';
+  }
+
+  @override
+  String get contactsReviewHint =>
+      'Họ tên liên hệ thành họ tên học viên, số điện thoại thành số của phụ huynh 1. Sửa hoặc bỏ từng dòng trước khi lưu.';
+
+  @override
+  String get contactsRowSaved => 'Đã lưu';
+
+  @override
+  String get contactsRowSaving => 'Đang lưu…';
+
+  @override
+  String get contactsRowFailed => 'Chưa lưu được';
+
+  @override
+  String get contactsRowDuplicate => 'Có thể trùng hồ sơ';
+
+  @override
+  String get contactsRowReview => 'Xem hồ sơ trùng';
 }
