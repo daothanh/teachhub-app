@@ -12,6 +12,8 @@
   "loginChangeEmail": "Change email",
   "loginRateLimited": "Too many attempts, please try again later.",
   "loginFailed": "Sign-in failed. Please try again.",
+  "loginUnavailable": "The service is busy, please try again in a few minutes.",
+  "loginEmailRequiresOtp": "This email needs a one-time code to sign in. Enter it below to get a code.",
   "splashLoadFailed": "Could not load your roles.",
   "roleWhoAreYou": "Who are you?",
   "roleTeacher": "Teacher",

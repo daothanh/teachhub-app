@@ -9,6 +9,7 @@ import '../../../l10n/l10n.dart';
 import '../cubit/student_form_cubit.dart';
 import '../data/student_models.dart';
 import '../data/student_repository.dart';
+import 'contact_import_page.dart';
 
 /// [T07] Thêm học viên. Route `/t/students/new`.
 class StudentFormPage extends StatelessWidget {
@@ -116,6 +117,13 @@ class _StudentFormViewState extends State<StudentFormView> {
     });
   }
 
+  Future<void> _importFromContacts() async {
+    final id = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const ContactImportPage()),
+    );
+    if (id != null && mounted) widget.onSaved(id);
+  }
+
   void _submit() {
     if (_formKey.currentState!.validate()) {
       context.read<StudentFormCubit>().submit(_draft());
@@ -202,6 +210,15 @@ class _StudentFormViewState extends State<StudentFormView> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: locked ? null : _importFromContacts,
+                  icon: const Icon(Icons.contacts_outlined),
+                  label: Text(l10n.contactsAdd),
+                ),
+              ),
+              const SizedBox(height: 8),
               AppTextFormField(
                 controller: _name,
                 label: l10n.studentsFullName,

@@ -669,4 +669,76 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get historyNoNote => 'no note';
+
+  @override
+  String get contactsAdd => 'Add from contacts';
+
+  @override
+  String get contactsTitle => 'Add from contacts';
+
+  @override
+  String get contactsDeniedTitle => 'No access to contacts';
+
+  @override
+  String get contactsDeniedBody =>
+      'TeachHub only reads your contacts when you tap Add from contacts, so you can pick students and parent numbers. You can still add each student by hand.';
+
+  @override
+  String get contactsAllow => 'Allow again';
+
+  @override
+  String get contactsOpenSettings => 'Open Settings';
+
+  @override
+  String get contactsManual => 'Add by hand';
+
+  @override
+  String get contactsLoadFailed =>
+      'Could not read your contacts. Try again later.';
+
+  @override
+  String get contactsEmpty => 'You have no contacts yet.';
+
+  @override
+  String get contactsNoPhone => 'No phone number';
+
+  @override
+  String contactsContinue(int n) {
+    return 'Continue ($n)';
+  }
+
+  @override
+  String contactsSaveAll(int n) {
+    return 'Save $n students';
+  }
+
+  @override
+  String get contactsDone => 'Done';
+
+  @override
+  String get contactsBack => 'Pick again';
+
+  @override
+  String contactsRemoveRow(String name) {
+    return 'Remove $name';
+  }
+
+  @override
+  String get contactsReviewHint =>
+      'The contact name becomes the student name and the phone number becomes parent 1\'s number. Edit or remove rows before saving.';
+
+  @override
+  String get contactsRowSaved => 'Saved';
+
+  @override
+  String get contactsRowSaving => 'Saving…';
+
+  @override
+  String get contactsRowFailed => 'Not saved';
+
+  @override
+  String get contactsRowDuplicate => 'Possible duplicate';
+
+  @override
+  String get contactsRowReview => 'Review duplicate';
 }

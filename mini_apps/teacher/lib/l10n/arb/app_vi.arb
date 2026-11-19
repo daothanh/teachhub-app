@@ -363,5 +363,47 @@
       }
     }
   },
-  "historyNoNote": "không có ghi chú"
+  "historyNoNote": "không có ghi chú",
+  "contactsAdd": "Thêm từ danh bạ",
+  "contactsTitle": "Thêm từ danh bạ",
+  "contactsDeniedTitle": "Chưa có quyền đọc danh bạ",
+  "contactsDeniedBody": "TeachHub chỉ đọc danh bạ khi bạn bấm Thêm từ danh bạ, để chọn học viên và số của phụ huynh. Bạn vẫn có thể nhập từng học viên bằng tay.",
+  "contactsAllow": "Cho phép lại",
+  "contactsOpenSettings": "Mở Cài đặt",
+  "contactsManual": "Nhập tay",
+  "contactsLoadFailed": "Không đọc được danh bạ. Thử lại sau.",
+  "contactsEmpty": "Danh bạ chưa có liên hệ nào.",
+  "contactsNoPhone": "Chưa có số điện thoại",
+  "contactsContinue": "Tiếp tục ({n})",
+  "@contactsContinue": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "contactsSaveAll": "Lưu {n} học viên",
+  "@contactsSaveAll": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "contactsDone": "Xong",
+  "contactsBack": "Chọn lại",
+  "contactsRemoveRow": "Bỏ {name}",
+  "@contactsRemoveRow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "contactsReviewHint": "Họ tên liên hệ thành họ tên học viên, số điện thoại thành số của phụ huynh 1. Sửa hoặc bỏ từng dòng trước khi lưu.",
+  "contactsRowSaved": "Đã lưu",
+  "contactsRowSaving": "Đang lưu…",
+  "contactsRowFailed": "Chưa lưu được",
+  "contactsRowDuplicate": "Có thể trùng hồ sơ",
+  "contactsRowReview": "Xem hồ sơ trùng"
 }

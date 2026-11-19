@@ -44,6 +44,9 @@ flutter run --flavor development -t lib/main_development.dart
 - Hợp đồng API: `teachhub-backend/contracts/openapi.json` (nguồn duy nhất). Bản chép dùng cho test nằm ở
   `packages/teachhub_shared/contracts/`, cập nhật bằng `dart run tool/sync_openapi.dart`.
 
+Mini-app teacher đọc danh bạ (`flutter_contacts`) nên quyền khai ở shell: `NSContactsUsageDescription` trong
+`ios/Runner/Info.plist` và `READ_CONTACTS` trong `android/app/src/main/AndroidManifest.xml`.
+
 ## Kiểm tra
 
 ```bash

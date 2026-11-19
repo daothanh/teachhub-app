@@ -66,6 +66,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSContactsUsageDescription</key>
+	<string>TeachHub đọc danh bạ khi bạn chọn Thêm từ danh bạ, để tạo học viên và lưu số của phụ huynh. Danh bạ không được dùng cho việc nào khác.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>TeachHub dùng Face ID để xác thực khi bạn mở khoá chế độ phụ huynh.</string>
 	<key>CFBundleURLTypes</key>

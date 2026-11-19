@@ -1222,6 +1222,132 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'không có ghi chú'**
   String get historyNoNote;
+
+  /// No description provided for @contactsAdd.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm từ danh bạ'**
+  String get contactsAdd;
+
+  /// No description provided for @contactsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm từ danh bạ'**
+  String get contactsTitle;
+
+  /// No description provided for @contactsDeniedTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có quyền đọc danh bạ'**
+  String get contactsDeniedTitle;
+
+  /// No description provided for @contactsDeniedBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'TeachHub chỉ đọc danh bạ khi bạn bấm Thêm từ danh bạ, để chọn học viên và số của phụ huynh. Bạn vẫn có thể nhập từng học viên bằng tay.'**
+  String get contactsDeniedBody;
+
+  /// No description provided for @contactsAllow.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cho phép lại'**
+  String get contactsAllow;
+
+  /// No description provided for @contactsOpenSettings.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mở Cài đặt'**
+  String get contactsOpenSettings;
+
+  /// No description provided for @contactsManual.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập tay'**
+  String get contactsManual;
+
+  /// No description provided for @contactsLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không đọc được danh bạ. Thử lại sau.'**
+  String get contactsLoadFailed;
+
+  /// No description provided for @contactsEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Danh bạ chưa có liên hệ nào.'**
+  String get contactsEmpty;
+
+  /// No description provided for @contactsNoPhone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có số điện thoại'**
+  String get contactsNoPhone;
+
+  /// No description provided for @contactsContinue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục ({n})'**
+  String contactsContinue(int n);
+
+  /// No description provided for @contactsSaveAll.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu {n} học viên'**
+  String contactsSaveAll(int n);
+
+  /// No description provided for @contactsDone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xong'**
+  String get contactsDone;
+
+  /// No description provided for @contactsBack.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn lại'**
+  String get contactsBack;
+
+  /// No description provided for @contactsRemoveRow.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ {name}'**
+  String contactsRemoveRow(String name);
+
+  /// No description provided for @contactsReviewHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Họ tên liên hệ thành họ tên học viên, số điện thoại thành số của phụ huynh 1. Sửa hoặc bỏ từng dòng trước khi lưu.'**
+  String get contactsReviewHint;
+
+  /// No description provided for @contactsRowSaved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu'**
+  String get contactsRowSaved;
+
+  /// No description provided for @contactsRowSaving.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang lưu…'**
+  String get contactsRowSaving;
+
+  /// No description provided for @contactsRowFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa lưu được'**
+  String get contactsRowFailed;
+
+  /// No description provided for @contactsRowDuplicate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Có thể trùng hồ sơ'**
+  String get contactsRowDuplicate;
+
+  /// No description provided for @contactsRowReview.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem hồ sơ trùng'**
+  String get contactsRowReview;
 }
 
 class _MiniAppLocalizationsDelegate
