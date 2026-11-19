@@ -1,7 +1,6 @@
 {
   "@@locale": "en",
   "spaceTitle": "Teacher",
-  "spaceComingSoon": "This space is under construction.",
   "switchRole": "Switch role",
   "offlineBanner": "Offline — changes are saved on this device and sync when you are back online.",
   "classesTitle": "Classes",
@@ -255,5 +254,114 @@
     }
   },
   "onboardingCreateClassPending": "The class screen will be connected later.",
-  "onboardingStudentSaved": "Student saved. This step could not be recorded yet."
+  "onboardingStudentSaved": "Student saved. This step could not be recorded yet.",
+  "todayTitle": "Today",
+  "todayEmpty": "No sessions today",
+  "todayEmptyHint": "Scheduled sessions of your classes show up here.",
+  "todayClassesEntry": "Classes",
+  "todaySessionAttended": "Attendance taken",
+  "todaySessionNotAttended": "Not taken yet",
+  "todaySessionCancelled": "Cancelled",
+  "todayTakeAttendance": "Take attendance",
+  "todayPending": "Waiting to sync ({count})",
+  "@todayPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "todayRefreshFailed": "Could not refresh. Pull down to retry.",
+  "todaySessionSemantics": "{className}, {time}, {status}",
+  "@todaySessionSemantics": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "todayOnboardingTitle": "Setup steps you skipped",
+  "todayOnboardingOpen": "Open step {step}",
+  "@todayOnboardingOpen": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "attendanceTitle": "Attendance",
+  "attendanceStatusPresent": "Present",
+  "attendanceStatusLate": "Late",
+  "attendanceStatusExcused": "Excused absence",
+  "attendanceStatusUnexcused": "Unexcused absence",
+  "attendanceStudentSemantics": "{name}, {status}. Tap to change status",
+  "@attendanceStudentSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "attendanceSave": "Save",
+  "attendanceSaving": "Saving…",
+  "attendanceSaveFailed": "Could not save. Try again.",
+  "attendanceLoadFailed": "Could not load the student list.",
+  "attendanceRetry": "Retry",
+  "attendanceEmptyRoster": "This class has no students yet.",
+  "attendanceReadOnlyCancelled": "This session was cancelled, so it is view only.",
+  "attendanceReadOnlyWindow": "This session is older than 7 days, so it is view only.",
+  "attendanceOfflineNotice": "You are offline. Changes are saved on this device and sent when you are back online.",
+  "attendanceNoteLabel": "Note",
+  "attendanceNoteToggle": "Note for {name}",
+  "@attendanceNoteToggle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "attendanceRejectedWindow": "The 7-day edit window has closed; the change was not accepted.",
+  "attendanceRejectedPlan": "Your current plan is view only; the change was not accepted.",
+  "attendanceRejectedNotFound": "The student is no longer in this session; the change was not accepted.",
+  "attendanceRejectedGeneric": "This change was not accepted.",
+  "attendanceBatchNotFound": "This session no longer exists, so attendance could not be sent.",
+  "attendanceBatchCancelled": "This session was cancelled, so attendance could not be sent.",
+  "attendanceBatchGeneric": "Attendance for this session could not be sent.",
+  "attendanceDiscard": "Discard rejected changes",
+  "attendanceHistory": "Edit history",
+  "historyTitle": "Edit history",
+  "historyEmpty": "No edits for this session yet.",
+  "historyLoadFailed": "Could not load the history.",
+  "historyLoadMore": "Load more",
+  "historyChangedBy": "{who} · {time}",
+  "@historyChangedBy": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "historyUnknownUser": "Unknown editor",
+  "historyFirst": "First attendance",
+  "historyNote": "Note: {note}",
+  "@historyNote": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "historyNoNote": "no note"
 }

@@ -12,9 +12,6 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get spaceTitle => 'Teacher';
 
   @override
-  String get spaceComingSoon => 'This space is under construction.';
-
-  @override
   String get switchRole => 'Switch role';
 
   @override
@@ -504,4 +501,172 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   @override
   String get onboardingStudentSaved =>
       'Student saved. This step could not be recorded yet.';
+
+  @override
+  String get todayTitle => 'Today';
+
+  @override
+  String get todayEmpty => 'No sessions today';
+
+  @override
+  String get todayEmptyHint =>
+      'Scheduled sessions of your classes show up here.';
+
+  @override
+  String get todayClassesEntry => 'Classes';
+
+  @override
+  String get todaySessionAttended => 'Attendance taken';
+
+  @override
+  String get todaySessionNotAttended => 'Not taken yet';
+
+  @override
+  String get todaySessionCancelled => 'Cancelled';
+
+  @override
+  String get todayTakeAttendance => 'Take attendance';
+
+  @override
+  String todayPending(int count) {
+    return 'Waiting to sync ($count)';
+  }
+
+  @override
+  String get todayRefreshFailed => 'Could not refresh. Pull down to retry.';
+
+  @override
+  String todaySessionSemantics(String className, String time, String status) {
+    return '$className, $time, $status';
+  }
+
+  @override
+  String get todayOnboardingTitle => 'Setup steps you skipped';
+
+  @override
+  String todayOnboardingOpen(String step) {
+    return 'Open step $step';
+  }
+
+  @override
+  String get attendanceTitle => 'Attendance';
+
+  @override
+  String get attendanceStatusPresent => 'Present';
+
+  @override
+  String get attendanceStatusLate => 'Late';
+
+  @override
+  String get attendanceStatusExcused => 'Excused absence';
+
+  @override
+  String get attendanceStatusUnexcused => 'Unexcused absence';
+
+  @override
+  String attendanceStudentSemantics(String name, String status) {
+    return '$name, $status. Tap to change status';
+  }
+
+  @override
+  String get attendanceSave => 'Save';
+
+  @override
+  String get attendanceSaving => 'Saving…';
+
+  @override
+  String get attendanceSaveFailed => 'Could not save. Try again.';
+
+  @override
+  String get attendanceLoadFailed => 'Could not load the student list.';
+
+  @override
+  String get attendanceRetry => 'Retry';
+
+  @override
+  String get attendanceEmptyRoster => 'This class has no students yet.';
+
+  @override
+  String get attendanceReadOnlyCancelled =>
+      'This session was cancelled, so it is view only.';
+
+  @override
+  String get attendanceReadOnlyWindow =>
+      'This session is older than 7 days, so it is view only.';
+
+  @override
+  String get attendanceOfflineNotice =>
+      'You are offline. Changes are saved on this device and sent when you are back online.';
+
+  @override
+  String get attendanceNoteLabel => 'Note';
+
+  @override
+  String attendanceNoteToggle(String name) {
+    return 'Note for $name';
+  }
+
+  @override
+  String get attendanceRejectedWindow =>
+      'The 7-day edit window has closed; the change was not accepted.';
+
+  @override
+  String get attendanceRejectedPlan =>
+      'Your current plan is view only; the change was not accepted.';
+
+  @override
+  String get attendanceRejectedNotFound =>
+      'The student is no longer in this session; the change was not accepted.';
+
+  @override
+  String get attendanceRejectedGeneric => 'This change was not accepted.';
+
+  @override
+  String get attendanceBatchNotFound =>
+      'This session no longer exists, so attendance could not be sent.';
+
+  @override
+  String get attendanceBatchCancelled =>
+      'This session was cancelled, so attendance could not be sent.';
+
+  @override
+  String get attendanceBatchGeneric =>
+      'Attendance for this session could not be sent.';
+
+  @override
+  String get attendanceDiscard => 'Discard rejected changes';
+
+  @override
+  String get attendanceHistory => 'Edit history';
+
+  @override
+  String get historyTitle => 'Edit history';
+
+  @override
+  String get historyEmpty => 'No edits for this session yet.';
+
+  @override
+  String get historyLoadFailed => 'Could not load the history.';
+
+  @override
+  String get historyLoadMore => 'Load more';
+
+  @override
+  String historyChangedBy(String who, String time) {
+    return '$who · $time';
+  }
+
+  @override
+  String get historyUnknownUser => 'Unknown editor';
+
+  @override
+  String get historyFirst => 'First attendance';
+
+  @override
+  String historyNote(String note) {
+    return 'Note: $note';
+  }
+
+  @override
+  String get historyNoNote => 'no note';
 }
