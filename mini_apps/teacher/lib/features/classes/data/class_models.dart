@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../data/cache/wall_time.dart';
+
 /// Mô hình lớp học khớp `contracts/openapi.json` (schema Class, ScheduleRule,
 /// Roster, Enrollment, Student, Session). Ngày là chuỗi `yyyy-MM-dd`, giờ là
 /// `HH:mm` đúng như hợp đồng, không đổi qua `DateTime` để khỏi lệch múi giờ.
@@ -399,13 +401,8 @@ class ClassSession extends Equatable {
 
   /// Giờ tường `HH:mm` đúng như server ghi (theo offset trong chuỗi), không đổi
   /// sang múi giờ máy để ngày và giờ luôn khớp nhau.
-  String get startTime => _wallTime(startsAt);
-  String get endTime => _wallTime(endsAt);
-
-  static String _wallTime(String iso) {
-    final t = iso.indexOf('T');
-    return t < 0 || iso.length < t + 6 ? iso : iso.substring(t + 1, t + 6);
-  }
+  String get startTime => wallTimeFromIso(startsAt);
+  String get endTime => wallTimeFromIso(endsAt);
 
   final SessionStatus status;
   final bool isMakeup;

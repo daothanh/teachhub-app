@@ -741,4 +741,59 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get contactsRowReview => 'Review duplicate';
+
+  @override
+  String get todayScheduleEntry => 'Schedule';
+
+  @override
+  String get scheduleTitle => 'Schedule';
+
+  @override
+  String get scheduleModeDay => 'Day';
+
+  @override
+  String get scheduleModeWeek => 'Week';
+
+  @override
+  String get schedulePrevious => 'Previous';
+
+  @override
+  String get scheduleNext => 'Next';
+
+  @override
+  String get scheduleToday => 'Today';
+
+  @override
+  String scheduleDayHeading(String weekday, String date) {
+    return '$weekday, $date';
+  }
+
+  @override
+  String scheduleWeekRange(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String get scheduleOfflineBanner =>
+      'You\'re offline. This is the last saved schedule.';
+
+  @override
+  String get scheduleEmpty => 'No sessions in this period';
+
+  @override
+  String get scheduleLoadFailed => 'Could not load the schedule.';
+
+  @override
+  String get scheduleRetry => 'Try again';
+
+  @override
+  String get scheduleCancelled => 'Cancelled';
+
+  @override
+  String get scheduleMakeup => 'Make-up session';
+
+  @override
+  String scheduleCancelReason(String reason) {
+    return 'Reason: $reason';
+  }
 }

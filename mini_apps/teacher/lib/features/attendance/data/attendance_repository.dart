@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../data/cache/session_cache.dart';
+import '../../../data/cache/wall_time.dart';
 import '../../../data/local_db/teacher_database.dart';
 import '../../../data/remote/teacher_api.dart';
 import '../../../data/sync/clock_skew.dart';
@@ -148,7 +149,7 @@ class DriftAttendanceRepository implements AttendanceRepository {
             TodaySession(
               id: s.id,
               className: s.className,
-              startTime: _wallTime(s),
+              startTime: wallTime(s.startsAt, s.tzOffsetMinutes),
               cancelled: s.status == 'cancelled',
               attended: s.status == 'taught' || recorded.contains(s.id),
             ),
@@ -205,7 +206,7 @@ class DriftAttendanceRepository implements AttendanceRepository {
       sessionId: id,
       className: s.className,
       sessionDate: s.sessionDate,
-      startTime: _wallTime(s),
+      startTime: wallTime(s.startsAt, s.tzOffsetMinutes),
       cancelled: s.status == 'cancelled',
       canEdit: s.canEdit,
       editableUntil: s.editableUntil,
@@ -300,13 +301,4 @@ class DriftAttendanceRepository implements AttendanceRepository {
         ),
     ], page.nextCursor);
   }
-}
-
-/// Giờ tường `HH:mm` theo offset của tenant; dòng cũ chưa có offset thì giờ máy.
-String _wallTime(CachedSession s) {
-  final t = s.tzOffsetMinutes == null
-      ? s.startsAt.toLocal()
-      : s.startsAt.toUtc().add(Duration(minutes: s.tzOffsetMinutes!));
-  String two(int n) => n.toString().padLeft(2, '0');
-  return '${two(t.hour)}:${two(t.minute)}';
 }

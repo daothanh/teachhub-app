@@ -792,6 +792,17 @@ class $CachedSessionsTable extends CachedSessions
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _cancelReasonMeta = const VerificationMeta(
+    'cancelReason',
+  );
+  @override
+  late final GeneratedColumn<String> cancelReason = GeneratedColumn<String>(
+    'cancel_reason',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _canEditMeta = const VerificationMeta(
     'canEdit',
   );
@@ -841,6 +852,7 @@ class $CachedSessionsTable extends CachedSessions
     status,
     isMakeup,
     tzOffsetMinutes,
+    cancelReason,
     canEdit,
     editableUntil,
     rosterFetchedAt,
@@ -930,6 +942,15 @@ class $CachedSessionsTable extends CachedSessions
         ),
       );
     }
+    if (data.containsKey('cancel_reason')) {
+      context.handle(
+        _cancelReasonMeta,
+        cancelReason.isAcceptableOrUnknown(
+          data['cancel_reason']!,
+          _cancelReasonMeta,
+        ),
+      );
+    }
     if (data.containsKey('can_edit')) {
       context.handle(
         _canEditMeta,
@@ -999,6 +1020,10 @@ class $CachedSessionsTable extends CachedSessions
         DriftSqlType.int,
         data['${effectivePrefix}tz_offset_minutes'],
       ),
+      cancelReason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cancel_reason'],
+      ),
       canEdit: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}can_edit'],
@@ -1038,6 +1063,9 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
   /// tường đúng khi ngoại tuyến. null ở dòng cũ: dùng giờ máy.
   final int? tzOffsetMinutes;
 
+  /// v5: lý do hủy của buổi (nếu có), để lịch ngoại tuyến vẫn hiện được.
+  final String? cancelReason;
+
   /// Chỉ có sau khi tải điểm danh của buổi; null = chưa tải danh sách.
   final bool? canEdit;
   final DateTime? editableUntil;
@@ -1052,6 +1080,7 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
     required this.status,
     required this.isMakeup,
     this.tzOffsetMinutes,
+    this.cancelReason,
     this.canEdit,
     this.editableUntil,
     this.rosterFetchedAt,
@@ -1069,6 +1098,9 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
     map['is_makeup'] = Variable<bool>(isMakeup);
     if (!nullToAbsent || tzOffsetMinutes != null) {
       map['tz_offset_minutes'] = Variable<int>(tzOffsetMinutes);
+    }
+    if (!nullToAbsent || cancelReason != null) {
+      map['cancel_reason'] = Variable<String>(cancelReason);
     }
     if (!nullToAbsent || canEdit != null) {
       map['can_edit'] = Variable<bool>(canEdit);
@@ -1095,6 +1127,9 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
       tzOffsetMinutes: tzOffsetMinutes == null && nullToAbsent
           ? const Value.absent()
           : Value(tzOffsetMinutes),
+      cancelReason: cancelReason == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cancelReason),
       canEdit: canEdit == null && nullToAbsent
           ? const Value.absent()
           : Value(canEdit),
@@ -1122,6 +1157,7 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
       status: serializer.fromJson<String>(json['status']),
       isMakeup: serializer.fromJson<bool>(json['isMakeup']),
       tzOffsetMinutes: serializer.fromJson<int?>(json['tzOffsetMinutes']),
+      cancelReason: serializer.fromJson<String?>(json['cancelReason']),
       canEdit: serializer.fromJson<bool?>(json['canEdit']),
       editableUntil: serializer.fromJson<DateTime?>(json['editableUntil']),
       rosterFetchedAt: serializer.fromJson<DateTime?>(json['rosterFetchedAt']),
@@ -1140,6 +1176,7 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
       'status': serializer.toJson<String>(status),
       'isMakeup': serializer.toJson<bool>(isMakeup),
       'tzOffsetMinutes': serializer.toJson<int?>(tzOffsetMinutes),
+      'cancelReason': serializer.toJson<String?>(cancelReason),
       'canEdit': serializer.toJson<bool?>(canEdit),
       'editableUntil': serializer.toJson<DateTime?>(editableUntil),
       'rosterFetchedAt': serializer.toJson<DateTime?>(rosterFetchedAt),
@@ -1156,6 +1193,7 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
     String? status,
     bool? isMakeup,
     Value<int?> tzOffsetMinutes = const Value.absent(),
+    Value<String?> cancelReason = const Value.absent(),
     Value<bool?> canEdit = const Value.absent(),
     Value<DateTime?> editableUntil = const Value.absent(),
     Value<DateTime?> rosterFetchedAt = const Value.absent(),
@@ -1171,6 +1209,7 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
     tzOffsetMinutes: tzOffsetMinutes.present
         ? tzOffsetMinutes.value
         : this.tzOffsetMinutes,
+    cancelReason: cancelReason.present ? cancelReason.value : this.cancelReason,
     canEdit: canEdit.present ? canEdit.value : this.canEdit,
     editableUntil: editableUntil.present
         ? editableUntil.value
@@ -1194,6 +1233,9 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
       tzOffsetMinutes: data.tzOffsetMinutes.present
           ? data.tzOffsetMinutes.value
           : this.tzOffsetMinutes,
+      cancelReason: data.cancelReason.present
+          ? data.cancelReason.value
+          : this.cancelReason,
       canEdit: data.canEdit.present ? data.canEdit.value : this.canEdit,
       editableUntil: data.editableUntil.present
           ? data.editableUntil.value
@@ -1216,6 +1258,7 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
           ..write('status: $status, ')
           ..write('isMakeup: $isMakeup, ')
           ..write('tzOffsetMinutes: $tzOffsetMinutes, ')
+          ..write('cancelReason: $cancelReason, ')
           ..write('canEdit: $canEdit, ')
           ..write('editableUntil: $editableUntil, ')
           ..write('rosterFetchedAt: $rosterFetchedAt')
@@ -1234,6 +1277,7 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
     status,
     isMakeup,
     tzOffsetMinutes,
+    cancelReason,
     canEdit,
     editableUntil,
     rosterFetchedAt,
@@ -1251,6 +1295,7 @@ class CachedSession extends DataClass implements Insertable<CachedSession> {
           other.status == this.status &&
           other.isMakeup == this.isMakeup &&
           other.tzOffsetMinutes == this.tzOffsetMinutes &&
+          other.cancelReason == this.cancelReason &&
           other.canEdit == this.canEdit &&
           other.editableUntil == this.editableUntil &&
           other.rosterFetchedAt == this.rosterFetchedAt);
@@ -1266,6 +1311,7 @@ class CachedSessionsCompanion extends UpdateCompanion<CachedSession> {
   final Value<String> status;
   final Value<bool> isMakeup;
   final Value<int?> tzOffsetMinutes;
+  final Value<String?> cancelReason;
   final Value<bool?> canEdit;
   final Value<DateTime?> editableUntil;
   final Value<DateTime?> rosterFetchedAt;
@@ -1280,6 +1326,7 @@ class CachedSessionsCompanion extends UpdateCompanion<CachedSession> {
     this.status = const Value.absent(),
     this.isMakeup = const Value.absent(),
     this.tzOffsetMinutes = const Value.absent(),
+    this.cancelReason = const Value.absent(),
     this.canEdit = const Value.absent(),
     this.editableUntil = const Value.absent(),
     this.rosterFetchedAt = const Value.absent(),
@@ -1295,6 +1342,7 @@ class CachedSessionsCompanion extends UpdateCompanion<CachedSession> {
     required String status,
     required bool isMakeup,
     this.tzOffsetMinutes = const Value.absent(),
+    this.cancelReason = const Value.absent(),
     this.canEdit = const Value.absent(),
     this.editableUntil = const Value.absent(),
     this.rosterFetchedAt = const Value.absent(),
@@ -1317,6 +1365,7 @@ class CachedSessionsCompanion extends UpdateCompanion<CachedSession> {
     Expression<String>? status,
     Expression<bool>? isMakeup,
     Expression<int>? tzOffsetMinutes,
+    Expression<String>? cancelReason,
     Expression<bool>? canEdit,
     Expression<DateTime>? editableUntil,
     Expression<DateTime>? rosterFetchedAt,
@@ -1332,6 +1381,7 @@ class CachedSessionsCompanion extends UpdateCompanion<CachedSession> {
       if (status != null) 'status': status,
       if (isMakeup != null) 'is_makeup': isMakeup,
       if (tzOffsetMinutes != null) 'tz_offset_minutes': tzOffsetMinutes,
+      if (cancelReason != null) 'cancel_reason': cancelReason,
       if (canEdit != null) 'can_edit': canEdit,
       if (editableUntil != null) 'editable_until': editableUntil,
       if (rosterFetchedAt != null) 'roster_fetched_at': rosterFetchedAt,
@@ -1349,6 +1399,7 @@ class CachedSessionsCompanion extends UpdateCompanion<CachedSession> {
     Value<String>? status,
     Value<bool>? isMakeup,
     Value<int?>? tzOffsetMinutes,
+    Value<String?>? cancelReason,
     Value<bool?>? canEdit,
     Value<DateTime?>? editableUntil,
     Value<DateTime?>? rosterFetchedAt,
@@ -1364,6 +1415,7 @@ class CachedSessionsCompanion extends UpdateCompanion<CachedSession> {
       status: status ?? this.status,
       isMakeup: isMakeup ?? this.isMakeup,
       tzOffsetMinutes: tzOffsetMinutes ?? this.tzOffsetMinutes,
+      cancelReason: cancelReason ?? this.cancelReason,
       canEdit: canEdit ?? this.canEdit,
       editableUntil: editableUntil ?? this.editableUntil,
       rosterFetchedAt: rosterFetchedAt ?? this.rosterFetchedAt,
@@ -1401,6 +1453,9 @@ class CachedSessionsCompanion extends UpdateCompanion<CachedSession> {
     if (tzOffsetMinutes.present) {
       map['tz_offset_minutes'] = Variable<int>(tzOffsetMinutes.value);
     }
+    if (cancelReason.present) {
+      map['cancel_reason'] = Variable<String>(cancelReason.value);
+    }
     if (canEdit.present) {
       map['can_edit'] = Variable<bool>(canEdit.value);
     }
@@ -1428,6 +1483,7 @@ class CachedSessionsCompanion extends UpdateCompanion<CachedSession> {
           ..write('status: $status, ')
           ..write('isMakeup: $isMakeup, ')
           ..write('tzOffsetMinutes: $tzOffsetMinutes, ')
+          ..write('cancelReason: $cancelReason, ')
           ..write('canEdit: $canEdit, ')
           ..write('editableUntil: $editableUntil, ')
           ..write('rosterFetchedAt: $rosterFetchedAt, ')
@@ -2232,6 +2288,7 @@ typedef $$CachedSessionsTableCreateCompanionBuilder =
       required String status,
       required bool isMakeup,
       Value<int?> tzOffsetMinutes,
+      Value<String?> cancelReason,
       Value<bool?> canEdit,
       Value<DateTime?> editableUntil,
       Value<DateTime?> rosterFetchedAt,
@@ -2248,6 +2305,7 @@ typedef $$CachedSessionsTableUpdateCompanionBuilder =
       Value<String> status,
       Value<bool> isMakeup,
       Value<int?> tzOffsetMinutes,
+      Value<String?> cancelReason,
       Value<bool?> canEdit,
       Value<DateTime?> editableUntil,
       Value<DateTime?> rosterFetchedAt,
@@ -2305,6 +2363,11 @@ class $$CachedSessionsTableFilterComposer
 
   ColumnFilters<int> get tzOffsetMinutes => $composableBuilder(
     column: $table.tzOffsetMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cancelReason => $composableBuilder(
+    column: $table.cancelReason,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2378,6 +2441,11 @@ class $$CachedSessionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get cancelReason => $composableBuilder(
+    column: $table.cancelReason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get canEdit => $composableBuilder(
     column: $table.canEdit,
     builder: (column) => ColumnOrderings(column),
@@ -2431,6 +2499,11 @@ class $$CachedSessionsTableAnnotationComposer
 
   GeneratedColumn<int> get tzOffsetMinutes => $composableBuilder(
     column: $table.tzOffsetMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cancelReason => $composableBuilder(
+    column: $table.cancelReason,
     builder: (column) => column,
   );
 
@@ -2494,6 +2567,7 @@ class $$CachedSessionsTableTableManager
                 Value<String> status = const Value.absent(),
                 Value<bool> isMakeup = const Value.absent(),
                 Value<int?> tzOffsetMinutes = const Value.absent(),
+                Value<String?> cancelReason = const Value.absent(),
                 Value<bool?> canEdit = const Value.absent(),
                 Value<DateTime?> editableUntil = const Value.absent(),
                 Value<DateTime?> rosterFetchedAt = const Value.absent(),
@@ -2508,6 +2582,7 @@ class $$CachedSessionsTableTableManager
                 status: status,
                 isMakeup: isMakeup,
                 tzOffsetMinutes: tzOffsetMinutes,
+                cancelReason: cancelReason,
                 canEdit: canEdit,
                 editableUntil: editableUntil,
                 rosterFetchedAt: rosterFetchedAt,
@@ -2524,6 +2599,7 @@ class $$CachedSessionsTableTableManager
                 required String status,
                 required bool isMakeup,
                 Value<int?> tzOffsetMinutes = const Value.absent(),
+                Value<String?> cancelReason = const Value.absent(),
                 Value<bool?> canEdit = const Value.absent(),
                 Value<DateTime?> editableUntil = const Value.absent(),
                 Value<DateTime?> rosterFetchedAt = const Value.absent(),
@@ -2538,6 +2614,7 @@ class $$CachedSessionsTableTableManager
                 status: status,
                 isMakeup: isMakeup,
                 tzOffsetMinutes: tzOffsetMinutes,
+                cancelReason: cancelReason,
                 canEdit: canEdit,
                 editableUntil: editableUntil,
                 rosterFetchedAt: rosterFetchedAt,

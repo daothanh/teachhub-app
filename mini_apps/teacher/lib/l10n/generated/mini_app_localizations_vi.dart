@@ -730,4 +730,59 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get contactsRowReview => 'Xem hồ sơ trùng';
+
+  @override
+  String get todayScheduleEntry => 'Lịch';
+
+  @override
+  String get scheduleTitle => 'Lịch';
+
+  @override
+  String get scheduleModeDay => 'Ngày';
+
+  @override
+  String get scheduleModeWeek => 'Tuần';
+
+  @override
+  String get schedulePrevious => 'Trước';
+
+  @override
+  String get scheduleNext => 'Sau';
+
+  @override
+  String get scheduleToday => 'Hôm nay';
+
+  @override
+  String scheduleDayHeading(String weekday, String date) {
+    return '$weekday, $date';
+  }
+
+  @override
+  String scheduleWeekRange(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String get scheduleOfflineBanner =>
+      'Đang ngoại tuyến. Lịch hiển thị là bản đã lưu gần nhất.';
+
+  @override
+  String get scheduleEmpty => 'Không có buổi nào trong khoảng này';
+
+  @override
+  String get scheduleLoadFailed => 'Chưa tải được lịch.';
+
+  @override
+  String get scheduleRetry => 'Thử lại';
+
+  @override
+  String get scheduleCancelled => 'Đã hủy';
+
+  @override
+  String get scheduleMakeup => 'Buổi bù';
+
+  @override
+  String scheduleCancelReason(String reason) {
+    return 'Lý do: $reason';
+  }
 }

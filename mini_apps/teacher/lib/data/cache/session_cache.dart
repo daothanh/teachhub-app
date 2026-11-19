@@ -74,6 +74,7 @@ class SessionCache {
                 status: x.status,
                 isMakeup: x.isMakeup,
                 tzOffsetMinutes: Value(x.tzOffsetMinutes),
+                cancelReason: Value(x.cancelReason),
               ),
             );
       }

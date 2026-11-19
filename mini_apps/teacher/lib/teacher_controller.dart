@@ -25,6 +25,8 @@ import 'features/offline/offline_banner_shell.dart';
 import 'features/onboarding/data/onboarding_models.dart';
 import 'features/onboarding/data/onboarding_repository.dart';
 import 'features/onboarding/pages/onboarding_page.dart';
+import 'features/schedule/data/schedule_repository.dart';
+import 'features/schedule/schedule_routes.dart';
 import 'features/students/data/student_repository.dart';
 import 'features/students/pages/student_form_page.dart';
 import 'features/today/pages/today_page.dart';
@@ -81,6 +83,7 @@ class TeacherController {
     ),
     ...classesRoutes(moduleId),
     ...attendanceRoutes(moduleId),
+    ...scheduleRoutes(moduleId),
   ];
 
   /// CSDL chỉ mở ở lần đầu cần (lazy): người dùng không có vai trò Giáo viên
@@ -116,6 +119,11 @@ class TeacherController {
           startSync: startSync,
           clock: clock,
         ),
+      );
+    }
+    if (!getIt.isRegistered<ScheduleRepository>()) {
+      getIt.registerLazySingleton<ScheduleRepository>(
+        () => DriftScheduleRepository(cache: openSessionCache),
       );
     }
     if (!getIt.isRegistered<OnboardingRepository>()) {
