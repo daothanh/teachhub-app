@@ -369,6 +369,8 @@ class ClassSession extends Equatable {
     required this.endsAt,
     required this.status,
     required this.isMakeup,
+    this.cancelReason,
+    this.makeupOf,
   });
 
   factory ClassSession.fromJson(Map<String, dynamic> json) => ClassSession(
@@ -380,6 +382,8 @@ class ClassSession extends Equatable {
     endsAt: json['endsAt'] as String,
     status: SessionStatus.fromWire(json['status'] as String),
     isMakeup: json['isMakeup'] as bool,
+    cancelReason: json['cancelReason'] as String?,
+    makeupOf: json['makeupOf'] as String?,
   );
 
   final String id;
@@ -406,9 +410,16 @@ class ClassSession extends Equatable {
   final SessionStatus status;
   final bool isMakeup;
 
+  /// Lý do hủy; null nếu buổi chưa hủy hoặc không nhập lý do.
+  final String? cancelReason;
+
+  /// Id buổi gốc nếu đây là buổi bù.
+  final String? makeupOf;
+
   @override
   List<Object?> get props => [
     id, classId, className, sessionDate, startsAt, endsAt, status, isMakeup, //
+    cancelReason, makeupOf,
   ];
 }
 
