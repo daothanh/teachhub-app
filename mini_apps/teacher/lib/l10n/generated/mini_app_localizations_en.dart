@@ -796,4 +796,120 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String scheduleCancelReason(String reason) {
     return 'Reason: $reason';
   }
+
+  @override
+  String get studentsEditTitle => 'Edit student';
+
+  @override
+  String get studentsGuardianRelation => 'Relationship';
+
+  @override
+  String get studentsRelationFather => 'Father';
+
+  @override
+  String get studentsRelationMother => 'Mother';
+
+  @override
+  String get studentsRelationGuardian => 'Guardian';
+
+  @override
+  String get inviteStatusNotInvited => 'Not invited';
+
+  @override
+  String get inviteStatusInvited => 'Invited';
+
+  @override
+  String get inviteStatusActivated => 'Activated';
+
+  @override
+  String get inviteStatusExpired => 'Expired';
+
+  @override
+  String get inviteShare => 'Share link';
+
+  @override
+  String get inviteResend => 'Resend link';
+
+  @override
+  String get rosterNoGuardians =>
+      'No parent yet. Tap the student name to add one.';
+
+  @override
+  String rosterGuardianLine(String relation, String name) {
+    return '$relation: $name';
+  }
+
+  @override
+  String rosterGuardianSemantics(String who, String status) {
+    return '$who, $status';
+  }
+
+  @override
+  String rosterEditSemantics(String name) {
+    return 'Edit student $name';
+  }
+
+  @override
+  String inviteSheetFor(String guardian, String student) {
+    return 'Invite $guardian, parent of $student';
+  }
+
+  @override
+  String get inviteQrLabel => 'Invitation QR code';
+
+  @override
+  String get inviteCodeLabel => 'Code to type in';
+
+  @override
+  String inviteCodeSemantics(String code) {
+    return 'Invitation code: $code';
+  }
+
+  @override
+  String get inviteExpiryNote =>
+      'The link works for 7 days and the typed code for 48 hours.';
+
+  @override
+  String get inviteOldLinkNote =>
+      'This parent\'s previous link, if any, no longer works.';
+
+  @override
+  String inviteShareMessage(
+    String guardian,
+    String student,
+    String url,
+    String code,
+  ) {
+    return 'Hello $guardian, I would like to invite you to follow $student\'s learning on TeachHub.\nOpen the link to accept: $url\nOr enter code $code in the TeachHub app (the code works for 48 hours).';
+  }
+
+  @override
+  String get inviteAllEntry => 'Invite all parents not yet activated';
+
+  @override
+  String get inviteAllTitle => 'Invite class parents';
+
+  @override
+  String get inviteAllEmpty => 'No parents left to invite.';
+
+  @override
+  String inviteAllProgress(int done, int total) {
+    return 'Created $done/$total links';
+  }
+
+  @override
+  String get inviteAllHint =>
+      'Tap Share to send to each parent in turn. Parents with a valid invitation are skipped.';
+
+  @override
+  String get inviteAllCreating => 'Creating link…';
+
+  @override
+  String get inviteAllShareAgain => 'Share again';
+
+  @override
+  String get inviteAllShowQr => 'Show QR code';
+
+  @override
+  String get inviteAllSharedMark => 'Share opened';
 }

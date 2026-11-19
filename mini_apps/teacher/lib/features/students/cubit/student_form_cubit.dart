@@ -31,9 +31,12 @@ class StudentFormState extends Equatable {
 }
 
 class StudentFormCubit extends Cubit<StudentFormState> {
-  StudentFormCubit(this._repo) : super(const StudentFormState());
+  /// [studentId] có giá trị = sửa hồ sơ có sẵn (`PATCH`), không thì thêm mới.
+  StudentFormCubit(this._repo, {this.studentId})
+    : super(const StudentFormState());
 
   final StudentRepository _repo;
+  final String? studentId;
   StudentDraft? _draft;
   bool _confirmNew = false;
   String? _key;
@@ -49,11 +52,14 @@ class StudentFormCubit extends Cubit<StudentFormState> {
     _confirmNew = confirmNew;
     emit(const StudentFormState(status: StudentFormStatus.submitting));
     try {
-      final student = await _repo.create(
-        draft,
-        idempotencyKey: _key!,
-        confirmNew: confirmNew,
-      );
+      final id = studentId;
+      final student = id == null
+          ? await _repo.create(
+              draft,
+              idempotencyKey: _key!,
+              confirmNew: confirmNew,
+            )
+          : await _repo.update(id, draft, idempotencyKey: _key!);
       if (isClosed) return;
       emit(
         StudentFormState(

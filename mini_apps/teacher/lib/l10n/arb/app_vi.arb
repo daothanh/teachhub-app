@@ -448,5 +448,106 @@
         "type": "String"
       }
     }
-  }
+  },
+  "studentsEditTitle": "Sửa học viên",
+  "studentsGuardianRelation": "Quan hệ",
+  "studentsRelationFather": "Bố",
+  "studentsRelationMother": "Mẹ",
+  "studentsRelationGuardian": "Người giám hộ",
+  "inviteStatusNotInvited": "Chưa mời",
+  "inviteStatusInvited": "Đã mời",
+  "inviteStatusActivated": "Đã kích hoạt",
+  "inviteStatusExpired": "Hết hạn",
+  "inviteShare": "Chia sẻ link",
+  "inviteResend": "Gửi lại link",
+  "rosterNoGuardians": "Chưa có phụ huynh. Chạm tên em để thêm.",
+  "rosterGuardianLine": "{relation}: {name}",
+  "@rosterGuardianLine": {
+    "placeholders": {
+      "relation": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterGuardianSemantics": "{who}, {status}",
+  "@rosterGuardianSemantics": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterEditSemantics": "Sửa học viên {name}",
+  "@rosterEditSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteSheetFor": "Mời {guardian}, phụ huynh của {student}",
+  "@inviteSheetFor": {
+    "placeholders": {
+      "guardian": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteQrLabel": "Mã QR lời mời",
+  "inviteCodeLabel": "Mã nhập tay",
+  "inviteCodeSemantics": "Mã mời: {code}",
+  "@inviteCodeSemantics": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteExpiryNote": "Link dùng được 7 ngày, mã nhập tay dùng được 48 giờ.",
+  "inviteOldLinkNote": "Link cũ của phụ huynh này (nếu có) không dùng được nữa.",
+  "inviteShareMessage": "Chào {guardian}, mình mời bạn theo dõi việc học của {student} trên TeachHub.\nMở link để nhận lời mời: {url}\nHoặc nhập mã {code} trong ứng dụng TeachHub (mã dùng được 48 giờ).",
+  "@inviteShareMessage": {
+    "placeholders": {
+      "guardian": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      },
+      "url": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteAllEntry": "Mời tất cả phụ huynh chưa kích hoạt",
+  "inviteAllTitle": "Mời phụ huynh của lớp",
+  "inviteAllEmpty": "Không còn phụ huynh nào cần mời.",
+  "inviteAllProgress": "Đã tạo {done}/{total} link",
+  "@inviteAllProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteAllHint": "Bấm Chia sẻ để gửi lần lượt cho từng phụ huynh. Phụ huynh đang có lời mời còn hạn được bỏ qua.",
+  "inviteAllCreating": "Đang tạo link…",
+  "inviteAllShareAgain": "Chia sẻ lại",
+  "inviteAllShowQr": "Xem mã QR",
+  "inviteAllSharedMark": "Đã mở chia sẻ"
 }

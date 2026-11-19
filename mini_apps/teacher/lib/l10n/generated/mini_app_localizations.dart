@@ -1444,6 +1444,197 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Lý do: {reason}'**
   String scheduleCancelReason(String reason);
+
+  /// No description provided for @studentsEditTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa học viên'**
+  String get studentsEditTitle;
+
+  /// No description provided for @studentsGuardianRelation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quan hệ'**
+  String get studentsGuardianRelation;
+
+  /// No description provided for @studentsRelationFather.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bố'**
+  String get studentsRelationFather;
+
+  /// No description provided for @studentsRelationMother.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mẹ'**
+  String get studentsRelationMother;
+
+  /// No description provided for @studentsRelationGuardian.
+  ///
+  /// In vi, this message translates to:
+  /// **'Người giám hộ'**
+  String get studentsRelationGuardian;
+
+  /// No description provided for @inviteStatusNotInvited.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa mời'**
+  String get inviteStatusNotInvited;
+
+  /// No description provided for @inviteStatusInvited.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã mời'**
+  String get inviteStatusInvited;
+
+  /// No description provided for @inviteStatusActivated.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã kích hoạt'**
+  String get inviteStatusActivated;
+
+  /// No description provided for @inviteStatusExpired.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hết hạn'**
+  String get inviteStatusExpired;
+
+  /// No description provided for @inviteShare.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chia sẻ link'**
+  String get inviteShare;
+
+  /// No description provided for @inviteResend.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi lại link'**
+  String get inviteResend;
+
+  /// No description provided for @rosterNoGuardians.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có phụ huynh. Chạm tên em để thêm.'**
+  String get rosterNoGuardians;
+
+  /// No description provided for @rosterGuardianLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{relation}: {name}'**
+  String rosterGuardianLine(String relation, String name);
+
+  /// No description provided for @rosterGuardianSemantics.
+  ///
+  /// In vi, this message translates to:
+  /// **'{who}, {status}'**
+  String rosterGuardianSemantics(String who, String status);
+
+  /// No description provided for @rosterEditSemantics.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa học viên {name}'**
+  String rosterEditSemantics(String name);
+
+  /// No description provided for @inviteSheetFor.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mời {guardian}, phụ huynh của {student}'**
+  String inviteSheetFor(String guardian, String student);
+
+  /// No description provided for @inviteQrLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã QR lời mời'**
+  String get inviteQrLabel;
+
+  /// No description provided for @inviteCodeLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã nhập tay'**
+  String get inviteCodeLabel;
+
+  /// No description provided for @inviteCodeSemantics.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã mời: {code}'**
+  String inviteCodeSemantics(String code);
+
+  /// No description provided for @inviteExpiryNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Link dùng được 7 ngày, mã nhập tay dùng được 48 giờ.'**
+  String get inviteExpiryNote;
+
+  /// No description provided for @inviteOldLinkNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Link cũ của phụ huynh này (nếu có) không dùng được nữa.'**
+  String get inviteOldLinkNote;
+
+  /// No description provided for @inviteShareMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chào {guardian}, mình mời bạn theo dõi việc học của {student} trên TeachHub.\nMở link để nhận lời mời: {url}\nHoặc nhập mã {code} trong ứng dụng TeachHub (mã dùng được 48 giờ).'**
+  String inviteShareMessage(
+    String guardian,
+    String student,
+    String url,
+    String code,
+  );
+
+  /// No description provided for @inviteAllEntry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mời tất cả phụ huynh chưa kích hoạt'**
+  String get inviteAllEntry;
+
+  /// No description provided for @inviteAllTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mời phụ huynh của lớp'**
+  String get inviteAllTitle;
+
+  /// No description provided for @inviteAllEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không còn phụ huynh nào cần mời.'**
+  String get inviteAllEmpty;
+
+  /// No description provided for @inviteAllProgress.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã tạo {done}/{total} link'**
+  String inviteAllProgress(int done, int total);
+
+  /// No description provided for @inviteAllHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bấm Chia sẻ để gửi lần lượt cho từng phụ huynh. Phụ huynh đang có lời mời còn hạn được bỏ qua.'**
+  String get inviteAllHint;
+
+  /// No description provided for @inviteAllCreating.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang tạo link…'**
+  String get inviteAllCreating;
+
+  /// No description provided for @inviteAllShareAgain.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chia sẻ lại'**
+  String get inviteAllShareAgain;
+
+  /// No description provided for @inviteAllShowQr.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem mã QR'**
+  String get inviteAllShowQr;
+
+  /// No description provided for @inviteAllSharedMark.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã mở chia sẻ'**
+  String get inviteAllSharedMark;
 }
 
 class _MiniAppLocalizationsDelegate

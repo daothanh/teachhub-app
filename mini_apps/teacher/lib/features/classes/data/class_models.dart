@@ -258,6 +258,84 @@ int minutesOf(String hhmm) {
   return int.parse(p[0]) * 60 + int.parse(p[1]);
 }
 
+/// Trạng thái lời mời của một phụ huynh (schema `GuardianInviteStatus`).
+/// `expired` hiện nút "Gửi lại link"; `notInvited` gồm cả lời mời đã thu hồi.
+enum GuardianInviteStatus {
+  notInvited('not_invited'),
+  invited('invited'),
+  activated('activated'),
+  expired('expired');
+
+  const GuardianInviteStatus(this.wire);
+  final String wire;
+
+  /// Giá trị lạ (server mới hơn app) coi như chưa mời: vẫn cho tạo link mới.
+  static GuardianInviteStatus fromWire(String? v) => values.firstWhere(
+    (s) => s.wire == v,
+    orElse: () => GuardianInviteStatus.notInvited,
+  );
+}
+
+/// Lời mời mới nhất của phụ huynh (kể cả hết hạn); không có token hay mã.
+class LatestInvite extends Equatable {
+  const LatestInvite({required this.id, required this.expiresAt});
+
+  factory LatestInvite.fromJson(Map<String, dynamic> json) => LatestInvite(
+    id: json['id'] as String,
+    expiresAt: json['expiresAt'] as String,
+  );
+
+  final String id;
+  final String expiresAt;
+
+  @override
+  List<Object?> get props => [id, expiresAt];
+}
+
+/// Phụ huynh trong danh sách lớp (schema `RosterGuardian`).
+class RosterGuardian extends Equatable {
+  const RosterGuardian({
+    required this.id,
+    required this.fullName,
+    required this.relation,
+    required this.inviteStatus,
+    this.latestInvite,
+  });
+
+  factory RosterGuardian.fromJson(Map<String, dynamic> json) => RosterGuardian(
+    id: json['id'] as String,
+    fullName: json['fullName'] as String,
+    relation: json['relation'] as String,
+    inviteStatus: GuardianInviteStatus.fromWire(
+      json['inviteStatus'] as String?,
+    ),
+    latestInvite: switch (json['latestInvite']) {
+      final Map<String, dynamic> m => LatestInvite.fromJson(m),
+      _ => null,
+    },
+  );
+
+  final String id;
+  final String fullName;
+
+  /// `father` | `mother` | `guardian`.
+  final String relation;
+  final GuardianInviteStatus inviteStatus;
+  final LatestInvite? latestInvite;
+
+  /// Chưa kích hoạt: còn việc mời (chưa mời, đang chờ hoặc hết hạn).
+  bool get needsInvite => inviteStatus != GuardianInviteStatus.activated;
+
+  @override
+  List<Object?> get props => [
+    id,
+    fullName,
+    relation,
+    inviteStatus,
+    latestInvite,
+  ];
+}
+
 class RosterEntry extends Equatable {
   const RosterEntry({
     required this.enrollmentId,
@@ -265,6 +343,8 @@ class RosterEntry extends Equatable {
     required this.fullName,
     required this.studentStatus,
     required this.joinedOn,
+    this.inviteStatus = GuardianInviteStatus.notInvited,
+    this.guardians = const [],
   });
 
   factory RosterEntry.fromJson(Map<String, dynamic> json) => RosterEntry(
@@ -273,6 +353,13 @@ class RosterEntry extends Equatable {
     fullName: json['fullName'] as String,
     studentStatus: json['studentStatus'] as String,
     joinedOn: json['joinedOn'] as String,
+    inviteStatus: GuardianInviteStatus.fromWire(
+      json['inviteStatus'] as String?,
+    ),
+    guardians: [
+      for (final g in json['guardians'] as List)
+        RosterGuardian.fromJson(g as Map<String, dynamic>),
+    ],
   );
 
   final String enrollmentId;
@@ -283,9 +370,14 @@ class RosterEntry extends Equatable {
   final String studentStatus;
   final String joinedOn;
 
+  /// Gộp theo các phụ huynh của học viên (server tính).
+  final GuardianInviteStatus inviteStatus;
+  final List<RosterGuardian> guardians;
+
   @override
   List<Object?> get props => [
     enrollmentId, studentId, fullName, studentStatus, joinedOn, //
+    inviteStatus, guardians,
   ];
 }
 

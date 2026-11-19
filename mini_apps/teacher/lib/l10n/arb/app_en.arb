@@ -448,5 +448,106 @@
         "type": "String"
       }
     }
-  }
+  },
+  "studentsEditTitle": "Edit student",
+  "studentsGuardianRelation": "Relationship",
+  "studentsRelationFather": "Father",
+  "studentsRelationMother": "Mother",
+  "studentsRelationGuardian": "Guardian",
+  "inviteStatusNotInvited": "Not invited",
+  "inviteStatusInvited": "Invited",
+  "inviteStatusActivated": "Activated",
+  "inviteStatusExpired": "Expired",
+  "inviteShare": "Share link",
+  "inviteResend": "Resend link",
+  "rosterNoGuardians": "No parent yet. Tap the student name to add one.",
+  "rosterGuardianLine": "{relation}: {name}",
+  "@rosterGuardianLine": {
+    "placeholders": {
+      "relation": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterGuardianSemantics": "{who}, {status}",
+  "@rosterGuardianSemantics": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterEditSemantics": "Edit student {name}",
+  "@rosterEditSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteSheetFor": "Invite {guardian}, parent of {student}",
+  "@inviteSheetFor": {
+    "placeholders": {
+      "guardian": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteQrLabel": "Invitation QR code",
+  "inviteCodeLabel": "Code to type in",
+  "inviteCodeSemantics": "Invitation code: {code}",
+  "@inviteCodeSemantics": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteExpiryNote": "The link works for 7 days and the typed code for 48 hours.",
+  "inviteOldLinkNote": "This parent's previous link, if any, no longer works.",
+  "inviteShareMessage": "Hello {guardian}, I would like to invite you to follow {student}'s learning on TeachHub.\nOpen the link to accept: {url}\nOr enter code {code} in the TeachHub app (the code works for 48 hours).",
+  "@inviteShareMessage": {
+    "placeholders": {
+      "guardian": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      },
+      "url": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteAllEntry": "Invite all parents not yet activated",
+  "inviteAllTitle": "Invite class parents",
+  "inviteAllEmpty": "No parents left to invite.",
+  "inviteAllProgress": "Created {done}/{total} links",
+  "@inviteAllProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteAllHint": "Tap Share to send to each parent in turn. Parents with a valid invitation are skipped.",
+  "inviteAllCreating": "Creating link…",
+  "inviteAllShareAgain": "Share again",
+  "inviteAllShowQr": "Show QR code",
+  "inviteAllSharedMark": "Share opened"
 }

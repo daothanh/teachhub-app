@@ -10,6 +10,7 @@ import '../cubit/classes_list_cubit.dart' show ClassesLoad;
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
 import '../widgets/classes_error_text.dart';
+import '../widgets/roster_tile.dart';
 
 /// T06a: chi tiết lớp, quy tắc lặp, buổi sắp tới, học viên, lưu trữ.
 class ClassDetailPage extends StatelessWidget {
@@ -199,15 +200,11 @@ class _Body extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           sliver: SliverList.builder(
             itemCount: state.roster.length,
-            itemBuilder: (context, i) {
-              final e = state.roster[i];
-              return AppListTile(
-                title: e.fullName,
-                trailingText: e.studentStatus == 'paused'
-                    ? l10n.classesStudentPaused
-                    : null,
-              );
-            },
+            itemBuilder: (context, i) => RosterTile(
+              classId: cls.id,
+              entry: state.roster[i],
+              onChanged: context.read<ClassDetailCubit>().load,
+            ),
           ),
         ),
         SliverPadding(
@@ -229,6 +226,25 @@ class _Body extends StatelessWidget {
                     }
                   },
                 ),
+                if (state.roster.any(
+                  (e) => e.guardians.any((g) => g.needsInvite),
+                ))
+                  Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.sm),
+                    child: AppButton(
+                      label: l10n.inviteAllEntry,
+                      variant: AppButtonVariant.outlinePrimary,
+                      width: double.infinity,
+                      onPressed: () async {
+                        await context.push<void>(
+                          ClassesRoutes.inviteAll(cls.id),
+                        );
+                        if (context.mounted) {
+                          context.read<ClassDetailCubit>().load();
+                        }
+                      },
+                    ),
+                  ),
               ],
             ]),
           ),

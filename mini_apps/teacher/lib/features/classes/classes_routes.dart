@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import 'data/class_models.dart';
+import '../invites/pages/bulk_invite_page.dart';
 import 'pages/class_detail_page.dart';
 import 'pages/class_form_page.dart';
 import 'pages/classes_list_page.dart';
@@ -14,6 +15,7 @@ abstract final class ClassesRoutes {
   static String detail(String id) => '$list/$id';
   static String edit(String id) => '$list/$id/edit';
   static String addStudent(String id) => '$list/$id/add-student';
+  static String inviteAll(String id) => '$list/$id/invite-all';
 }
 
 /// `/new` đứng trước `/:id` để không bị nuốt thành id.
@@ -50,5 +52,11 @@ List<RouteBase> classesRoutes(String moduleId) => [
     name: '$moduleId.classes.addStudent',
     builder: (context, state) =>
         StudentPickerPage(classId: state.pathParameters['id']!),
+  ),
+  GoRoute(
+    path: '${ClassesRoutes.list}/:id/invite-all',
+    name: '$moduleId.classes.inviteAll',
+    builder: (context, state) =>
+        BulkInvitePage(classId: state.pathParameters['id']!),
   ),
 ];

@@ -785,4 +785,119 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String scheduleCancelReason(String reason) {
     return 'Lý do: $reason';
   }
+
+  @override
+  String get studentsEditTitle => 'Sửa học viên';
+
+  @override
+  String get studentsGuardianRelation => 'Quan hệ';
+
+  @override
+  String get studentsRelationFather => 'Bố';
+
+  @override
+  String get studentsRelationMother => 'Mẹ';
+
+  @override
+  String get studentsRelationGuardian => 'Người giám hộ';
+
+  @override
+  String get inviteStatusNotInvited => 'Chưa mời';
+
+  @override
+  String get inviteStatusInvited => 'Đã mời';
+
+  @override
+  String get inviteStatusActivated => 'Đã kích hoạt';
+
+  @override
+  String get inviteStatusExpired => 'Hết hạn';
+
+  @override
+  String get inviteShare => 'Chia sẻ link';
+
+  @override
+  String get inviteResend => 'Gửi lại link';
+
+  @override
+  String get rosterNoGuardians => 'Chưa có phụ huynh. Chạm tên em để thêm.';
+
+  @override
+  String rosterGuardianLine(String relation, String name) {
+    return '$relation: $name';
+  }
+
+  @override
+  String rosterGuardianSemantics(String who, String status) {
+    return '$who, $status';
+  }
+
+  @override
+  String rosterEditSemantics(String name) {
+    return 'Sửa học viên $name';
+  }
+
+  @override
+  String inviteSheetFor(String guardian, String student) {
+    return 'Mời $guardian, phụ huynh của $student';
+  }
+
+  @override
+  String get inviteQrLabel => 'Mã QR lời mời';
+
+  @override
+  String get inviteCodeLabel => 'Mã nhập tay';
+
+  @override
+  String inviteCodeSemantics(String code) {
+    return 'Mã mời: $code';
+  }
+
+  @override
+  String get inviteExpiryNote =>
+      'Link dùng được 7 ngày, mã nhập tay dùng được 48 giờ.';
+
+  @override
+  String get inviteOldLinkNote =>
+      'Link cũ của phụ huynh này (nếu có) không dùng được nữa.';
+
+  @override
+  String inviteShareMessage(
+    String guardian,
+    String student,
+    String url,
+    String code,
+  ) {
+    return 'Chào $guardian, mình mời bạn theo dõi việc học của $student trên TeachHub.\nMở link để nhận lời mời: $url\nHoặc nhập mã $code trong ứng dụng TeachHub (mã dùng được 48 giờ).';
+  }
+
+  @override
+  String get inviteAllEntry => 'Mời tất cả phụ huynh chưa kích hoạt';
+
+  @override
+  String get inviteAllTitle => 'Mời phụ huynh của lớp';
+
+  @override
+  String get inviteAllEmpty => 'Không còn phụ huynh nào cần mời.';
+
+  @override
+  String inviteAllProgress(int done, int total) {
+    return 'Đã tạo $done/$total link';
+  }
+
+  @override
+  String get inviteAllHint =>
+      'Bấm Chia sẻ để gửi lần lượt cho từng phụ huynh. Phụ huynh đang có lời mời còn hạn được bỏ qua.';
+
+  @override
+  String get inviteAllCreating => 'Đang tạo link…';
+
+  @override
+  String get inviteAllShareAgain => 'Chia sẻ lại';
+
+  @override
+  String get inviteAllShowQr => 'Xem mã QR';
+
+  @override
+  String get inviteAllSharedMark => 'Đã mở chia sẻ';
 }
