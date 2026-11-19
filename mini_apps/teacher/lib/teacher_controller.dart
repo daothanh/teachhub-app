@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get_it/get_it.dart';
@@ -99,10 +101,8 @@ class TeacherController {
           database: () =>
               getIt.getAsync<TeacherDatabase>(instanceName: databaseKey),
           api: _api,
-          engine: () async {
-            await startSync();
-            return syncEngine;
-          },
+          engine: () async => syncEngine,
+          startSync: startSync,
           clock: clock,
         ),
       );
@@ -116,8 +116,8 @@ class TeacherController {
 
   /// CSDL gắn với phiên: đếm, xóa, đổi chủ (xem [TeacherLocalData]).
   late final localData = TeacherLocalData(
-    keyStore: SecureStore(),
-    directory: getApplicationDocumentsDirectory,
+    keyStore: keyStoreOverride ?? SecureStore(),
+    directory: () => documentsDirectory(),
     // Lấy qua GetIt mỗi lần, không giữ instance: xóa xong đăng ký lại.
     database: () =>
         GetIt.I.getAsync<TeacherDatabase>(instanceName: databaseKey),
@@ -180,6 +180,11 @@ class TeacherController {
   /// Số engine đã dựng (để test kiểm các lần startSync chồng nhau).
   @visibleForTesting
   int enginesCreated = 0;
+
+  /// Thư mục chứa file CSDL; test thay bằng thư mục tạm.
+  @visibleForTesting
+  Future<Directory> Function() documentsDirectory =
+      getApplicationDocumentsDirectory;
 
   /// Thay kho khóa thật (Keychain/Keystore) trong test.
   @visibleForTesting

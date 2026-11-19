@@ -192,7 +192,7 @@ class TeacherApi {
     try {
       return await run();
     } on DioException catch (e) {
-      throw ApiException.fromDio(e)!;
+      throw ApiException.fromDio(e) ?? const ApiException.unexpected();
     } on FormatException {
       throw const ApiException.unexpected();
     } on TypeError {

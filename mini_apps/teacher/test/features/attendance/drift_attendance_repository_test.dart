@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart' show OrderingTerm;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -85,6 +87,7 @@ void main() {
       database: () async => db,
       api: () async => api,
       engine: () async => engine,
+      startSync: () async {},
       clock: clock,
     );
   });
@@ -149,6 +152,7 @@ void main() {
         database: () async => db,
         api: () async => TeacherApi(server.dio(), deviceId: 'd'),
         engine: () async => null, // không đẩy: chỉ đo đường ghi cục bộ
+        startSync: () async {},
         clock: ClockSkew(now: () => now),
       );
 
@@ -307,4 +311,24 @@ void main() {
     expect(TeacherApi.offsetMinutes('2026-11-18T01:00:00.000Z'), 0);
     expect(TeacherApi.offsetMinutes('2026-11-18T08:00:00'), isNull);
   });
+
+  test(
+    'hủy nghe trước khi CSDL sẵn sàng: không đăng ký tableUpdates',
+    () async {
+      final ready = Completer<TeacherDatabase>();
+      final lazyRepo = DriftAttendanceRepository(
+        database: () => ready.future,
+        api: () async => TeacherApi(server.dio(), deviceId: 'd'),
+        engine: () async => null,
+        startSync: () async {},
+        clock: ClockSkew(now: () => now),
+      );
+      var emitted = 0;
+      final sub = lazyRepo.watchSessions('2026-11-18').listen((_) => emitted++);
+      await sub.cancel();
+      ready.complete(db);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(emitted, 0);
+    },
+  );
 }

@@ -50,24 +50,28 @@ class DriftAttendanceRepository implements AttendanceRepository {
     required Future<TeacherDatabase> Function() database,
     required Future<TeacherApi> Function() api,
     required Future<SyncEngine?> Function() engine,
+    required Future<void> Function() startSync,
     required this.clock,
   }) : _db = database,
        _api = api,
-       _engine = engine;
+       _engine = engine,
+       _startSync = startSync;
 
   // Lấy CSDL qua hàm mỗi lần (không giữ instance): đăng xuất xóa rồi mở lại.
   final Future<TeacherDatabase> Function() _db;
   final Future<TeacherApi> Function() _api;
 
-  /// Khởi động (nếu chưa) và trả engine; null khi đã bị dừng.
+  /// Engine đang chạy, null khi chưa bật hoặc đã dừng (đăng xuất). Không tự
+  /// bật lại: chỉ màn chính gọi [startSync].
   final Future<SyncEngine?> Function() _engine;
+  final Future<void> Function() _startSync;
   final ClockSkew clock;
 
   Future<SessionCache> _cache() async =>
       SessionCache(await _db(), await _api(), clock: clock);
 
   @override
-  Future<void> startSync() async => _engine();
+  Future<void> startSync() => _startSync();
 
   @override
   DateTime serverNow() => clock.now();
@@ -109,7 +113,7 @@ class DriftAttendanceRepository implements AttendanceRepository {
     out = StreamController<T>(
       onListen: () async {
         final db = await _db();
-        if (out.isClosed) return;
+        if (out.isClosed || !out.hasListener) return; // đã hủy trong lúc chờ
         sub = db
             .tableUpdates(TableUpdateQuery.onAllTables(tables(db)))
             .listen((_) => run(db));
