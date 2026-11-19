@@ -74,6 +74,8 @@
 	<array>
 		<string>zalo</string>
 	</array>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>TeachHub lưu ảnh mã QR hóa đơn vào thư viện ảnh khi bạn bấm Lưu ảnh QR. Thư viện ảnh không được dùng cho việc nào khác.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>TeachHub dùng Face ID để xác thực khi bạn mở khoá chế độ phụ huynh.</string>
 	<key>CFBundleURLTypes</key>

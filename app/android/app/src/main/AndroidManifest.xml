@@ -5,7 +5,12 @@
     <!-- Quét QR lời mời (P05b); camera không bắt buộc để cài app. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <!-- Lưu ảnh QR hóa đơn vào thư viện (S5-FL-04); chỉ cần trên Android 10 trở xuống. -->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
     <application
+        android:requestLegacyExternalStorage="true"
         android:label="@string/app_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
