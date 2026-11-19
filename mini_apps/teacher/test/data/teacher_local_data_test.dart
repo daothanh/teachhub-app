@@ -194,7 +194,13 @@ void main() {
       await pumpEventQueue();
       await wipe; // không bị transport chậm giữ lại
       expect(log, ['send', 'close', 'reopen', 'resume']);
-      expect(await running, (sent: 0, rejected: 0, failed: 0, retryIn: null));
+      expect(await running, (
+        sent: 0,
+        rejected: 0,
+        failed: 0,
+        blocked: 0,
+        retryIn: null,
+      ));
 
       release.complete(); // phản hồi muộn không được ghi vào CSDL đã xóa
       await pumpEventQueue();

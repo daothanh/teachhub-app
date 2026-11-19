@@ -96,7 +96,13 @@ void main() {
     await save(3);
     await save(4);
     final report = await engine.drain();
-    expect(report, (sent: 4, rejected: 0, failed: 0, retryIn: null));
+    expect(report, (
+      sent: 4,
+      rejected: 0,
+      failed: 0,
+      blocked: 0,
+      retryIn: null,
+    ));
     expect(server.syncRequests.map((r) => r.body['sessionId']), [s1, s2, s1]);
     expect(
       [
@@ -153,6 +159,7 @@ void main() {
       sent: 2,
       rejected: 0,
       failed: 0,
+      blocked: 0,
       retryIn: null,
     ));
     expect(server.appliedCount, {mid(1): 1, mid(2): 1});
@@ -270,6 +277,7 @@ void main() {
       sent: 1,
       rejected: 1,
       failed: 0,
+      blocked: 0,
       retryIn: null,
     ));
     await pumpEventQueue();
@@ -305,6 +313,7 @@ void main() {
           sent: 1,
           rejected: 0,
           failed: 2,
+          blocked: 0,
           retryIn: null,
         ));
         await pumpEventQueue();
@@ -371,6 +380,7 @@ void main() {
       sent: 0,
       rejected: 0,
       failed: 0,
+      blocked: 1,
       retryIn: null,
     ));
     expect((await outbox()).single.lastError, 'FORBIDDEN');

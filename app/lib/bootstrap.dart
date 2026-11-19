@@ -83,7 +83,6 @@ Future<void> bootstrap({required Env env}) async {
   TeacherController.instance.backgroundSync = workmanagerSyncHooks(
     apiUrl: appEnvForSync.apiUrl,
     pins: appEnvForSync.certificatePins,
-    requirePins: !appEnvForSync.isDevelopment,
   );
 
   // 3. Remote Config — chỉ bật/tắt giao diện; giới hạn gói chặn ở backend.
@@ -151,10 +150,17 @@ Future<void> bootstrap({required Env env}) async {
           state.statusCheckToken != LoadingStatus.loading;
       // Không hủy khi mới khởi động nguội (đang kiểm phiên): chỉ khi vừa mất
       // phiên hoặc đã kiểm xong mà không có.
+      var hasToken = true; // đọc kho lỗi: giữ lịch, đợi lần sau
+      if (checked && !before) {
+        try {
+          hasToken = await TokenStore(SecureStore()).getAccessToken() != null;
+        } catch (_) {}
+      }
       if (shouldCancelBackgroundSync(
         wasAuthenticated: before,
         isAuthenticated: false,
         sessionChecked: checked,
+        hasStoredToken: hasToken,
       )) {
         unawaited(TeacherController.instance.backgroundSync?.cancel());
       }

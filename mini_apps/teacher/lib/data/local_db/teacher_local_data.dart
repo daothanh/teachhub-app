@@ -100,6 +100,8 @@ class TeacherLocalData {
       if (!await isBackgroundRunning(_keys)) return;
       await Future<void>.delayed(waitStep);
     }
+    // Quá hạn mà nền vẫn báo chạy: xóa luôn (không ghi dữ liệu cá nhân).
+    log('Wipe: nền chưa đóng CSDL sau khi chờ, xóa luôn', name: 'teacher');
   }
 
   /// Chờ nền đóng CSDL tối đa [waitSteps] × [waitStep].

@@ -168,8 +168,10 @@ void main() {
     Future<BackgroundSyncOutcome> sync(
       Map<String, dynamic> input, {
       required List<String> calls,
+      bool requirePins = true,
     }) => syncOutboxFromInput(
       input,
+      requirePins: requirePins,
       keys: InMemoryKeyValueStore(),
       accessToken: () async => 'tok',
       userId: () async => 'u',
@@ -196,24 +198,26 @@ void main() {
     test('production thiếu pin: không chạy (fail-closed)', () async {
       final calls = <String>[];
       await sync(
-        backgroundInput(
-          apiUrl: 'https://api.test/v1',
-          pins: {},
-          requirePins: true,
-        ),
+        backgroundInput(apiUrl: 'https://api.test/v1', pins: {}),
         calls: calls,
+        requirePins: true,
       );
+      expect(calls, isEmpty);
+    });
+
+    test('inputData không tắt được yêu cầu pin', () async {
+      final calls = <String>[];
+      await sync({
+        ...backgroundInput(apiUrl: 'https://api.test/v1', pins: {}),
+        'requirePins': false,
+      }, calls: calls);
       expect(calls, isEmpty);
     });
 
     test('đủ cấu hình: chạy runner với base URL từ inputData', () async {
       final calls = <String>[];
       await sync(
-        backgroundInput(
-          apiUrl: 'https://api.test/v1',
-          pins: {'aa'},
-          requirePins: true,
-        ),
+        backgroundInput(apiUrl: 'https://api.test/v1', pins: {'aa'}),
         calls: calls,
       );
       expect(calls, ['run:https://api.test/v1']);
@@ -223,19 +227,24 @@ void main() {
   test(
     'chỉ hủy lịch khi vừa mất phiên hoặc kiểm phiên xong không có phiên',
     () {
-      bool c(bool was, bool checked) => shouldCancelBackgroundSync(
-        wasAuthenticated: was,
-        isAuthenticated: false,
-        sessionChecked: checked,
-      );
+      bool c(bool was, bool checked, {bool token = false}) =>
+          shouldCancelBackgroundSync(
+            wasAuthenticated: was,
+            isAuthenticated: false,
+            sessionChecked: checked,
+            hasStoredToken: token,
+          );
       expect(c(false, false), isFalse); // khởi động nguội: đang kiểm phiên
       expect(c(true, false), isTrue); // vừa đăng xuất
       expect(c(false, true), isTrue); // kiểm xong, không có phiên
+      // Kiểm phiên failure vì mất mạng nhưng token còn: giữ lịch.
+      expect(c(false, true, token: true), isFalse);
       expect(
         shouldCancelBackgroundSync(
           wasAuthenticated: true,
           isAuthenticated: true,
           sessionChecked: true,
+          hasStoredToken: true,
         ),
         isFalse,
       );

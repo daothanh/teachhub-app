@@ -105,6 +105,18 @@ void main() {
     expect(await pending(), 1);
   });
 
+  for (final status in [403, 401]) {
+    test(
+      '$status: dòng kẹt không tự hết, báo done (không retry vô hạn)',
+      () async {
+        await seed();
+        server.failSession[_s1] = (status, 'FORBIDDEN');
+        expect(await run(), BackgroundSyncOutcome.done);
+        expect(await pending(), 1);
+      },
+    );
+  }
+
   test('chủ CSDL khác người đăng nhập: không đồng bộ', () async {
     await seed();
     user = 'user-2';

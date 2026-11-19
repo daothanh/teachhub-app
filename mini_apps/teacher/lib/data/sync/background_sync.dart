@@ -42,7 +42,9 @@ enum BackgroundSyncOutcome {
   /// Xong, hoặc không có gì để làm.
   done,
 
-  /// Còn mutation chờ (mất mạng, token hết hạn...): hệ điều hành thử lại.
+  /// Còn mutation chờ vì lỗi tạm thời (mất mạng, 5xx...): hệ điều hành thử lại.
+  /// Dòng chỉ còn kẹt vì 401/403 thì là [done]: thử lại nền vô ích, foreground
+  /// xử lý khi app mở.
   retry,
 
   /// Không được đồng bộ (đang xóa, sai chủ, mất phiên): hủy lịch.
@@ -112,9 +114,10 @@ Future<BackgroundSyncOutcome> runOutboxSyncOnce({
         checking = false;
       }
     });
-    await engine.drain();
+    final report = await engine.drain();
     if (stoppedByGate) return BackgroundSyncOutcome.notAllowed;
-    return await pendingOutboxCount(db) == 0
+    // Dòng còn lại đều là dòng bị bỏ qua vì lỗi không tự hết: không retry vô hạn.
+    return await pendingOutboxCount(db) <= report.blocked
         ? BackgroundSyncOutcome.done
         : BackgroundSyncOutcome.retry;
   } catch (e) {

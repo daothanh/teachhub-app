@@ -219,6 +219,7 @@ void Function(CommonDatabase) encryptionSetup(String hexKey) => (db) {
   db.execute("PRAGMA hexkey = '$hexKey';");
   // App và isolate nền có thể cùng mở file: WAL cho đọc/ghi song song, chờ
   // tối đa 5 giây khi bị khóa thay vì lỗi SQLITE_BUSY.
-  db.execute('PRAGMA journal_mode = WAL;');
+  // busy_timeout đặt trước: chính việc đổi sang WAL cũng cần khóa.
   db.execute('PRAGMA busy_timeout = 5000;');
+  db.execute('PRAGMA journal_mode = WAL;');
 };

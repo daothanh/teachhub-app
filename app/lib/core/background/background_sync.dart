@@ -2,8 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart' show visibleForTesting;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart' show kReleaseMode, visibleForTesting;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tasco_core/tasco_core.dart';
@@ -20,7 +19,6 @@ const outboxSyncTask = 'vn.dayhoc.app.sync-outbox';
 
 const _apiUrlKey = 'apiUrl';
 const _pinsKey = 'pins';
-const _requirePinsKey = 'requirePins';
 const _userKey = 'user_info';
 
 bool get _supported => Platform.isAndroid || Platform.isIOS;
@@ -33,17 +31,12 @@ Future<void> initBackgroundSync() async {
 }
 
 /// `inputData` của tác vụ: isolate nền không có `GetIt`/dotenv nên mang theo
-/// cấu hình mạng. [requirePins] = không phải development.
+/// cấu hình mạng. Việc bắt buộc pin KHÔNG đi qua đây (xem [syncOutboxFromInput]).
 @visibleForTesting
 Map<String, Object?> backgroundInput({
   required String apiUrl,
   required Set<String> pins,
-  required bool requirePins,
-}) => {
-  _apiUrlKey: apiUrl,
-  _pinsKey: pins.join(','),
-  _requirePinsKey: requirePins,
-};
+}) => {_apiUrlKey: apiUrl, _pinsKey: pins.join(',')};
 
 Future<void> _schedule(Map<String, Object?> input) =>
     Workmanager().registerOneOffTask(
@@ -62,13 +55,9 @@ Future<void> _schedule(Map<String, Object?> input) =>
 BackgroundSyncHooks workmanagerSyncHooks({
   required String apiUrl,
   required Set<String> pins,
-  required bool requirePins,
 }) => BackgroundSyncHooks(
-  schedule: () => _guard(
-    () => _schedule(
-      backgroundInput(apiUrl: apiUrl, pins: pins, requirePins: requirePins),
-    ),
-  ),
+  schedule: () =>
+      _guard(() => _schedule(backgroundInput(apiUrl: apiUrl, pins: pins))),
   cancel: () => _guard(() => Workmanager().cancelByUniqueName(outboxSyncTask)),
 );
 
@@ -151,10 +140,12 @@ Future<bool> runBackgroundTask({
 }
 
 /// Phần thuần Dart của callback nền: dựng Dio rồi chạy một lượt. Thiếu cấu
-/// hình hoặc (ngoài development) thiếu pin thì không gửi gì.
+/// hình hoặc (bản release) thiếu pin thì không gửi gì. [requirePins] lấy từ hằng
+/// build-time, không đọc từ `inputData` (dữ liệu tác vụ không được tắt pin).
 @visibleForTesting
 Future<BackgroundSyncOutcome> syncOutboxFromInput(
   Map<String, dynamic> input, {
+  bool requirePins = kReleaseMode,
   required KeyValueStore keys,
   required Future<String?> Function() accessToken,
   required Future<String?> Function() userId,
@@ -179,7 +170,7 @@ Future<BackgroundSyncOutcome> syncOutboxFromInput(
         for (final p in (input[_pinsKey] as String? ?? '').split(','))
           if (p.trim().isNotEmpty) p.trim(),
       },
-      requirePins: input[_requirePinsKey] != false,
+      requirePins: requirePins,
       accessToken: accessToken,
       clientInfo: await clientInfo(),
     );
@@ -244,8 +235,15 @@ Dio buildBackgroundDio({
 /// Khi nào hủy lịch nền theo trạng thái phiên. Không hủy ở state ban đầu
 /// (đang kiểm phiên lúc khởi động nguội: chưa biết là có hay không), chỉ khi
 /// vừa đăng xuất/hết phiên hoặc kiểm xong mà không có phiên.
+///
+/// Kiểm phiên có thể `failure` khi mất mạng lúc khởi động nguội (chưa có user
+/// cache) dù token vẫn còn trong kho: nên chỉ coi là "không có phiên" khi kho
+/// không còn token ([hasStoredToken] = false).
 bool shouldCancelBackgroundSync({
   required bool wasAuthenticated,
   required bool isAuthenticated,
   required bool sessionChecked,
-}) => !isAuthenticated && (wasAuthenticated || sessionChecked);
+  required bool hasStoredToken,
+}) =>
+    !isAuthenticated &&
+    (wasAuthenticated || (sessionChecked && !hasStoredToken));
