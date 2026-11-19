@@ -27,6 +27,9 @@ void main() {
     expect(normalizePhone('84901234567'), '0901234567');
     expect(normalizePhone('(091) 234.5678'), '0912345678');
     expect(normalizePhone('+1 415 555 0100'), '+14155550100');
+    expect(normalizePhone('+84 0912 345 678'), '0912345678');
+    expect(normalizePhone('0084912345678'), '0912345678');
+    expect(normalizePhone('+84(0)912345678'), '0912345678');
     expect(normalizePhone('  '), isNull);
     expect(normalizePhone(null), isNull);
   });
@@ -126,6 +129,85 @@ void main() {
       expect(repo.calls[2].key, isNot(repo.calls[1].key));
       await cubit.confirmNew('a');
       expect(cubit.state.rows.single.savedId, 's-new');
+    });
+
+    test('repository ném lỗi lạ: dòng failed, saving được reset', () async {
+      final repo = FakeStudentRepository([StateError('boom')]);
+      final cubit = ContactImportCubit(
+        FakeContactsService(contacts: _contacts),
+        repo,
+      );
+      await cubit.start();
+      cubit.toggle('a');
+      cubit.confirmSelection();
+      await cubit.saveAll();
+      expect(cubit.state.saving, isFalse);
+      expect(cubit.state.rows.single.status, RowStatus.failed);
+    });
+
+    test(
+      'tên phụ huynh: điền sẵn, sửa được, có SĐT mà trống thì không gửi',
+      () async {
+        final repo = FakeStudentRepository([
+          const Student(id: 's', fullName: 'x'),
+        ]);
+        final cubit = ContactImportCubit(
+          FakeContactsService(contacts: _contacts),
+          repo,
+        );
+        await cubit.start();
+        cubit.toggle('a');
+        cubit.confirmSelection();
+        expect(cubit.state.rows.single.guardianName, 'Minh Anh');
+        cubit.edit('a', guardianName: ' ');
+        expect(cubit.state.canSave, isFalse);
+        cubit.edit('a', guardianName: 'Mẹ Bin');
+        await cubit.saveAll();
+        expect(repo.calls.single.draft.fullName, 'Minh Anh');
+        expect(repo.calls.single.draft.guardians.single.fullName, 'Mẹ Bin');
+      },
+    );
+
+    test(
+      'review bỏ danh sách contacts; Quay lại giữ dòng đã sửa tay',
+      () async {
+        final cubit = ContactImportCubit(
+          FakeContactsService(contacts: _contacts),
+          FakeStudentRepository([]),
+        );
+        await cubit.start();
+        cubit.toggle('a');
+        cubit.toggle('b');
+        cubit.confirmSelection();
+        expect(cubit.state.contacts, isEmpty);
+        cubit.edit('a', name: 'Sửa tay');
+        cubit.remove('b');
+        await cubit.backToPicking();
+        expect(cubit.state.contacts, hasLength(3));
+        expect(cubit.state.selected, {'a'});
+        cubit.toggle('c');
+        cubit.confirmSelection();
+        expect(cubit.state.rows.map((r) => r.name), ['Sửa tay', 'Gia Hân']);
+      },
+    );
+
+    test('đã confirmNew thì các lần lưu sau vẫn gửi cờ', () async {
+      final repo = FakeStudentRepository([
+        StudentDuplicateException(const [_candidate]),
+        const ApiException.network(),
+        const Student(id: 's', fullName: 'x'),
+      ]);
+      final cubit = ContactImportCubit(
+        FakeContactsService(contacts: _contacts),
+        repo,
+      );
+      await cubit.start();
+      cubit.toggle('a');
+      cubit.confirmSelection();
+      await cubit.saveAll();
+      await cubit.confirmNew('a'); // lỗi mạng
+      await cubit.saveAll();
+      expect(repo.calls.map((c) => c.confirmNew), [false, true, true]);
     });
 
     test('dòng sai SĐT không được gửi', () async {

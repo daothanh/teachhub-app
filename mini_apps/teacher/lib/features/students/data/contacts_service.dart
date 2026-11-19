@@ -15,6 +15,16 @@ class PickableContact extends Equatable {
   List<Object?> get props => [id, name, phone];
 }
 
+final _validPhone = RegExp(r'^\+?[0-9]{8,15}$');
+
+/// Số đầu tiên hợp lệ sau chuẩn hóa; không có thì số đầu tiên.
+String? _bestPhone(Iterable<String> numbers) {
+  for (final n in numbers) {
+    if (_validPhone.hasMatch(normalizePhone(n) ?? '')) return n;
+  }
+  return numbers.firstOrNull;
+}
+
 /// Bọc plugin danh bạ để test không cần native.
 abstract class ContactsService {
   /// Chỉ gọi khi người dùng bấm "Thêm từ danh bạ".
@@ -50,7 +60,7 @@ class DeviceContactsService implements ContactsService {
           PickableContact(
             id: c.id!,
             name: c.displayName!.trim(),
-            phone: c.phones.firstOrNull?.number,
+            phone: _bestPhone(c.phones.map((p) => p.number)),
           ),
     ];
   }
@@ -59,15 +69,22 @@ class DeviceContactsService implements ContactsService {
   Future<void> openSettings() => fc.FlutterContacts.permissions.openSettings();
 }
 
-/// SĐT trong danh bạ → dạng nhập ở form: bỏ dấu cách/chấm/gạch, `+84…` và
-/// `84…` thành `0…`; số quốc tế khác giữ `+`. Trả `null` khi trống.
+/// SĐT trong danh bạ → dạng nhập ở form: bỏ dấu cách/chấm/gạch/ngoặc, `+84…`,
+/// `0084…` và `84…` thành `0…` (bỏ cả số 0 thừa sau mã nước, vd `+84(0)912…`);
+/// số quốc tế khác giữ `+`. Trả `null` khi trống.
 String? normalizePhone(String? raw) {
   if (raw == null) return null;
-  final hasPlus = raw.trimLeft().startsWith('+');
-  final digits = raw.replaceAll(RegExp(r'\D'), '');
+  var digits = raw.replaceAll(RegExp(r'\D'), '');
   if (digits.isEmpty) return null;
-  if (digits.startsWith('84') && (hasPlus || digits.length == 11)) {
-    return '0${digits.substring(2)}';
+  var intl = raw.trimLeft().startsWith('+');
+  if (!intl && digits.startsWith('00')) {
+    intl = true;
+    digits = digits.substring(2);
   }
-  return hasPlus ? '+$digits' : digits;
+  if (digits.startsWith('84') && (intl || digits.length == 11)) {
+    var rest = digits.substring(2);
+    if (rest.startsWith('0')) rest = rest.substring(1);
+    return '0$rest';
+  }
+  return intl ? '+$digits' : digits;
 }

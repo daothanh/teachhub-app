@@ -122,6 +122,7 @@ class _Picking extends StatelessWidget {
         ),
       );
     }
+    final phones = [for (final c in state.contacts) normalizePhone(c.phone)];
     return Column(
       children: [
         Expanded(
@@ -133,7 +134,7 @@ class _Picking extends StatelessWidget {
                 value: state.selected.contains(c.id),
                 onChanged: (_) => cubit.toggle(c.id),
                 title: Text(c.name),
-                subtitle: Text(normalizePhone(c.phone) ?? l10n.contactsNoPhone),
+                subtitle: Text(phones[i] ?? l10n.contactsNoPhone),
               );
             },
           ),
@@ -168,13 +169,16 @@ class _Review extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: ListView(
+          child: ListView.builder(
             padding: const EdgeInsets.all(16),
-            children: [
-              Text(l10n.contactsReviewHint),
-              for (final r in state.rows)
-                _RowTile(key: ValueKey(r.id), row: r, locked: state.saving),
-            ],
+            itemCount: state.rows.length + 1,
+            itemBuilder: (context, i) => i == 0
+                ? Text(l10n.contactsReviewHint)
+                : _RowTile(
+                    key: ValueKey(state.rows[i - 1].id),
+                    row: state.rows[i - 1],
+                    locked: state.saving,
+                  ),
           ),
         ),
         SafeArea(
@@ -238,9 +242,7 @@ class _RowTile extends StatelessWidget {
     final status = _status(l10n);
     return Padding(
       padding: const EdgeInsets.only(top: 16),
-      child: Semantics(
-        container: true,
-        label: [row.name, status].where((s) => s.isNotEmpty).join(', '),
+      child: MergeSemantics(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -279,6 +281,19 @@ class _RowTile extends StatelessWidget {
                   : l10n.studentsGuardianPhoneInvalid,
               onChanged: (v) => cubit.edit(row.id, phone: v),
             ),
+            if (row.hasPhone) ...[
+              const SizedBox(height: 8),
+              AppTextFormField(
+                initialValue: row.guardianName,
+                label: l10n.studentsGuardianName,
+                enabled: enabled,
+                maxLength: 120,
+                forceErrorText: row.guardianValid
+                    ? null
+                    : l10n.studentsGuardianNameRequired,
+                onChanged: (v) => cubit.edit(row.id, guardianName: v),
+              ),
+            ],
             if (status.isNotEmpty) ...[
               const SizedBox(height: 4),
               Text(

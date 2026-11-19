@@ -44,7 +44,12 @@ class AppleSsoProvider implements SsoProvider {
         .join(' ');
     return SsoResult(
       idToken: idToken,
-      extra: {'nonce': nonce, if (fullName.isNotEmpty) 'fullName': fullName},
+      extra: {
+        'nonce': nonce,
+        // API giới hạn fullName 120 ký tự.
+        if (fullName.isNotEmpty)
+          'fullName': fullName.substring(0, min(120, fullName.length)),
+      },
     );
   }
 

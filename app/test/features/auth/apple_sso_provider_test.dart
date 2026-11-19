@@ -96,6 +96,14 @@ void main() {
     expect(r.extra.keys, ['nonce']);
   });
 
+  test('fullName dài hơn 120 ký tự bị cắt', () async {
+    final r = await AppleSsoProvider(
+      fetchCredential: ({required nonce}) async =>
+          _cred(given: 'a' * 100, family: 'b' * 100),
+    ).authenticate();
+    expect((r.extra['fullName'] as String).length, 120);
+  });
+
   test('hai lần đăng nhập sinh nonce khác nhau', () async {
     final p = AppleSsoProvider(
       fetchCredential: ({required nonce}) async => _cred(),

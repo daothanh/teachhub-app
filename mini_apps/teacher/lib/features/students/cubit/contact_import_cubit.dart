@@ -25,15 +25,19 @@ class DraftRow extends Equatable {
     required this.id,
     required this.name,
     this.phone = '',
+    String? guardianName,
     this.status = RowStatus.pending,
     this.candidates = const [],
     this.error,
     this.savedId,
-  });
+  }) : guardianName = guardianName ?? name;
 
   final String id;
   final String name;
   final String phone;
+
+  /// Tên phụ huynh 1, điền sẵn bằng tên liên hệ; chỉ dùng khi có [phone].
+  final String guardianName;
   final RowStatus status;
   final List<StudentCandidate> candidates;
   final ApiException? error;
@@ -43,29 +47,32 @@ class DraftRow extends Equatable {
 
   bool get nameValid => name.trim().isNotEmpty;
   bool get phoneValid => phone.trim().isEmpty || phoneRe.hasMatch(phone.trim());
+  bool get hasPhone => phone.trim().isNotEmpty;
+  bool get guardianValid => !hasPhone || guardianName.trim().isNotEmpty;
   bool get editable =>
       status == RowStatus.pending ||
       status == RowStatus.failed ||
       status == RowStatus.duplicate;
 
   /// Chưa lưu được và dữ liệu hợp lệ → được gửi (lại) khi bấm Lưu.
-  bool get sendable => nameValid && phoneValid && editable;
+  bool get sendable => nameValid && phoneValid && guardianValid && editable;
 
-  /// Tên liên hệ là họ tên học viên; SĐT là SĐT phụ huynh 1 (tên PH lấy theo
-  /// tên liên hệ vì API bắt buộc `guardians[].fullName`).
+  /// Tên liên hệ là họ tên học viên; SĐT là SĐT phụ huynh 1 (API bắt buộc
+  /// `guardians[].fullName`, nên có SĐT thì phải có tên phụ huynh).
   StudentDraft toDraft() {
     final p = phone.trim();
     return StudentDraft(
       fullName: name.trim(),
       guardians: p.isEmpty
           ? const []
-          : [GuardianDraft(fullName: name.trim(), phone: p)],
+          : [GuardianDraft(fullName: guardianName.trim(), phone: p)],
     );
   }
 
   DraftRow copyWith({
     String? name,
     String? phone,
+    String? guardianName,
     RowStatus? status,
     List<StudentCandidate>? candidates,
     ApiException? error,
@@ -74,6 +81,7 @@ class DraftRow extends Equatable {
     id: id,
     name: name ?? this.name,
     phone: phone ?? this.phone,
+    guardianName: guardianName ?? this.guardianName,
     status: status ?? this.status,
     candidates: candidates ?? const [],
     error: status == RowStatus.failed ? error : null,
@@ -85,6 +93,7 @@ class DraftRow extends Equatable {
     id,
     name,
     phone,
+    guardianName,
     status,
     candidates,
     error,
@@ -156,6 +165,12 @@ class ContactImportCubit extends Cubit<ContactImportState> {
   // (hoặc cờ confirmNew) đổi.
   final _keys = <String, ({String key, StudentDraft draft, bool confirmNew})>{};
 
+  // Dòng đã "Không phải em này": giữ cờ confirmNew cho các lần lưu sau.
+  final _confirmed = <String>{};
+
+  // Dòng đã sửa tay, theo id liên hệ: Quay lại rồi Tiếp tục không mất.
+  final _memo = <String, DraftRow>{};
+
   /// Hỏi quyền rồi nạp danh bạ. Chỉ gọi sau khi người dùng bấm nút.
   Future<void> start() async {
     emit(state.copyWith(phase: ImportPhase.requesting, loadFailed: false));
@@ -163,6 +178,7 @@ class ContactImportCubit extends Cubit<ContactImportState> {
     try {
       access = await _contacts.requestAccess();
     } catch (_) {
+      if (isClosed) return;
       return emit(state.copyWith(phase: ImportPhase.denied));
     }
     if (isClosed) return;
@@ -198,38 +214,54 @@ class ContactImportCubit extends Cubit<ContactImportState> {
     emit(state.copyWith(selected: next));
   }
 
-  /// Chọn xong → danh sách nháp theo thứ tự danh bạ.
+  /// Chọn xong → danh sách nháp theo thứ tự danh bạ. Bỏ danh sách liên hệ
+  /// khỏi state (có thể rất lớn); Quay lại thì nạp lại.
   void confirmSelection() {
     final rows = [
       for (final c in state.contacts)
         if (state.selected.contains(c.id))
-          DraftRow(
-            id: c.id,
-            name: c.name,
-            phone: normalizePhone(c.phone) ?? '',
-          ),
+          _memo[c.id] ??
+              DraftRow(
+                id: c.id,
+                name: c.name,
+                phone: normalizePhone(c.phone) ?? '',
+              ),
     ];
-    emit(state.copyWith(phase: ImportPhase.review, rows: rows));
+    emit(
+      state.copyWith(phase: ImportPhase.review, rows: rows, contacts: const []),
+    );
   }
 
-  void backToPicking() => emit(state.copyWith(phase: ImportPhase.picking));
+  Future<void> backToPicking() {
+    _memo.addAll({for (final r in state.rows) r.id: r});
+    return start();
+  }
 
-  void edit(String id, {String? name, String? phone}) => _update(
-    id,
-    (r) => r.editable
-        ? r.copyWith(name: name, phone: phone, status: RowStatus.pending)
-        : r,
-  );
+  void edit(String id, {String? name, String? phone, String? guardianName}) =>
+      _update(
+        id,
+        (r) => r.editable
+            ? r.copyWith(
+                name: name,
+                phone: phone,
+                guardianName: guardianName,
+                status: RowStatus.pending,
+              )
+            : r,
+      );
 
   void remove(String id) {
     if (state.saving) return;
     _keys.remove(id);
+    _confirmed.remove(id);
+    _memo.remove(id);
     emit(
       state.copyWith(
         rows: [
           for (final r in state.rows)
             if (r.id != id) r,
         ],
+        selected: {...state.selected}..remove(id),
       ),
     );
   }
@@ -238,26 +270,34 @@ class ContactImportCubit extends Cubit<ContactImportState> {
   Future<void> saveAll() async {
     if (state.saving) return;
     emit(state.copyWith(saving: true));
-    for (final id in [for (final r in state.toSend) r.id]) {
-      if (isClosed) return;
-      await _save(id);
+    try {
+      for (final id in [for (final r in state.toSend) r.id]) {
+        if (isClosed) return;
+        await _save(id);
+      }
+    } finally {
+      if (!isClosed) emit(state.copyWith(saving: false));
     }
-    if (!isClosed) emit(state.copyWith(saving: false));
   }
 
   /// "Không phải em này" ở hộp thoại trùng: gửi lại kèm `confirmNew`.
   Future<void> confirmNew(String id) async {
     if (state.saving) return;
+    _confirmed.add(id);
     emit(state.copyWith(saving: true));
-    await _save(id, confirmNew: true);
-    if (!isClosed) emit(state.copyWith(saving: false));
+    try {
+      await _save(id);
+    } finally {
+      if (!isClosed) emit(state.copyWith(saving: false));
+    }
   }
 
   /// "Đúng là em này": dùng hồ sơ có sẵn.
   void pickExisting(String id, StudentCandidate c) =>
       _update(id, (r) => r.copyWith(status: RowStatus.saved, savedId: c.id));
 
-  Future<void> _save(String id, {bool confirmNew = false}) async {
+  Future<void> _save(String id) async {
+    final confirmNew = _confirmed.contains(id);
     final row = state.rows.firstWhere((r) => r.id == id);
     final draft = row.toDraft();
     final prev = _keys[id];
@@ -282,6 +322,15 @@ class ContactImportCubit extends Cubit<ContactImportState> {
       );
     } on ApiException catch (e) {
       _update(id, (r) => r.copyWith(status: RowStatus.failed, error: e));
+    } catch (_) {
+      // Lỗi lạ: dòng này thất bại, không treo cả lượt lưu.
+      _update(
+        id,
+        (r) => r.copyWith(
+          status: RowStatus.failed,
+          error: const ApiException.unexpected(),
+        ),
+      );
     }
   }
 
