@@ -160,6 +160,21 @@ class AppLocalizationsVi extends AppLocalizations {
   String get logout => 'Đăng xuất';
 
   @override
+  String logoutPendingTitle(int count) {
+    return 'Còn $count buổi chưa đồng bộ';
+  }
+
+  @override
+  String get logoutPendingBody =>
+      'Đăng xuất bây giờ sẽ xóa các buổi này khỏi máy. Hãy kết nối mạng để đồng bộ trước.';
+
+  @override
+  String get logoutPendingConfirm => 'Vẫn đăng xuất';
+
+  @override
+  String get logoutPendingCancel => 'Ở lại';
+
+  @override
   String get loading => 'Đang tải...';
 
   @override

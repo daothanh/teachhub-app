@@ -11,9 +11,36 @@ import '../../core/config/app_env.dart';
 import '../../core/routing/app_routes.dart';
 import '../../core/theme/theme_controller.dart';
 import '../../features/auth/auth_cubit.dart';
+import '../../features/auth/logout_service.dart';
 import '../../l10n/l10n.dart';
 
 // ── Settings Page ─────────────────────────────────────────────────────────────
+
+/// Đăng xuất; còn buổi chưa đồng bộ thì hỏi trước (spec §6.4).
+Future<void> _logout(BuildContext context) {
+  final l10n = AppLocalizations.of(context);
+  return GetIt.I<LogoutService>().logout(
+    confirmDiscard: (pending) async =>
+        await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(l10n.logoutPendingTitle(pending)),
+            content: Text(l10n.logoutPendingBody),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text(l10n.logoutPendingCancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: Text(l10n.logoutPendingConfirm),
+              ),
+            ],
+          ),
+        ) ??
+        false,
+  );
+}
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -70,7 +97,7 @@ class SettingsPage extends StatelessWidget {
             AppButton(
               label: l10n.logout,
               variant: AppButtonVariant.outlineDanger,
-              onPressed: () => context.read<AppAuthCubit>().logout(),
+              onPressed: () => _logout(context),
             ),
             SizedBox(height: 40.h),
           ],

@@ -9,6 +9,7 @@ import 'package:app/core/theme/theme_controller.dart';
 import 'package:app/features/auth/teachhub_user.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:app/features/auth/auth_cubit.dart';
+import 'package:app/features/auth/logout_service.dart';
 import 'package:app/features/settings/settings_page.dart';
 import 'package:app/l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -154,6 +155,37 @@ void main() {
   });
 
   group('SettingsPage Widget Tests', () {
+    testWidgets('logout with unsynced sessions warns and can be cancelled', (
+      tester,
+    ) async {
+      await _setupGetIt();
+      final calls = <String>[];
+      GetIt.I.registerSingleton<LogoutService>(
+        LogoutService(
+          logout: () async => calls.add('logout'),
+          pendingCount: () async => 3,
+          wipeLocalData: () async => calls.add('wipe'),
+        ),
+      );
+      await tester.pumpWidget(_wrap(GetIt.I<AppAuthCubit>()));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Đăng xuất'));
+      await tester.tap(find.text('Đăng xuất'));
+      await tester.pumpAndSettle();
+      expect(find.text('Còn 3 buổi chưa đồng bộ'), findsOneWidget);
+
+      await tester.tap(find.text('Ở lại'));
+      await tester.pumpAndSettle();
+      expect(calls, isEmpty);
+
+      await tester.tap(find.text('Đăng xuất'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Vẫn đăng xuất'));
+      await tester.pumpAndSettle();
+      expect(calls, ['logout', 'wipe']);
+    });
+
     testWidgets('renders all four sections with l10n labels', (tester) async {
       await _setupGetIt();
       final cubit = GetIt.I<AppAuthCubit>();

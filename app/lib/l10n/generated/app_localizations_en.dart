@@ -160,6 +160,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logout => 'Logout';
 
   @override
+  String logoutPendingTitle(int count) {
+    return '$count sessions not synced yet';
+  }
+
+  @override
+  String get logoutPendingBody =>
+      'Logging out now deletes them from this device. Connect to the internet to sync first.';
+
+  @override
+  String get logoutPendingConfirm => 'Log out anyway';
+
+  @override
+  String get logoutPendingCancel => 'Stay';
+
+  @override
   String get loading => 'Loading...';
 
   @override

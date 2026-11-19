@@ -65,6 +65,10 @@ class TeacherDatabase extends _$TeacherDatabase {
 
 const _keyName = 'teacher.db_key';
 
+/// Số mutation còn trong outbox (kể cả bị từ chối) = số buổi chưa đồng bộ.
+Future<int> pendingOutboxCount(TeacherDatabase db) =>
+    db.outboxMutations.count().getSingle();
+
 /// Xóa CSDL `teacher` (file + WAL/SHM/journal) và khóa của nó — dùng khi đăng
 /// xuất, sau khi outbox đã trống (spec §6.4). [dir] là thư mục drift_flutter
 /// lưu file (`getApplicationDocumentsDirectory()`). Phải đóng CSDL trước.

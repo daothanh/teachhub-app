@@ -386,6 +386,30 @@ abstract class AppLocalizations {
   /// **'Đăng xuất'**
   String get logout;
 
+  /// No description provided for @logoutPendingTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Còn {count} buổi chưa đồng bộ'**
+  String logoutPendingTitle(int count);
+
+  /// No description provided for @logoutPendingBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đăng xuất bây giờ sẽ xóa các buổi này khỏi máy. Hãy kết nối mạng để đồng bộ trước.'**
+  String get logoutPendingBody;
+
+  /// No description provided for @logoutPendingConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vẫn đăng xuất'**
+  String get logoutPendingConfirm;
+
+  /// No description provided for @logoutPendingCancel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ở lại'**
+  String get logoutPendingCancel;
+
   /// No description provided for @loading.
   ///
   /// In vi, this message translates to:

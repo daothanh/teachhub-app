@@ -33,6 +33,7 @@ import 'di/di.dart';
 import 'features/app_version/app_version_gate.dart';
 import 'features/auth/auth_cubit.dart';
 import 'features/auth/email_otp_sender.dart';
+import 'features/auth/logout_service.dart';
 import 'features/auth/pages/login_page.dart';
 import 'features/auth/sso/apple_sso_provider.dart';
 import 'features/auth/sso/google_sso_provider.dart';
@@ -97,6 +98,21 @@ Future<void> bootstrap({required Env env}) async {
       membershipCubit.clear();
     }
   });
+  // Đăng xuất xóa CSDL teacher khi outbox trống; phiên hết hạn đi cùng đường đó.
+  final logoutService = LogoutService(
+    logout: authCubit.logout,
+    pendingCount: TeacherController.instance.pendingSyncCount,
+    wipeLocalData: TeacherController.instance.wipeLocalData,
+  );
+  GetIt.I.registerSingleton<LogoutService>(logoutService);
+  GetIt.I<AuthEventBus>().stream
+      .where((e) => e == AuthEvent.sessionExpired)
+      .listen(
+        (_) => logoutService.onSessionExpired().catchError((Object e, st) {
+          log('Wipe after session expiry failed: $e', name: 'bootstrap');
+          return false;
+        }),
+      );
   unawaited(authCubit.initSession());
 
   // 6. Router.
