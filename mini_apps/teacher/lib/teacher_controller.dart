@@ -80,7 +80,7 @@ class TeacherController {
 
   /// Mã thiết bị ổn định của máy này (không xóa khi đăng xuất: là của máy).
   Future<TeacherApi> _api() async {
-    final keys = SecureStore();
+    final keys = keyStoreOverride ?? SecureStore();
     var id = await keys.read(_deviceIdKey);
     if (id == null) {
       id = newUuid();
@@ -101,15 +101,31 @@ class TeacherController {
 
   /// Bật SyncEngine (đẩy ngay, đẩy khi có mạng, tự thử lại). Hook cho đồng bộ
   /// nền (S3-FL-09). Engine tự dừng khi xóa CSDL và bật lại sau đó.
-  Future<void> startSync() async {
+  Future<void> startSync() {
     _syncWanted = true;
+    return _starting ??= _start().whenComplete(() => _starting = null);
+  }
+
+  Future<void> _start() async {
     if (syncEngine != null) return;
     final db = await GetIt.I.getAsync<TeacherDatabase>(
       instanceName: databaseKey,
     );
     final api = await _api();
+    if (!_syncWanted) return; // stopSync() gọi trong lúc chờ
+    enginesCreated++;
     syncEngine = SyncEngine(db, api.sync, clock: clock)..start(onlineChanges());
   }
+
+  Future<void>? _starting;
+
+  /// Số engine đã dựng (để test kiểm các lần startSync chồng nhau).
+  @visibleForTesting
+  int enginesCreated = 0;
+
+  /// Thay kho khóa thật (Keychain/Keystore) trong test.
+  @visibleForTesting
+  KeyValueStore? keyStoreOverride;
 
   Future<void> stopSync() {
     _syncWanted = false;
@@ -117,6 +133,7 @@ class TeacherController {
   }
 
   Future<void> _pauseSync() async {
+    await _starting; // chờ lượt startSync đang dựng engine
     final engine = syncEngine;
     syncEngine = null;
     await engine?.stop();
@@ -125,6 +142,8 @@ class TeacherController {
   Future<void> _resumeSync() => _syncWanted ? startSync() : Future.value();
 
   Future<int> pendingSyncCount() => localData.pendingSyncCount();
+  Future<int> failedSyncCount() => localData.failedSyncCount();
+  Future<void> discardFailedSync() => localData.discardFailed();
   Future<void> wipeLocalData() => localData.wipe();
   Future<void> retryPendingWipe() => localData.retryPendingWipe();
   Future<void> claimDatabaseFor(String userId) => localData.claimFor(userId);

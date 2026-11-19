@@ -107,6 +107,11 @@ class TeacherDatabase extends _$TeacherDatabase {
         await m.addColumn(outboxMutations, outboxMutations.batchDeviceTime);
         await m.createTable(cachedSessions);
         await m.createTable(cachedAttendances);
+        // Dòng của spike v2 (chưa phát hành) không có buổi/học viên nên không
+        // gửi được: bỏ.
+        await customStatement(
+          'DELETE FROM outbox_mutations WHERE session_id IS NULL',
+        );
       }
     },
   );
@@ -130,9 +135,30 @@ const _keyName = 'teacher.db_key';
 const teacherDatabaseName = 'teacher';
 const teacherDatabaseFile = '$teacherDatabaseName.sqlite';
 
-/// Số mutation còn trong outbox (kể cả bị từ chối) = số buổi chưa đồng bộ.
+/// Prefix của `lastError` cho mutation bị từ chối: không gửi lại nữa.
+const rejectedPrefix = 'rejected:';
+
+/// Prefix của `lastError` cho mutation thuộc lô lỗi cả lô: không gửi lại nữa.
+const batchFailedPrefix = 'batch:';
+
+/// Mutation đang chờ gửi: chưa bị từ chối và không thuộc lô lỗi.
+Expression<bool> outboxPending($OutboxMutationsTable r) =>
+    r.lastError.isNull() |
+    (r.lastError.like('$rejectedPrefix%').not() &
+        r.lastError.like('$batchFailedPrefix%').not());
+
+/// Số mutation đang chờ gửi (khớp chip "Chờ đồng bộ") = số buổi chưa đồng bộ.
 Future<int> pendingOutboxCount(TeacherDatabase db) =>
-    db.outboxMutations.count().getSingle();
+    db.outboxMutations.count(where: outboxPending).getSingle();
+
+/// Số mutation bị từ chối hoặc thuộc lô lỗi: giữ lại để người dùng xem, sẽ
+/// không bao giờ tự gửi lại.
+Future<int> failedOutboxCount(TeacherDatabase db) =>
+    db.outboxMutations.count(where: (r) => outboxPending(r).not()).getSingle();
+
+/// Bỏ các mutation bị từ chối/lô lỗi (người dùng đã xem). Trả số dòng đã bỏ.
+Future<int> discardFailedOutbox(TeacherDatabase db) =>
+    (db.delete(db.outboxMutations)..where((r) => outboxPending(r).not())).go();
 
 /// Xóa CSDL `teacher` (file + WAL/SHM/journal) và khóa của nó — dùng khi đăng
 /// xuất, sau khi outbox đã trống (spec §6.4). [dir] là thư mục drift_flutter

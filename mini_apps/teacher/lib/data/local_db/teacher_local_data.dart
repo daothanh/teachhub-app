@@ -52,6 +52,19 @@ class TeacherLocalData {
   /// Số buổi chưa đồng bộ. Chưa có file CSDL thì 0 và không tạo file.
   Future<int> pendingSyncCount() => _serial(_count);
 
+  /// Số mutation bị từ chối/lô lỗi: cảnh báo khi đăng xuất, cho phép bỏ.
+  Future<int> failedSyncCount() => _serial(() async {
+    final dir = await _dir();
+    if (!File('${dir.path}/$teacherDatabaseFile').existsSync()) return 0;
+    return failedOutboxCount(await _db());
+  });
+
+  Future<void> discardFailed() => _serial(() async {
+    final dir = await _dir();
+    if (!File('${dir.path}/$teacherDatabaseFile').existsSync()) return;
+    await discardFailedOutbox(await _db());
+  });
+
   Future<int> _count() async {
     final dir = await _dir();
     if (!File('${dir.path}/$teacherDatabaseFile').existsSync()) return 0;

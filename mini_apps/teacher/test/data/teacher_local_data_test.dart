@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart' show Database;
@@ -103,6 +104,30 @@ void main() {
     expect(dir.listSync(), isEmpty);
   });
 
+  test(
+    'failedSyncCount/discardFailed: đếm và bỏ dòng bị từ chối, giữ dòng chờ gửi',
+    () async {
+      await addMutation('m-1');
+      final d = db!;
+      await d
+          .into(d.outboxMutations)
+          .insert(
+            OutboxMutationsCompanion.insert(
+              clientMutationId: 'm-2',
+              entity: 'attendance',
+              payload: '{}',
+              clientUpdatedAt: DateTime.utc(2026, 11, 14),
+              lastError: const Value('rejected:NOT_FOUND'),
+            ),
+          );
+      expect(await data.pendingSyncCount(), 1);
+      expect(await data.failedSyncCount(), 1);
+      await data.discardFailed();
+      expect(await data.failedSyncCount(), 0);
+      expect(await data.pendingSyncCount(), 1);
+    },
+  );
+
   test('nhiều lần xóa chồng nhau chạy lần lượt, không lỗi', () async {
     await addMutation('m-1');
     await Future.wait([data.wipe(), data.wipe(), data.wipe()]);
@@ -125,7 +150,7 @@ void main() {
   });
 
   test(
-    'xóa dừng SyncEngine, chờ lượt đang chạy xong rồi mới đóng CSDL; sau đó bật lại',
+    'xóa dừng SyncEngine (bỏ chờ lượt gửi đang bay) trước khi đóng CSDL; sau đó bật lại',
     () async {
       final d = db ?? await open();
       await enqueueAttendance(
@@ -167,12 +192,13 @@ void main() {
       await pumpEventQueue();
       final wipe = wiping.wipe();
       await pumpEventQueue();
-      expect(log, ['send'], reason: 'chưa đóng CSDL khi sync còn chạy');
+      await wipe; // không bị transport chậm giữ lại
+      expect(log, ['send', 'close', 'reopen', 'resume']);
+      expect(await running, (sent: 0, rejected: 0, failed: 0, retryIn: null));
 
-      release.complete();
-      await running;
-      await wipe;
-      expect(log, ['send', 'sent', 'close', 'reopen', 'resume']);
+      release.complete(); // phản hồi muộn không được ghi vào CSDL đã xóa
+      await pumpEventQueue();
+      expect(log, ['send', 'close', 'reopen', 'resume', 'sent']);
     },
   );
 }

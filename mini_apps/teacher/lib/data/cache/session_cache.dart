@@ -8,8 +8,8 @@ import '../sync/clock_skew.dart';
 /// S3-FL-10). Màn hình đọc từ đây; [refreshSessions]/[refreshAttendance] làm
 /// mới từ API khi mở lại hoặc kéo xuống.
 ///
-/// Bản cục bộ chưa đồng bộ luôn thắng: dòng điểm danh còn trong outbox không bị
-/// ghi đè bởi dữ liệu tải về.
+/// Bản cục bộ mới hơn thắng: dòng điểm danh đang chờ gửi, hoặc có
+/// `clientUpdatedAt` không cũ hơn của server, không bị ghi đè bởi dữ liệu tải về.
 class SessionCache {
   SessionCache(
     this._db,
@@ -103,7 +103,7 @@ class SessionCache {
       final pending =
           (await (_db.selectOnly(o)
                     ..addColumns([o.studentId])
-                    ..where(o.sessionId.equals(sessionId)))
+                    ..where(o.sessionId.equals(sessionId) & outboxPending(o)))
                   .map((r) => r.read(o.studentId))
                   .get())
               .whereType<String>()
@@ -115,7 +115,30 @@ class SessionCache {
                 r.studentId.isNotIn(pending),
           ))
           .go();
-      for (final i in data.items.where((i) => !pending.contains(i.studentId))) {
+      final local = {
+        for (final r in await (_db.select(
+          a,
+        )..where((r) => r.sessionId.equals(sessionId))).get())
+          r.studentId: r,
+      };
+      for (final i in data.items) {
+        final mine = local[i.studentId]?.clientUpdatedAt;
+        // Bản cục bộ đang chờ gửi, hoặc không cũ hơn bản server: giữ, chỉ cập
+        // nhật tên.
+        final keep =
+            pending.contains(i.studentId) ||
+            (mine != null &&
+                (i.clientUpdatedAt == null ||
+                    !mine.isBefore(i.clientUpdatedAt!)));
+        if (keep && local.containsKey(i.studentId)) {
+          await (_db.update(a)..where(
+                (r) =>
+                    r.sessionId.equals(sessionId) &
+                    r.studentId.equals(i.studentId),
+              ))
+              .write(CachedAttendancesCompanion(fullName: Value(i.fullName)));
+          continue;
+        }
         await _db
             .into(a)
             .insertOnConflictUpdate(

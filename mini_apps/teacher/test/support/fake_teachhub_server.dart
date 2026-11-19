@@ -20,6 +20,9 @@ class FakeTeachHubServer implements HttpClientAdapter {
   /// Trả lỗi này cho cả lô của buổi tương ứng (status, code).
   final failSession = <String, (int, String)>{};
 
+  /// Như [failSession] nhưng chỉ một lần.
+  final failSessionOnce = <String, (int, String)>{};
+
   /// Trả lỗi 5xx cho request kế tiếp, từng lần một.
   int serverErrors = 0;
 
@@ -40,7 +43,7 @@ class FakeTeachHubServer implements HttpClientAdapter {
   final appliedCount = <String, int>{};
 
   final _byKey = <String, ({String body, Map<String, Object?> response})>{};
-  final _seen = <String, Map<String, Object?>>{};
+  final _seen = <(String, String), Map<String, Object?>>{};
   final _current = <(String, String), Map<String, Object?>>{};
 
   /// Server có sẵn bản điểm danh này (để tạo xung đột).
@@ -100,11 +103,37 @@ class FakeTeachHubServer implements HttpClientAdapter {
     return _error(404, 'NOT_FOUND');
   }
 
+  static final _uuid = RegExp(
+    r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+    caseSensitive: false,
+  );
+
+  /// Kiểm thân request theo hợp đồng: UUID, 1..500 mutation, note ≤ 500.
+  bool _valid(Map<String, Object?> b) {
+    bool uuid(Object? v) => v is String && _uuid.hasMatch(v);
+    final ms = b['mutations'];
+    return uuid(b['deviceId']) &&
+        uuid(b['sessionId']) &&
+        b['deviceTime'] is String &&
+        ms is List &&
+        ms.isNotEmpty &&
+        ms.length <= 500 &&
+        ms.every(
+          (m) =>
+              m is Map &&
+              uuid(m['clientMutationId']) &&
+              uuid(m['studentId']) &&
+              ((m['note'] as String?)?.length ?? 0) <= 500,
+        );
+  }
+
   ResponseBody _sync(RequestOptions options) {
     final key = options.headers['Idempotency-Key'] as String?;
-    if (key == null) return _error(422, 'VALIDATION_FAILED');
     final raw = jsonEncode(options.data);
     final body = (jsonDecode(raw) as Map).cast<String, Object?>();
+    if (key == null || !_uuid.hasMatch(key) || !_valid(body)) {
+      return _error(422, 'VALIDATION_FAILED');
+    }
     syncRequests.add((key: key, body: body));
 
     if (serverErrors > 0) {
@@ -117,6 +146,9 @@ class FakeTeachHubServer implements HttpClientAdapter {
       return _json(200, stored.response);
     }
     final sessionId = body['sessionId'] as String;
+    if (failSessionOnce.remove(sessionId) case (final status, final code)) {
+      return _error(status, code);
+    }
     if (failSession[sessionId] case (final status, final code)) {
       return _error(status, code);
     }
@@ -137,7 +169,7 @@ class FakeTeachHubServer implements HttpClientAdapter {
           };
       if (rejectIds[id] case final code?) {
         results.add(r('rejected', code: code));
-      } else if (_seen[id] case final cur?) {
+      } else if (_seen[(sessionId, id)] case final cur?) {
         results.add(r('duplicate', current: cur));
       } else if (_current[(sessionId, student)] case final cur?
           when !at.isAfter(DateTime.parse(cur['clientUpdatedAt'] as String))) {
@@ -151,7 +183,7 @@ class FakeTeachHubServer implements HttpClientAdapter {
           note: m['note'] as String?,
           clientUpdatedAt: at,
         );
-        _seen[id] = _current[(sessionId, student)]!;
+        _seen[(sessionId, id)] = _current[(sessionId, student)]!;
         results.add(r('applied'));
       }
     }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:drift/drift.dart';
 
@@ -21,6 +22,33 @@ Future<String> enqueueAttendance(
 }) {
   final id = clientMutationId ?? newUuid();
   return db.transaction(() async {
+    // Drift lưu DateTime theo giây và server coi bằng nhau là stale, nên mỗi lần
+    // sửa của một học viên phải mới hơn bản đã biết (cache hoặc outbox) ≥ 1 giây.
+    final known = <int>[
+      ?(await (db.select(db.cachedAttendances)..where(
+                (r) =>
+                    r.sessionId.equals(sessionId) &
+                    r.studentId.equals(studentId),
+              ))
+              .getSingleOrNull())
+          ?.clientUpdatedAt
+          ?.millisecondsSinceEpoch,
+      for (final m
+          in await (db.select(db.outboxMutations)..where(
+                (r) =>
+                    r.sessionId.equals(sessionId) &
+                    r.studentId.equals(studentId),
+              ))
+              .get())
+        m.clientUpdatedAt.millisecondsSinceEpoch,
+    ];
+    var secs = clientUpdatedAt.millisecondsSinceEpoch ~/ 1000;
+    final latest = known.isEmpty ? null : known.reduce(max) ~/ 1000;
+    if (latest != null && secs <= latest) secs = latest + 1;
+    clientUpdatedAt = DateTime.fromMillisecondsSinceEpoch(
+      secs * 1000,
+      isUtc: true,
+    );
     await (db.update(db.cachedAttendances)..where(
           (r) => r.sessionId.equals(sessionId) & r.studentId.equals(studentId),
         ))

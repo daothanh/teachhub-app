@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:math';
+import 'dart:developer';
+import 'dart:math' hide log;
 
 import 'package:drift/drift.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
@@ -87,20 +88,9 @@ class SyncEvent {
   final String? errorCode;
 }
 
-/// Prefix của `lastError` cho mutation bị từ chối: không gửi lại nữa.
-const rejectedPrefix = 'rejected:';
-
-/// Prefix của `lastError` cho mutation thuộc lô lỗi cả lô: không gửi lại nữa.
-const batchFailedPrefix = 'batch:';
-
-/// Mutation còn cần gửi: chưa bị từ chối/lỗi lô, và đủ buổi + học viên (dòng
-/// cũ của bản spike v2 không có nên bỏ qua).
-Expression<bool> _pending($OutboxMutationsTable r) =>
-    r.sessionId.isNotNull() &
-    r.studentId.isNotNull() &
-    (r.lastError.isNull() |
-        (r.lastError.like('$rejectedPrefix%').not() &
-            r.lastError.like('$batchFailedPrefix%').not()));
+/// Mutation engine có thể gửi: đang chờ và đủ buổi + học viên.
+Expression<bool> _sendable($OutboxMutationsTable r) =>
+    outboxPending(r) & r.sessionId.isNotNull() & r.studentId.isNotNull();
 
 /// Đẩy `outbox_mutations` lên server, mỗi lô một buổi, đúng thứ tự tạo
 /// (spec §6.4).
@@ -118,6 +108,7 @@ class SyncEngine {
     Random? random,
     DateTime Function()? now,
     String Function()? newKey,
+    this.sendTimeout = const Duration(seconds: 30),
   }) : assert(batchSize >= 1 && batchSize <= 500),
        clock = clock ?? ClockSkew(now: now),
        _random = random ?? Random(),
@@ -127,6 +118,9 @@ class SyncEngine {
   final TeacherDatabase _db;
   final SyncTransport _send;
   final int batchSize;
+
+  /// Quá hạn thì coi như mất mạng (thử lại cùng khóa).
+  final Duration sendTimeout;
 
   /// Lệch đồng hồ đo từ `serverTime`; UI dùng `clock.now()` để gắn `clientUpdatedAt`.
   final ClockSkew clock;
@@ -142,13 +136,15 @@ class SyncEngine {
   StreamSubscription<bool>? _online;
   Timer? _retry;
   bool _paused = false;
+  Completer<void> _abort = Completer();
+  int _crashes = 0;
 
   /// Banner "stale"/"rejected"/"lô lỗi".
   Stream<SyncEvent> get events => _events.stream;
 
   /// Số mutation đang chờ gửi (chip "Chờ đồng bộ"); không tính dòng bị từ chối.
   Stream<int> watchPending() =>
-      _db.outboxMutations.count(where: _pending).watchSingle();
+      _db.outboxMutations.count(where: outboxPending).watchSingle();
 
   /// Giãn thử lại 1s, 2s, 4s… tối đa [maxBackoff] theo số lần thất bại, rồi
   /// giảm ngẫu nhiên tới một nửa để nhiều máy không dồn vào cùng lúc.
@@ -167,6 +163,7 @@ class SyncEngine {
   /// Đẩy ngay khi có mạng trở lại và tự thử lại theo [backoff].
   void start(Stream<bool> online) {
     _paused = false;
+    if (_abort.isCompleted) _abort = Completer();
     _online ??= online.where((up) => up).listen((_) => _drainAndSchedule());
     _drainAndSchedule();
   }
@@ -174,16 +171,30 @@ class SyncEngine {
   /// Dừng hẳn và chờ lượt đang chạy xong: gọi trước khi đóng/xóa CSDL.
   Future<void> stop() async {
     _paused = true;
+    if (!_abort.isCompleted) _abort.complete(); // bỏ chờ lượt gửi đang bay
     _retry?.cancel();
     await _online?.cancel();
     _online = null;
     await _running;
   }
 
+  /// Dừng hẳn và đóng các stream; engine không dùng lại được.
+  Future<void> dispose() async {
+    await stop();
+    await _events.close();
+  }
+
   Future<void> _drainAndSchedule() async {
     _retry?.cancel();
-    final report = await drain();
-    final wait = report.retryIn;
+    Duration? wait;
+    try {
+      wait = (await drain()).retryIn;
+      _crashes = 0;
+    } catch (e) {
+      // Lỗi ngoài dự kiến (vd. CSDL): chỉ ghi loại lỗi, không ghi nội dung.
+      log('SyncEngine lỗi nội bộ: ${e.runtimeType}', name: 'teacher');
+      wait = backoff(++_crashes);
+    }
     if (wait != null && _online != null && !_paused) {
       _retry = Timer(wait, _drainAndSchedule);
     }
@@ -195,26 +206,46 @@ class SyncEngine {
     SyncReport report(Duration? retryIn) =>
         (sent: sent, rejected: rejected, failed: failed, retryIn: retryIn);
 
+    // Buổi bỏ qua trong lượt này (lỗi không tự hết) để không chặn buổi khác.
+    final skip = <String>{};
+    // Buổi đã reset khóa vì 422 IDEMPOTENCY_KEY_REUSED (chỉ một lần).
+    final keyReset = <String>{};
+
     while (!_paused) {
-      final batch = await _nextBatch();
+      final batch = await _nextBatch(skip);
       if (batch == null) return report(null);
       final sessionId = batch.first.sessionId!;
 
       final sentAt = _now();
-      final SyncResponse response;
+      final SyncResponse? response;
       try {
-        response = await _send(
-          SyncRequest(
-            sessionId: sessionId,
-            idempotencyKey: batch.first.batchKey!,
-            deviceTime: batch.first.batchDeviceTime!,
-            mutations: batch,
+        response = await Future.any<SyncResponse?>([
+          _send(
+            SyncRequest(
+              sessionId: sessionId,
+              idempotencyKey: batch.first.batchKey!,
+              deviceTime: batch.first.batchDeviceTime!,
+              mutations: batch,
+            ),
+          ).timeout(
+            sendTimeout,
+            onTimeout: () => throw const ApiException.network(),
           ),
-        );
+          _abort.future.then((_) => null),
+        ]);
       } on ApiException catch (e) {
         final code = e.wireCode ?? e.kind.name;
-        // Buổi không có (404) hoặc đã hủy (409): thử lại vẫn y vậy.
-        if (e.status == 404 || (e.status == 409 && !e.retryable)) {
+        if (e.code == ApiErrorCode.idempotencyKeyReused &&
+            keyReset.add(sessionId)) {
+          // Thân lô khác bản đã gửi với khóa này: gom lại với khóa mới.
+          await _resetBatch(batch);
+          continue;
+        }
+        // Thử lại vẫn y vậy: buổi không có (404), đã hủy (409), dữ liệu sai
+        // (422), hoặc khóa vẫn bị dùng lại sau khi đã reset.
+        if (e.status == 404 ||
+            (e.status == 409 && !e.retryable) ||
+            e.status == 422) {
           await _setError(batch, '$batchFailedPrefix$code');
           failed += batch.length;
           _events.add(
@@ -227,16 +258,22 @@ class SyncEngine {
           continue;
         }
         final attempts = await _markFailed(batch, code);
-        // Lỗi không tự hết (403…): dừng, chờ lần kích hoạt sau.
-        return report(e.retryable ? (e.retryAfter ?? backoff(attempts)) : null);
+        if (e.retryable) {
+          return report(e.retryAfter ?? backoff(attempts));
+        }
+        // Lỗi không tự hết (403…): bỏ qua buổi này, chờ lần kích hoạt sau.
+        skip.add(sessionId);
+        continue;
       }
+      if (response == null) return report(null); // bị stop() giữa chừng
+      final results = response.results;
       clock.observe(response.serverTime, sentAt: sentAt, receivedAt: _now());
 
       final missing = <OutboxMutation>[];
       final events = <SyncEvent>[];
       await _db.transaction(() async {
         for (final row in batch) {
-          final r = response.results[row.clientMutationId];
+          final r = results[row.clientMutationId];
           switch (r?.result) {
             case null:
               missing.add(row);
@@ -291,14 +328,25 @@ class SyncEngine {
     return report(null);
   }
 
+  /// Gỡ khóa và giờ máy của lô để lần sau gom lại với khóa mới.
+  Future<void> _resetBatch(List<OutboxMutation> rows) =>
+      (_db.update(
+        _db.outboxMutations,
+      )..where((x) => x.id.isIn(rows.map((m) => m.id)))).write(
+        const OutboxMutationsCompanion(
+          batchKey: Value(null),
+          batchDeviceTime: Value(null),
+        ),
+      );
+
   /// Lô kế tiếp: buổi của mutation chờ gửi cũ nhất. Lô đã gom từ trước (còn
   /// `batchKey`) được gửi lại nguyên vẹn; chưa có thì gom tối đa [batchSize]
   /// dòng và lưu khóa + giờ máy vào chính các dòng đó.
-  Future<List<OutboxMutation>?> _nextBatch() async {
+  Future<List<OutboxMutation>?> _nextBatch(Set<String> skip) async {
     final t = _db.outboxMutations;
     final first =
         await (_db.select(t)
-              ..where(_pending)
+              ..where((r) => _sendable(r) & r.sessionId.isNotIn(skip))
               ..orderBy([(r) => OrderingTerm(expression: r.id)])
               ..limit(1))
             .getSingleOrNull();
@@ -312,7 +360,7 @@ class SyncEngine {
         (_db.select(t)
               ..where(
                 (r) =>
-                    _pending(r) &
+                    _sendable(r) &
                     r.sessionId.equals(first.sessionId!) &
                     extra(r),
               )
@@ -348,6 +396,7 @@ class SyncEngine {
         await (_db.select(o)
               ..where(
                 (r) =>
+                    outboxPending(r) &
                     r.sessionId.equals(row.sessionId!) &
                     r.studentId.equals(row.studentId!),
               )

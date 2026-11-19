@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:sqlite3/sqlite3.dart' show Database;
 import 'package:flutter_test/flutter_test.dart';
@@ -89,4 +90,35 @@ void main() {
     }
     expect(await pendingOutboxCount(db), 2);
   });
+
+  test(
+    'pendingOutboxCount khớp chip; rejected/lô lỗi tính riêng và bỏ được',
+    () async {
+      final db = open(File('${dir.path}/d.sqlite'), key);
+      addTearDown(db.close);
+      for (final (id, err) in [
+        ('m-1', null),
+        ('m-2', 'network'),
+        ('m-3', 'rejected:ATTENDANCE_EDIT_WINDOW_CLOSED'),
+        ('m-4', 'batch:SESSION_CANCELLED'),
+      ]) {
+        await db
+            .into(db.outboxMutations)
+            .insert(
+              OutboxMutationsCompanion.insert(
+                clientMutationId: id,
+                entity: 'attendance',
+                payload: '{}',
+                clientUpdatedAt: DateTime.utc(2026, 11, 14),
+                lastError: Value(err),
+              ),
+            );
+      }
+      expect(await pendingOutboxCount(db), 2);
+      expect(await failedOutboxCount(db), 2);
+      expect(await discardFailedOutbox(db), 2);
+      expect(await failedOutboxCount(db), 0);
+      expect(await pendingOutboxCount(db), 2);
+    },
+  );
 }

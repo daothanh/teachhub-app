@@ -146,6 +146,7 @@ class TeacherApi {
     } on FormatException {
       throw _badResponse();
     } on TypeError {
+      // Ép kiểu trong lúc đọc JSON sai hợp đồng (thiếu trường, sai kiểu).
       throw _badResponse();
     }
   }

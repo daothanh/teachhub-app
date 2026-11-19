@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:drift/drift.dart' hide isNotNull;
+import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart' show Database;
@@ -27,6 +27,7 @@ class _FixedRandom implements Random {
 
 const s1 = '00000000-0000-4000-8000-000000000001';
 const s2 = '00000000-0000-4000-8000-000000000002';
+const devId = '40000000-0000-4000-8000-000000000001';
 
 String stu(int i) => '10000000-0000-4000-8000-${i.toString().padLeft(12, '0')}';
 String mid(int i) => '20000000-0000-4000-8000-${i.toString().padLeft(12, '0')}';
@@ -45,10 +46,11 @@ void main() {
     Random? random,
   }) => SyncEngine(
     d,
-    TeacherApi(server.dio(), deviceId: 'dev-1').sync,
+    TeacherApi(server.dio(), deviceId: devId).sync,
     batchSize: batchSize,
     random: random ?? _FixedRandom(1),
-    newKey: () => 'key-${++keyCounter}',
+    newKey: () =>
+        '30000000-0000-4000-8000-${(++keyCounter).toString().padLeft(12, '0')}',
   );
 
   setUp(() {
@@ -107,7 +109,7 @@ void main() {
         [mid(4)],
       ],
     );
-    expect(server.syncRequests.first.body['deviceId'], 'dev-1');
+    expect(server.syncRequests.first.body['deviceId'], devId);
     expect(await outbox(), isEmpty);
   });
 
@@ -399,7 +401,7 @@ void main() {
     var device = DateTime.utc(2026, 11, 18, 9, 50);
     final e = SyncEngine(
       db,
-      TeacherApi(server.dio(), deviceId: 'd').sync,
+      TeacherApi(server.dio(), deviceId: devId).sync,
       now: () => device,
     );
     await save(1);
@@ -424,7 +426,7 @@ void main() {
     expect(seen.last, 0);
   });
 
-  test('dòng cũ của bản spike (không có buổi) bị bỏ qua', () async {
+  test('dòng thiếu buổi/học viên không bao giờ được gửi', () async {
     await db
         .into(db.outboxMutations)
         .insert(
@@ -437,6 +439,161 @@ void main() {
         );
     expect((await engine.drain()).sent, 0);
     expect(server.syncRequests, isEmpty);
+  });
+
+  group('lỗi một buổi không chặn buổi khác', () {
+    for (final (status, code) in [
+      (422, 'VALIDATION_FAILED'),
+      (403, 'FORBIDDEN'),
+    ]) {
+      test('$status $code ở buổi A: buổi B vẫn gửi trong cùng lượt', () async {
+        server.failSession[s1] = (status, code);
+        await save(1);
+        await save(2, session: s2);
+        final report = await engine.drain();
+        expect(report.sent, 1);
+        expect(report.retryIn, isNull);
+        expect(server.appliedCount, {mid(2): 1});
+        final left = await outbox();
+        expect(left.single.clientMutationId, mid(1));
+        // 422 là lỗi lô (không gửi lại); 403 giữ chờ gửi.
+        expect(left.single.lastError, status == 422 ? 'batch:$code' : code);
+      });
+    }
+
+    test(
+      '422 IDEMPOTENCY_KEY_REUSED: gom lại với khóa mới đúng một lần',
+      () async {
+        server.failSessionOnce[s1] = (422, 'IDEMPOTENCY_KEY_REUSED');
+        await save(1);
+        final report = await engine.drain();
+        expect(report.sent, 1);
+        // Lần đầu bị từ chối, lần hai gom lại với khóa mới.
+        expect(server.syncRequests.map((r) => r.key).toSet(), hasLength(2));
+        expect(await outbox(), isEmpty);
+      },
+    );
+
+    test('422 IDEMPOTENCY_KEY_REUSED lặp lại: đánh dấu lô lỗi', () async {
+      server.failSession[s1] = (422, 'IDEMPOTENCY_KEY_REUSED');
+      await save(1);
+      final report = await engine.drain();
+      expect(report.failed, 1);
+      expect((await outbox()).single.lastError, 'batch:IDEMPOTENCY_KEY_REUSED');
+    });
+  });
+
+  test('enqueue lúc lô đang bay: dòng mới đi lô sau với khóa khác', () async {
+    final gate = Completer<void>();
+    final api = TeacherApi(server.dio(), deviceId: devId);
+    final e = SyncEngine(
+      db,
+      (req) async {
+        await gate.future;
+        return api.sync(req);
+      },
+      newKey: () =>
+          '30000000-0000-4000-8000-${(++keyCounter).toString().padLeft(12, '0')}',
+    );
+    await save(1);
+    final running = e.drain();
+    await pumpEventQueue();
+    await save(2);
+    gate.complete();
+    final report = await running;
+    expect(report.sent, 2);
+    expect(server.syncRequests.map((r) => r.key).toSet(), hasLength(2));
+    expect(await outbox(), isEmpty);
+  });
+
+  test('stop() khi transport chậm không phải chờ transport', () async {
+    final never = Completer<SyncResponse>();
+    final e = SyncEngine(db, (_) => never.future);
+    await save(1);
+    e.start(const Stream.empty());
+    await pumpEventQueue();
+    await e.stop().timeout(const Duration(seconds: 2));
+    expect((await outbox()).single.batchKey, isNotNull);
+  });
+
+  test('transport quá hạn được coi như mất mạng', () async {
+    final e = SyncEngine(
+      db,
+      (_) => Completer<SyncResponse>().future,
+      sendTimeout: const Duration(milliseconds: 20),
+      random: _FixedRandom(1),
+    );
+    await save(1);
+    final report = await e.drain();
+    expect(report.retryIn, const Duration(seconds: 1));
+    expect((await outbox()).single.lastError, 'network');
+  });
+
+  test(
+    'lỗi ngoài dự kiến trong lượt tự động: không văng, thử lại sau',
+    () async {
+      var calls = 0;
+      final api = TeacherApi(server.dio(), deviceId: devId);
+      final e = SyncEngine(db, (req) {
+        if (++calls == 1) throw StateError('db');
+        return api.sync(req);
+      }, random: _FixedRandom(0));
+      await save(1);
+      e.start(Stream.value(false));
+      await pumpEventQueue();
+      expect(calls, 1);
+      await Future<void>.delayed(
+        const Duration(milliseconds: 700),
+      ); // backoff(1) ≥ 0,5s
+      expect(server.appliedCount, {mid(1): 1});
+      await e.dispose();
+    },
+  );
+
+  group('enqueueAttendance', () {
+    test(
+      'hai lần sửa trong cùng một giây: lần hai mới hơn, không bị stale',
+      () async {
+        await seedRoster(1);
+        await save(1, status: 'present', sec: 10);
+        await enqueueAttendance(
+          db,
+          sessionId: s1,
+          studentId: stu(1),
+          status: 'excused',
+          clientUpdatedAt: at(10),
+        );
+        final times = (await outbox())
+            .map((r) => r.clientUpdatedAt.toUtc())
+            .toList();
+        expect(times.first, at(10));
+        expect(times.last.isAfter(times.first), isTrue);
+        await engine.drain();
+        final row = await db.select(db.cachedAttendances).getSingle();
+        expect(row.status, 'excused');
+      },
+    );
+  });
+
+  test('stale: dòng đã bị từ chối không chặn ghi đè bản server', () async {
+    await seedRoster(1);
+    server.rejectIds[mid(98)] = 'ATTENDANCE_EDIT_WINDOW_CLOSED';
+    await enqueueAttendance(
+      db,
+      sessionId: s1,
+      studentId: stu(1),
+      status: 'late',
+      clientUpdatedAt: at(5),
+      clientMutationId: mid(98),
+    );
+    await engine.drain(); // mid(98) rejected, giữ lại
+    server.seedCurrent(s1, stu(1), status: 'excused', clientUpdatedAt: at(40));
+    await save(1, status: 'present', sec: 20);
+    await engine.drain();
+    expect(
+      (await db.select(db.cachedAttendances).getSingle()).status,
+      'excused',
+    );
   });
 
   test('gọi drain chồng nhau dùng chung một lượt', () async {

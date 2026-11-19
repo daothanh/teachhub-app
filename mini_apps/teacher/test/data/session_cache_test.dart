@@ -1,4 +1,5 @@
 import 'package:drift/native.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:teacher/data/cache/session_cache.dart';
 import 'package:teacher/data/local_db/teacher_database.dart';
@@ -170,5 +171,67 @@ void main() {
     server.sessions = [];
     await cache.refreshSessions('2026-11-18', '2026-11-18');
     expect(await db.select(db.cachedAttendances).get(), isEmpty);
+  });
+
+  test(
+    'làm mới giữ bản cục bộ không cũ hơn server; bản mới hơn của server thì lấy',
+    () async {
+      server.sessions = [session(s1, '2026-11-18')];
+      await cache.refreshSessions('2026-11-18', '2026-11-18');
+      server.attendance[s1] = roster(s1, [item(a, 'An'), item(b, 'Bình')]);
+      await cache.refreshAttendance(s1);
+      // Đã đồng bộ xong (outbox trống), cục bộ 'excused' lúc 09:00 và 'late' lúc 08:00.
+      await (db.update(
+        db.cachedAttendances,
+      )..where((r) => r.studentId.equals(a))).write(
+        CachedAttendancesCompanion(
+          status: const Value('excused'),
+          clientUpdatedAt: Value(DateTime.utc(2026, 11, 18, 9)),
+        ),
+      );
+      await (db.update(
+        db.cachedAttendances,
+      )..where((r) => r.studentId.equals(b))).write(
+        CachedAttendancesCompanion(
+          status: const Value('late'),
+          clientUpdatedAt: Value(DateTime.utc(2026, 11, 18, 8)),
+        ),
+      );
+      // Server: An chưa có bản nào (null), Bình có bản 09:00 mới hơn.
+      server.attendance[s1] = roster(s1, [
+        item(a, 'An A.', status: null),
+        item(b, 'Bình', status: 'present'),
+      ]);
+      await cache.refreshAttendance(s1);
+      final rows = {
+        for (final r in await db.select(db.cachedAttendances).get())
+          r.studentId: r,
+      };
+      expect((rows[a]!.status, rows[a]!.fullName), ('excused', 'An A.'));
+      expect(rows[b]!.status, 'present');
+    },
+  );
+
+  test('dòng bị từ chối không còn bảo vệ: server mới hơn ghi đè', () async {
+    server.sessions = [session(s1, '2026-11-18')];
+    await cache.refreshSessions('2026-11-18', '2026-11-18');
+    server.attendance[s1] = roster(s1, [item(a, 'An')]);
+    await cache.refreshAttendance(s1);
+    await enqueueAttendance(
+      db,
+      sessionId: s1,
+      studentId: a,
+      status: 'excused',
+      clientUpdatedAt: DateTime.utc(2026, 11, 18, 8),
+    );
+    await (db.update(db.outboxMutations)).write(
+      const OutboxMutationsCompanion(lastError: Value('rejected:NOT_FOUND')),
+    );
+    server.attendance[s1] = roster(s1, [item(a, 'An', status: 'present')]);
+    await cache.refreshAttendance(s1);
+    expect(
+      (await db.select(db.cachedAttendances).getSingle()).status,
+      'present',
+    );
   });
 }
