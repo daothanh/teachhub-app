@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart' show StringCharacters;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:teacher/features/attendance/cubit/attendance_cubit.dart';
 import 'package:teacher/features/attendance/data/attendance_models.dart';
@@ -301,5 +302,73 @@ void main() {
     gate.complete();
     await saving; // không ném StateError "Cannot emit new states after calling close"
     expect(cubit.isClosed, isTrue);
+  });
+
+  group('vòng sửa', () {
+    test(
+      'lỗi không phải ApiException khi làm mới → màn lỗi có Thử lại',
+      () async {
+        final repo = FakeAttendanceRepository()
+          ..refreshError = StateError('db');
+        final cubit = await open(repo);
+        addTearDown(cubit.close);
+        expect(cubit.state.load, AttendanceLoad.failure);
+        repo.refreshError = null;
+        repo.setSheet(sheetOf(roster(1)));
+        await cubit.refresh();
+        await Future<void>.delayed(Duration.zero);
+        expect(cubit.state.load, AttendanceLoad.ready);
+      },
+    );
+
+    test(
+      'stream lỗi (CSDL đóng): không uncaught, phát trạng thái lỗi',
+      () async {
+        final repo = FakeAttendanceRepository()
+          ..streamError = StateError('closed');
+        final cubit = AttendanceCubit(repo, sessionId, analytics: _Analytics());
+        addTearDown(cubit.close);
+        final states = <AttendanceState>[];
+        final sub = cubit.stream.listen(states.add);
+        addTearDown(sub.cancel);
+        await cubit.load();
+        await Future<void>.delayed(Duration.zero);
+        expect(states.any((s) => s.error != null), isTrue);
+      },
+    );
+
+    test('discardFailed lỗi: bắt lại, báo error', () async {
+      final repo = FakeAttendanceRepository(sheet: sheetOf(roster(1)))
+        ..discardError = StateError('db');
+      final cubit = await open(repo);
+      addTearDown(cubit.close);
+      await cubit.discardFailed();
+      expect(cubit.state.error, isNotNull);
+    });
+
+    test('hết hạn đúng lúc: timer tính lại readOnly theo giờ server', () async {
+      final repo = FakeAttendanceRepository(
+        sheet: sheetOf(
+          roster(1),
+          editableUntil: DateTime.utc(2026, 11, 18, 10, 0, 0, 50),
+        ),
+      )..advanceOnRead = const Duration(milliseconds: 100);
+      final cubit = await open(repo);
+      addTearDown(cubit.close);
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      expect(cubit.state.readOnly, ReadOnlyReason.windowClosed);
+      expect(cubit.state.canSave, isFalse);
+    });
+
+    test('ghi chú cắt theo ký tự, không xé đôi emoji', () async {
+      final repo = FakeAttendanceRepository(sheet: sheetOf(roster(1)));
+      final cubit = await open(repo);
+      addTearDown(cubit.close);
+      cubit.setNote('st-1', '👨‍👩‍👧' * 600);
+      expect(
+        cubit.state.drafts['st-1']!.note!.characters.length,
+        attendanceNoteMax,
+      );
+    });
   });
 }

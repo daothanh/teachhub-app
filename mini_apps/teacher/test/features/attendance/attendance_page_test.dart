@@ -155,7 +155,9 @@ void main() {
 
       expect(find.textContaining('đã hủy nên chưa gửi được'), findsOneWidget);
       expect(
-        find.textContaining('7 ngày), thay đổi không được nhận'),
+        find.textContaining(
+          'quá hạn sửa 7 ngày nên thay đổi này không được nhận',
+        ),
         findsOneWidget,
       );
 
@@ -222,5 +224,20 @@ void main() {
     await tester.tap(find.byTooltip('Nhật ký sửa'));
     await tester.pumpAndSettle();
     expect(find.text('history-page'), findsOneWidget);
+  });
+
+  testWidgets('ghi chú đồng bộ lại khi dữ liệu đổi và ô không đang focus', (
+    tester,
+  ) async {
+    final repo = FakeAttendanceRepository(
+      sheet: sheetOf([student(1, note: 'cũ')]),
+    );
+    await open(tester, repo);
+    expect(find.text('cũ'), findsOneWidget);
+
+    repo.setSheet(sheetOf([student(1, note: 'mới')]));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('mới'), findsOneWidget);
+    expect(find.text('cũ'), findsNothing);
   });
 }

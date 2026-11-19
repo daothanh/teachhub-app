@@ -63,27 +63,37 @@ class TodayCubit extends Cubit<TodayState> {
   /// shortcut: "hôm nay" theo ngày của máy, chưa theo múi giờ tenant (app chưa
   /// biết múi giờ tenant); đủ cho tenant cùng múi giờ với giáo viên.
   Future<void> start() async {
-    unawaited(_repo.startSync().catchError((Object _) {}));
+    if (isClosed) return;
+    // Bật engine trước để watchPending thấy engine đang chạy.
+    try {
+      await _repo.startSync();
+    } catch (_) {}
+    if (isClosed) return;
     _pending = _repo.watchPending().listen((n) {
       if (!isClosed) emit(_copy(pending: n));
-    });
+    }, onError: _onStreamError);
     _watchToday();
     unawaited(_loadOnboarding());
     await refresh();
   }
 
+  void _onStreamError(Object _) {
+    if (!isClosed) emit(_copy(error: const ApiException.unexpected()));
+  }
+
   void _watchToday() {
+    if (isClosed) return;
     final date = isoDate(_now());
     if (date == _date) return;
     _date = date;
     _sessions?.cancel();
     _sessions = _repo.watchSessions(date).listen((list) {
       if (!isClosed) emit(_copy(loaded: true, sessions: list));
-    });
+    }, onError: _onStreamError);
   }
 
   Future<void> refresh() async {
-    if (_refreshing) return;
+    if (isClosed || _refreshing) return;
     _refreshing = true;
     _watchToday(); // qua nửa đêm thì đổi sang ngày mới
     try {
@@ -96,6 +106,10 @@ class TodayCubit extends Cubit<TodayState> {
       emit(
         _copy(offline: network, error: network ? null : e, clearError: network),
       );
+    } catch (_) {
+      // Lỗi ngoài dự kiến (vd. CSDL đóng): báo lỗi chung, kéo xuống để thử lại.
+      if (isClosed) return;
+      emit(_copy(error: const ApiException.unexpected()));
     } finally {
       _refreshing = false;
     }

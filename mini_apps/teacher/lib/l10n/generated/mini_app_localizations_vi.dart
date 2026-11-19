@@ -599,15 +599,15 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get attendanceRejectedWindow =>
-      'Đã quá hạn sửa (7 ngày), thay đổi không được nhận.';
+      'Đã quá hạn sửa 7 ngày nên thay đổi này không được nhận.';
 
   @override
   String get attendanceRejectedPlan =>
-      'Gói hiện tại chỉ cho xem, thay đổi không được nhận.';
+      'Gói hiện tại chỉ cho xem nên thay đổi này không được nhận.';
 
   @override
   String get attendanceRejectedNotFound =>
-      'Học viên không còn trong buổi này, thay đổi không được nhận.';
+      'Học viên không còn trong buổi này nên thay đổi không được nhận.';
 
   @override
   String get attendanceRejectedGeneric => 'Thay đổi này không được nhận.';

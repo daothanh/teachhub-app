@@ -1118,19 +1118,19 @@ abstract class MiniAppLocalizations {
   /// No description provided for @attendanceRejectedWindow.
   ///
   /// In vi, this message translates to:
-  /// **'Đã quá hạn sửa (7 ngày), thay đổi không được nhận.'**
+  /// **'Đã quá hạn sửa 7 ngày nên thay đổi này không được nhận.'**
   String get attendanceRejectedWindow;
 
   /// No description provided for @attendanceRejectedPlan.
   ///
   /// In vi, this message translates to:
-  /// **'Gói hiện tại chỉ cho xem, thay đổi không được nhận.'**
+  /// **'Gói hiện tại chỉ cho xem nên thay đổi này không được nhận.'**
   String get attendanceRejectedPlan;
 
   /// No description provided for @attendanceRejectedNotFound.
   ///
   /// In vi, this message translates to:
-  /// **'Học viên không còn trong buổi này, thay đổi không được nhận.'**
+  /// **'Học viên không còn trong buổi này nên thay đổi không được nhận.'**
   String get attendanceRejectedNotFound;
 
   /// No description provided for @attendanceRejectedGeneric.

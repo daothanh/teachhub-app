@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/widgets.dart' show StringCharacters;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
@@ -108,12 +109,38 @@ class AttendanceCubit extends Cubit<AttendanceState> {
   Future<void> load() async {
     unawaited(_sub?.cancel()); // không chờ: sự kiện dừng ngay khi hủy
     emit(const AttendanceState());
-    _sub = _repo.watchSheet(sessionId).listen(_onSheet);
+    _sub = _repo.watchSheet(sessionId).listen(_onSheet, onError: _onError);
     await refresh();
+  }
+
+  void _onError(Object e) {
+    if (isClosed) return;
+    final hasRoster = state.sheet?.students.isNotEmpty ?? false;
+    emit(
+      _copy(
+        load: hasRoster ? AttendanceLoad.ready : AttendanceLoad.failure,
+        error: e is ApiException ? e : const ApiException.unexpected(),
+      ),
+    );
+  }
+
+  Timer? _expiry;
+
+  /// Hạn sửa trôi qua lúc đang mở: tính lại chỉ-xem đúng lúc hết hạn.
+  void _scheduleExpiry(SessionSheet sheet) {
+    _expiry?.cancel();
+    final until = sheet.editableUntil;
+    if (until == null || _readOnly(sheet) != null) return;
+    _expiry = Timer(until.difference(_repo.serverNow()), () {
+      final s = state.sheet;
+      if (isClosed || s == null) return;
+      emit(_copy(readOnly: _readOnly(s), setReadOnly: true));
+    });
   }
 
   void _onSheet(SessionSheet? sheet) {
     if (isClosed || sheet == null) return;
+    _scheduleExpiry(sheet);
     final ready =
         sheet.students.isNotEmpty || state.load == AttendanceLoad.ready;
     emit(
@@ -146,14 +173,15 @@ class AttendanceCubit extends Cubit<AttendanceState> {
       await _repo.refreshSheet(sessionId);
       if (isClosed) return;
       emit(_copy(load: AttendanceLoad.ready, offline: false, clearError: true));
-    } on ApiException catch (e) {
+    } catch (e) {
+      // Mọi lỗi (kể cả CSDL) thành trạng thái lỗi có nút Thử lại.
       if (isClosed) return;
       final hasRoster = state.sheet?.students.isNotEmpty ?? false;
       emit(
         _copy(
           load: hasRoster ? AttendanceLoad.ready : AttendanceLoad.failure,
-          offline: e.kind == ApiErrorKind.network,
-          error: e,
+          offline: e is ApiException && e.kind == ApiErrorKind.network,
+          error: e is ApiException ? e : const ApiException.unexpected(),
         ),
       );
     }
@@ -173,9 +201,7 @@ class AttendanceCubit extends Cubit<AttendanceState> {
     if (!state.editable || state.saving || sheet == null) return;
     final s = sheet.students.where((s) => s.studentId == studentId).firstOrNull;
     if (s == null) return;
-    final note = text.length > attendanceNoteMax
-        ? text.substring(0, attendanceNoteMax)
-        : text;
+    final note = text.characters.take(attendanceNoteMax).toString();
     _draft(s, status: state.statusOf(s), note: note);
   }
 
@@ -214,7 +240,12 @@ class AttendanceCubit extends Cubit<AttendanceState> {
 
   /// Bỏ các bản ghi bị server từ chối của buổi này.
   Future<void> discardFailed() async {
-    await _repo.discardFailed(sessionId);
+    try {
+      await _repo.discardFailed(sessionId);
+    } catch (_) {
+      if (!isClosed) emit(_copy(error: const ApiException.unexpected()));
+      return;
+    }
     if (isClosed) return;
     emit(_copy(drafts: const {}));
   }
@@ -228,6 +259,8 @@ class AttendanceCubit extends Cubit<AttendanceState> {
     bool? offline,
     ApiException? error,
     bool clearError = false,
+    ReadOnlyReason? readOnly,
+    bool setReadOnly = false,
   }) => AttendanceState(
     load: load ?? state.load,
     sheet: state.sheet,
@@ -237,11 +270,12 @@ class AttendanceCubit extends Cubit<AttendanceState> {
     saveFailed: saveFailed ?? state.saveFailed,
     offline: offline ?? state.offline,
     error: clearError ? null : error ?? state.error,
-    readOnly: state.readOnly,
+    readOnly: setReadOnly ? readOnly : state.readOnly,
   );
 
   @override
   Future<void> close() async {
+    _expiry?.cancel();
     await _sub?.cancel();
     return super.close();
   }

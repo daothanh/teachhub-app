@@ -174,8 +174,24 @@ class _StudentRowState extends State<_StudentRow> {
   late final _note = TextEditingController(text: widget.student.note ?? '');
   late bool _noteOpen = (widget.student.note ?? '').isNotEmpty;
 
+  final _focus = FocusNode();
+
+  /// Ghi chú đổi từ nguồn khác (bỏ bản bị từ chối, làm mới): cập nhật ô nhập,
+  /// trừ khi người dùng đang gõ.
+  @override
+  void didUpdateWidget(_StudentRow old) {
+    super.didUpdateWidget(old);
+    final note = widget.student.note ?? '';
+    if (old.student.note != widget.student.note &&
+        !_focus.hasFocus &&
+        _note.text != note) {
+      _note.text = note;
+    }
+  }
+
   @override
   void dispose() {
+    _focus.dispose();
     _note.dispose();
     super.dispose();
   }
@@ -237,6 +253,7 @@ class _StudentRowState extends State<_StudentRow> {
               padding: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: TextField(
                 controller: _note,
+                focusNode: _focus,
                 enabled: state.editable,
                 maxLength: attendanceNoteMax,
                 maxLines: null,

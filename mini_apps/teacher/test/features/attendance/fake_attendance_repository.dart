@@ -32,6 +32,10 @@ class FakeAttendanceRepository implements AttendanceRepository {
   /// Chờ [saveGate] trước khi trả (để test emit sau close).
   Completer<void>? saveGate;
   Object? saveError;
+  Object? discardError;
+
+  /// Ném từ các stream (giả CSDL đóng).
+  Object? streamError;
 
   int pending = 0;
   final histories = <HistoryChunk>[];
@@ -56,17 +60,27 @@ class FakeAttendanceRepository implements AttendanceRepository {
   @override
   Future<void> startSync() async => startSyncCalls++;
 
+  /// Mỗi lần đọc giờ server, giờ nhích thêm khoảng này (giả thời gian trôi).
+  Duration advanceOnRead = Duration.zero;
+  late DateTime _clock = _now;
+
   @override
-  DateTime serverNow() => _now;
+  DateTime serverNow() {
+    final v = _clock;
+    _clock = _clock.add(advanceOnRead);
+    return v;
+  }
 
   @override
   Stream<int> watchPending() async* {
+    if (streamError != null) throw streamError!;
     yield pending;
     yield* _pendingOut.stream;
   }
 
   @override
   Stream<List<TodaySession>> watchSessions(String date) async* {
+    if (streamError != null) throw streamError!;
     yield _sessions;
     yield* _sessionsOut.stream;
   }
@@ -79,6 +93,7 @@ class FakeAttendanceRepository implements AttendanceRepository {
 
   @override
   Stream<SessionSheet?> watchSheet(String sessionId) async* {
+    if (streamError != null) throw streamError!;
     yield sheet;
     yield* _sheetOut.stream;
   }
@@ -97,7 +112,10 @@ class FakeAttendanceRepository implements AttendanceRepository {
   }
 
   @override
-  Future<void> discardFailed(String sessionId) async => discards.add(sessionId);
+  Future<void> discardFailed(String sessionId) async {
+    if (discardError != null) throw discardError!;
+    discards.add(sessionId);
+  }
 
   @override
   Future<HistoryChunk> history(String sessionId, {String? cursor}) async {

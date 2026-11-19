@@ -329,9 +329,9 @@
       }
     }
   },
-  "attendanceRejectedWindow": "Đã quá hạn sửa (7 ngày), thay đổi không được nhận.",
-  "attendanceRejectedPlan": "Gói hiện tại chỉ cho xem, thay đổi không được nhận.",
-  "attendanceRejectedNotFound": "Học viên không còn trong buổi này, thay đổi không được nhận.",
+  "attendanceRejectedWindow": "Đã quá hạn sửa 7 ngày nên thay đổi này không được nhận.",
+  "attendanceRejectedPlan": "Gói hiện tại chỉ cho xem nên thay đổi này không được nhận.",
+  "attendanceRejectedNotFound": "Học viên không còn trong buổi này nên thay đổi không được nhận.",
   "attendanceRejectedGeneric": "Thay đổi này không được nhận.",
   "attendanceBatchNotFound": "Buổi này không còn tồn tại nên chưa gửi được điểm danh.",
   "attendanceBatchCancelled": "Buổi này đã hủy nên chưa gửi được điểm danh.",

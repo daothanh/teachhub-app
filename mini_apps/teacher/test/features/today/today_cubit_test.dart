@@ -91,6 +91,65 @@ void main() {
     await starting;
     expect(cubit.isClosed, isTrue);
   });
+
+  test(
+    'refresh lỗi không phải ApiException: vào trạng thái lỗi, không ném',
+    () async {
+      final repo = FakeAttendanceRepository(sessions: [s])
+        ..refreshError = StateError('db');
+      final cubit = await open(repo);
+      addTearDown(cubit.close);
+      expect(cubit.state.error, isNotNull);
+      expect(cubit.state.offline, isFalse);
+    },
+  );
+
+  test('refresh sau close: không làm gì, không tạo sub mới', () async {
+    final repo = FakeAttendanceRepository(sessions: [s]);
+    final cubit = await open(repo);
+    final calls = repo.refreshTodayCalls;
+    await cubit.close();
+    await cubit.refresh();
+    expect(repo.refreshTodayCalls, calls);
+  });
+
+  test('stream lỗi (CSDL đóng): bắt lại, phát error', () async {
+    final repo = FakeAttendanceRepository(sessions: [s])
+      ..streamError = StateError('closed');
+    final cubit = TodayCubit(repo, null);
+    addTearDown(cubit.close);
+    final states = <TodayState>[];
+    final sub = cubit.stream.listen(states.add);
+    addTearDown(sub.cancel);
+    await cubit.start();
+    await Future<void>.delayed(Duration.zero);
+    expect(states.any((x) => x.error != null), isTrue);
+  });
+
+  test('startSync xong rồi mới nghe watchPending', () async {
+    final order = <String>[];
+    final repo = _OrderRepo(order);
+    final cubit = TodayCubit(repo, null);
+    addTearDown(cubit.close);
+    await cubit.start();
+    expect(order.take(2), ['startSync', 'watchPending']);
+  });
+}
+
+class _OrderRepo extends FakeAttendanceRepository {
+  _OrderRepo(this.order);
+  final List<String> order;
+  @override
+  Future<void> startSync() async {
+    await Future<void>.delayed(const Duration(milliseconds: 5));
+    order.add('startSync');
+  }
+
+  @override
+  Stream<int> watchPending() {
+    order.add('watchPending');
+    return super.watchPending();
+  }
 }
 
 class _DateRepo extends FakeAttendanceRepository {
