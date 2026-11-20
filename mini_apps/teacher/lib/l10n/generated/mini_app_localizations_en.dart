@@ -427,7 +427,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
       'Could not save the student. Try again later.';
 
   @override
-  String get onboardingTitle => 'Get started with TeachHub';
+  String get onboardingTitle => 'Get started with DayHoc';
 
   @override
   String onboardingProgress(int n, int total) {
@@ -473,7 +473,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get onboardingDoneBody => 'Go see your classes and students.';
 
   @override
-  String get onboardingFinish => 'Open TeachHub';
+  String get onboardingFinish => 'Open DayHoc';
 
   @override
   String get onboardingLoadFailed => 'Could not load progress. Try again.';
@@ -681,7 +681,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get contactsDeniedBody =>
-      'TeachHub only reads your contacts when you tap Add from contacts, so you can pick students and parent numbers. You can still add each student by hand.';
+      'DayHoc only reads your contacts when you tap Add from contacts, so you can pick students and parent numbers. You can still add each student by hand.';
 
   @override
   String get contactsAllow => 'Allow again';
@@ -880,7 +880,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
     String url,
     String code,
   ) {
-    return 'Hello $guardian, I would like to invite you to follow $student\'s learning on TeachHub.\nOpen the link to accept: $url\nOr enter code $code in the TeachHub app (the code works for 48 hours).';
+    return 'Hello $guardian, I would like to invite you to follow $student\'s learning on DayHoc.\nOpen the link to accept: $url\nOr enter code $code in the DayHoc app (the code works for 48 hours).';
   }
 
   @override

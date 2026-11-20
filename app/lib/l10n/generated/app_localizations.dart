@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In vi, this message translates to:
-  /// **'TeachHub'**
+  /// **'DayHoc'**
   String get appName;
 
   /// No description provided for @retry.
@@ -311,7 +311,7 @@ abstract class AppLocalizations {
   /// No description provided for @inviteAskMessage.
   ///
   /// In vi, this message translates to:
-  /// **'Chào thầy/cô, tôi là phụ huynh. Nhờ thầy/cô gửi lại link mời TeachHub để tôi xem thông tin của con. Cảm ơn thầy/cô.'**
+  /// **'Chào thầy/cô, tôi là phụ huynh. Nhờ thầy/cô gửi lại link mời DayHoc để tôi xem thông tin của con. Cảm ơn thầy/cô.'**
   String get inviteAskMessage;
 
   /// No description provided for @inviteAskCopied.
@@ -341,7 +341,7 @@ abstract class AppLocalizations {
   /// No description provided for @inviteScanNotInvite.
   ///
   /// In vi, this message translates to:
-  /// **'Mã QR này không phải lời mời TeachHub.'**
+  /// **'Mã QR này không phải lời mời DayHoc.'**
   String get inviteScanNotInvite;
 
   /// No description provided for @consentTitle.
@@ -353,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @consentBody.
   ///
   /// In vi, this message translates to:
-  /// **'Để xem thông tin học tập của con, bạn cần đồng ý để TeachHub xử lý dữ liệu cá nhân của bạn và của con theo điều khoản và chính sách bảo mật.'**
+  /// **'Để xem thông tin học tập của con, bạn cần đồng ý để DayHoc xử lý dữ liệu cá nhân của bạn và của con theo điều khoản và chính sách bảo mật.'**
   String get consentBody;
 
   /// No description provided for @consentVersion.
@@ -629,7 +629,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginTermsSuffix.
   ///
   /// In vi, this message translates to:
-  /// **' của TeachHub.'**
+  /// **' của DayHoc.'**
   String get loginTermsSuffix;
 
   /// No description provided for @heroTeacher.
@@ -749,7 +749,7 @@ abstract class AppLocalizations {
   /// No description provided for @roleIntro.
   ///
   /// In vi, this message translates to:
-  /// **'Chọn để TeachHub hiện đúng những gì bạn cần. Bạn có thể thêm vai trò khác sau.'**
+  /// **'Chọn để DayHoc hiện đúng những gì bạn cần. Bạn có thể thêm vai trò khác sau.'**
   String get roleIntro;
 
   /// No description provided for @roleTeacherDesc.
@@ -809,7 +809,7 @@ abstract class AppLocalizations {
   /// No description provided for @updateTitle.
   ///
   /// In vi, this message translates to:
-  /// **'Cần cập nhật TeachHub'**
+  /// **'Cần cập nhật DayHoc'**
   String get updateTitle;
 
   /// No description provided for @updateBody.

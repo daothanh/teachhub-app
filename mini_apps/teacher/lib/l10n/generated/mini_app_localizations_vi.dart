@@ -421,7 +421,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get studentsErrorGeneric => 'Chưa lưu được học viên. Thử lại sau.';
 
   @override
-  String get onboardingTitle => 'Làm quen TeachHub';
+  String get onboardingTitle => 'Làm quen DayHoc';
 
   @override
   String onboardingProgress(int n, int total) {
@@ -467,7 +467,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get onboardingDoneBody => 'Vào xem lớp và học viên của bạn.';
 
   @override
-  String get onboardingFinish => 'Vào TeachHub';
+  String get onboardingFinish => 'Vào DayHoc';
 
   @override
   String get onboardingLoadFailed => 'Không tải được tiến độ. Thử lại.';
@@ -671,7 +671,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get contactsDeniedBody =>
-      'TeachHub chỉ đọc danh bạ khi bạn bấm Thêm từ danh bạ, để chọn học viên và số của phụ huynh. Bạn vẫn có thể nhập từng học viên bằng tay.';
+      'DayHoc chỉ đọc danh bạ khi bạn bấm Thêm từ danh bạ, để chọn học viên và số của phụ huynh. Bạn vẫn có thể nhập từng học viên bằng tay.';
 
   @override
   String get contactsAllow => 'Cho phép lại';
@@ -868,7 +868,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
     String url,
     String code,
   ) {
-    return 'Chào $guardian, mình mời bạn theo dõi việc học của $student trên TeachHub.\nMở link để nhận lời mời: $url\nHoặc nhập mã $code trong ứng dụng TeachHub (mã dùng được 48 giờ).';
+    return 'Chào $guardian, mình mời bạn theo dõi việc học của $student trên DayHoc.\nMở link để nhận lời mời: $url\nHoặc nhập mã $code trong ứng dụng DayHoc (mã dùng được 48 giờ).';
   }
 
   @override

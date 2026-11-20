@@ -800,7 +800,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @onboardingTitle.
   ///
   /// In vi, this message translates to:
-  /// **'Làm quen TeachHub'**
+  /// **'Làm quen DayHoc'**
   String get onboardingTitle;
 
   /// No description provided for @onboardingProgress.
@@ -884,7 +884,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @onboardingFinish.
   ///
   /// In vi, this message translates to:
-  /// **'Vào TeachHub'**
+  /// **'Vào DayHoc'**
   String get onboardingFinish;
 
   /// No description provided for @onboardingLoadFailed.
@@ -1244,7 +1244,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @contactsDeniedBody.
   ///
   /// In vi, this message translates to:
-  /// **'TeachHub chỉ đọc danh bạ khi bạn bấm Thêm từ danh bạ, để chọn học viên và số của phụ huynh. Bạn vẫn có thể nhập từng học viên bằng tay.'**
+  /// **'DayHoc chỉ đọc danh bạ khi bạn bấm Thêm từ danh bạ, để chọn học viên và số của phụ huynh. Bạn vẫn có thể nhập từng học viên bằng tay.'**
   String get contactsDeniedBody;
 
   /// No description provided for @contactsAllow.
@@ -1574,7 +1574,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @inviteShareMessage.
   ///
   /// In vi, this message translates to:
-  /// **'Chào {guardian}, mình mời bạn theo dõi việc học của {student} trên TeachHub.\nMở link để nhận lời mời: {url}\nHoặc nhập mã {code} trong ứng dụng TeachHub (mã dùng được 48 giờ).'**
+  /// **'Chào {guardian}, mình mời bạn theo dõi việc học của {student} trên DayHoc.\nMở link để nhận lời mời: {url}\nHoặc nhập mã {code} trong ứng dụng DayHoc (mã dùng được 48 giờ).'**
   String inviteShareMessage(
     String guardian,
     String student,

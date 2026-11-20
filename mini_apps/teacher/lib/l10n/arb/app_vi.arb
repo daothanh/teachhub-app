@@ -215,7 +215,7 @@
   "studentsErrorValidation": "Thông tin chưa hợp lệ. Kiểm tra lại các ô.",
   "studentsErrorNetwork": "Không có mạng. Thử lại sau.",
   "studentsErrorGeneric": "Chưa lưu được học viên. Thử lại sau.",
-  "onboardingTitle": "Làm quen TeachHub",
+  "onboardingTitle": "Làm quen DayHoc",
   "onboardingProgress": "Bước {n}/{total}",
   "@onboardingProgress": {
     "placeholders": {
@@ -239,7 +239,7 @@
   "onboardingComplianceBody": "Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.",
   "onboardingDoneTitle": "Bạn đã xong phần làm quen",
   "onboardingDoneBody": "Vào xem lớp và học viên của bạn.",
-  "onboardingFinish": "Vào TeachHub",
+  "onboardingFinish": "Vào DayHoc",
   "onboardingLoadFailed": "Không tải được tiến độ. Thử lại.",
   "onboardingRetry": "Thử lại",
   "onboardingErrorBusy": "Yêu cầu đang xử lý. Thử lại sau giây lát.",
@@ -367,7 +367,7 @@
   "contactsAdd": "Thêm từ danh bạ",
   "contactsTitle": "Thêm từ danh bạ",
   "contactsDeniedTitle": "Chưa có quyền đọc danh bạ",
-  "contactsDeniedBody": "TeachHub chỉ đọc danh bạ khi bạn bấm Thêm từ danh bạ, để chọn học viên và số của phụ huynh. Bạn vẫn có thể nhập từng học viên bằng tay.",
+  "contactsDeniedBody": "DayHoc chỉ đọc danh bạ khi bạn bấm Thêm từ danh bạ, để chọn học viên và số của phụ huynh. Bạn vẫn có thể nhập từng học viên bằng tay.",
   "contactsAllow": "Cho phép lại",
   "contactsOpenSettings": "Mở Cài đặt",
   "contactsManual": "Nhập tay",
@@ -514,7 +514,7 @@
   },
   "inviteExpiryNote": "Link dùng được 7 ngày, mã nhập tay dùng được 48 giờ.",
   "inviteOldLinkNote": "Link cũ của phụ huynh này (nếu có) không dùng được nữa.",
-  "inviteShareMessage": "Chào {guardian}, mình mời bạn theo dõi việc học của {student} trên TeachHub.\nMở link để nhận lời mời: {url}\nHoặc nhập mã {code} trong ứng dụng TeachHub (mã dùng được 48 giờ).",
+  "inviteShareMessage": "Chào {guardian}, mình mời bạn theo dõi việc học của {student} trên DayHoc.\nMở link để nhận lời mời: {url}\nHoặc nhập mã {code} trong ứng dụng DayHoc (mã dùng được 48 giờ).",
   "@inviteShareMessage": {
     "placeholders": {
       "guardian": {
