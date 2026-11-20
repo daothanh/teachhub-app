@@ -56,6 +56,14 @@ dynamic _sample(Object? node, [String? name]) {
   if (s['\$ref'] != null) {
     return _sample(_schemas[(s['\$ref'] as String).split('/').last]);
   }
+  // `anyOf`/`oneOf` (vd. `$ref` hoặc null): lấy nhánh khác null đầu tiên.
+  final branches = (s['anyOf'] ?? s['oneOf']) as List?;
+  if (branches != null) {
+    return _sample(
+      branches.firstWhere((b) => (b as Map)['type'] != 'null'),
+      name,
+    );
+  }
   if (s['enum'] != null) return (s['enum'] as List).first;
   var type = s['type'];
   if (type is List) type = type.firstWhere((t) => t != 'null');
@@ -168,6 +176,40 @@ void main() {
 
   modelReads('RosterGuardian', RosterGuardian.fromJson);
   modelReads('LatestInvite', LatestInvite.fromJson);
+
+  test(
+    'Học phí: đọc kiểu và mức; lớp cũ null; feeOverride → nhãn Giá riêng',
+    () {
+      final base = _sample(_schema('Class')) as Map<String, dynamic>;
+      final paid = TeachClass.fromJson({
+        ...base,
+        'feeType': 'monthly',
+        'feeAmount': 500000,
+      });
+      expect(paid.feeType, FeeType.monthly);
+      expect(paid.feeAmount, 500000);
+      expect(paid.feeRules, isNotNull);
+      final legacy = TeachClass.fromJson({
+        ...base,
+        'feeType': null,
+        'feeAmount': null,
+        'feeRules': null,
+      });
+      expect(legacy.feeType, isNull);
+      expect(FeeType.fromWire('per_session'), FeeType.perSession);
+      expect(FeeType.fromWire('la'), isNull);
+
+      final item =
+          ((_schema('Roster')['properties'] as Map)['items'] as Map)['items']
+              as Map<String, dynamic>;
+      final entry = _sample(item) as Map<String, dynamic>;
+      expect(RosterEntry.fromJson(entry).hasFeeOverride, isTrue);
+      expect(
+        RosterEntry.fromJson({...entry, 'feeOverride': null}).hasFeeOverride,
+        isFalse,
+      );
+    },
+  );
 
   test('Roster: đọc inviteStatus và phụ huynh kèm lời mời mới nhất', () {
     final item = RosterEntry.fromJson({

@@ -26,6 +26,21 @@ enum ClassStatus {
   );
 }
 
+/// Kiểu học phí của lớp (schema `FeeType`).
+enum FeeType {
+  perSession,
+  monthly,
+  course;
+
+  /// `null` (lớp cũ chưa cấu hình học phí) hoặc giá trị lạ → `null`.
+  static FeeType? fromWire(String? v) => switch (v) {
+    'per_session' => perSession,
+    'monthly' => monthly,
+    'course' => course,
+    _ => null,
+  };
+}
+
 /// Quy tắc lặp. `weekday` theo ISO 8601: 1 = Thứ Hai … 7 = Chủ nhật.
 class ScheduleRule extends Equatable {
   const ScheduleRule({
@@ -75,6 +90,9 @@ class TeachClass extends Equatable {
     required this.enrolledCount,
     required this.scheduleRules,
     required this.createdAt,
+    this.feeType,
+    this.feeAmount,
+    this.feeRules,
   });
 
   factory TeachClass.fromJson(Map<String, dynamic> json) => TeachClass(
@@ -94,6 +112,9 @@ class TeachClass extends Equatable {
         ScheduleRule.fromJson(r as Map<String, dynamic>),
     ],
     createdAt: json['createdAt'] as String,
+    feeType: FeeType.fromWire(json['feeType'] as String?),
+    feeAmount: json['feeAmount'] as int?,
+    feeRules: json['feeRules'] as Map<String, dynamic>?,
   );
 
   final String id;
@@ -110,12 +131,23 @@ class TeachClass extends Equatable {
   final List<ScheduleRule> scheduleRules;
   final String createdAt;
 
+  /// `null` = lớp chưa cấu hình học phí: không sinh hóa đơn.
+  final FeeType? feeType;
+
+  /// VND: đơn giá buổi, học phí tháng hoặc tổng khóa, tùy [feeType].
+  final int? feeAmount;
+
+  /// shortcut: giữ nguyên JSON `FeeRules`, đổi sang model khi màn học phí
+  /// (S5-FL-01) cần đọc từng công tắc.
+  final Map<String, dynamic>? feeRules;
+
   bool get archived => status == ClassStatus.archived;
 
   @override
   List<Object?> get props => [
     id, name, subject, grade, mode, location, capacity, startDate, endDate,
-    status, enrolledCount, scheduleRules, createdAt, //
+    status, enrolledCount, scheduleRules, createdAt, feeType, feeAmount,
+    feeRules, //
   ];
 }
 
@@ -345,6 +377,7 @@ class RosterEntry extends Equatable {
     required this.joinedOn,
     this.inviteStatus = GuardianInviteStatus.notInvited,
     this.guardians = const [],
+    this.hasFeeOverride = false,
   });
 
   factory RosterEntry.fromJson(Map<String, dynamic> json) => RosterEntry(
@@ -360,6 +393,7 @@ class RosterEntry extends Equatable {
       for (final g in json['guardians'] as List)
         RosterGuardian.fromJson(g as Map<String, dynamic>),
     ],
+    hasFeeOverride: json['feeOverride'] != null,
   );
 
   final String enrollmentId;
@@ -374,10 +408,14 @@ class RosterEntry extends Equatable {
   final GuardianInviteStatus inviteStatus;
   final List<RosterGuardian> guardians;
 
+  /// `feeOverride` khác null (mức riêng, quy tắc vắng riêng hoặc miễn giảm)
+  /// → hiện nhãn "Giá riêng" cạnh tên (US-1.3 AC2).
+  final bool hasFeeOverride;
+
   @override
   List<Object?> get props => [
     enrollmentId, studentId, fullName, studentStatus, joinedOn, //
-    inviteStatus, guardians,
+    inviteStatus, guardians, hasFeeOverride,
   ];
 }
 
