@@ -215,7 +215,7 @@
   "studentsErrorValidation": "Some details are invalid. Check the fields.",
   "studentsErrorNetwork": "No connection. Try again later.",
   "studentsErrorGeneric": "Could not save the student. Try again later.",
-  "onboardingTitle": "Get started with TeachHub",
+  "onboardingTitle": "Get started with DayHoc",
   "onboardingProgress": "Step {n}/{total}",
   "@onboardingProgress": {
     "placeholders": {
@@ -238,7 +238,7 @@
   "onboardingComplianceBody": "See what to do to teach within the rules. Coming soon.",
   "onboardingDoneTitle": "You are all set",
   "onboardingDoneBody": "Go see your classes and students.",
-  "onboardingFinish": "Open TeachHub",
+  "onboardingFinish": "Open DayHoc",
   "onboardingLoadFailed": "Could not load progress. Try again.",
   "onboardingRetry": "Retry",
   "onboardingErrorBusy": "Still processing. Try again in a moment.",
@@ -366,7 +366,7 @@
   "contactsAdd": "Add from contacts",
   "contactsTitle": "Add from contacts",
   "contactsDeniedTitle": "No access to contacts",
-  "contactsDeniedBody": "TeachHub only reads your contacts when you tap Add from contacts, so you can pick students and parent numbers. You can still add each student by hand.",
+  "contactsDeniedBody": "DayHoc only reads your contacts when you tap Add from contacts, so you can pick students and parent numbers. You can still add each student by hand.",
   "contactsAllow": "Allow again",
   "contactsOpenSettings": "Open Settings",
   "contactsManual": "Add by hand",
@@ -513,7 +513,7 @@
   },
   "inviteExpiryNote": "The link works for 7 days and the typed code for 48 hours.",
   "inviteOldLinkNote": "This parent's previous link, if any, no longer works.",
-  "inviteShareMessage": "Hello {guardian}, I would like to invite you to follow {student}'s learning on TeachHub.\nOpen the link to accept: {url}\nOr enter code {code} in the TeachHub app (the code works for 48 hours).",
+  "inviteShareMessage": "Hello {guardian}, I would like to invite you to follow {student}'s learning on DayHoc.\nOpen the link to accept: {url}\nOr enter code {code} in the DayHoc app (the code works for 48 hours).",
   "@inviteShareMessage": {
     "placeholders": {
       "guardian": {

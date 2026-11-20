@@ -444,6 +444,8 @@ class RosterEntry extends Equatable {
   /// Khác null: hiện nhãn "Giá riêng" (US-1.3 AC2).
   final FeeOverride? feeOverride;
 
+  bool get hasFeeOverride => feeOverride != null;
+
   @override
   List<Object?> get props => [
     enrollmentId, studentId, fullName, studentStatus, joinedOn, //

@@ -9,6 +9,12 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 import 'features/family/cubit/family_cubit.dart';
 import 'features/family/data/family_repository.dart';
 import 'features/home/pages/parent_home_page.dart';
+import 'features/invoice/cubit/invoice_detail_cubit.dart';
+import 'features/invoice/cubit/invoice_list_cubit.dart';
+import 'features/invoice/data/invoice_repository.dart';
+import 'features/invoice/data/qr_image_saver.dart';
+import 'features/invoice/pages/invoice_detail_page.dart';
+import 'features/invoice/pages/invoice_list_page.dart';
 import 'l10n/l10n.dart';
 import 'notification_permission_gate.dart';
 
@@ -33,6 +39,16 @@ class ParentController {
   @visibleForTesting
   FamilyRepository? familyRepository;
 
+  @visibleForTesting
+  InvoiceRepository? invoiceRepository;
+
+  @visibleForTesting
+  QrImageSaver? qrImageSaver;
+
+  InvoiceRepository _invoices() =>
+      invoiceRepository ??
+      DioInvoiceRepository(GetIt.I<Dio>(instanceName: TeachHubDiKey.api));
+
   List<LocalizationsDelegate> get localizationsDelegates =>
       MiniAppLocalizations.localizationsDelegates;
 
@@ -48,8 +64,36 @@ class ParentController {
               ),
           notifications: notifications,
         )..load(),
-        child: ParentHomePage(noInviteBuilder: noInviteBuilder),
+        child: ParentHomePage(
+          noInviteBuilder: noInviteBuilder,
+          invoiceRepository: _invoices,
+        ),
       ),
+      routes: [
+        // P03: danh sách và chi tiết hóa đơn (US-7.3).
+        GoRoute(
+          path: 'invoices',
+          name: '$moduleId.invoices',
+          builder: (context, state) => BlocProvider(
+            create: (_) => InvoiceListCubit(_invoices())..load(),
+            child: const InvoiceListPage(),
+          ),
+          routes: [
+            GoRoute(
+              path: ':id',
+              name: '$moduleId.invoice',
+              builder: (context, state) => BlocProvider(
+                create: (_) => InvoiceDetailCubit(
+                  _invoices(),
+                  qrImageSaver ?? const GalQrImageSaver(),
+                  state.pathParameters['id']!,
+                )..load(),
+                child: const InvoiceDetailPage(),
+              ),
+            ),
+          ],
+        ),
+      ],
     ),
   ];
 

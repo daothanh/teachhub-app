@@ -342,7 +342,7 @@ void main() {
       await _pump(tester, router());
       await tester.tap(find.text('Nhắn giáo viên xin link'));
       await tester.pumpAndSettle();
-      expect(requesterLog.single, contains('TeachHub'));
+      expect(requesterLog.single, contains('DayHoc'));
       expect(find.textContaining('Đã sao chép tin nhắn'), findsOneWidget);
     });
 

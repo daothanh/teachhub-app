@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'TeachHub';
+  String get appName => 'DayHoc';
 
   @override
   String get retry => 'Retry';
@@ -128,7 +128,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get inviteAskMessage =>
-      'Hello, I am a parent. Could you please resend the TeachHub invitation link so I can see my child\'s information? Thank you.';
+      'Hello, I am a parent. Could you please resend the DayHoc invitation link so I can see my child\'s information? Thank you.';
 
   @override
   String get inviteAskCopied =>
@@ -145,15 +145,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'The app is not allowed to use the camera. You can paste the link or enter the code instead.';
 
   @override
-  String get inviteScanNotInvite =>
-      'This QR code is not a TeachHub invitation.';
+  String get inviteScanNotInvite => 'This QR code is not a DayHoc invitation.';
 
   @override
   String get consentTitle => 'Consent to data processing';
 
   @override
   String get consentBody =>
-      'To see your child\'s learning information, you need to agree that TeachHub processes your and your child\'s personal data under the terms and privacy policy.';
+      'To see your child\'s learning information, you need to agree that DayHoc processes your and your child\'s personal data under the terms and privacy policy.';
 
   @override
   String consentVersion(String version) {
@@ -304,7 +303,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginPrivacy => 'Data policy';
 
   @override
-  String get loginTermsSuffix => ' of TeachHub.';
+  String get loginTermsSuffix => ' of DayHoc.';
 
   @override
   String get heroTeacher => 'Teacher';
@@ -374,7 +373,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roleIntro =>
-      'Choose so TeachHub shows what you need. You can add other roles later.';
+      'Choose so DayHoc shows what you need. You can add other roles later.';
 
   @override
   String get roleTeacherDesc => 'Manage classes, attendance, tuition';
@@ -404,7 +403,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleContinue => 'Continue';
 
   @override
-  String get updateTitle => 'Update TeachHub';
+  String get updateTitle => 'Update DayHoc';
 
   @override
   String get updateBody =>

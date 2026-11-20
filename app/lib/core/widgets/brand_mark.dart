@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// `Brand/Logo` · Mark: ô vuông lime, chữ "T" ink. Màu cố định ở mọi mode
+/// `Brand/Logo` · Mark: ô vuông lime, chữ "D" ink. Màu cố định ở mọi mode
 /// (`brand/logo` = `primary`, `brand/logo-fg` = `onPrimary` trong theme TeachHub).
 class BrandMark extends StatelessWidget {
   const BrandMark({super.key, this.size = 48});
@@ -20,7 +20,7 @@ class BrandMark extends StatelessWidget {
         borderRadius: BorderRadius.circular(size / 3),
       ),
       child: Text(
-        'T',
+        'D',
         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
           fontSize: size / 2,
           height: 4 / 3,

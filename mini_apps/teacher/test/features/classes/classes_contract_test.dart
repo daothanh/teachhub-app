@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:teacher/features/classes/data/class_models.dart';
 import 'package:teacher/features/classes/data/classes_repository.dart';
 import 'package:teacher/features/fees/data/fee_models.dart';
-import 'package:teacher/features/fees/data/fee_repository.dart';
 
 /// Đối chiếu mô hình và client lớp học với `contracts/openapi.json` (bản chép
 /// từ backend, cập nhật bằng `dart run tool/sync_openapi.dart` trong
@@ -182,6 +181,40 @@ void main() {
   modelReads('PayoutAccount', PayoutAccount.fromJson, subset: true);
   modelReads('RosterGuardian', RosterGuardian.fromJson);
   modelReads('LatestInvite', LatestInvite.fromJson);
+
+  test(
+    'Học phí: đọc kiểu và mức; lớp cũ null; feeOverride → nhãn Giá riêng',
+    () {
+      final base = _sample(_schema('Class')) as Map<String, dynamic>;
+      final paid = TeachClass.fromJson({
+        ...base,
+        'feeType': 'monthly',
+        'feeAmount': 500000,
+      });
+      expect(paid.feeType, FeeType.monthly);
+      expect(paid.feeAmount, 500000);
+      expect(paid.feeRules, isNotNull);
+      final legacy = TeachClass.fromJson({
+        ...base,
+        'feeType': null,
+        'feeAmount': null,
+        'feeRules': null,
+      });
+      expect(legacy.feeType, isNull);
+      expect(FeeType.fromWire('per_session'), FeeType.perSession);
+      expect(FeeType.fromWire('la'), isNull);
+
+      final item =
+          ((_schema('Roster')['properties'] as Map)['items'] as Map)['items']
+              as Map<String, dynamic>;
+      final entry = _sample(item) as Map<String, dynamic>;
+      expect(RosterEntry.fromJson(entry).hasFeeOverride, isTrue);
+      expect(
+        RosterEntry.fromJson({...entry, 'feeOverride': null}).hasFeeOverride,
+        isFalse,
+      );
+    },
+  );
 
   test('Roster: đọc inviteStatus và phụ huynh kèm lời mời mới nhất', () {
     final item = RosterEntry.fromJson({

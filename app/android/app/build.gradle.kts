@@ -50,16 +50,16 @@ android {
         create("development") {
             dimension = "env"
             applicationIdSuffix = ".dev"
-            resValue("string", "app_name", "TeachHub Dev")
+            resValue("string", "app_name", "DayHoc Dev")
         }
         create("staging") {
             dimension = "env"
             applicationIdSuffix = ".stg"
-            resValue("string", "app_name", "TeachHub Stg")
+            resValue("string", "app_name", "DayHoc Stg")
         }
         create("production") {
             dimension = "env"
-            resValue("string", "app_name", "TeachHub")
+            resValue("string", "app_name", "DayHoc")
         }
     }
 

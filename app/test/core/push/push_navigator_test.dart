@@ -52,6 +52,15 @@ void main() {
     },
   );
 
+  test(
+    'invoice_issued (chỉ có notificationId và type) mở danh sách hóa đơn',
+    () async {
+      final h = _Harness(active: parent);
+      await h.nav.handle({'notificationId': 'n1', 'type': 'invoice_issued'});
+      expect(h.routes, ['/p/invoices']);
+    },
+  );
+
   test('đã ở đúng vai trò thì không đổi vai trò', () async {
     final h = _Harness(active: parent);
     await h.nav.handle({

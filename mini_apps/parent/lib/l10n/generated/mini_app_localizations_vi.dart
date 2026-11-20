@@ -96,4 +96,127 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get notificationBannerAction => 'Bật thông báo';
+
+  @override
+  String get invoiceTuitionTitle => 'Học phí';
+
+  @override
+  String invoiceTuitionUnpaid(int count, String total) {
+    return '$count hóa đơn chưa đóng xong, tổng $total';
+  }
+
+  @override
+  String invoiceTuitionUnpaidMore(int count) {
+    return '$count+ hóa đơn chưa đóng xong';
+  }
+
+  @override
+  String get invoiceTuitionNone => 'Không có hóa đơn nào cần đóng.';
+
+  @override
+  String get invoiceTuitionOpen => 'Xem hóa đơn';
+
+  @override
+  String get invoiceListTitle => 'Hóa đơn';
+
+  @override
+  String get invoiceFilterAll => 'Tất cả';
+
+  @override
+  String get invoiceStatusIssued => 'Chưa thanh toán';
+
+  @override
+  String get invoiceStatusPending => 'Chờ xác nhận';
+
+  @override
+  String get invoiceStatusPartial => 'Đã trả một phần';
+
+  @override
+  String get invoiceStatusPaid => 'Đã thanh toán';
+
+  @override
+  String get invoiceStatusVoid => 'Đã hủy';
+
+  @override
+  String get invoiceStatusUnknown => 'Khác';
+
+  @override
+  String get invoiceEmpty => 'Chưa có hóa đơn nào.';
+
+  @override
+  String get invoiceLoadMore => 'Xem thêm';
+
+  @override
+  String invoiceRowSubtitle(String student, String month) {
+    return '$student, kỳ $month';
+  }
+
+  @override
+  String invoiceDue(String date) {
+    return 'Hạn $date';
+  }
+
+  @override
+  String invoiceCodeLabel(String code) {
+    return 'Mã $code';
+  }
+
+  @override
+  String get invoiceLinesTitle => 'Các khoản';
+
+  @override
+  String get invoiceTotal => 'Tổng cộng';
+
+  @override
+  String get invoiceVoidNotice => 'Hóa đơn đã hủy, bạn không cần chuyển khoản.';
+
+  @override
+  String get invoicePayTitle => 'Chuyển khoản';
+
+  @override
+  String get invoiceQrHint => 'Quét mã bằng app ngân hàng.';
+
+  @override
+  String get invoiceSaveQr => 'Lưu ảnh QR';
+
+  @override
+  String get invoiceQrSaved => 'Đã lưu ảnh QR.';
+
+  @override
+  String get invoiceQrDenied =>
+      'Chưa có quyền lưu ảnh. Mở Cài đặt để cho phép.';
+
+  @override
+  String get invoiceQrFailed => 'Không lưu được ảnh QR. Hãy thử lại.';
+
+  @override
+  String get invoiceCopyNote => 'Sao chép nội dung chuyển khoản';
+
+  @override
+  String get invoiceCopyAccount => 'Sao chép số tài khoản';
+
+  @override
+  String get invoiceCopied => 'Đã sao chép.';
+
+  @override
+  String get invoiceBank => 'Ngân hàng';
+
+  @override
+  String get invoiceAccountNo => 'Số tài khoản';
+
+  @override
+  String get invoiceAccountName => 'Chủ tài khoản';
+
+  @override
+  String get invoiceTransferNote => 'Nội dung chuyển khoản';
+
+  @override
+  String get invoiceNotFound => 'Không tìm thấy hóa đơn';
+
+  @override
+  String get invoiceNotFoundBody =>
+      'Hóa đơn không tồn tại hoặc bạn không xem được.';
+
+  @override
+  String get invoiceLoadFailed => 'Không tải được hóa đơn. Hãy thử lại.';
 }

@@ -23,6 +23,14 @@ class TeachHubLoggingInterceptor extends LoggingInterceptor {
     'code',
     'shortcode',
     'url',
+    // Hóa đơn phụ huynh (S5): QR, tài khoản nhận tiền, tên con, số tiền.
+    'qrpayload',
+    'accountno',
+    'accountname',
+    'transfernote',
+    'payout',
+    'studentname',
+    'totalamount',
   };
 
   /// Thay giá trị của mọi khóa cá nhân bằng `***` (đệ quy), rồi áp che mặc định

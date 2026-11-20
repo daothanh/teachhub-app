@@ -9,7 +9,7 @@ class AppLocalizationsVi extends AppLocalizations {
   AppLocalizationsVi([String locale = 'vi']) : super(locale);
 
   @override
-  String get appName => 'TeachHub';
+  String get appName => 'DayHoc';
 
   @override
   String get retry => 'Thử lại';
@@ -130,7 +130,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get inviteAskMessage =>
-      'Chào thầy/cô, tôi là phụ huynh. Nhờ thầy/cô gửi lại link mời TeachHub để tôi xem thông tin của con. Cảm ơn thầy/cô.';
+      'Chào thầy/cô, tôi là phụ huynh. Nhờ thầy/cô gửi lại link mời DayHoc để tôi xem thông tin của con. Cảm ơn thầy/cô.';
 
   @override
   String get inviteAskCopied =>
@@ -147,14 +147,14 @@ class AppLocalizationsVi extends AppLocalizations {
       'Ứng dụng chưa được dùng camera. Bạn có thể dán link hoặc nhập mã thay thế.';
 
   @override
-  String get inviteScanNotInvite => 'Mã QR này không phải lời mời TeachHub.';
+  String get inviteScanNotInvite => 'Mã QR này không phải lời mời DayHoc.';
 
   @override
   String get consentTitle => 'Đồng ý xử lý dữ liệu';
 
   @override
   String get consentBody =>
-      'Để xem thông tin học tập của con, bạn cần đồng ý để TeachHub xử lý dữ liệu cá nhân của bạn và của con theo điều khoản và chính sách bảo mật.';
+      'Để xem thông tin học tập của con, bạn cần đồng ý để DayHoc xử lý dữ liệu cá nhân của bạn và của con theo điều khoản và chính sách bảo mật.';
 
   @override
   String consentVersion(String version) {
@@ -305,7 +305,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loginPrivacy => 'Chính sách dữ liệu';
 
   @override
-  String get loginTermsSuffix => ' của TeachHub.';
+  String get loginTermsSuffix => ' của DayHoc.';
 
   @override
   String get heroTeacher => 'Thầy cô';
@@ -374,7 +374,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get roleIntro =>
-      'Chọn để TeachHub hiện đúng những gì bạn cần. Bạn có thể thêm vai trò khác sau.';
+      'Chọn để DayHoc hiện đúng những gì bạn cần. Bạn có thể thêm vai trò khác sau.';
 
   @override
   String get roleTeacherDesc => 'Quản lý lớp, điểm danh, thu học phí';
@@ -404,7 +404,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get roleContinue => 'Tiếp tục';
 
   @override
-  String get updateTitle => 'Cần cập nhật TeachHub';
+  String get updateTitle => 'Cần cập nhật DayHoc';
 
   @override
   String get updateBody =>

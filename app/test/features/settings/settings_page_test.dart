@@ -140,7 +140,7 @@ void main() {
     _themeCtrl = ThemeController(_prefs);
     GetIt.I.registerSingleton<PackageInfo>(
       PackageInfo(
-        appName: 'TeachHub',
+        appName: 'DayHoc',
         packageName: 'vn.dayhoc.app',
         version: '1.2.3',
         buildNumber: '1',
@@ -478,7 +478,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Về ứng dụng'), findsOneWidget);
-      expect(find.text('TeachHub'), findsOneWidget);
+      expect(find.text('DayHoc'), findsOneWidget);
       expect(find.text('1.2.3'), findsOneWidget);
     });
 
