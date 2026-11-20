@@ -191,7 +191,9 @@ Future<void> bootstrap({required Env env}) async {
         // Token FCM cũ vô hiệu: máy này không nhận push của người vừa đăng xuất.
         if (firebaseReady) unawaited(deleteFcmToken());
       }
-      if (membershipCubit.state.statusLoad != LoadingStatus.initial) {
+      // `before`: đăng xuất trước khi kịp tải vai trò vẫn phải xóa cache vai
+      // trò, để người đăng nhập sau không thấy vai trò của người trước.
+      if (before || membershipCubit.state.statusLoad != LoadingStatus.initial) {
         membershipCubit.clear();
       }
       consentCubit.clear();

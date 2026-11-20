@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
@@ -73,6 +74,10 @@ class MembershipCubit extends Cubit<MembershipState> {
 
   static const _activeKey = 'active_membership_id';
 
+  /// Phản hồi `GET /me/memberships` gần nhất, để mở app khi mất mạng vẫn vào
+  /// được vai trò (và cache buổi học của nó) thay vì kẹt ở splash.
+  static const _cacheKey = 'memberships_cache';
+
   @override
   void emit(MembershipState state) {
     if (isClosed) return;
@@ -89,27 +94,41 @@ class MembershipCubit extends Cubit<MembershipState> {
     try {
       final res = await _api.get<Map<String, dynamic>>('/me/memberships');
       final body = res.data ?? const {};
-      final items = [
-        for (final raw in body['items'] as List? ?? const [])
-          ?Membership.fromJson(raw as Map<String, dynamic>),
-      ];
-      Membership? byId(String? id) =>
-          id == null ? null : items.where((m) => m.id == id).firstOrNull;
-      final active =
-          byId(_prefs.getString(_activeKey)) ??
-          byId(body['lastMembershipId'] as String?) ??
-          (items.length == 1 ? items.single : null);
-      emit(
-        state.copyWith(
-          statusLoad: LoadingStatus.success,
-          memberships: items,
-          active: active,
-          clearActive: active == null,
-        ),
-      );
+      _apply(body);
+      await _prefs.setString(_cacheKey, jsonEncode(body));
+    } on DioException catch (e) {
+      // Chỉ lỗi mạng (không có phản hồi) mới dùng bản cũ; 401/403/5xx thì báo
+      // lỗi như trước để không mở vai trò đã bị thu hồi.
+      final cached = e.response == null ? _prefs.getString(_cacheKey) : null;
+      if (cached != null) {
+        _apply(jsonDecode(cached) as Map<String, dynamic>);
+      } else {
+        emit(state.copyWith(statusLoad: LoadingStatus.failure, error: e));
+      }
     } catch (e) {
       emit(state.copyWith(statusLoad: LoadingStatus.failure, error: e));
     }
+  }
+
+  void _apply(Map<String, dynamic> body) {
+    final items = [
+      for (final raw in body['items'] as List? ?? const [])
+        ?Membership.fromJson(raw as Map<String, dynamic>),
+    ];
+    Membership? byId(String? id) =>
+        id == null ? null : items.where((m) => m.id == id).firstOrNull;
+    final active =
+        byId(_prefs.getString(_activeKey)) ??
+        byId(body['lastMembershipId'] as String?) ??
+        (items.length == 1 ? items.single : null);
+    emit(
+      state.copyWith(
+        statusLoad: LoadingStatus.success,
+        memberships: items,
+        active: active,
+        clearActive: active == null,
+      ),
+    );
   }
 
   /// Mở một vai trò đã có.
@@ -154,6 +173,7 @@ class MembershipCubit extends Cubit<MembershipState> {
   /// Đăng xuất: quên vai trò của phiên này.
   Future<void> clear() async {
     await _prefs.remove(_activeKey);
+    await _prefs.remove(_cacheKey);
     emit(const MembershipState());
   }
 }
