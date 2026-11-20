@@ -47,10 +47,11 @@ void main() {
       cubit.tap('st-1');
       seen.add(cubit.state.statusOf(s1));
     }
+    // US-3.1 AC2: vắng có phép → vắng không phép → đi muộn → có mặt.
     expect(seen, [
-      AttendanceStatus.late,
       AttendanceStatus.excused,
       AttendanceStatus.unexcused,
+      AttendanceStatus.late,
       AttendanceStatus.present,
     ]);
     // Em còn lại không đổi.
@@ -81,16 +82,14 @@ void main() {
     },
   );
 
-  test('AC-8: 3 em vắng (mỗi em chạm 2 lần) rồi Lưu', () async {
+  test('AC-8: 3 em vắng có phép (mỗi em 1 chạm) rồi Lưu', () async {
     final repo = FakeAttendanceRepository(sheet: sheetOf(roster(20)));
     final cubit = await open(repo);
     addTearDown(cubit.close);
 
-    // Có mặt → Muộn → Vắng có phép: 2 chạm.
+    // Có mặt → Vắng có phép: 1 chạm.
     for (final n in [1, 2, 3]) {
-      cubit
-        ..tap('st-$n')
-        ..tap('st-$n');
+      cubit.tap('st-$n');
     }
     await cubit.save();
 
@@ -159,8 +158,9 @@ void main() {
       addTearDown(cubit.close);
 
       cubit
-        ..tap('st-1')
         ..tap('st-1') // vắng có phép
+        ..tap('st-2')
+        ..tap('st-2')
         ..tap('st-2'); // muộn: chưa tính vắng
       await cubit.save();
 
