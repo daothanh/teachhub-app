@@ -28,11 +28,14 @@ Future<void> tapText(
   bool last = false,
 }) async {
   final plain = find.text(text);
-  await tester.scrollUntilVisible(
-    plain,
-    300,
-    scrollable: find.byType(Scrollable).first,
-  );
+  // Nhiều ô cùng nhãn đã được dựng thì khỏi cuộn (scrollUntilVisible cần 1 ô).
+  if (plain.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(
+      plain,
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+  }
   final all = plain.evaluate().toList();
   final f = find.byWidget((last ? all.last : all.first).widget);
   await tester.ensureVisible(f);

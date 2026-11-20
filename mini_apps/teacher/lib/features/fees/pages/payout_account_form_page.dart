@@ -197,7 +197,7 @@ class _BodyState extends State<_Body> {
                 : l10n.payoutSave,
             width: double.infinity,
             disabled: s.busy,
-            onPressed: () => cubit.submit(input),
+            onPressed: () => cubit.submit(_input),
           ),
         ] else ...[
           if (s.codeSent && err == null) ...[

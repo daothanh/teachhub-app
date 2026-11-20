@@ -6,7 +6,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:teacher/features/fees/data/fee_models.dart';
 import 'package:teacher/features/fees/data/fee_repository.dart';
-import 'package:teachhub_shared/teachhub_shared.dart';
 
 /// Đối chiếu client học phí với `contracts/openapi.json` (Sprint 5).
 final _openapi =
