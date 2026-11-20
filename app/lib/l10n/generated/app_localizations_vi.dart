@@ -47,6 +47,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get loginFailed => 'Đăng nhập không thành công. Vui lòng thử lại.';
 
   @override
+  String get loginUnavailable =>
+      'Hệ thống đang bận, vui lòng thử lại sau ít phút.';
+
+  @override
+  String get loginEmailRequiresOtp =>
+      'Email này cần đăng nhập bằng mã OTP. Nhập email bên dưới để nhận mã.';
+
+  @override
   String get splashLoadFailed => 'Không tải được vai trò của bạn.';
 
   @override
@@ -68,26 +76,107 @@ class AppLocalizationsVi extends AppLocalizations {
   String get inviteTitle => 'Lời mời tham gia lớp';
 
   @override
-  String get inviteBody => 'Giáo viên đã mời bạn kết nối với lớp học của con.';
-
-  @override
   String get inviteAccept => 'Nhận lời mời';
 
   @override
-  String get inviteInvalid => 'Lời mời không tồn tại hoặc đã hết hạn.';
+  String inviteCardTitle(String teacher) {
+    return 'Lời mời từ $teacher';
+  }
+
+  @override
+  String inviteCardBody(String teacher, String student, String expires) {
+    return '$teacher mời bạn xem thông tin học tập của $student. Link còn hiệu lực tới $expires.';
+  }
+
+  @override
+  String get inviteInvalid =>
+      'Link mời hết hạn hoặc không còn dùng được. Hãy nhắn giáo viên xin link mới.';
+
+  @override
+  String get inviteEntryTitle => 'Cần lời mời từ giáo viên';
+
+  @override
+  String get inviteEntryBody =>
+      'Giáo viên của con sẽ gửi cho bạn link, mã hoặc mã QR. Ứng dụng không tìm học sinh theo tên, trường hay số điện thoại.';
+
+  @override
+  String get inviteScanQr => 'Quét mã QR';
+
+  @override
+  String get inviteInputLabel => 'Dán link hoặc nhập mã mời';
+
+  @override
+  String get inviteInputSubmit => 'Tiếp tục';
+
+  @override
+  String get inviteInputBad =>
+      'Chưa nhận ra link hoặc mã. Hãy dán cả link, hoặc nhập mã gồm 8 ký tự.';
+
+  @override
+  String get inviteCodeInvalid =>
+      'Mã không đúng hoặc đã hết hạn. Hãy nhắn giáo viên xin mã mới.';
+
+  @override
+  String inviteCodeLocked(int minutes) {
+    return 'Bạn đã nhập sai quá nhiều lần. Thử lại sau $minutes phút.';
+  }
+
+  @override
+  String get inviteRateLimited =>
+      'Bạn thao tác quá nhanh, vui lòng thử lại sau.';
+
+  @override
+  String get inviteAskTeacher => 'Nhắn giáo viên xin link';
+
+  @override
+  String get inviteAskMessage =>
+      'Chào thầy/cô, tôi là phụ huynh. Nhờ thầy/cô gửi lại link mời DayHoc để tôi xem thông tin của con. Cảm ơn thầy/cô.';
+
+  @override
+  String get inviteAskCopied =>
+      'Đã sao chép tin nhắn. Hãy dán vào Zalo để gửi cho giáo viên.';
+
+  @override
+  String get inviteScanTitle => 'Quét mã QR lời mời';
+
+  @override
+  String get inviteScanHint => 'Đưa mã QR vào khung hình.';
+
+  @override
+  String get inviteScanDenied =>
+      'Ứng dụng chưa được dùng camera. Bạn có thể dán link hoặc nhập mã thay thế.';
+
+  @override
+  String get inviteScanNotInvite => 'Mã QR này không phải lời mời DayHoc.';
+
+  @override
+  String get consentTitle => 'Đồng ý xử lý dữ liệu';
+
+  @override
+  String get consentBody =>
+      'Để xem thông tin học tập của con, bạn cần đồng ý để DayHoc xử lý dữ liệu cá nhân của bạn và của con theo điều khoản và chính sách bảo mật.';
+
+  @override
+  String consentVersion(String version) {
+    return 'Phiên bản điều khoản: $version';
+  }
+
+  @override
+  String get consentAccept => 'Đồng ý và tiếp tục';
+
+  @override
+  String get consentTermsChanged =>
+      'Điều khoản vừa được cập nhật. Vui lòng đọc lại rồi đồng ý.';
+
+  @override
+  String get consentFailed => 'Chưa gửi được. Vui lòng thử lại.';
+
+  @override
+  String get consentLoadFailed =>
+      'Không tải được điều khoản. Vui lòng thử lại.';
 
   @override
   String get inviteFailed => 'Không nhận được lời mời. Vui lòng thử lại.';
-
-  @override
-  String get inviteConsentTitle => 'Đồng ý xử lý dữ liệu';
-
-  @override
-  String get inviteConsentBody =>
-      'Để xem thông tin học tập của con, bạn cần đồng ý với điều khoản và chính sách xử lý dữ liệu cá nhân của DayHoc.';
-
-  @override
-  String get inviteConsentAccept => 'Đồng ý và nhận lời mời';
 
   @override
   String get settings => 'Cài đặt';
@@ -158,6 +247,32 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get logout => 'Đăng xuất';
+
+  @override
+  String logoutPendingTitle(int count) {
+    return 'Còn $count buổi chưa đồng bộ';
+  }
+
+  @override
+  String get logoutUnreadableTitle => 'Không đọc được dữ liệu chưa đồng bộ';
+
+  @override
+  String get logoutUnreadableBody =>
+      'Nếu đăng xuất, dữ liệu trên máy sẽ bị xóa và có thể mất các buổi chưa đồng bộ.';
+
+  @override
+  String get logoutWipeFailed =>
+      'Đã đăng xuất, nhưng chưa xóa hết dữ liệu trên máy. Ứng dụng sẽ thử lại lần mở sau.';
+
+  @override
+  String get logoutPendingBody =>
+      'Đăng xuất bây giờ sẽ xóa các buổi này khỏi máy. Hãy kết nối mạng để đồng bộ trước.';
+
+  @override
+  String get logoutPendingConfirm => 'Vẫn đăng xuất';
+
+  @override
+  String get logoutPendingCancel => 'Ở lại';
 
   @override
   String get loading => 'Đang tải...';
@@ -308,4 +423,135 @@ class AppLocalizationsVi extends AppLocalizations {
   String roleSwitchedTo(String role) {
     return 'Đang ở vai trò $role';
   }
+
+  @override
+  String get waitlistTitle => 'Đăng ký sớm cho Chủ trung tâm';
+
+  @override
+  String get waitlistIntro =>
+      'Tính năng cho trung tâm sắp ra mắt. Để lại thông tin, chúng tôi sẽ liên hệ khi sẵn sàng.';
+
+  @override
+  String get waitlistCenterName => 'Tên trung tâm';
+
+  @override
+  String get waitlistCenterNameRequired => 'Nhập tên trung tâm.';
+
+  @override
+  String get waitlistTeacherCount => 'Số giáo viên';
+
+  @override
+  String get waitlistTeacherCountInvalid => 'Nhập số từ 1 đến 1000.';
+
+  @override
+  String get waitlistSubmit => 'Gửi đăng ký';
+
+  @override
+  String get waitlistTrialHint =>
+      'Trong lúc chờ, bạn có thể dùng thử với vai trò Giáo viên.';
+
+  @override
+  String get waitlistTrialAction => 'Dùng thử vai trò Giáo viên';
+
+  @override
+  String get waitlistSent => 'Đã nhận đăng ký';
+
+  @override
+  String get waitlistSentBody => 'Cảm ơn bạn. Chúng tôi sẽ liên hệ sớm.';
+
+  @override
+  String get waitlistErrorBusy => 'Yêu cầu đang xử lý. Thử lại sau giây lát.';
+
+  @override
+  String get waitlistErrorValidation =>
+      'Thông tin chưa hợp lệ. Kiểm tra lại các ô.';
+
+  @override
+  String get waitlistErrorNetwork => 'Không có mạng. Thử lại sau.';
+
+  @override
+  String get waitlistErrorGeneric => 'Chưa gửi được đăng ký. Thử lại sau.';
+
+  @override
+  String get settingsAccount => 'Tài khoản';
+
+  @override
+  String get deleteAccountEntry => 'Xóa tài khoản';
+
+  @override
+  String get deleteAccountEntrySubtitle =>
+      'Xóa vĩnh viễn tài khoản và dữ liệu cá nhân';
+
+  @override
+  String get deleteAccountTitle => 'Xóa tài khoản';
+
+  @override
+  String get deleteAccountWarnHeading => 'Hành động này không thể hoàn tác';
+
+  @override
+  String deleteAccountWarnBody(String email) {
+    return 'Tài khoản $email và dữ liệu cá nhân sẽ bị xóa. Đăng nhập lại bằng email này sẽ tạo tài khoản mới và không thấy dữ liệu cũ. Chứng từ tài chính được giữ lại theo quy định.';
+  }
+
+  @override
+  String deleteAccountPendingWarn(int count) {
+    return 'Máy này còn $count mục chưa đồng bộ (điểm danh, thay đổi). Xóa tài khoản sẽ làm mất các dữ liệu đó.';
+  }
+
+  @override
+  String get deleteAccountUnreadableWarn =>
+      'Không kiểm tra được dữ liệu chưa đồng bộ trên máy này. Nếu có, dữ liệu đó sẽ mất.';
+
+  @override
+  String get deleteAccountSendCode => 'Gửi mã xác nhận';
+
+  @override
+  String get deleteAccountSending => 'Đang gửi mã…';
+
+  @override
+  String get deleteAccountCodeHeading => 'Nhập mã xác nhận';
+
+  @override
+  String deleteAccountCodeSent(String email) {
+    return 'Mã 6 số đã gửi tới $email. Mã dùng được trong 5 phút.';
+  }
+
+  @override
+  String get deleteAccountConfirm => 'Xóa tài khoản vĩnh viễn';
+
+  @override
+  String get deleteAccountDeleting => 'Đang xóa…';
+
+  @override
+  String get deleteAccountResend => 'Gửi lại mã';
+
+  @override
+  String get deleteAccountErrNetwork => 'Không có mạng. Thử lại sau.';
+
+  @override
+  String deleteAccountErrRateLimited(int seconds) {
+    return 'Gửi mã quá nhiều lần. Thử lại sau $seconds giây.';
+  }
+
+  @override
+  String get deleteAccountErrRateLimitedNoTime =>
+      'Gửi mã quá nhiều lần. Thử lại sau ít phút.';
+
+  @override
+  String get deleteAccountErrOwnerHasStaff =>
+      'Bạn đang là chủ không gian còn giáo viên khác. Hãy chuyển quyền hoặc gỡ họ khỏi không gian trước khi xóa tài khoản.';
+
+  @override
+  String get deleteAccountErrActiveClasses =>
+      'Còn lớp đang hoạt động. Hãy lưu trữ hết các lớp trước khi xóa tài khoản.';
+
+  @override
+  String get deleteAccountErrStale =>
+      'Dữ liệu vừa thay đổi. Mở lại màn này rồi thử lại.';
+
+  @override
+  String get deleteAccountErrGeneric => 'Chưa xóa được tài khoản. Thử lại sau.';
+
+  @override
+  String get consentLater => 'Để sau';
 }

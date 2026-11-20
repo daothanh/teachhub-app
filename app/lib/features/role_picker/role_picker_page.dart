@@ -16,7 +16,7 @@ import 'membership_cubit.dart';
 ///
 /// Chọn một vai trò rồi "Tiếp tục": vai trò đã có → mở luôn; chưa có → tạo
 /// (Giáo viên = `POST /workspaces`, Phụ huynh/Học sinh = `POST /me/roles`).
-/// Chủ trung tâm (T01d, đăng ký sớm) mở ở Sprint 2.
+/// Chủ trung tâm chưa mở: chạm vào thẻ để đăng ký sớm (T01d).
 class RolePickerPage extends StatefulWidget {
   const RolePickerPage({super.key});
 
@@ -126,6 +126,7 @@ class _RolePickerPageState extends State<RolePickerPage> {
                   title: l10n.roleCenterOwner,
                   caption: l10n.roleCenterOwnerDesc,
                   comingSoon: l10n.roleComingSoon,
+                  onTap: () => context.push(AppRoutes.centerWaitlist),
                 ),
               ],
             ),
@@ -204,10 +205,13 @@ class _RoleCard extends StatelessWidget {
     );
 
     if (comingSoon != null) {
-      return DashedBorder(
-        color: context.teachHubColors.warningBorder,
-        radius: tokens.cardRadius,
-        child: content,
+      return Semantics(
+        button: onTap != null,
+        child: DashedBorder(
+          color: context.teachHubColors.warningBorder,
+          radius: tokens.cardRadius,
+          child: InkWell(borderRadius: radius, onTap: onTap, child: content),
+        ),
       );
     }
     return Semantics(

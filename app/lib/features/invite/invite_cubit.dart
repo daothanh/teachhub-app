@@ -1,99 +1,121 @@
-import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tasco_utils/tasco_utils.dart';
-
 import 'package:teachhub_shared/teachhub_shared.dart';
 
-import '../../core/network/api_error.dart';
+import '../consent/consent_cubit.dart';
 import '../role_picker/membership_cubit.dart';
+import 'invite_accept.dart';
+import 'invite_repository.dart';
+
+enum InvitePhase {
+  /// Đang xem trước lời mời.
+  loading,
+
+  /// Thẻ lời mời đã hiện, chờ người dùng nhận.
+  ready,
+  accepting,
+
+  /// Server đòi đồng ý điều khoản: trang mở màn đồng ý rồi gọi [InviteCubit.accept] lại.
+  consentRequired,
+  accepted,
+
+  /// 410: link sai, hết hạn, đã dùng hay bị thu hồi (cùng một thông báo).
+  invalid,
+  failed,
+}
 
 class InviteState extends Equatable {
   const InviteState({
-    this.statusAccept = LoadingStatus.initial,
-    this.consentTermsVersion,
+    this.phase = InvitePhase.loading,
+    this.preview,
     this.errorCode,
   });
 
-  final LoadingStatus statusAccept;
-
-  /// Có giá trị khi API trả `CONSENT_REQUIRED`: phiên bản điều khoản cần đồng
-  /// ý trước khi nhận lời mời (FR-0.14).
-  final String? consentTermsVersion;
+  final InvitePhase phase;
+  final InvitePreview? preview;
   final ApiErrorCode? errorCode;
 
   @override
-  List<Object?> get props => [statusAccept, consentTermsVersion, errorCode];
+  List<Object?> get props => [
+    phase,
+    preview?.teacherName,
+    preview?.studentGivenName,
+    errorCode,
+  ];
 }
 
-/// Nhận lời mời từ link `dayhoc.app/i/<token>` (spec §5.2c).
+/// Nhận lời mời từ link/QR (token) — spec §5.2c, US-0.3, US-0.12 AC2.
+///
+/// Token là bí mật: chỉ giữ trong bộ nhớ của cubit, bỏ ngay khi dùng xong.
 class InviteCubit extends Cubit<InviteState> {
   InviteCubit({
-    required Dio api,
+    required InviteRepository repository,
     required MembershipCubit memberships,
-    required this.token,
-  }) : _api = api,
+    required ConsentCubit consent,
+    required String token,
+  }) : _repo = repository,
        _memberships = memberships,
+       _consent = consent,
+       _token = token,
        super(const InviteState());
 
-  final Dio _api;
+  final InviteRepository _repo;
   final MembershipCubit _memberships;
-  final String token;
+  final ConsentCubit _consent;
+  String? _token;
 
-  /// `POST /invites/{token}/accept` → `{ membershipId }`; mở vai trò vừa nhận.
-  Future<void> accept() async {
-    emit(const InviteState(statusAccept: LoadingStatus.loading));
+  /// `POST /invites/preview` (công khai).
+  Future<void> load() async {
+    final token = _token;
+    if (token == null) return;
+    emit(const InviteState());
     try {
-      final res = await _api.post<Map<String, dynamic>>(
-        '/invites/${Uri.encodeComponent(token)}/accept',
-      );
-      await _memberships.load(silent: true);
-      final id = res.data?['membershipId'];
-      final joined = _memberships.state.memberships
-          .where((m) => m.id == id)
-          .firstOrNull;
-      if (joined != null) await _memberships.select(joined);
+      final preview = await _repo.preview(token);
       if (!isClosed) {
-        emit(const InviteState(statusAccept: LoadingStatus.success));
+        emit(InviteState(phase: InvitePhase.ready, preview: preview));
       }
-    } on DioException catch (e) {
-      if (isClosed) return;
-      final error = apiException(e);
-      final version = error?.details['termsVersion'];
-      emit(
-        InviteState(
-          statusAccept: LoadingStatus.failure,
-          errorCode: error?.code,
-          consentTermsVersion:
-              error?.code == ApiErrorCode.consentRequired && version is String
-              ? version
-              : null,
-        ),
-      );
+    } catch (e) {
+      _fail(e);
     }
   }
 
-  /// `POST /consents { role: parent, termsVersion }` rồi nhận lại lời mời.
-  Future<void> consentAndAccept() async {
-    final version = state.consentTermsVersion;
-    if (version == null) return;
-    emit(const InviteState(statusAccept: LoadingStatus.loading));
+  /// `POST /invites/accept`; 403 `CONSENT_REQUIRED` → [InvitePhase.consentRequired].
+  Future<void> accept() async {
+    final token = _token;
+    if (token == null || state.phase == InvitePhase.accepting) return;
+    emit(InviteState(phase: InvitePhase.accepting, preview: state.preview));
     try {
-      await _api.post<void>(
-        '/consents',
-        data: {'role': 'parent', 'termsVersion': version},
+      final accepted = await _repo.accept(token);
+      await completeInvite(
+        accepted: accepted,
+        memberships: _memberships,
+        consent: _consent,
       );
-    } on DioException catch (e) {
+      _token = null;
       if (!isClosed) {
-        emit(
-          InviteState(
-            statusAccept: LoadingStatus.failure,
-            errorCode: apiException(e)?.code,
-          ),
-        );
+        emit(InviteState(phase: InvitePhase.accepted, preview: state.preview));
       }
-      return;
+    } catch (e) {
+      _fail(e);
     }
-    await accept();
+  }
+
+  /// Người dùng thoát màn đồng ý mà chưa đồng ý: quay lại thẻ lời mời.
+  void consentDeclined() {
+    if (state.phase == InvitePhase.consentRequired) {
+      emit(InviteState(phase: InvitePhase.ready, preview: state.preview));
+    }
+  }
+
+  void _fail(Object error) {
+    if (isClosed) return;
+    final code = error is ApiException ? error.code : ApiErrorCode.unknown;
+    final phase = switch (code) {
+      ApiErrorCode.consentRequired => InvitePhase.consentRequired,
+      ApiErrorCode.inviteInvalid => InvitePhase.invalid,
+      _ => InvitePhase.failed,
+    };
+    if (phase == InvitePhase.invalid) _token = null;
+    emit(InviteState(phase: phase, preview: state.preview, errorCode: code));
   }
 }

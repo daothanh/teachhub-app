@@ -1,6 +1,144 @@
 {
   "@@locale": "en",
   "spaceTitle": "Parent",
-  "spaceComingSoon": "This space is under construction.",
-  "switchRole": "Switch role"
+  "switchRole": "Switch role",
+  "parentNoInviteTitle": "You need an invitation from a teacher",
+  "parentNoInviteBody": "The teacher sends a link, a code or a QR code to connect you to your child's class.",
+  "parentAddInvite": "Add invitation",
+  "parentLoadFailed": "Could not load your child's information. Please try again.",
+  "parentRetry": "Try again",
+  "parentPickChild": "Choose child",
+  "parentChildClasses": "Classes: {classes}",
+  "@parentChildClasses": {
+    "placeholders": {
+      "classes": {
+        "type": "String"
+      }
+    }
+  },
+  "parentNoClasses": "Your child is not enrolled in any class.",
+  "attendanceWeekTitle": "Attendance this week",
+  "attendanceWeekRange": "{start} – {end}",
+  "@attendanceWeekRange": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "attendancePresent": "Present",
+  "attendanceLate": "Late",
+  "attendanceExcused": "Excused absence",
+  "attendanceUnexcused": "Unexcused absence",
+  "attendanceNotRecorded": "Not recorded",
+  "attendanceUpcoming": "Upcoming",
+  "attendanceCount": "{label}: {count}",
+  "@attendanceCount": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "attendanceNoSessions": "No classes this week.",
+  "attendanceCancelled": "Cancelled",
+  "attendanceMakeup": "Make-up class",
+  "attendanceSessionLine": "{className}, {when}",
+  "@attendanceSessionLine": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationBannerTitle": "Turn on notifications",
+  "notificationBannerBody": "Get attendance and schedule updates for your child as soon as the teacher posts them.",
+  "notificationBannerAction": "Turn on notifications",
+  "invoiceTuitionTitle": "Tuition",
+  "invoiceTuitionUnpaid": "{count} invoices not settled, {total} in total",
+  "@invoiceTuitionUnpaid": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceTuitionUnpaidMore": "{count}+ invoices not settled",
+  "@invoiceTuitionUnpaidMore": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invoiceTuitionNone": "No invoices to pay.",
+  "invoiceTuitionOpen": "View invoices",
+  "invoiceListTitle": "Invoices",
+  "invoiceFilterAll": "All",
+  "invoiceStatusIssued": "Unpaid",
+  "invoiceStatusPending": "Awaiting confirmation",
+  "invoiceStatusPartial": "Partially paid",
+  "invoiceStatusPaid": "Paid",
+  "invoiceStatusVoid": "Cancelled",
+  "invoiceStatusUnknown": "Other",
+  "invoiceEmpty": "No invoices yet.",
+  "invoiceLoadMore": "Load more",
+  "invoiceRowSubtitle": "{student}, {month}",
+  "@invoiceRowSubtitle": {
+    "placeholders": {
+      "student": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceDue": "Due {date}",
+  "@invoiceDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceCodeLabel": "Code {code}",
+  "@invoiceCodeLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceLinesTitle": "Items",
+  "invoiceTotal": "Total",
+  "invoiceVoidNotice": "This invoice was cancelled. No payment needed.",
+  "invoicePayTitle": "Bank transfer",
+  "invoiceQrHint": "Scan with your banking app.",
+  "invoiceSaveQr": "Save QR image",
+  "invoiceQrSaved": "QR image saved.",
+  "invoiceQrDenied": "No permission to save photos. Allow it in Settings.",
+  "invoiceQrFailed": "Couldn't save the QR image. Please try again.",
+  "invoiceCopyNote": "Copy transfer note",
+  "invoiceCopyAccount": "Copy account number",
+  "invoiceCopied": "Copied.",
+  "invoiceBank": "Bank",
+  "invoiceAccountNo": "Account number",
+  "invoiceAccountName": "Account holder",
+  "invoiceTransferNote": "Transfer note",
+  "invoiceNotFound": "Invoice not found",
+  "invoiceNotFoundBody": "This invoice doesn't exist or you can't view it.",
+  "invoiceLoadFailed": "Couldn't load the invoice. Please try again."
 }

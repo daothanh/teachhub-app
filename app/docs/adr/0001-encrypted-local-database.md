@@ -36,7 +36,7 @@ và có thể đóng gói **SQLite3MultipleCiphers** (sqlite3mc) thay SQLite g�
 | --- | --- |
 | File không đọc được khi thiếu/sai khóa; không còn chuỗi plaintext | Có test (`test/data/teacher_database_test.dart`) |
 | `client_mutation_id` duy nhất trong outbox | Có test |
-| Export schema | `drift_schemas/drift_schema_v1.json`, `drift_schema_v2.json` (`dart run drift_dev schema dump …`) |
+| Export schema | `drift_schemas/drift_schema_v1.json` đến `drift_schema_v4.json` (`dart run drift_dev schema dump …`) |
 | Nâng cấp schema v1 → v2 | **Đạt** — `test/data/teacher_migration_test.dart`: `SchemaVerifier` khớp schema v2; nâng cấp trên **file mã hóa** có dữ liệu v1 → dữ liệu còn, cột mới có mặc định |
 | Build + chạy trên máy Android thật | **Đạt** 18/11/2026 — OPPO CPH2577 (Android 13, tầm trung), `app/integration_test/teacher_db_device_test.dart` |
 | File trên máy đã mã hóa | **Đạt** — 16 byte đầu là dữ liệu ngẫu nhiên, không phải `SQLite format 3` |
@@ -88,8 +88,25 @@ lâu hơn (lần chạy trên chờ 8 s) — chấp nhận được vì sự ki�
 - Gọi `deleteTeacherDatabase` trong luồng đăng xuất sau khi outbox trống (S1-FL-10);
   cảnh báo "Còn N buổi chưa đồng bộ".
 
+## Schema v3 và SyncEngine thật (S3-FL-08, S3-FL-10)
+
+- v3 thêm bảng cache `cached_sessions` (buổi: id, lớp, ngày, giờ, trạng thái, `canEdit`, `editableUntil`) và
+  `cached_attendances` (tên học viên, trạng thái, ghi chú, `clientUpdatedAt`) — chỉ cột tối thiểu, không SĐT, ngày sinh.
+  Outbox có thêm `sessionId`, `studentId`, `batchKey`, `batchDeviceTime`. Dòng outbox cũ của spike v2 không có
+  `sessionId` nên SyncEngine bỏ qua.
+- Mỗi lô gửi lên server là một buổi, tối đa 500 mutation. `Idempotency-Key` và `deviceTime` của lô lưu ngay vào các
+  dòng outbox khi gom lô, nên gửi lại sau khi mất phản hồi, kể cả sau khi app bị kill, là đúng cùng một request.
+- 404 và 409 `SESSION_CANCELLED` cả lô: dòng chuyển `lastError = batch:<mã>`, không gửi lại. `stale`: ghi đè bản cục bộ
+  bằng `current` trừ khi người dùng đã sửa tiếp. Banner phát qua `SyncEngine.events`, chip qua `watchPending()`.
+- Xóa CSDL: `TeacherLocalData` dừng engine và chờ lượt đang chạy xong trước khi đóng CSDL, rồi bật lại sau khi mở lại.
+
 ## Hệ quả
 
 - Mọi lệnh `flutter build/run/test` của app tải và biên dịch sqlite3mc qua build hook.
 - Đổi tên khóa `teacher.db_key` hoặc mất Keychain ⇒ không mở được CSDL cũ; khi đó xóa
   file và tải lại từ server (dữ liệu nguồn ở server, trừ outbox chưa đồng bộ).
+
+## Schema v4 (S3-FL-01)
+
+- v4 thêm cột `cached_sessions.tz_offset_minutes` (offset UTC của tenant, lấy từ `startsAt`). Drift chỉ lưu thời điểm tuyệt đối, nên không có cột này thì ngoại tuyến không hiện được giờ tường của tenant. Dòng cũ để null và dùng giờ máy.
+- Migration: `from == 3` mới `addColumn`, vì `createTable` ở bước v3 đã tạo bảng với cột mới. Có test v3 → v4 và v1/v2 → v4.

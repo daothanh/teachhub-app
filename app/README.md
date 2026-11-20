@@ -41,7 +41,11 @@ flutter run --flavor development -t lib/main_development.dart
   simulator, sửa thành `http://localhost:3000/v1` trong `assets/.env.development`.
 - Staging và production **dừng ngay khi khởi động** nếu thiếu cấu hình Firebase của flavor đó.
   Cách thêm file Firebase, ký release, Google client ID: xem `docs/native-setup.md`.
-- Hợp đồng API mà app đang dùng: `docs/api-contract.md`.
+- Hợp đồng API: `teachhub-backend/contracts/openapi.json` (nguồn duy nhất). Bản chép dùng cho test nằm ở
+  `packages/teachhub_shared/contracts/`, cập nhật bằng `dart run tool/sync_openapi.dart`.
+
+Mini-app teacher đọc danh bạ (`flutter_contacts`) nên quyền khai ở shell: `NSContactsUsageDescription` trong
+`ios/Runner/Info.plist` và `READ_CONTACTS` trong `android/app/src/main/AndroidManifest.xml`.
 
 ## Kiểm tra
 

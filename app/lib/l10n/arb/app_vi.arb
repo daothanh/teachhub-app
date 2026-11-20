@@ -12,6 +12,8 @@
   "loginChangeEmail": "Đổi email",
   "loginRateLimited": "Bạn thao tác quá nhanh, vui lòng thử lại sau.",
   "loginFailed": "Đăng nhập không thành công. Vui lòng thử lại.",
+  "loginUnavailable": "Hệ thống đang bận, vui lòng thử lại sau ít phút.",
+  "loginEmailRequiresOtp": "Email này cần đăng nhập bằng mã OTP. Nhập email bên dưới để nhận mã.",
   "splashLoadFailed": "Không tải được vai trò của bạn.",
   "roleWhoAreYou": "Bạn là…?",
   "roleTeacher": "Giáo viên",
@@ -19,13 +21,68 @@
   "roleStudent": "Học sinh",
   "roleAddFailed": "Không thêm được vai trò. Vui lòng thử lại.",
   "inviteTitle": "Lời mời tham gia lớp",
-  "inviteBody": "Giáo viên đã mời bạn kết nối với lớp học của con.",
   "inviteAccept": "Nhận lời mời",
-  "inviteInvalid": "Lời mời không tồn tại hoặc đã hết hạn.",
+  "inviteCardTitle": "Lời mời từ {teacher}",
+  "@inviteCardTitle": {
+    "placeholders": {
+      "teacher": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteCardBody": "{teacher} mời bạn xem thông tin học tập của {student}. Link còn hiệu lực tới {expires}.",
+  "@inviteCardBody": {
+    "placeholders": {
+      "teacher": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      },
+      "expires": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteInvalid": "Link mời hết hạn hoặc không còn dùng được. Hãy nhắn giáo viên xin link mới.",
+  "inviteEntryTitle": "Cần lời mời từ giáo viên",
+  "inviteEntryBody": "Giáo viên của con sẽ gửi cho bạn link, mã hoặc mã QR. Ứng dụng không tìm học sinh theo tên, trường hay số điện thoại.",
+  "inviteScanQr": "Quét mã QR",
+  "inviteInputLabel": "Dán link hoặc nhập mã mời",
+  "inviteInputSubmit": "Tiếp tục",
+  "inviteInputBad": "Chưa nhận ra link hoặc mã. Hãy dán cả link, hoặc nhập mã gồm 8 ký tự.",
+  "inviteCodeInvalid": "Mã không đúng hoặc đã hết hạn. Hãy nhắn giáo viên xin mã mới.",
+  "inviteCodeLocked": "Bạn đã nhập sai quá nhiều lần. Thử lại sau {minutes} phút.",
+  "@inviteCodeLocked": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteRateLimited": "Bạn thao tác quá nhanh, vui lòng thử lại sau.",
+  "inviteAskTeacher": "Nhắn giáo viên xin link",
+  "inviteAskMessage": "Chào thầy/cô, tôi là phụ huynh. Nhờ thầy/cô gửi lại link mời DayHoc để tôi xem thông tin của con. Cảm ơn thầy/cô.",
+  "inviteAskCopied": "Đã sao chép tin nhắn. Hãy dán vào Zalo để gửi cho giáo viên.",
+  "inviteScanTitle": "Quét mã QR lời mời",
+  "inviteScanHint": "Đưa mã QR vào khung hình.",
+  "inviteScanDenied": "Ứng dụng chưa được dùng camera. Bạn có thể dán link hoặc nhập mã thay thế.",
+  "inviteScanNotInvite": "Mã QR này không phải lời mời DayHoc.",
+  "consentTitle": "Đồng ý xử lý dữ liệu",
+  "consentBody": "Để xem thông tin học tập của con, bạn cần đồng ý để DayHoc xử lý dữ liệu cá nhân của bạn và của con theo điều khoản và chính sách bảo mật.",
+  "consentVersion": "Phiên bản điều khoản: {version}",
+  "@consentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "consentAccept": "Đồng ý và tiếp tục",
+  "consentTermsChanged": "Điều khoản vừa được cập nhật. Vui lòng đọc lại rồi đồng ý.",
+  "consentFailed": "Chưa gửi được. Vui lòng thử lại.",
+  "consentLoadFailed": "Không tải được điều khoản. Vui lòng thử lại.",
   "inviteFailed": "Không nhận được lời mời. Vui lòng thử lại.",
-  "inviteConsentTitle": "Đồng ý xử lý dữ liệu",
-  "inviteConsentBody": "Để xem thông tin học tập của con, bạn cần đồng ý với điều khoản và chính sách xử lý dữ liệu cá nhân của DayHoc.",
-  "inviteConsentAccept": "Đồng ý và nhận lời mời",
   "settings": "Cài đặt",
   "settingsAbout": "Về ứng dụng",
   "settingsAboutApp": "Ứng dụng",
@@ -48,6 +105,20 @@
   "settingsThemeLight": "Sáng",
   "settingsThemeSystem": "Theo hệ thống",
   "logout": "Đăng xuất",
+  "logoutPendingTitle": "Còn {count} buổi chưa đồng bộ",
+  "@logoutPendingTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "logoutUnreadableTitle": "Không đọc được dữ liệu chưa đồng bộ",
+  "logoutUnreadableBody": "Nếu đăng xuất, dữ liệu trên máy sẽ bị xóa và có thể mất các buổi chưa đồng bộ.",
+  "logoutWipeFailed": "Đã đăng xuất, nhưng chưa xóa hết dữ liệu trên máy. Ứng dụng sẽ thử lại lần mở sau.",
+  "logoutPendingBody": "Đăng xuất bây giờ sẽ xóa các buổi này khỏi máy. Hãy kết nối mạng để đồng bộ trước.",
+  "logoutPendingConfirm": "Vẫn đăng xuất",
+  "logoutPendingCancel": "Ở lại",
   "loading": "Đang tải...",
   "loginSlogan": "Kết nối thầy, trò và gia đình.",
   "loginTagline": "Quản lý lớp dạy thêm thật đơn giản.",
@@ -128,5 +199,71 @@
         "type": "String"
       }
     }
-  }
+  },
+  "waitlistTitle": "Đăng ký sớm cho Chủ trung tâm",
+  "waitlistIntro": "Tính năng cho trung tâm sắp ra mắt. Để lại thông tin, chúng tôi sẽ liên hệ khi sẵn sàng.",
+  "waitlistCenterName": "Tên trung tâm",
+  "waitlistCenterNameRequired": "Nhập tên trung tâm.",
+  "waitlistTeacherCount": "Số giáo viên",
+  "waitlistTeacherCountInvalid": "Nhập số từ 1 đến 1000.",
+  "waitlistSubmit": "Gửi đăng ký",
+  "waitlistTrialHint": "Trong lúc chờ, bạn có thể dùng thử với vai trò Giáo viên.",
+  "waitlistTrialAction": "Dùng thử vai trò Giáo viên",
+  "waitlistSent": "Đã nhận đăng ký",
+  "waitlistSentBody": "Cảm ơn bạn. Chúng tôi sẽ liên hệ sớm.",
+  "waitlistErrorBusy": "Yêu cầu đang xử lý. Thử lại sau giây lát.",
+  "waitlistErrorValidation": "Thông tin chưa hợp lệ. Kiểm tra lại các ô.",
+  "waitlistErrorNetwork": "Không có mạng. Thử lại sau.",
+  "waitlistErrorGeneric": "Chưa gửi được đăng ký. Thử lại sau.",
+  "settingsAccount": "Tài khoản",
+  "deleteAccountEntry": "Xóa tài khoản",
+  "deleteAccountEntrySubtitle": "Xóa vĩnh viễn tài khoản và dữ liệu cá nhân",
+  "deleteAccountTitle": "Xóa tài khoản",
+  "deleteAccountWarnHeading": "Hành động này không thể hoàn tác",
+  "deleteAccountWarnBody": "Tài khoản {email} và dữ liệu cá nhân sẽ bị xóa. Đăng nhập lại bằng email này sẽ tạo tài khoản mới và không thấy dữ liệu cũ. Chứng từ tài chính được giữ lại theo quy định.",
+  "@deleteAccountWarnBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountPendingWarn": "Máy này còn {count} mục chưa đồng bộ (điểm danh, thay đổi). Xóa tài khoản sẽ làm mất các dữ liệu đó.",
+  "@deleteAccountPendingWarn": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteAccountUnreadableWarn": "Không kiểm tra được dữ liệu chưa đồng bộ trên máy này. Nếu có, dữ liệu đó sẽ mất.",
+  "deleteAccountSendCode": "Gửi mã xác nhận",
+  "deleteAccountSending": "Đang gửi mã…",
+  "deleteAccountCodeHeading": "Nhập mã xác nhận",
+  "deleteAccountCodeSent": "Mã 6 số đã gửi tới {email}. Mã dùng được trong 5 phút.",
+  "@deleteAccountCodeSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteAccountConfirm": "Xóa tài khoản vĩnh viễn",
+  "deleteAccountDeleting": "Đang xóa…",
+  "deleteAccountResend": "Gửi lại mã",
+  "deleteAccountErrNetwork": "Không có mạng. Thử lại sau.",
+  "deleteAccountErrRateLimited": "Gửi mã quá nhiều lần. Thử lại sau {seconds} giây.",
+  "@deleteAccountErrRateLimited": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteAccountErrRateLimitedNoTime": "Gửi mã quá nhiều lần. Thử lại sau ít phút.",
+  "deleteAccountErrOwnerHasStaff": "Bạn đang là chủ không gian còn giáo viên khác. Hãy chuyển quyền hoặc gỡ họ khỏi không gian trước khi xóa tài khoản.",
+  "deleteAccountErrActiveClasses": "Còn lớp đang hoạt động. Hãy lưu trữ hết các lớp trước khi xóa tài khoản.",
+  "deleteAccountErrStale": "Dữ liệu vừa thay đổi. Mở lại màn này rồi thử lại.",
+  "deleteAccountErrGeneric": "Chưa xóa được tài khoản. Thử lại sau.",
+  "consentLater": "Để sau"
 }

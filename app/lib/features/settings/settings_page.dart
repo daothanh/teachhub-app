@@ -11,9 +11,51 @@ import '../../core/config/app_env.dart';
 import '../../core/routing/app_routes.dart';
 import '../../core/theme/theme_controller.dart';
 import '../../features/auth/auth_cubit.dart';
+import '../../features/auth/logout_service.dart';
 import '../../l10n/l10n.dart';
 
 // ── Settings Page ─────────────────────────────────────────────────────────────
+
+/// Đăng xuất; còn buổi chưa đồng bộ (hoặc không đọc được) thì hỏi trước
+/// (spec §6.4).
+Future<void> _logout(BuildContext context) async {
+  final l10n = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final result = await GetIt.I<LogoutService>().logout(
+    confirmDiscard: (pending) async {
+      if (!context.mounted) return false;
+      return await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text(
+                pending == null
+                    ? l10n.logoutUnreadableTitle
+                    : l10n.logoutPendingTitle(pending),
+              ),
+              content: Text(
+                pending == null
+                    ? l10n.logoutUnreadableBody
+                    : l10n.logoutPendingBody,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: Text(l10n.logoutPendingCancel),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: Text(l10n.logoutPendingConfirm),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+    },
+  );
+  if (result == LogoutResult.wipeFailed) {
+    messenger.showSnackBar(SnackBar(content: Text(l10n.logoutWipeFailed)));
+  }
+}
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -67,10 +109,35 @@ class SettingsPage extends StatelessWidget {
             SizedBox(height: 8.h),
             _AboutSection(isDark: isDark),
             SizedBox(height: 20.h),
+
+            // ── Account ─────────────────────────────────────────────────
+            _SectionHeader(title: l10n.settingsAccount),
+            SizedBox(height: 8.h),
+            _SettingsCard(
+              isDark: isDark,
+              children: [
+                ListTile(
+                  key: const Key('delete_account_tile'),
+                  leading: Icon(
+                    Icons.delete_forever_outlined,
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                  title: Text(
+                    l10n.deleteAccountEntry,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                  subtitle: Text(l10n.deleteAccountEntrySubtitle),
+                  onTap: () => context.push(AppRoutes.deleteAccount),
+                ),
+              ],
+            ),
+            SizedBox(height: 20.h),
             AppButton(
               label: l10n.logout,
               variant: AppButtonVariant.outlineDanger,
-              onPressed: () => context.read<AppAuthCubit>().logout(),
+              onPressed: () => _logout(context),
             ),
             SizedBox(height: 40.h),
           ],
@@ -101,12 +168,15 @@ class _SectionHeader extends StatelessWidget {
           ),
         ),
         SizedBox(width: 8.w),
-        Text(
-          title,
-          // TeachHub/Section: 12/16, đậm, chữ phụ.
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
+        // Expanded để tiêu đề xuống dòng khi chữ phóng 200%.
+        Expanded(
+          child: Text(
+            title,
+            // TeachHub/Section: 12/16, đậm, chữ phụ.
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ],

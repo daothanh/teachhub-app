@@ -10,7 +10,10 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../core/config/app_env.dart';
 import '../core/network/teachhub_headers_interceptor.dart';
+import '../core/network/teachhub_logging_interceptor.dart';
+import '../core/network/consent_required_interceptor.dart';
 import '../features/auth/teachhub_user.dart';
+import '../features/consent/consent_cubit.dart';
 
 /// HTTP inspector; `null` ở production.
 Alice? alice;
@@ -53,6 +56,10 @@ Future<void> apiModule(GetIt getIt) async {
         pinnedAdapter,
         apiInterceptors(
           headers: TeachHubHeadersInterceptor(clientInfo: clientInfo),
+          // Lazy: ConsentCubit cần chính Dio này, chỉ tra khi có lỗi 403.
+          consentRequired: ConsentRequiredInterceptor(
+            (v) => getIt<ConsentCubit>().markRequired(v),
+          ),
           loadingManager: getIt<LoadingManager>(),
           authInterceptor: getIt<AuthInterceptor>(),
           retryInterceptor: RetryInterceptor(
@@ -81,15 +88,17 @@ Future<void> apiModule(GetIt getIt) async {
 @visibleForTesting
 List<Interceptor> apiInterceptors({
   required TeachHubHeadersInterceptor headers,
+  required ConsentRequiredInterceptor consentRequired,
   required LoadingManager loadingManager,
   required AuthInterceptor authInterceptor,
   required RetryInterceptor retryInterceptor,
 }) => [
   headers,
+  consentRequired,
   ErrorInterceptor(loadingManager: loadingManager),
   authInterceptor,
   retryInterceptor,
-  LoggingInterceptor(),
+  TeachHubLoggingInterceptor(),
 ];
 
 Dio _buildDio(

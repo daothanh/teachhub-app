@@ -9,6 +9,7 @@ import 'package:app/core/theme/theme_controller.dart';
 import 'package:app/features/auth/teachhub_user.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:app/features/auth/auth_cubit.dart';
+import 'package:app/features/auth/logout_service.dart';
 import 'package:app/features/settings/settings_page.dart';
 import 'package:app/l10n/l10n.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -154,6 +155,91 @@ void main() {
   });
 
   group('SettingsPage Widget Tests', () {
+    testWidgets('logout with unsynced sessions warns and can be cancelled', (
+      tester,
+    ) async {
+      await _setupGetIt();
+      final calls = <String>[];
+      GetIt.I.registerSingleton<LogoutService>(
+        LogoutService(
+          logout: () async => calls.add('logout'),
+          pendingCount: () async => 3,
+          wipeLocalData: () async => calls.add('wipe'),
+        ),
+      );
+      await tester.pumpWidget(_wrap(GetIt.I<AppAuthCubit>()));
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('Đăng xuất'));
+      await tester.tap(find.text('Đăng xuất'));
+      await tester.pumpAndSettle();
+      expect(find.text('Còn 3 buổi chưa đồng bộ'), findsOneWidget);
+
+      await tester.tap(find.text('Ở lại'));
+      await tester.pumpAndSettle();
+      expect(calls, isEmpty);
+
+      await tester.tap(find.text('Đăng xuất'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Vẫn đăng xuất'));
+      await tester.pumpAndSettle();
+      expect(calls, ['logout', 'wipe']);
+    });
+
+    testWidgets('mục "Xóa tài khoản" nằm trong cài đặt, chữ 200% không vỡ', (
+      tester,
+    ) async {
+      await _setupGetIt();
+      tester.view.physicalSize = const Size(390, 1200) * 3;
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: _wrap(GetIt.I<AppAuthCubit>()),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Xóa tài khoản'));
+      expect(find.text('Tài khoản'), findsOneWidget);
+      expect(find.text('Xóa tài khoản'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('wipe failure after logout shows a snackbar', (tester) async {
+      await _setupGetIt();
+      GetIt.I.registerSingleton<LogoutService>(
+        LogoutService(
+          logout: () async {},
+          pendingCount: () async => 0,
+          wipeLocalData: () async => throw StateError('disk'),
+        ),
+      );
+      await tester.pumpWidget(_wrap(GetIt.I<AppAuthCubit>()));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Đăng xuất'));
+      await tester.tap(find.text('Đăng xuất'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('chưa xóa hết dữ liệu'), findsOneWidget);
+    });
+
+    testWidgets('unreadable outbox shows its own warning', (tester) async {
+      await _setupGetIt();
+      GetIt.I.registerSingleton<LogoutService>(
+        LogoutService(
+          logout: () async {},
+          pendingCount: () async => throw StateError('key lost'),
+          wipeLocalData: () async {},
+        ),
+      );
+      await tester.pumpWidget(_wrap(GetIt.I<AppAuthCubit>()));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Đăng xuất'));
+      await tester.tap(find.text('Đăng xuất'));
+      await tester.pumpAndSettle();
+      expect(find.text('Không đọc được dữ liệu chưa đồng bộ'), findsOneWidget);
+    });
+
     testWidgets('renders all four sections with l10n labels', (tester) async {
       await _setupGetIt();
       final cubit = GetIt.I<AppAuthCubit>();

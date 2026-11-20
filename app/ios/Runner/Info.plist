@@ -66,6 +66,16 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSContactsUsageDescription</key>
+	<string>TeachHub đọc danh bạ khi bạn chọn Thêm từ danh bạ, để tạo học viên và lưu số của phụ huynh. Danh bạ không được dùng cho việc nào khác.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>TeachHub dùng camera để quét mã QR lời mời của giáo viên. Camera không được dùng cho việc nào khác.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>zalo</string>
+	</array>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>TeachHub lưu ảnh mã QR hóa đơn vào thư viện ảnh khi bạn bấm Lưu ảnh QR. Thư viện ảnh không được dùng cho việc nào khác.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>DayHoc dùng Face ID để xác thực khi bạn mở khoá chế độ phụ huynh.</string>
 	<key>CFBundleURLTypes</key>
@@ -96,6 +106,11 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
+		<string>processing</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>vn.dayhoc.app.sync-outbox</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>

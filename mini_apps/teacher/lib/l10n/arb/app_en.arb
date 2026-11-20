@@ -1,7 +1,607 @@
 {
   "@@locale": "en",
   "spaceTitle": "Teacher",
-  "spaceComingSoon": "This space is under construction.",
   "switchRole": "Switch role",
-  "offlineBanner": "Offline — changes are saved on this device and sync when you are back online."
+  "offlineBanner": "Offline — changes are saved on this device and sync when you are back online.",
+  "classesTitle": "Classes",
+  "classesTabActive": "Active",
+  "classesTabArchived": "Archived",
+  "classesEmpty": "No classes yet",
+  "classesEmptyHint": "Create your first class to get started.",
+  "classesEmptyArchived": "No archived classes",
+  "classesCreate": "Create class",
+  "classesRetry": "Try again",
+  "classesCancel": "Cancel",
+  "classesItemMeta": "{subject} · Grade {grade}",
+  "classesStudentCount": "{count, plural, =1{1 student} other{{count} students}}",
+  "classesModeOffline": "In person",
+  "classesModeOnline": "Online",
+  "classesDetailTitle": "Class details",
+  "classesEdit": "Edit class",
+  "classesArchive": "Archive class",
+  "classesArchiveConfirmTitle": "Archive this class?",
+  "classesArchiveConfirmBody": "The class will be hidden from the list and the calendar. Its data is kept.",
+  "classesArchivedBanner": "This class is archived.",
+  "classesSectionInfo": "Details",
+  "classesSectionSchedule": "Weekly schedule",
+  "classesSectionSessions": "Upcoming sessions",
+  "classesSectionStudents": "Students",
+  "classesNoRules": "No weekly schedule yet.",
+  "classesNoSessions": "No sessions in the next two months.",
+  "classesSessionsLoadFailed": "Could not load the sessions.",
+  "classesNoStudents": "No students in this class yet.",
+  "classesAddStudent": "Add student",
+  "classesLabelLocation": "Location",
+  "classesLabelCapacity": "Capacity",
+  "classesLabelStart": "Starts",
+  "classesLabelEnd": "Ends",
+  "classesNoEnd": "Open-ended",
+  "classesRuleLine": "{day} · {start} · {minutes} min",
+  "classesSessionLine": "{date} · {start}–{end}",
+  "classesSessionPlanned": "Planned",
+  "classesSessionTaught": "Taught",
+  "classesSessionCancelled": "Cancelled",
+  "classesSessionMakeup": "Make-up",
+  "classesStudentPaused": "On break",
+  "classesFormNewTitle": "New class",
+  "classesFormEditTitle": "Edit class",
+  "classesFieldName": "Class name",
+  "classesFieldSubject": "Subject",
+  "classesFieldGrade": "Grade (1–12)",
+  "classesFieldMode": "Format",
+  "classesFieldLocation": "Location",
+  "classesFieldCapacity": "Capacity (optional)",
+  "classesFieldStart": "Start date",
+  "classesFieldEnd": "End date (optional)",
+  "classesPickDate": "Pick a date",
+  "classesClearEnd": "Clear end date",
+  "classesSave": "Save",
+  "classesFormSaved": "Class saved.",
+  "classesFormSavedSessions": "Class saved. {count, plural, =1{1 session} other{{count} sessions}} created.",
+  "classesErrRequired": "This is required.",
+  "classesErrGrade": "Grade must be 1 to 12.",
+  "classesErrCapacity": "Capacity must be 1 to 500.",
+  "classesErrEndBeforeStart": "The end date cannot be before the start date.",
+  "classesErrRulesDuplicate": "Two sessions share the same day and start time.",
+  "classesErrRulesOverflow": "A session cannot run past 24:00.",
+  "classesErrRulesTooMany": "At most 14 sessions per week.",
+  "classesRulesTitle": "Weekly schedule",
+  "classesRuleAdd": "Add session",
+  "classesRuleRemove": "Remove this session",
+  "classesRuleTime": "Start time",
+  "classesRuleDuration": "Duration (min)",
+  "classesWeekday": "{day, select, 1{Monday} 2{Tuesday} 3{Wednesday} 4{Thursday} 5{Friday} 6{Saturday} other{Sunday}}",
+  "classesWeekdayShort": "{day, select, 1{Mon} 2{Tue} 3{Wed} 4{Thu} 5{Fri} 6{Sat} other{Sun}}",
+  "classesErrNetwork": "No connection. Check your network and try again.",
+  "classesErrPlanLimit": "Your plan limit is reached. Upgrade to add more.",
+  "classesErrStale": "The data just changed. Reload and try again.",
+  "classesErrBusy": "Your request is still processing. Wait a moment.",
+  "classesErrForbidden": "You do not have permission to do this.",
+  "classesErrNotFound": "This class was not found.",
+  "classesErrValidation": "Some data is not valid. Check the fields.",
+  "classesErrGeneric": "Something went wrong. Try again later.",
+  "classesErrEnrollConflict": "The class is archived or the student has left, so they cannot be added.",
+  "classesPickerTitle": "Add student",
+  "classesPickerSearchHint": "Search by name",
+  "classesPickerTooShort": "Type at least 2 characters to search.",
+  "classesPickerNone": "No matching students.",
+  "classesPickerNoneHint": "New students are added from the Students section.",
+  "classesEnrolled": "{name} was added to the class.",
+  "classesAlreadyEnrolled": "{name} is already in the class.",
+  "@classesItemMeta": {
+    "placeholders": {
+      "subject": {
+        "type": "String"
+      },
+      "grade": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesStudentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesRuleLine": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesSessionLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesFormSavedSessions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@classesWeekday": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesWeekdayShort": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesEnrolled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@classesAlreadyEnrolled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "classesErrRulesDuration": "Duration must be 15 to 480 minutes.",
+  "classesRuleN": "Session {n}",
+  "@classesRuleN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classesRuleRemoveN": "Remove session {n}",
+  "@classesRuleRemoveN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "studentsFormTitle": "Add student",
+  "studentsFullName": "Full name",
+  "studentsFullNameRequired": "Enter the student's name.",
+  "studentsDob": "Date of birth (optional)",
+  "studentsSchool": "School (optional)",
+  "studentsNote": "Note (optional)",
+  "studentsGuardianTitle": "Parent {n}",
+  "@studentsGuardianTitle": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "studentsGuardianName": "Parent's name",
+  "studentsGuardianNameRequired": "Enter the parent's name.",
+  "studentsGuardianPhone": "Phone (optional)",
+  "studentsGuardianPhoneInvalid": "The phone number looks wrong.",
+  "studentsAddGuardian": "Add parent",
+  "studentsRemoveGuardian": "Remove parent {n}",
+  "studentsSave": "Save student",
+  "studentsSaving": "Saving…",
+  "studentsDuplicateTitle": "Is this the same student?",
+  "studentsDuplicateBody": "A record with the same name and birth date exists. Pick the student, or add a new one.",
+  "studentsDuplicateSame": "Yes, same student",
+  "studentsDuplicateNew": "No, add as new",
+  "studentsDuplicateCancel": "Back to edit",
+  "studentsErrorLimit": "Your plan has no room for more students. Upgrade to add more.",
+  "studentsErrorBusy": "Still processing. Try again in a moment.",
+  "studentsErrorValidation": "Some details are invalid. Check the fields.",
+  "studentsErrorNetwork": "No connection. Try again later.",
+  "studentsErrorGeneric": "Could not save the student. Try again later.",
+  "onboardingTitle": "Get started with DayHoc",
+  "onboardingProgress": "Step {n}/{total}",
+  "@onboardingProgress": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingStepCreateClass": "Create your first class",
+  "onboardingStepAddStudents": "Add students",
+  "onboardingStepSetSchedule": "Set the schedule",
+  "onboardingStepPayoutAccount": "Payout account",
+  "onboardingStepComplianceChecklist": "Compliance checklist",
+  "onboardingSkip": "Later",
+  "onboardingMarkDone": "Done with this step",
+  "onboardingPlaceholderBody": "This screen is being finished.",
+  "onboardingPayoutBody": "Add an account to receive tuition. Coming soon.",
+  "onboardingComplianceBody": "See what to do to teach within the rules. Coming soon.",
+  "onboardingDoneTitle": "You are all set",
+  "onboardingDoneBody": "Go see your classes and students.",
+  "onboardingFinish": "Open DayHoc",
+  "onboardingLoadFailed": "Could not load progress. Try again.",
+  "onboardingRetry": "Retry",
+  "onboardingErrorBusy": "Still processing. Try again in a moment.",
+  "onboardingErrorValidation": "This step could not be saved. Check it.",
+  "onboardingErrorNetwork": "No connection. Try again later.",
+  "onboardingErrorGeneric": "Could not save. Try again later.",
+  "@studentsRemoveGuardian": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingCreateClassPending": "The class screen will be connected later.",
+  "onboardingStudentSaved": "Student saved. This step could not be recorded yet.",
+  "todayTitle": "Today",
+  "todayEmpty": "No sessions today",
+  "todayEmptyHint": "Scheduled sessions of your classes show up here.",
+  "todayClassesEntry": "Classes",
+  "todaySessionAttended": "Attendance taken",
+  "todaySessionNotAttended": "Not taken yet",
+  "todaySessionCancelled": "Cancelled",
+  "todayTakeAttendance": "Take attendance",
+  "todayPending": "Waiting to sync ({count})",
+  "@todayPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "todayRefreshFailed": "Could not refresh. Pull down to retry.",
+  "todaySessionSemantics": "{className}, {time}, {status}",
+  "@todaySessionSemantics": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "todayOnboardingTitle": "Setup steps you skipped",
+  "todayOnboardingOpen": "Open step {step}",
+  "@todayOnboardingOpen": {
+    "placeholders": {
+      "step": {
+        "type": "String"
+      }
+    }
+  },
+  "attendanceTitle": "Attendance",
+  "attendanceStatusPresent": "Present",
+  "attendanceStatusLate": "Late",
+  "attendanceStatusExcused": "Excused absence",
+  "attendanceStatusUnexcused": "Unexcused absence",
+  "attendanceStudentSemantics": "{name}, {status}. Tap to change status",
+  "@attendanceStudentSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "attendanceSave": "Save",
+  "attendanceSaving": "Saving…",
+  "attendanceSaveFailed": "Could not save. Try again.",
+  "attendanceLoadFailed": "Could not load the student list.",
+  "attendanceRetry": "Retry",
+  "attendanceEmptyRoster": "This class has no students yet.",
+  "attendanceReadOnlyCancelled": "This session was cancelled, so it is view only.",
+  "attendanceReadOnlyWindow": "This session is older than 7 days, so it is view only.",
+  "attendanceOfflineNotice": "You are offline. Changes are saved on this device and sent when you are back online.",
+  "attendanceNoteLabel": "Note",
+  "attendanceNoteToggle": "Note for {name}",
+  "@attendanceNoteToggle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "attendanceRejectedWindow": "The 7-day edit window has closed; the change was not accepted.",
+  "attendanceRejectedPlan": "Your current plan is view only; the change was not accepted.",
+  "attendanceRejectedNotFound": "The student is no longer in this session; the change was not accepted.",
+  "attendanceRejectedGeneric": "This change was not accepted.",
+  "attendanceBatchNotFound": "This session no longer exists, so attendance could not be sent.",
+  "attendanceBatchCancelled": "This session was cancelled, so attendance could not be sent.",
+  "attendanceBatchGeneric": "Attendance for this session could not be sent.",
+  "attendanceDiscard": "Discard rejected changes",
+  "attendanceHistory": "Edit history",
+  "historyTitle": "Edit history",
+  "historyEmpty": "No edits for this session yet.",
+  "historyLoadFailed": "Could not load the history.",
+  "historyLoadMore": "Load more",
+  "historyChangedBy": "{who} · {time}",
+  "@historyChangedBy": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "historyUnknownUser": "Unknown editor",
+  "historyFirst": "First attendance",
+  "historyNote": "Note: {note}",
+  "@historyNote": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "historyNoNote": "no note",
+  "contactsAdd": "Add from contacts",
+  "contactsTitle": "Add from contacts",
+  "contactsDeniedTitle": "No access to contacts",
+  "contactsDeniedBody": "DayHoc only reads your contacts when you tap Add from contacts, so you can pick students and parent numbers. You can still add each student by hand.",
+  "contactsAllow": "Allow again",
+  "contactsOpenSettings": "Open Settings",
+  "contactsManual": "Add by hand",
+  "contactsLoadFailed": "Could not read your contacts. Try again later.",
+  "contactsEmpty": "You have no contacts yet.",
+  "contactsNoPhone": "No phone number",
+  "contactsContinue": "Continue ({n})",
+  "@contactsContinue": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "contactsSaveAll": "Save {n} students",
+  "@contactsSaveAll": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "contactsDone": "Done",
+  "contactsBack": "Pick again",
+  "contactsRemoveRow": "Remove {name}",
+  "@contactsRemoveRow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "contactsReviewHint": "The contact name becomes the student name and the phone number becomes parent 1's number. Edit or remove rows before saving.",
+  "contactsRowSaved": "Saved",
+  "contactsRowSaving": "Saving…",
+  "contactsRowFailed": "Not saved",
+  "contactsRowDuplicate": "Possible duplicate",
+  "contactsRowReview": "Review duplicate",
+  "todayScheduleEntry": "Schedule",
+  "scheduleTitle": "Schedule",
+  "scheduleModeDay": "Day",
+  "scheduleModeWeek": "Week",
+  "schedulePrevious": "Previous",
+  "scheduleNext": "Next",
+  "scheduleToday": "Today",
+  "scheduleDayHeading": "{weekday}, {date}",
+  "@scheduleDayHeading": {
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleWeekRange": "{from} – {to}",
+  "@scheduleWeekRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleOfflineBanner": "You're offline. This is the last saved schedule.",
+  "scheduleEmpty": "No sessions in this period",
+  "scheduleLoadFailed": "Could not load the schedule.",
+  "scheduleRetry": "Try again",
+  "scheduleCancelled": "Cancelled",
+  "scheduleMakeup": "Make-up session",
+  "scheduleCancelReason": "Reason: {reason}",
+  "@scheduleCancelReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "studentsEditTitle": "Edit student",
+  "studentsGuardianRelation": "Relationship",
+  "studentsRelationFather": "Father",
+  "studentsRelationMother": "Mother",
+  "studentsRelationGuardian": "Guardian",
+  "inviteStatusNotInvited": "Not invited",
+  "inviteStatusInvited": "Invited",
+  "inviteStatusActivated": "Activated",
+  "inviteStatusExpired": "Expired",
+  "inviteShare": "Share link",
+  "inviteResend": "Resend link",
+  "rosterNoGuardians": "No parent yet. Tap the student name to add one.",
+  "rosterGuardianLine": "{relation}: {name}",
+  "@rosterGuardianLine": {
+    "placeholders": {
+      "relation": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterGuardianSemantics": "{who}, {status}",
+  "@rosterGuardianSemantics": {
+    "placeholders": {
+      "who": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "rosterEditSemantics": "Edit student {name}",
+  "@rosterEditSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteSheetFor": "Invite {guardian}, parent of {student}",
+  "@inviteSheetFor": {
+    "placeholders": {
+      "guardian": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteQrLabel": "Invitation QR code",
+  "inviteCodeLabel": "Code to type in",
+  "inviteCodeSemantics": "Invitation code: {code}",
+  "@inviteCodeSemantics": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteExpiryNote": "The link works for 7 days and the typed code for 48 hours.",
+  "inviteOldLinkNote": "This parent's previous link, if any, no longer works.",
+  "inviteShareMessage": "Hello {guardian}, I would like to invite you to follow {student}'s learning on DayHoc.\nOpen the link to accept: {url}\nOr enter code {code} in the DayHoc app (the code works for 48 hours).",
+  "@inviteShareMessage": {
+    "placeholders": {
+      "guardian": {
+        "type": "String"
+      },
+      "student": {
+        "type": "String"
+      },
+      "url": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "inviteAllEntry": "Invite all parents not yet activated",
+  "inviteAllTitle": "Invite class parents",
+  "inviteAllEmpty": "No parents left to invite.",
+  "inviteAllProgress": "Created {done}/{total} links",
+  "@inviteAllProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteAllHint": "Tap Share to send to each parent in turn. Parents with a valid invitation are skipped.",
+  "inviteAllPausedNetwork": "Stopped after repeated network errors. Check your connection, then tap Continue.",
+  "inviteAllPausedRate": "Stopped because of too many requests. Wait about {seconds} seconds, then tap Continue.",
+  "@inviteAllPausedRate": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "inviteAllPausedRateNoWait": "Stopped because of too many requests. Wait a moment, then tap Continue.",
+  "inviteAllResume": "Continue",
+  "inviteAllWaiting": "Not created yet",
+  "inviteAllCreating": "Creating link…",
+  "inviteAllShareAgain": "Share again",
+  "inviteAllShowQr": "Show QR code",
+  "inviteAllSharedMark": "Share opened",
+  "sessionActionReschedule": "Reschedule",
+  "sessionActionCancel": "Cancel session",
+  "sessionActionMakeup": "Add makeup",
+  "sessionRescheduleTitle": "Reschedule session",
+  "sessionCancelTitle": "Cancel this session?",
+  "sessionCancelBody": "The class's parents will be notified that this session is cancelled.",
+  "sessionMakeupTitle": "Add makeup session",
+  "sessionPickDate": "Date",
+  "sessionPickTime": "Start time",
+  "sessionReasonLabel": "Reason (optional)",
+  "sessionConfirmReschedule": "Reschedule",
+  "sessionConfirmCancel": "Cancel session",
+  "sessionConfirmMakeup": "Add makeup",
+  "sessionClose": "Close",
+  "sessionErrPast": "The new time must be in the future.",
+  "sessionErrCancelled": "This session is cancelled, so it cannot be rescheduled.",
+  "sessionHasAttendanceTitle": "Attendance already taken",
+  "sessionHasAttendanceBody": "This session has attendance, so it cannot be cancelled yet. Open the attendance sheet to fix it, then cancel the session.",
+  "sessionOpenAttendance": "Open attendance",
+  "sessionDoneRescheduled": "Session rescheduled.",
+  "sessionDoneCancelled": "Session cancelled.",
+  "sessionDoneMakeup": "Makeup session added.",
+  "sessionActionsLabel": "Actions for session on {date} at {start}",
+  "@sessionActionsLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionCancelReasonLine": "Cancel reason: {reason}",
+  "@sessionCancelReasonLine": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "todaySettings": "Settings and account"
 }

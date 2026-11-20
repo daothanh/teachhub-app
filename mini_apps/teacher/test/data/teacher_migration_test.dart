@@ -9,20 +9,79 @@ import 'package:teacher/data/local_db/teacher_database.dart';
 
 import '../generated_migrations/schema.dart';
 import '../generated_migrations/schema_v1.dart' as v1;
+import '../generated_migrations/schema_v2.dart' as v2;
+import '../generated_migrations/schema_v3.dart' as v3;
+import '../generated_migrations/schema_v4.dart' as v4;
 
 void main() {
   late SchemaVerifier verifier;
   setUpAll(() => verifier = SchemaVerifier(GeneratedHelper()));
 
-  test('v1 → v2: cấu trúc sau nâng cấp khớp schema v2 đã export', () async {
+  test(
+    'v2 → v5: cấu trúc khớp schema v5, dòng outbox spike (không buổi) bị bỏ',
+    () async {
+      final schema = await verifier.schemaAt(2);
+      final old = v2.DatabaseAtV2(schema.newConnection());
+      await old.customStatement(
+        "INSERT INTO outbox_mutations (client_mutation_id, entity, payload, client_updated_at, attempt_count) "
+        "VALUES ('m-1', 'attendance', '{}', 1794960000, 3)",
+      );
+      await old.close();
+
+      final db = TeacherDatabase(schema.newConnection());
+      addTearDown(db.close);
+      await verifier.migrateAndValidate(db, 5);
+      expect(await db.select(db.outboxMutations).get(), isEmpty);
+    },
+  );
+
+  test(
+    'v3 → v5: buổi cũ giữ nguyên, cột offset và lý do hủy mới là null',
+    () async {
+      final schema = await verifier.schemaAt(3);
+      final old = v3.DatabaseAtV3(schema.newConnection());
+      await old.customStatement(
+        "INSERT INTO cached_sessions (id, class_id, class_name, session_date, starts_at, ends_at, status, is_makeup) "
+        "VALUES ('s-1', 'c-1', 'Toán 9', '2026-11-19', 1794960000, 1794963600, 'planned', 0)",
+      );
+      await old.close();
+
+      final db = TeacherDatabase(schema.newConnection());
+      addTearDown(db.close);
+      await verifier.migrateAndValidate(db, 5);
+      final rows = await db.select(db.cachedSessions).get();
+      expect(rows.single.className, 'Toán 9');
+      expect(rows.single.tzOffsetMinutes, isNull);
+      expect(rows.single.cancelReason, isNull);
+    },
+  );
+
+  test('v4 → v5: buổi giữ nguyên offset, thêm cột lý do hủy', () async {
+    final schema = await verifier.schemaAt(4);
+    final old = v4.DatabaseAtV4(schema.newConnection());
+    await old.customStatement(
+      "INSERT INTO cached_sessions (id, class_id, class_name, session_date, starts_at, ends_at, status, is_makeup, tz_offset_minutes) "
+      "VALUES ('s-1', 'c-1', 'Toán 9', '2026-11-19', 1794960000, 1794963600, 'cancelled', 0, 420)",
+    );
+    await old.close();
+
+    final db = TeacherDatabase(schema.newConnection());
+    addTearDown(db.close);
+    await verifier.migrateAndValidate(db, 5);
+    final row = (await db.select(db.cachedSessions).get()).single;
+    expect(row.tzOffsetMinutes, 420);
+    expect(row.cancelReason, isNull);
+  });
+
+  test('v1 → v5 một mạch', () async {
     final connection = await verifier.startAt(1);
     final db = TeacherDatabase(connection);
     addTearDown(db.close);
-    await verifier.migrateAndValidate(db, 2);
+    await verifier.migrateAndValidate(db, 5);
   });
 
   test(
-    'v1 → v2 trên file mã hóa: dữ liệu outbox còn nguyên, cột mới có mặc định',
+    'v1 → v5 trên file mã hóa: mở được, bảng mới có mặt, dòng không buổi bị bỏ',
     () async {
       final dir = Directory.systemTemp.createTempSync('teacher_mig');
       addTearDown(() => dir.deleteSync(recursive: true));
@@ -41,9 +100,9 @@ void main() {
       final db = TeacherDatabase(open());
       addTearDown(db.close);
       final rows = await db.select(db.outboxMutations).get();
-      expect(rows.single.clientMutationId, 'm-1');
-      expect(rows.single.attemptCount, 0);
-      expect(rows.single.lastError, isNull);
+      // Dòng v1 không có buổi/học viên: migration v3 bỏ, nhưng file mã hóa vẫn mở được.
+      expect(rows, isEmpty);
+      expect(await db.select(db.cachedSessions).get(), isEmpty);
     },
   );
 

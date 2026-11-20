@@ -45,6 +45,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginFailed => 'Sign-in failed. Please try again.';
 
   @override
+  String get loginUnavailable =>
+      'The service is busy, please try again in a few minutes.';
+
+  @override
+  String get loginEmailRequiresOtp =>
+      'This email needs a one-time code to sign in. Enter it below to get a code.';
+
+  @override
   String get splashLoadFailed => 'Could not load your roles.';
 
   @override
@@ -66,28 +74,107 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inviteTitle => 'Class invitation';
 
   @override
-  String get inviteBody =>
-      'A teacher invited you to connect with your child\'s class.';
-
-  @override
   String get inviteAccept => 'Accept invitation';
 
   @override
-  String get inviteInvalid => 'This invitation does not exist or has expired.';
+  String inviteCardTitle(String teacher) {
+    return 'Invitation from $teacher';
+  }
+
+  @override
+  String inviteCardBody(String teacher, String student, String expires) {
+    return '$teacher invites you to see $student\'s learning information. The link is valid until $expires.';
+  }
+
+  @override
+  String get inviteInvalid =>
+      'This invitation link has expired or can no longer be used. Message the teacher for a new link.';
+
+  @override
+  String get inviteEntryTitle => 'You need an invitation from a teacher';
+
+  @override
+  String get inviteEntryBody =>
+      'Your child\'s teacher will send you a link, a code or a QR code. The app cannot search for students by name, school or phone number.';
+
+  @override
+  String get inviteScanQr => 'Scan QR code';
+
+  @override
+  String get inviteInputLabel => 'Paste the link or enter the invitation code';
+
+  @override
+  String get inviteInputSubmit => 'Continue';
+
+  @override
+  String get inviteInputBad =>
+      'Link or code not recognised. Paste the whole link, or enter the 8-character code.';
+
+  @override
+  String get inviteCodeInvalid =>
+      'The code is wrong or has expired. Message the teacher for a new code.';
+
+  @override
+  String inviteCodeLocked(int minutes) {
+    return 'Too many wrong attempts. Try again in $minutes minutes.';
+  }
+
+  @override
+  String get inviteRateLimited =>
+      'You are going too fast, please try again later.';
+
+  @override
+  String get inviteAskTeacher => 'Message the teacher for a link';
+
+  @override
+  String get inviteAskMessage =>
+      'Hello, I am a parent. Could you please resend the DayHoc invitation link so I can see my child\'s information? Thank you.';
+
+  @override
+  String get inviteAskCopied =>
+      'Message copied. Paste it into Zalo to send it to the teacher.';
+
+  @override
+  String get inviteScanTitle => 'Scan the invitation QR code';
+
+  @override
+  String get inviteScanHint => 'Point the camera at the QR code.';
+
+  @override
+  String get inviteScanDenied =>
+      'The app is not allowed to use the camera. You can paste the link or enter the code instead.';
+
+  @override
+  String get inviteScanNotInvite => 'This QR code is not a DayHoc invitation.';
+
+  @override
+  String get consentTitle => 'Consent to data processing';
+
+  @override
+  String get consentBody =>
+      'To see your child\'s learning information, you need to agree that DayHoc processes your and your child\'s personal data under the terms and privacy policy.';
+
+  @override
+  String consentVersion(String version) {
+    return 'Terms version: $version';
+  }
+
+  @override
+  String get consentAccept => 'Agree and continue';
+
+  @override
+  String get consentTermsChanged =>
+      'The terms were just updated. Please read them again, then agree.';
+
+  @override
+  String get consentFailed => 'Could not send. Please try again.';
+
+  @override
+  String get consentLoadFailed => 'Could not load the terms. Please try again.';
 
   @override
   String get inviteFailed =>
       'Could not accept the invitation. Please try again.';
-
-  @override
-  String get inviteConsentTitle => 'Data processing consent';
-
-  @override
-  String get inviteConsentBody =>
-      'To see your child\'s learning information, you need to agree to DayHoc\'s terms and personal data policy.';
-
-  @override
-  String get inviteConsentAccept => 'Agree and accept';
 
   @override
   String get settings => 'Settings';
@@ -158,6 +245,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logout => 'Logout';
+
+  @override
+  String logoutPendingTitle(int count) {
+    return '$count sessions not synced yet';
+  }
+
+  @override
+  String get logoutUnreadableTitle => 'Can\'t read unsynced data';
+
+  @override
+  String get logoutUnreadableBody =>
+      'If you log out, data on this device is deleted and unsynced sessions may be lost.';
+
+  @override
+  String get logoutWipeFailed =>
+      'Logged out, but some data on this device wasn\'t deleted. The app will retry next time it opens.';
+
+  @override
+  String get logoutPendingBody =>
+      'Logging out now deletes them from this device. Connect to the internet to sync first.';
+
+  @override
+  String get logoutPendingConfirm => 'Log out anyway';
+
+  @override
+  String get logoutPendingCancel => 'Stay';
 
   @override
   String get loading => 'Loading...';
@@ -309,4 +422,136 @@ class AppLocalizationsEn extends AppLocalizations {
   String roleSwitchedTo(String role) {
     return 'Now in the $role role';
   }
+
+  @override
+  String get waitlistTitle => 'Early sign-up for Center owners';
+
+  @override
+  String get waitlistIntro =>
+      'Center features are coming. Leave your details and we will contact you when ready.';
+
+  @override
+  String get waitlistCenterName => 'Center name';
+
+  @override
+  String get waitlistCenterNameRequired => 'Enter the center name.';
+
+  @override
+  String get waitlistTeacherCount => 'Number of teachers';
+
+  @override
+  String get waitlistTeacherCountInvalid => 'Enter a number from 1 to 1000.';
+
+  @override
+  String get waitlistSubmit => 'Send';
+
+  @override
+  String get waitlistTrialHint =>
+      'While you wait, you can try the Teacher role.';
+
+  @override
+  String get waitlistTrialAction => 'Try the Teacher role';
+
+  @override
+  String get waitlistSent => 'Request received';
+
+  @override
+  String get waitlistSentBody => 'Thank you. We will be in touch soon.';
+
+  @override
+  String get waitlistErrorBusy => 'Still processing. Try again in a moment.';
+
+  @override
+  String get waitlistErrorValidation =>
+      'Some details are invalid. Check the fields.';
+
+  @override
+  String get waitlistErrorNetwork => 'No connection. Try again later.';
+
+  @override
+  String get waitlistErrorGeneric => 'Could not send. Try again later.';
+
+  @override
+  String get settingsAccount => 'Account';
+
+  @override
+  String get deleteAccountEntry => 'Delete account';
+
+  @override
+  String get deleteAccountEntrySubtitle =>
+      'Permanently delete your account and personal data';
+
+  @override
+  String get deleteAccountTitle => 'Delete account';
+
+  @override
+  String get deleteAccountWarnHeading => 'This cannot be undone';
+
+  @override
+  String deleteAccountWarnBody(String email) {
+    return 'The account $email and your personal data will be deleted. Signing in again with this email creates a new account with none of the old data. Financial records are kept as required by regulation.';
+  }
+
+  @override
+  String deleteAccountPendingWarn(int count) {
+    return 'This device has $count unsynced items (attendance, changes). Deleting the account will lose them.';
+  }
+
+  @override
+  String get deleteAccountUnreadableWarn =>
+      'Could not check for unsynced data on this device. If there is any, it will be lost.';
+
+  @override
+  String get deleteAccountSendCode => 'Send confirmation code';
+
+  @override
+  String get deleteAccountSending => 'Sending code…';
+
+  @override
+  String get deleteAccountCodeHeading => 'Enter the confirmation code';
+
+  @override
+  String deleteAccountCodeSent(String email) {
+    return 'A 6-digit code was sent to $email. It is valid for 5 minutes.';
+  }
+
+  @override
+  String get deleteAccountConfirm => 'Delete account permanently';
+
+  @override
+  String get deleteAccountDeleting => 'Deleting…';
+
+  @override
+  String get deleteAccountResend => 'Resend code';
+
+  @override
+  String get deleteAccountErrNetwork => 'No connection. Try again later.';
+
+  @override
+  String deleteAccountErrRateLimited(int seconds) {
+    return 'Too many codes requested. Try again in $seconds seconds.';
+  }
+
+  @override
+  String get deleteAccountErrRateLimitedNoTime =>
+      'Too many codes requested. Try again in a few minutes.';
+
+  @override
+  String get deleteAccountErrOwnerHasStaff =>
+      'You own a workspace that still has other teachers. Transfer ownership or remove them before deleting your account.';
+
+  @override
+  String get deleteAccountErrActiveClasses =>
+      'You still have active classes. Archive all classes before deleting your account.';
+
+  @override
+  String get deleteAccountErrStale =>
+      'Data just changed. Reopen this screen and try again.';
+
+  @override
+  String get deleteAccountErrGeneric =>
+      'Could not delete the account. Try again later.';
+
+  @override
+  String get consentLater => 'Later';
 }

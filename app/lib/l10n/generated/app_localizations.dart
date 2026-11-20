@@ -170,6 +170,18 @@ abstract class AppLocalizations {
   /// **'Đăng nhập không thành công. Vui lòng thử lại.'**
   String get loginFailed;
 
+  /// No description provided for @loginUnavailable.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hệ thống đang bận, vui lòng thử lại sau ít phút.'**
+  String get loginUnavailable;
+
+  /// No description provided for @loginEmailRequiresOtp.
+  ///
+  /// In vi, this message translates to:
+  /// **'Email này cần đăng nhập bằng mã OTP. Nhập email bên dưới để nhận mã.'**
+  String get loginEmailRequiresOtp;
+
   /// No description provided for @splashLoadFailed.
   ///
   /// In vi, this message translates to:
@@ -212,47 +224,173 @@ abstract class AppLocalizations {
   /// **'Lời mời tham gia lớp'**
   String get inviteTitle;
 
-  /// No description provided for @inviteBody.
-  ///
-  /// In vi, this message translates to:
-  /// **'Giáo viên đã mời bạn kết nối với lớp học của con.'**
-  String get inviteBody;
-
   /// No description provided for @inviteAccept.
   ///
   /// In vi, this message translates to:
   /// **'Nhận lời mời'**
   String get inviteAccept;
 
+  /// No description provided for @inviteCardTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lời mời từ {teacher}'**
+  String inviteCardTitle(String teacher);
+
+  /// No description provided for @inviteCardBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'{teacher} mời bạn xem thông tin học tập của {student}. Link còn hiệu lực tới {expires}.'**
+  String inviteCardBody(String teacher, String student, String expires);
+
   /// No description provided for @inviteInvalid.
   ///
   /// In vi, this message translates to:
-  /// **'Lời mời không tồn tại hoặc đã hết hạn.'**
+  /// **'Link mời hết hạn hoặc không còn dùng được. Hãy nhắn giáo viên xin link mới.'**
   String get inviteInvalid;
+
+  /// No description provided for @inviteEntryTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cần lời mời từ giáo viên'**
+  String get inviteEntryTitle;
+
+  /// No description provided for @inviteEntryBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giáo viên của con sẽ gửi cho bạn link, mã hoặc mã QR. Ứng dụng không tìm học sinh theo tên, trường hay số điện thoại.'**
+  String get inviteEntryBody;
+
+  /// No description provided for @inviteScanQr.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quét mã QR'**
+  String get inviteScanQr;
+
+  /// No description provided for @inviteInputLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dán link hoặc nhập mã mời'**
+  String get inviteInputLabel;
+
+  /// No description provided for @inviteInputSubmit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục'**
+  String get inviteInputSubmit;
+
+  /// No description provided for @inviteInputBad.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa nhận ra link hoặc mã. Hãy dán cả link, hoặc nhập mã gồm 8 ký tự.'**
+  String get inviteInputBad;
+
+  /// No description provided for @inviteCodeInvalid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã không đúng hoặc đã hết hạn. Hãy nhắn giáo viên xin mã mới.'**
+  String get inviteCodeInvalid;
+
+  /// No description provided for @inviteCodeLocked.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đã nhập sai quá nhiều lần. Thử lại sau {minutes} phút.'**
+  String inviteCodeLocked(int minutes);
+
+  /// No description provided for @inviteRateLimited.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn thao tác quá nhanh, vui lòng thử lại sau.'**
+  String get inviteRateLimited;
+
+  /// No description provided for @inviteAskTeacher.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắn giáo viên xin link'**
+  String get inviteAskTeacher;
+
+  /// No description provided for @inviteAskMessage.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chào thầy/cô, tôi là phụ huynh. Nhờ thầy/cô gửi lại link mời DayHoc để tôi xem thông tin của con. Cảm ơn thầy/cô.'**
+  String get inviteAskMessage;
+
+  /// No description provided for @inviteAskCopied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã sao chép tin nhắn. Hãy dán vào Zalo để gửi cho giáo viên.'**
+  String get inviteAskCopied;
+
+  /// No description provided for @inviteScanTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quét mã QR lời mời'**
+  String get inviteScanTitle;
+
+  /// No description provided for @inviteScanHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đưa mã QR vào khung hình.'**
+  String get inviteScanHint;
+
+  /// No description provided for @inviteScanDenied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ứng dụng chưa được dùng camera. Bạn có thể dán link hoặc nhập mã thay thế.'**
+  String get inviteScanDenied;
+
+  /// No description provided for @inviteScanNotInvite.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã QR này không phải lời mời DayHoc.'**
+  String get inviteScanNotInvite;
+
+  /// No description provided for @consentTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đồng ý xử lý dữ liệu'**
+  String get consentTitle;
+
+  /// No description provided for @consentBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Để xem thông tin học tập của con, bạn cần đồng ý để DayHoc xử lý dữ liệu cá nhân của bạn và của con theo điều khoản và chính sách bảo mật.'**
+  String get consentBody;
+
+  /// No description provided for @consentVersion.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phiên bản điều khoản: {version}'**
+  String consentVersion(String version);
+
+  /// No description provided for @consentAccept.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đồng ý và tiếp tục'**
+  String get consentAccept;
+
+  /// No description provided for @consentTermsChanged.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điều khoản vừa được cập nhật. Vui lòng đọc lại rồi đồng ý.'**
+  String get consentTermsChanged;
+
+  /// No description provided for @consentFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa gửi được. Vui lòng thử lại.'**
+  String get consentFailed;
+
+  /// No description provided for @consentLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được điều khoản. Vui lòng thử lại.'**
+  String get consentLoadFailed;
 
   /// No description provided for @inviteFailed.
   ///
   /// In vi, this message translates to:
   /// **'Không nhận được lời mời. Vui lòng thử lại.'**
   String get inviteFailed;
-
-  /// No description provided for @inviteConsentTitle.
-  ///
-  /// In vi, this message translates to:
-  /// **'Đồng ý xử lý dữ liệu'**
-  String get inviteConsentTitle;
-
-  /// No description provided for @inviteConsentBody.
-  ///
-  /// In vi, this message translates to:
-  /// **'Để xem thông tin học tập của con, bạn cần đồng ý với điều khoản và chính sách xử lý dữ liệu cá nhân của DayHoc.'**
-  String get inviteConsentBody;
-
-  /// No description provided for @inviteConsentAccept.
-  ///
-  /// In vi, this message translates to:
-  /// **'Đồng ý và nhận lời mời'**
-  String get inviteConsentAccept;
 
   /// No description provided for @settings.
   ///
@@ -385,6 +523,48 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Đăng xuất'**
   String get logout;
+
+  /// No description provided for @logoutPendingTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Còn {count} buổi chưa đồng bộ'**
+  String logoutPendingTitle(int count);
+
+  /// No description provided for @logoutUnreadableTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không đọc được dữ liệu chưa đồng bộ'**
+  String get logoutUnreadableTitle;
+
+  /// No description provided for @logoutUnreadableBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nếu đăng xuất, dữ liệu trên máy sẽ bị xóa và có thể mất các buổi chưa đồng bộ.'**
+  String get logoutUnreadableBody;
+
+  /// No description provided for @logoutWipeFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã đăng xuất, nhưng chưa xóa hết dữ liệu trên máy. Ứng dụng sẽ thử lại lần mở sau.'**
+  String get logoutWipeFailed;
+
+  /// No description provided for @logoutPendingBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đăng xuất bây giờ sẽ xóa các buổi này khỏi máy. Hãy kết nối mạng để đồng bộ trước.'**
+  String get logoutPendingBody;
+
+  /// No description provided for @logoutPendingConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vẫn đăng xuất'**
+  String get logoutPendingConfirm;
+
+  /// No description provided for @logoutPendingCancel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ở lại'**
+  String get logoutPendingCancel;
 
   /// No description provided for @loading.
   ///
@@ -661,6 +841,234 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Đang ở vai trò {role}'**
   String roleSwitchedTo(String role);
+
+  /// No description provided for @waitlistTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đăng ký sớm cho Chủ trung tâm'**
+  String get waitlistTitle;
+
+  /// No description provided for @waitlistIntro.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính năng cho trung tâm sắp ra mắt. Để lại thông tin, chúng tôi sẽ liên hệ khi sẵn sàng.'**
+  String get waitlistIntro;
+
+  /// No description provided for @waitlistCenterName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tên trung tâm'**
+  String get waitlistCenterName;
+
+  /// No description provided for @waitlistCenterNameRequired.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập tên trung tâm.'**
+  String get waitlistCenterNameRequired;
+
+  /// No description provided for @waitlistTeacherCount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số giáo viên'**
+  String get waitlistTeacherCount;
+
+  /// No description provided for @waitlistTeacherCountInvalid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập số từ 1 đến 1000.'**
+  String get waitlistTeacherCountInvalid;
+
+  /// No description provided for @waitlistSubmit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi đăng ký'**
+  String get waitlistSubmit;
+
+  /// No description provided for @waitlistTrialHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trong lúc chờ, bạn có thể dùng thử với vai trò Giáo viên.'**
+  String get waitlistTrialHint;
+
+  /// No description provided for @waitlistTrialAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dùng thử vai trò Giáo viên'**
+  String get waitlistTrialAction;
+
+  /// No description provided for @waitlistSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã nhận đăng ký'**
+  String get waitlistSent;
+
+  /// No description provided for @waitlistSentBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cảm ơn bạn. Chúng tôi sẽ liên hệ sớm.'**
+  String get waitlistSentBody;
+
+  /// No description provided for @waitlistErrorBusy.
+  ///
+  /// In vi, this message translates to:
+  /// **'Yêu cầu đang xử lý. Thử lại sau giây lát.'**
+  String get waitlistErrorBusy;
+
+  /// No description provided for @waitlistErrorValidation.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thông tin chưa hợp lệ. Kiểm tra lại các ô.'**
+  String get waitlistErrorValidation;
+
+  /// No description provided for @waitlistErrorNetwork.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có mạng. Thử lại sau.'**
+  String get waitlistErrorNetwork;
+
+  /// No description provided for @waitlistErrorGeneric.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa gửi được đăng ký. Thử lại sau.'**
+  String get waitlistErrorGeneric;
+
+  /// No description provided for @settingsAccount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản'**
+  String get settingsAccount;
+
+  /// No description provided for @deleteAccountEntry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tài khoản'**
+  String get deleteAccountEntry;
+
+  /// No description provided for @deleteAccountEntrySubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa vĩnh viễn tài khoản và dữ liệu cá nhân'**
+  String get deleteAccountEntrySubtitle;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tài khoản'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountWarnHeading.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hành động này không thể hoàn tác'**
+  String get deleteAccountWarnHeading;
+
+  /// No description provided for @deleteAccountWarnBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản {email} và dữ liệu cá nhân sẽ bị xóa. Đăng nhập lại bằng email này sẽ tạo tài khoản mới và không thấy dữ liệu cũ. Chứng từ tài chính được giữ lại theo quy định.'**
+  String deleteAccountWarnBody(String email);
+
+  /// No description provided for @deleteAccountPendingWarn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Máy này còn {count} mục chưa đồng bộ (điểm danh, thay đổi). Xóa tài khoản sẽ làm mất các dữ liệu đó.'**
+  String deleteAccountPendingWarn(int count);
+
+  /// No description provided for @deleteAccountUnreadableWarn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không kiểm tra được dữ liệu chưa đồng bộ trên máy này. Nếu có, dữ liệu đó sẽ mất.'**
+  String get deleteAccountUnreadableWarn;
+
+  /// No description provided for @deleteAccountSendCode.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi mã xác nhận'**
+  String get deleteAccountSendCode;
+
+  /// No description provided for @deleteAccountSending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang gửi mã…'**
+  String get deleteAccountSending;
+
+  /// No description provided for @deleteAccountCodeHeading.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập mã xác nhận'**
+  String get deleteAccountCodeHeading;
+
+  /// No description provided for @deleteAccountCodeSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã 6 số đã gửi tới {email}. Mã dùng được trong 5 phút.'**
+  String deleteAccountCodeSent(String email);
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tài khoản vĩnh viễn'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @deleteAccountDeleting.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang xóa…'**
+  String get deleteAccountDeleting;
+
+  /// No description provided for @deleteAccountResend.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi lại mã'**
+  String get deleteAccountResend;
+
+  /// No description provided for @deleteAccountErrNetwork.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có mạng. Thử lại sau.'**
+  String get deleteAccountErrNetwork;
+
+  /// No description provided for @deleteAccountErrRateLimited.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi mã quá nhiều lần. Thử lại sau {seconds} giây.'**
+  String deleteAccountErrRateLimited(int seconds);
+
+  /// No description provided for @deleteAccountErrRateLimitedNoTime.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi mã quá nhiều lần. Thử lại sau ít phút.'**
+  String get deleteAccountErrRateLimitedNoTime;
+
+  /// No description provided for @deleteAccountErrOwnerHasStaff.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đang là chủ không gian còn giáo viên khác. Hãy chuyển quyền hoặc gỡ họ khỏi không gian trước khi xóa tài khoản.'**
+  String get deleteAccountErrOwnerHasStaff;
+
+  /// No description provided for @deleteAccountErrActiveClasses.
+  ///
+  /// In vi, this message translates to:
+  /// **'Còn lớp đang hoạt động. Hãy lưu trữ hết các lớp trước khi xóa tài khoản.'**
+  String get deleteAccountErrActiveClasses;
+
+  /// No description provided for @deleteAccountErrStale.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dữ liệu vừa thay đổi. Mở lại màn này rồi thử lại.'**
+  String get deleteAccountErrStale;
+
+  /// No description provided for @deleteAccountErrGeneric.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa xóa được tài khoản. Thử lại sau.'**
+  String get deleteAccountErrGeneric;
+
+  /// No description provided for @consentLater.
+  ///
+  /// In vi, this message translates to:
+  /// **'Để sau'**
+  String get consentLater;
 }
 
 class _AppLocalizationsDelegate

@@ -27,6 +27,22 @@ class _Repo implements AuthRepository<TeachHubUser> {
   }
 
   @override
+  Future<TeachHubUser> loginWithSso({
+    required String providerId,
+    required SsoResult ssoResult,
+  }) async {
+    final o = RequestOptions(path: '/auth/sso/$providerId');
+    throw DioException(
+      requestOptions: o,
+      response: Response(
+        requestOptions: o,
+        statusCode: loginError['code'] == 'SERVICE_UNAVAILABLE' ? 503 : 401,
+        data: loginError,
+      ),
+    );
+  }
+
+  @override
   dynamic noSuchMethod(Invocation i) => super.noSuchMethod(i);
 }
 
@@ -60,7 +76,10 @@ Future<List<String>> _pump(
           child: LoginPage(
             sendOtp: (email) async => sent.add(email),
             google: _NoSso(),
-            apple: _NoSso(),
+            apple: const GenericSsoProvider(
+              providerId: 'apple',
+              onAuthenticate: _fakeSso,
+            ),
             isIOS: true,
           ),
         ),
@@ -69,6 +88,8 @@ Future<List<String>> _pump(
   );
   return sent;
 }
+
+Future<SsoResult> _fakeSso() async => const SsoResult(idToken: 't');
 
 class _NoSso implements SsoProvider {
   @override
@@ -89,6 +110,28 @@ Future<void> _dispose(WidgetTester tester) =>
     tester.pumpWidget(const SizedBox()); // hủy timer đếm ngược
 
 void main() {
+  for (final (code, extra, message) in [
+    ('SERVICE_UNAVAILABLE', <String, Object?>{}, 'Hệ thống đang bận'),
+    (
+      'UNAUTHENTICATED',
+      {
+        'details': {'reason': 'EMAIL_REQUIRES_OTP'},
+      },
+      'cần đăng nhập bằng mã OTP',
+    ),
+    ('UNAUTHENTICATED', <String, Object?>{}, 'Đăng nhập không thành công'),
+  ]) {
+    testWidgets(
+      'Apple SSO lỗi $code ${extra.isEmpty ? '' : 'OTP'} → thông báo',
+      (tester) async {
+        await _pump(tester, loginError: {'code': code, ...extra});
+        await tester.tap(find.text('Tiếp tục với Apple'));
+        await tester.pumpAndSettle();
+        expect(find.textContaining(message), findsOneWidget);
+      },
+    );
+  }
+
   testWidgets(
     'T01 (B01): Apple, Google trước email; gửi mã tắt tới khi email hợp lệ',
     (tester) async {

@@ -107,17 +107,377 @@ abstract class MiniAppLocalizations {
   /// **'Phụ huynh'**
   String get spaceTitle;
 
-  /// No description provided for @spaceComingSoon.
-  ///
-  /// In vi, this message translates to:
-  /// **'Không gian này đang được xây dựng.'**
-  String get spaceComingSoon;
-
   /// No description provided for @switchRole.
   ///
   /// In vi, this message translates to:
   /// **'Đổi vai trò'**
   String get switchRole;
+
+  /// No description provided for @parentNoInviteTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cần lời mời từ giáo viên'**
+  String get parentNoInviteTitle;
+
+  /// No description provided for @parentNoInviteBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giáo viên sẽ gửi link, mã hoặc mã QR để kết nối với lớp của con.'**
+  String get parentNoInviteBody;
+
+  /// No description provided for @parentAddInvite.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm lời mời'**
+  String get parentAddInvite;
+
+  /// No description provided for @parentLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được thông tin của con. Vui lòng thử lại.'**
+  String get parentLoadFailed;
+
+  /// No description provided for @parentRetry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thử lại'**
+  String get parentRetry;
+
+  /// No description provided for @parentPickChild.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn con'**
+  String get parentPickChild;
+
+  /// No description provided for @parentChildClasses.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp: {classes}'**
+  String parentChildClasses(String classes);
+
+  /// No description provided for @parentNoClasses.
+  ///
+  /// In vi, this message translates to:
+  /// **'Con chưa ghi danh lớp nào.'**
+  String get parentNoClasses;
+
+  /// No description provided for @attendanceWeekTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyên cần tuần này'**
+  String get attendanceWeekTitle;
+
+  /// No description provided for @attendanceWeekRange.
+  ///
+  /// In vi, this message translates to:
+  /// **'{start} – {end}'**
+  String attendanceWeekRange(String start, String end);
+
+  /// No description provided for @attendancePresent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Có mặt'**
+  String get attendancePresent;
+
+  /// No description provided for @attendanceLate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đi muộn'**
+  String get attendanceLate;
+
+  /// No description provided for @attendanceExcused.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vắng có phép'**
+  String get attendanceExcused;
+
+  /// No description provided for @attendanceUnexcused.
+  ///
+  /// In vi, this message translates to:
+  /// **'Vắng không phép'**
+  String get attendanceUnexcused;
+
+  /// No description provided for @attendanceNotRecorded.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa điểm danh'**
+  String get attendanceNotRecorded;
+
+  /// No description provided for @attendanceUpcoming.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sắp học'**
+  String get attendanceUpcoming;
+
+  /// No description provided for @attendanceCount.
+  ///
+  /// In vi, this message translates to:
+  /// **'{label}: {count}'**
+  String attendanceCount(String label, int count);
+
+  /// No description provided for @attendanceNoSessions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tuần này chưa có buổi học.'**
+  String get attendanceNoSessions;
+
+  /// No description provided for @attendanceCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi đã hủy'**
+  String get attendanceCancelled;
+
+  /// No description provided for @attendanceMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi bù'**
+  String get attendanceMakeup;
+
+  /// No description provided for @attendanceSessionLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{className}, {when}'**
+  String attendanceSessionLine(String className, String when);
+
+  /// No description provided for @notificationBannerTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bật thông báo'**
+  String get notificationBannerTitle;
+
+  /// No description provided for @notificationBannerBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhận tin điểm danh và thay đổi lịch của con ngay khi giáo viên cập nhật.'**
+  String get notificationBannerBody;
+
+  /// No description provided for @notificationBannerAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bật thông báo'**
+  String get notificationBannerAction;
+
+  /// No description provided for @invoiceTuitionTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học phí'**
+  String get invoiceTuitionTitle;
+
+  /// No description provided for @invoiceTuitionUnpaid.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count} hóa đơn chưa đóng xong, tổng {total}'**
+  String invoiceTuitionUnpaid(int count, String total);
+
+  /// No description provided for @invoiceTuitionUnpaidMore.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count}+ hóa đơn chưa đóng xong'**
+  String invoiceTuitionUnpaidMore(int count);
+
+  /// No description provided for @invoiceTuitionNone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có hóa đơn nào cần đóng.'**
+  String get invoiceTuitionNone;
+
+  /// No description provided for @invoiceTuitionOpen.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem hóa đơn'**
+  String get invoiceTuitionOpen;
+
+  /// No description provided for @invoiceListTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn'**
+  String get invoiceListTitle;
+
+  /// No description provided for @invoiceFilterAll.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tất cả'**
+  String get invoiceFilterAll;
+
+  /// No description provided for @invoiceStatusIssued.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa thanh toán'**
+  String get invoiceStatusIssued;
+
+  /// No description provided for @invoiceStatusPending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chờ xác nhận'**
+  String get invoiceStatusPending;
+
+  /// No description provided for @invoiceStatusPartial.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã trả một phần'**
+  String get invoiceStatusPartial;
+
+  /// No description provided for @invoiceStatusPaid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thanh toán'**
+  String get invoiceStatusPaid;
+
+  /// No description provided for @invoiceStatusVoid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy'**
+  String get invoiceStatusVoid;
+
+  /// No description provided for @invoiceStatusUnknown.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khác'**
+  String get invoiceStatusUnknown;
+
+  /// No description provided for @invoiceEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có hóa đơn nào.'**
+  String get invoiceEmpty;
+
+  /// No description provided for @invoiceLoadMore.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem thêm'**
+  String get invoiceLoadMore;
+
+  /// No description provided for @invoiceRowSubtitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'{student}, kỳ {month}'**
+  String invoiceRowSubtitle(String student, String month);
+
+  /// No description provided for @invoiceDue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hạn {date}'**
+  String invoiceDue(String date);
+
+  /// No description provided for @invoiceCodeLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã {code}'**
+  String invoiceCodeLabel(String code);
+
+  /// No description provided for @invoiceLinesTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Các khoản'**
+  String get invoiceLinesTitle;
+
+  /// No description provided for @invoiceTotal.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tổng cộng'**
+  String get invoiceTotal;
+
+  /// No description provided for @invoiceVoidNotice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn đã hủy, bạn không cần chuyển khoản.'**
+  String get invoiceVoidNotice;
+
+  /// No description provided for @invoicePayTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển khoản'**
+  String get invoicePayTitle;
+
+  /// No description provided for @invoiceQrHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quét mã bằng app ngân hàng.'**
+  String get invoiceQrHint;
+
+  /// No description provided for @invoiceSaveQr.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu ảnh QR'**
+  String get invoiceSaveQr;
+
+  /// No description provided for @invoiceQrSaved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu ảnh QR.'**
+  String get invoiceQrSaved;
+
+  /// No description provided for @invoiceQrDenied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có quyền lưu ảnh. Mở Cài đặt để cho phép.'**
+  String get invoiceQrDenied;
+
+  /// No description provided for @invoiceQrFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không lưu được ảnh QR. Hãy thử lại.'**
+  String get invoiceQrFailed;
+
+  /// No description provided for @invoiceCopyNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sao chép nội dung chuyển khoản'**
+  String get invoiceCopyNote;
+
+  /// No description provided for @invoiceCopyAccount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sao chép số tài khoản'**
+  String get invoiceCopyAccount;
+
+  /// No description provided for @invoiceCopied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã sao chép.'**
+  String get invoiceCopied;
+
+  /// No description provided for @invoiceBank.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngân hàng'**
+  String get invoiceBank;
+
+  /// No description provided for @invoiceAccountNo.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tài khoản'**
+  String get invoiceAccountNo;
+
+  /// No description provided for @invoiceAccountName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chủ tài khoản'**
+  String get invoiceAccountName;
+
+  /// No description provided for @invoiceTransferNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nội dung chuyển khoản'**
+  String get invoiceTransferNote;
+
+  /// No description provided for @invoiceNotFound.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tìm thấy hóa đơn'**
+  String get invoiceNotFound;
+
+  /// No description provided for @invoiceNotFoundBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn không tồn tại hoặc bạn không xem được.'**
+  String get invoiceNotFoundBody;
+
+  /// No description provided for @invoiceLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được hóa đơn. Hãy thử lại.'**
+  String get invoiceLoadFailed;
 }
 
 class _MiniAppLocalizationsDelegate
