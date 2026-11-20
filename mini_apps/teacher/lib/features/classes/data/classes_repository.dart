@@ -16,9 +16,14 @@ abstract class ClassesRepository {
   /// Các lệnh ghi nhận [idempotencyKey]: cùng khóa = cùng một lệnh (gửi lại
   /// sau lỗi mạng không tạo bản trùng). `null` thì host tự sinh cho POST/PATCH.
   Future<ClassCreated> create(ClassInput input, {String? idempotencyKey});
+
+  ///
+  /// [withFee]: gửi cả học phí (`feeType`, `feeAmount`, `feeRules`); không thì
+  /// giữ nguyên học phí đã lưu.
   Future<TeachClass> update(
     String id,
     ClassInput input, {
+    bool withFee = false,
     String? idempotencyKey,
   });
   Future<TeachClass> archive(String id, {String? idempotencyKey});
@@ -111,11 +116,12 @@ class DioClassesRepository implements ClassesRepository {
   Future<TeachClass> update(
     String id,
     ClassInput input, {
+    bool withFee = false,
     String? idempotencyKey,
   }) => _call(() async {
     final r = await _dio.patch<Map<String, dynamic>>(
       '/classes/$id',
-      data: input.toJson(),
+      data: input.toPatchJson(withFee: withFee),
       options: _key(idempotencyKey),
     );
     return TeachClass.fromJson(r.data!);

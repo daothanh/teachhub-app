@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../data/cache/wall_time.dart';
+import '../../fees/data/fee_models.dart';
 
 /// Mô hình lớp học khớp `contracts/openapi.json` (schema Class, ScheduleRule,
 /// Roster, Enrollment, Student, Session). Ngày là chuỗi `yyyy-MM-dd`, giờ là
@@ -75,6 +76,9 @@ class TeachClass extends Equatable {
     required this.enrolledCount,
     required this.scheduleRules,
     required this.createdAt,
+    this.feeType,
+    this.feeAmount,
+    this.feeRules,
   });
 
   factory TeachClass.fromJson(Map<String, dynamic> json) => TeachClass(
@@ -94,6 +98,12 @@ class TeachClass extends Equatable {
         ScheduleRule.fromJson(r as Map<String, dynamic>),
     ],
     createdAt: json['createdAt'] as String,
+    feeType: FeeType.fromWire(json['feeType'] as String?),
+    feeAmount: json['feeAmount'] as int?,
+    feeRules: switch (json['feeRules']) {
+      final Map<String, dynamic> m => FeeRules.fromJson(m),
+      _ => null,
+    },
   );
 
   final String id;
@@ -110,12 +120,18 @@ class TeachClass extends Equatable {
   final List<ScheduleRule> scheduleRules;
   final String createdAt;
 
+  /// Học phí của lớp; `null` = lớp chưa cấu hình (không sinh hóa đơn).
+  final FeeType? feeType;
+  final int? feeAmount;
+  final FeeRules? feeRules;
+
   bool get archived => status == ClassStatus.archived;
 
   @override
   List<Object?> get props => [
     id, name, subject, grade, mode, location, capacity, startDate, endDate,
-    status, enrolledCount, scheduleRules, createdAt, //
+    status, enrolledCount, scheduleRules, createdAt, feeType, feeAmount, //
+    feeRules,
   ];
 }
 
@@ -159,6 +175,9 @@ class ClassInput extends Equatable {
     this.capacity,
     this.startDate,
     this.endDate,
+    this.feeType,
+    this.feeAmount,
+    this.feeRules,
   });
 
   factory ClassInput.from(TeachClass c) => ClassInput(
@@ -170,6 +189,9 @@ class ClassInput extends Equatable {
     capacity: c.capacity,
     startDate: c.startDate,
     endDate: c.endDate,
+    feeType: c.feeType,
+    feeAmount: c.feeAmount,
+    feeRules: c.feeRules,
   );
 
   final String name;
@@ -180,6 +202,29 @@ class ClassInput extends Equatable {
   final int? capacity;
   final String? startDate;
   final String? endDate;
+
+  /// Học phí: `feeType` null = không thu; `feeAmount` null khi chưa nhập.
+  final FeeType? feeType;
+  final int? feeAmount;
+  final FeeRules? feeRules;
+
+  /// Học phí giống lớp đã lưu (để khỏi gửi lại khi không đổi).
+  bool sameFeeAs(TeachClass c) =>
+      feeType == c.feeType &&
+      feeAmount == c.feeAmount &&
+      feeRules == c.feeRules;
+
+  /// Body `PATCH /classes/{id}`. Học phí chỉ gửi khi [withFee] (xóa học phí =
+  /// `feeType` và `feeAmount` cùng `null`); `POST` chưa nhận học phí nên dùng
+  /// [toJson].
+  Map<String, dynamic> toPatchJson({bool withFee = false}) => {
+    ...toJson(),
+    if (withFee) ...{
+      'feeType': feeType?.wire,
+      'feeAmount': feeType == null ? null : feeAmount,
+      if (feeType != null) 'feeRules': (feeRules ?? const FeeRules()).toJson(),
+    },
+  };
 
   /// Lớp trực tuyến không gửi địa điểm.
   Map<String, dynamic> toJson() => {
@@ -196,6 +241,7 @@ class ClassInput extends Equatable {
   @override
   List<Object?> get props => [
     name, subject, grade, mode, location, capacity, startDate, endDate, //
+    feeType, feeAmount, feeRules,
   ];
 }
 
@@ -209,6 +255,9 @@ enum ClassFieldError {
   rulesOverflow,
   rulesDuration,
   rulesTooMany,
+  feeAmountRequired,
+  feeAmountRange,
+  feeInstallments,
 }
 
 /// Kiểm tra trước khi gọi API (US-1.1 AC1–AC2, US-2.1). Server vẫn là nguồn
@@ -249,6 +298,19 @@ Map<String, ClassFieldError> validateClass(
     e['rules'] = ClassFieldError.rulesDuplicate;
   } else if (rules.any((r) => minutesOf(r.startTime) + r.durationMin > 1440)) {
     e['rules'] = ClassFieldError.rulesOverflow;
+  }
+  final t = i.feeType;
+  if (t != null) {
+    final a = i.feeAmount;
+    if (a == null) {
+      e['feeAmount'] = ClassFieldError.feeAmountRequired;
+    } else if (a < 1 || a > feeAmountMax) {
+      e['feeAmount'] = ClassFieldError.feeAmountRange;
+    }
+    final n = i.feeRules?.installments ?? 1;
+    if (n < 1 || n > feeInstallmentsMax || (t != FeeType.course && n != 1)) {
+      e['feeRules'] = ClassFieldError.feeInstallments;
+    }
   }
   return e;
 }
@@ -345,6 +407,7 @@ class RosterEntry extends Equatable {
     required this.joinedOn,
     this.inviteStatus = GuardianInviteStatus.notInvited,
     this.guardians = const [],
+    this.feeOverride,
   });
 
   factory RosterEntry.fromJson(Map<String, dynamic> json) => RosterEntry(
@@ -360,6 +423,10 @@ class RosterEntry extends Equatable {
       for (final g in json['guardians'] as List)
         RosterGuardian.fromJson(g as Map<String, dynamic>),
     ],
+    feeOverride: switch (json['feeOverride']) {
+      final Map<String, dynamic> m => FeeOverride.fromJson(m),
+      _ => null,
+    },
   );
 
   final String enrollmentId;
@@ -374,10 +441,13 @@ class RosterEntry extends Equatable {
   final GuardianInviteStatus inviteStatus;
   final List<RosterGuardian> guardians;
 
+  /// Khác null: hiện nhãn "Giá riêng" (US-1.3 AC2).
+  final FeeOverride? feeOverride;
+
   @override
   List<Object?> get props => [
     enrollmentId, studentId, fullName, studentStatus, joinedOn, //
-    inviteStatus, guardians,
+    inviteStatus, guardians, feeOverride,
   ];
 }
 

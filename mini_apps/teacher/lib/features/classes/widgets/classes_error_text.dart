@@ -25,6 +25,7 @@ String classesErrorText(
     ApiErrorKind.notFound => l10n.classesErrNotFound,
     ApiErrorKind.conflict => l10n.classesErrStale,
     ApiErrorKind.validation => l10n.classesErrValidation,
+    ApiErrorKind.rateLimited => l10n.feesErrRateLimited,
     _ => l10n.classesErrGeneric,
   };
 }

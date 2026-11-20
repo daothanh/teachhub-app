@@ -1,0 +1,113 @@
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
+
+import '../../classes/data/draft_keys.dart';
+import '../data/fee_models.dart';
+import '../data/fee_repository.dart';
+
+enum PayoutLoad { loading, ready, failure }
+
+enum PayoutNotice { primarySet, deleted }
+
+class PayoutAccountsState extends Equatable {
+  const PayoutAccountsState({
+    this.load = PayoutLoad.loading,
+    this.accounts = const [],
+    this.busy = false,
+    this.error,
+    this.notice,
+  });
+
+  final PayoutLoad load;
+  final List<PayoutAccount> accounts;
+
+  /// Đang đặt chính hoặc xóa.
+  final bool busy;
+
+  /// Lỗi tải (khi [load] là failure) hoặc lỗi của lệnh đặt chính/xóa.
+  final ApiException? error;
+  final PayoutNotice? notice;
+
+  bool get canAdd => accounts.length < payoutAccountsMax;
+
+  PayoutAccountsState copyWith({
+    PayoutLoad? load,
+    List<PayoutAccount>? accounts,
+    bool? busy,
+    ApiException? error,
+    PayoutNotice? notice,
+  }) => PayoutAccountsState(
+    load: load ?? this.load,
+    accounts: accounts ?? this.accounts,
+    busy: busy ?? this.busy,
+    error: error,
+    notice: notice,
+  );
+
+  @override
+  List<Object?> get props => [load, accounts, busy, error, notice];
+}
+
+/// Danh sách tài khoản nhận tiền (US-7.3 AC5): tải, đặt chính, xóa. Thêm và
+/// sửa ở [PayoutAccountFormCubit] (cần OTP).
+class PayoutAccountsCubit extends Cubit<PayoutAccountsState> {
+  PayoutAccountsCubit(this._repo, {DraftKeys? keys})
+    : _keys = keys ?? DraftKeys(),
+      super(const PayoutAccountsState());
+  final FeeRepository _repo;
+  final DraftKeys _keys;
+
+  Future<void> load() async {
+    emit(state.copyWith(load: PayoutLoad.loading));
+    try {
+      final items = await _repo.listPayoutAccounts();
+      if (isClosed) return;
+      emit(PayoutAccountsState(load: PayoutLoad.ready, accounts: items));
+    } on ApiException catch (e) {
+      if (isClosed) return;
+      emit(state.copyWith(load: PayoutLoad.failure, error: e));
+    }
+  }
+
+  Future<void> setPrimary(String id) =>
+      _act('primary|$id', PayoutNotice.primarySet, (key) async {
+        await _repo.updatePayoutAccount(
+          id,
+          makePrimary: true,
+          idempotencyKey: key,
+        );
+      });
+
+  Future<void> delete(String id) =>
+      _act('delete|$id', PayoutNotice.deleted, (key) async {
+        await _repo.deletePayoutAccount(id, idempotencyKey: key);
+      });
+
+  Future<void> _act(
+    String op,
+    PayoutNotice notice,
+    Future<void> Function(String key) run,
+  ) async {
+    if (state.busy) return;
+    emit(state.copyWith(busy: true));
+    try {
+      await run(_keys.of(op, op));
+      _keys.done(op);
+      // Tải lại: xóa tài khoản chính đổi chính sang tài khoản khác (server).
+      final items = await _repo.listPayoutAccounts();
+      if (isClosed) return;
+      emit(
+        PayoutAccountsState(
+          load: PayoutLoad.ready,
+          accounts: items,
+          notice: notice,
+        ),
+      );
+    } on ApiException catch (e) {
+      if (!e.retryable) _keys.done(op);
+      if (isClosed) return;
+      emit(state.copyWith(busy: false, error: e));
+    }
+  }
+}
