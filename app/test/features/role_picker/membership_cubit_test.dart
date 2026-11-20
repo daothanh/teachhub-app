@@ -123,4 +123,58 @@ void main() {
     expect(c.state.statusLoad, LoadingStatus.initial);
     expect(active.value, isNull);
   });
+
+  group('mở app khi mất mạng (#34)', () {
+    final online = _FakeApi({
+      'GET /me/memberships': () => {
+        'items': [_m('m1', 'tenant_owner')],
+      },
+    });
+    // Không có route → DioException không kèm phản hồi, như mất mạng.
+    final offline = _FakeApi({});
+
+    test('lỗi mạng dùng danh sách vai trò lần trước', () async {
+      await cubit(online).load();
+      final c = cubit(offline);
+      await c.load();
+      expect(c.state.statusLoad, LoadingStatus.success);
+      expect(c.state.active?.id, 'm1');
+    });
+
+    test('chưa có bản lưu thì vẫn báo lỗi', () async {
+      final c = cubit(offline);
+      await c.load();
+      expect(c.state.statusLoad, LoadingStatus.failure);
+    });
+
+    test('server trả lỗi (403) thì không dùng bản lưu', () async {
+      await cubit(online).load();
+      final c = MembershipCubit(
+        api: Dio()
+          ..interceptors.add(
+            InterceptorsWrapper(
+              onRequest: (o, h) => h.reject(
+                DioException(
+                  requestOptions: o,
+                  response: Response(requestOptions: o, statusCode: 403),
+                ),
+              ),
+            ),
+          ),
+        prefs: prefs,
+        activeMembership: active,
+      );
+      await c.load();
+      expect(c.state.statusLoad, LoadingStatus.failure);
+    });
+
+    test('clear() (đăng xuất) xóa bản lưu', () async {
+      final first = cubit(online);
+      await first.load();
+      await first.clear();
+      final c = cubit(offline);
+      await c.load();
+      expect(c.state.statusLoad, LoadingStatus.failure);
+    });
+  });
 }

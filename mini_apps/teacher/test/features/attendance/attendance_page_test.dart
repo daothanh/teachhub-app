@@ -55,9 +55,9 @@ void main() {
 
       final row = find.text('Em 1');
       for (final label in [
-        'Đi muộn',
         'Vắng có phép',
         'Vắng không phép',
+        'Đi muộn',
         'Có mặt',
       ]) {
         await tester.tap(row);
@@ -68,7 +68,7 @@ void main() {
       await tester.tap(row);
       await tester.pumpAndSettle();
       expect(find.text('Có mặt'), findsOneWidget);
-      expect(find.text('Đi muộn'), findsOneWidget);
+      expect(find.text('Vắng có phép'), findsOneWidget);
     },
   );
 
@@ -84,7 +84,7 @@ void main() {
       await tester.tap(find.text('Em 1'));
       await tester.pumpAndSettle();
       expect(
-        find.bySemanticsLabel('Em 1, Đi muộn. Chạm để đổi trạng thái'),
+        find.bySemanticsLabel('Em 1, Vắng có phép. Chạm để đổi trạng thái'),
         findsOneWidget,
       );
       handle.dispose();

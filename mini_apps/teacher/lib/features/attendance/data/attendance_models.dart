@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-/// 4 trạng thái của `AttendanceStatus` trong hợp đồng. Thứ tự là thứ tự vòng
-/// khi chạm một học viên.
+/// 4 trạng thái của `AttendanceStatus` trong hợp đồng.
 enum AttendanceStatus {
   present,
   late,
@@ -12,7 +11,14 @@ enum AttendanceStatus {
   static AttendanceStatus? fromWire(String? wire) =>
       values.where((s) => s.name == wire).firstOrNull;
 
-  AttendanceStatus get next => values[(index + 1) % values.length];
+  /// Vòng khi chạm một học viên (US-3.1 AC2): vắng có phép → vắng không
+  /// phép → đi muộn → có mặt, để ca vắng có phép hay gặp nhất chỉ mất 1 chạm.
+  AttendanceStatus get next => switch (this) {
+    present => excused,
+    excused => unexcused,
+    unexcused => late,
+    late => present,
+  };
 
   /// Vắng: báo phụ huynh.
   bool get absent => this == excused || this == unexcused;
