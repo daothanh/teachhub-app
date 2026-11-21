@@ -234,7 +234,6 @@
   "onboardingStepComplianceChecklist": "Việc cần làm theo quy định",
   "onboardingSkip": "Để sau",
   "onboardingMarkDone": "Xong bước này",
-  "onboardingPlaceholderBody": "Màn này đang được hoàn thiện.",
   "onboardingComplianceBody": "Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.",
   "onboardingDoneTitle": "Bạn đã xong phần làm quen",
   "onboardingDoneBody": "Vào xem lớp và học viên của bạn.",
@@ -252,8 +251,8 @@
       }
     }
   },
-  "onboardingCreateClassPending": "Màn tạo lớp sẽ được nối sau.",
-  "onboardingStudentSaved": "Đã lưu học viên. Chưa ghi nhận được bước này.",
+  "onboardingSaved": "Đã lưu. Chưa ghi nhận được bước này.",
+  "onboardingScheduleNoClass": "Chưa có lớp để đặt lịch. Hãy tạo lớp ở bước 1.",
   "todayTitle": "Hôm nay",
   "todayEmpty": "Hôm nay không có buổi học",
   "todayEmptyHint": "Buổi học theo lịch của các lớp sẽ hiện ở đây.",

@@ -456,9 +456,6 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get onboardingMarkDone => 'Done with this step';
 
   @override
-  String get onboardingPlaceholderBody => 'This screen is being finished.';
-
-  @override
   String get onboardingComplianceBody =>
       'See what to do to teach within the rules. Coming soon.';
 
@@ -491,12 +488,11 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get onboardingErrorGeneric => 'Could not save. Try again later.';
 
   @override
-  String get onboardingCreateClassPending =>
-      'The class screen will be connected later.';
+  String get onboardingSaved => 'Saved. This step could not be recorded yet.';
 
   @override
-  String get onboardingStudentSaved =>
-      'Student saved. This step could not be recorded yet.';
+  String get onboardingScheduleNoClass =>
+      'There is no class to schedule yet. Create one in step 1.';
 
   @override
   String get todayTitle => 'Today';

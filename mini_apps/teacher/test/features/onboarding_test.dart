@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:teacher/features/classes/data/classes_repository.dart';
 import 'package:teacher/features/fees/data/fee_repository.dart';
 import 'package:teacher/features/onboarding/data/onboarding_models.dart';
 import 'package:teacher/features/onboarding/data/onboarding_repository.dart';
@@ -10,6 +11,7 @@ import 'package:teacher/features/students/data/student_repository.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../support/fakes.dart';
+import 'classes/fake_classes_repository.dart';
 import 'fees/fake_fee_repository.dart';
 import '../support/pump_app.dart';
 
@@ -22,6 +24,7 @@ Future<FakeOnboardingRepository> _open(
   FakeFeeRepository? fees,
 }) async {
   GetIt.I.registerSingleton<OnboardingRepository>(repo);
+  GetIt.I.registerSingleton<ClassesRepository>(FakeClassesRepository());
   GetIt.I.registerSingleton<FeeRepository>(fees ?? FakeFeeRepository());
   GetIt.I.registerSingleton<StudentRepository>(
     students ??
@@ -39,18 +42,6 @@ void main() {
     expect(find.text('Bước 1/5'), findsOneWidget);
     expect(find.text('Tạo lớp đầu tiên'), findsOneWidget);
     expect(find.text('Để sau'), findsNothing);
-  });
-
-  testWidgets('bước 1 placeholder: không có nút xong, không ghi done', (
-    tester,
-  ) async {
-    final repo = await _open(
-      tester,
-      FakeOnboardingRepository(onboardingOf({})),
-    );
-    expect(find.text('Màn tạo lớp sẽ được nối sau.'), findsOneWidget);
-    expect(find.text('Xong bước này'), findsNothing);
-    expect(repo.patches, isEmpty);
   });
 
   testWidgets('bước 1 đã xong: bước 2 nhúng form học viên', (tester) async {
@@ -241,10 +232,7 @@ void main() {
       await tester.tap(find.text('Lưu học viên'));
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('Đã lưu học viên. Chưa ghi nhận được bước này.'),
-        findsOneWidget,
-      );
+      expect(find.text('Đã lưu. Chưa ghi nhận được bước này.'), findsOneWidget);
       expect(find.text('Bước 2/5'), findsOneWidget);
 
       repo.patchError = null;

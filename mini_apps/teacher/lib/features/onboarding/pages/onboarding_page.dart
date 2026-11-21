@@ -6,6 +6,9 @@ import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../classes/data/class_models.dart';
+import '../../classes/data/classes_repository.dart';
+import '../../classes/pages/class_form_page.dart';
 import '../../fees/pages/payout_accounts_page.dart';
 import '../../students/pages/student_form_page.dart';
 import '../cubit/onboarding_cubit.dart';
@@ -26,11 +29,10 @@ class OnboardingPage extends StatelessWidget {
   );
 }
 
-/// Chỗ nối màn do nhánh `s2-fl-classes` làm (tạo lớp, đặt lịch).
+/// Màn giữ chỗ của bước 5 (checklist tuân thủ, chưa có màn thật).
 ///
-/// shortcut: chưa có màn thật nên không có nút hoàn thành (không được ghi `done`
-/// khi chưa làm gì); sau khi merge s2-fl-classes thay bằng màn lớp (bước 1) và
-/// màn lịch (bước 3), truyền [onDone] để gọi khi người dùng lưu xong.
+/// shortcut: không có nút hoàn thành (không ghi `done` khi chưa làm gì); thay
+/// bằng màn thật khi có, truyền [onDone] để gọi khi người dùng xong.
 class OnboardingPlaceholderStep extends StatelessWidget {
   const OnboardingPlaceholderStep({super.key, required this.body, this.onDone});
 
@@ -168,14 +170,20 @@ class _StepBody extends StatelessWidget {
         Expanded(
           key: ValueKey(step),
           child: switch (step) {
-            OnboardingStep.addStudents => _AddStudentsStep(
+            OnboardingStep.addStudents => _SaveThenComplete(
+              builder: (onSaved) => StudentFormScope(onSaved: (_) => onSaved()),
               onSaved: () => cubit.complete(step),
             ),
-            OnboardingStep.createClass => OnboardingPlaceholderStep(
-              body: l10n.onboardingCreateClassPending,
+            OnboardingStep.createClass => _SaveThenComplete(
+              builder: (onSaved) => ClassFormPage(
+                part: ClassFormPart.basics,
+                embedded: true,
+                onSaved: (_) => onSaved(),
+              ),
+              onSaved: () => cubit.complete(step),
             ),
-            OnboardingStep.setSchedule => OnboardingPlaceholderStep(
-              body: l10n.onboardingPlaceholderBody,
+            OnboardingStep.setSchedule => _ScheduleStep(
+              onSaved: () => cubit.complete(step),
             ),
             OnboardingStep.payoutAccount => PayoutAccountsPage(
               embedded: true,
@@ -202,18 +210,20 @@ class _StepBody extends StatelessWidget {
   }
 }
 
-/// Bước 2: form học viên. Lưu xong form bị khóa; nếu ghi bước thất bại thì chỉ
-/// thử lại việc ghi bước, không gửi lại học viên.
-class _AddStudentsStep extends StatefulWidget {
-  const _AddStudentsStep({required this.onSaved});
+/// Bước nhúng một form có sẵn (tạo lớp, thêm học viên). Lưu xong form đã gọi
+/// API thật; nếu ghi bước thất bại thì chỉ thử lại việc ghi bước, không gửi
+/// lại dữ liệu.
+class _SaveThenComplete extends StatefulWidget {
+  const _SaveThenComplete({required this.builder, required this.onSaved});
 
+  final Widget Function(VoidCallback onSaved) builder;
   final VoidCallback onSaved;
 
   @override
-  State<_AddStudentsStep> createState() => _AddStudentsStepState();
+  State<_SaveThenComplete> createState() => _SaveThenCompleteState();
 }
 
-class _AddStudentsStepState extends State<_AddStudentsStep> {
+class _SaveThenCompleteState extends State<_SaveThenComplete> {
   bool _saved = false;
 
   @override
@@ -224,19 +234,17 @@ class _AddStudentsStepState extends State<_AddStudentsStep> {
     return Column(
       children: [
         Expanded(
-          child: StudentFormScope(
-            onSaved: (_) {
-              setState(() => _saved = true);
-              widget.onSaved();
-            },
-          ),
+          child: widget.builder(() {
+            setState(() => _saved = true);
+            widget.onSaved();
+          }),
         ),
         if (failed)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Column(
               children: [
-                Text(l10n.onboardingStudentSaved),
+                Text(l10n.onboardingSaved),
                 const SizedBox(height: 8),
                 AppButton(
                   label: l10n.onboardingRetry,
@@ -246,6 +254,60 @@ class _AddStudentsStepState extends State<_AddStudentsStep> {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Bước 3: đặt lịch cho lớp đã tạo ở bước 1. Lớp lấy từ server nên mở lại app
+/// vẫn đúng lớp và quy tắc đã lưu.
+class _ScheduleStep extends StatefulWidget {
+  const _ScheduleStep({required this.onSaved});
+
+  final VoidCallback onSaved;
+
+  @override
+  State<_ScheduleStep> createState() => _ScheduleStepState();
+}
+
+class _ScheduleStepState extends State<_ScheduleStep> {
+  late Future<TeachClass?> _class = _load();
+
+  // shortcut: lấy lớp đầu danh sách; lớp mới nhất = lớp ở bước 1 khi chưa có lớp
+  // khác, đủ cho onboarding của tenant mới.
+  Future<TeachClass?> _load() async =>
+      (await classesRepository().list()).items.firstOrNull;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    return FutureBuilder<TeachClass?>(
+      future: _class,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final c = snap.data;
+        if (snap.hasError || c == null) {
+          return AppEmptyState(
+            message: snap.hasError
+                ? l10n.onboardingLoadFailed
+                : l10n.onboardingScheduleNoClass,
+            action: AppButton(
+              label: l10n.onboardingRetry,
+              onPressed: () => setState(() => _class = _load()),
+            ),
+          );
+        }
+        return _SaveThenComplete(
+          builder: (onSaved) => ClassFormPage(
+            initial: c,
+            part: ClassFormPart.schedule,
+            embedded: true,
+            onSaved: (_) => onSaved(),
+          ),
+          onSaved: widget.onSaved,
+        );
+      },
     );
   }
 }

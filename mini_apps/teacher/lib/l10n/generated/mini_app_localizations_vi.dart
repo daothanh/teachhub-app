@@ -450,9 +450,6 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get onboardingMarkDone => 'Xong bước này';
 
   @override
-  String get onboardingPlaceholderBody => 'Màn này đang được hoàn thiện.';
-
-  @override
   String get onboardingComplianceBody =>
       'Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.';
 
@@ -485,11 +482,11 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get onboardingErrorGeneric => 'Chưa lưu được. Thử lại sau.';
 
   @override
-  String get onboardingCreateClassPending => 'Màn tạo lớp sẽ được nối sau.';
+  String get onboardingSaved => 'Đã lưu. Chưa ghi nhận được bước này.';
 
   @override
-  String get onboardingStudentSaved =>
-      'Đã lưu học viên. Chưa ghi nhận được bước này.';
+  String get onboardingScheduleNoClass =>
+      'Chưa có lớp để đặt lịch. Hãy tạo lớp ở bước 1.';
 
   @override
   String get todayTitle => 'Hôm nay';
