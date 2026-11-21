@@ -1561,6 +1561,14 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
       'This invoice is already issued and cannot be edited. Void it and create a replacement.';
 
   @override
+  String get billingErrStaleUnverified =>
+      'Could not confirm the result. Pull to reload and check before sending again.';
+
+  @override
+  String get billingErrStale =>
+      'This invoice just changed, so we loaded the latest status. Check it and try again.';
+
+  @override
   String get billingVoid => 'Void invoice';
 
   @override

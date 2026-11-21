@@ -136,14 +136,39 @@ void main() {
       },
     );
 
-    test('lỗi không thử lại được (409) → khóa mới ở lần sau', () async {
+    test(
+      '409 CONFLICT_STALE → tải lại kỳ, không tự gửi lại, khóa mới',
+      () async {
+        repo.detail = sampleDetail();
+        final c = make();
+        await c.load();
+        repo.calls.clear();
+        repo.detail = sampleDetail(invoices: [sampleSummary(id: 'i9')]);
+        repo.issueError = apiErr(ApiErrorCode.conflictStale);
+        await c.issueAll();
+        expect(c.state.error!.code, ApiErrorCode.conflictStale);
+        expect(c.state.issuing, isFalse);
+        expect(c.state.detail!.invoices.single.id, 'i9');
+        expect(c.state.staleUnverified, isFalse);
+        expect(repo.calls, ['issue:$periodId', 'getPeriod:$periodId']);
+        await c.issueAll();
+        expect(repo.keys[0], isNot(repo.keys[1]));
+        await c.close();
+      },
+    );
+
+    test('409 CONFLICT_STALE mà tải lại kỳ cũng lỗi → chưa xác nhận', () async {
       repo.detail = sampleDetail();
       final c = make();
       await c.load();
+      final before = c.state.detail;
       repo.issueError = apiErr(ApiErrorCode.conflictStale);
+      repo.periodError = const ApiException.network();
       await c.issueAll();
-      await c.issueAll();
-      expect(repo.keys[0], isNot(repo.keys[1]));
+      expect(c.state.error!.code, ApiErrorCode.conflictStale);
+      expect(c.state.staleUnverified, isTrue);
+      expect(c.state.detail, before);
+      expect(c.state.issuing, isFalse);
       await c.close();
     });
 
@@ -361,6 +386,23 @@ void main() {
       repo.voidError = apiErr(ApiErrorCode.conflictStale);
       await c.voidInvoice('lý do');
       expect(c.state.voidError!.code, ApiErrorCode.conflictStale);
+      expect(c.state.invoice!.status, InvoiceStatus.issued);
+      // Tải lại hóa đơn, không tự gửi lại; lần bấm sau dùng khóa mới.
+      expect(repo.calls, ['getInvoice:i1', 'void:i1:lý do', 'getInvoice:i1']);
+      await c.voidInvoice('lý do');
+      expect(repo.keys[0], isNot(repo.keys[1]));
+      await c.close();
+    });
+
+    test('hủy: 409 mà tải lại hóa đơn cũng lỗi → chưa xác nhận', () async {
+      repo.invoice = sampleInvoice(status: InvoiceStatus.issued);
+      final c = make();
+      await c.load();
+      repo.voidError = apiErr(ApiErrorCode.conflictStale);
+      repo.invoiceError = const ApiException.network();
+      await c.voidInvoice('lý do');
+      expect(c.state.voidError!.code, ApiErrorCode.conflictStale);
+      expect(c.state.voidStaleUnverified, isTrue);
       expect(c.state.invoice!.status, InvoiceStatus.issued);
       await c.close();
     });

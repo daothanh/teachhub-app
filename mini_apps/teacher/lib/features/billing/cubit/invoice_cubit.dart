@@ -18,6 +18,7 @@ class InvoiceState extends Equatable {
     this.serverErrors = const {},
     this.error,
     this.voidError,
+    this.voidStaleUnverified = false,
     this.done,
   });
 
@@ -36,6 +37,9 @@ class InvoiceState extends Equatable {
 
   /// Lỗi của lệnh hủy (hiện ở trang; lỗi điều chỉnh hiện trong form).
   final ApiException? voidError;
+
+  /// Hủy gặp `CONFLICT_STALE` mà tải lại hóa đơn cũng lỗi.
+  final bool voidStaleUnverified;
   final InvoiceDone? done;
 
   InvoiceState copyWith({
@@ -46,6 +50,7 @@ class InvoiceState extends Equatable {
     Map<String, List<String>> serverErrors = const {},
     ApiException? error,
     ApiException? voidError,
+    bool voidStaleUnverified = false,
     InvoiceDone? done,
   }) => InvoiceState(
     load: load ?? this.load,
@@ -55,12 +60,21 @@ class InvoiceState extends Equatable {
     serverErrors: serverErrors,
     error: error,
     voidError: voidError,
+    voidStaleUnverified: voidStaleUnverified,
     done: done,
   );
 
   @override
   List<Object?> get props => [
-    load, invoice, busy, clientErrors, serverErrors, error, voidError, done, //
+    load,
+    invoice,
+    busy,
+    clientErrors,
+    serverErrors,
+    error,
+    voidError,
+    voidStaleUnverified,
+    done, //
   ];
 }
 
@@ -155,7 +169,24 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     } on ApiException catch (e) {
       if (!e.retryable) _keys.done('void');
       if (isClosed) return;
-      emit(state.copyWith(voidError: e));
+      Invoice? fresh;
+      if (e.code == ApiErrorCode.conflictStale) {
+        // Kết quả hủy đã lưu quá hạn phát lại: tải lại hóa đơn, lần bấm sau dùng khóa mới.
+        try {
+          fresh = await _repo.getInvoice(invoiceId);
+        } on ApiException {
+          // Giữ bản cũ; kéo làm mới/vào lại sẽ tải lại.
+        }
+        if (isClosed) return;
+      }
+      emit(
+        state.copyWith(
+          invoice: fresh,
+          voidError: e,
+          voidStaleUnverified:
+              e.code == ApiErrorCode.conflictStale && fresh == null,
+        ),
+      );
     }
   }
 }

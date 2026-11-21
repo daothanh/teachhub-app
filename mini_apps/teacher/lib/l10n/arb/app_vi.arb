@@ -914,6 +914,8 @@
   "billingErrDescription": "Nhập mô tả, tối đa 200 ký tự.",
   "billingErrReason": "Nhập lý do, tối đa 300 ký tự.",
   "billingErrImmutable": "Hóa đơn đã phát hành nên không sửa được. Hãy hủy rồi tạo hóa đơn thay thế.",
+  "billingErrStaleUnverified": "Chưa xác nhận được kết quả. Kéo để tải lại rồi kiểm tra trước khi chốt tiếp.",
+  "billingErrStale": "Hóa đơn vừa có thay đổi, đã cập nhật trạng thái mới nhất. Kiểm tra lại rồi thử lần nữa.",
   "billingVoid": "Hủy hóa đơn",
   "billingVoidTitle": "Hủy hóa đơn này?",
   "billingVoidBody": "Phụ huynh sẽ không còn thấy mã QR của hóa đơn. Cần ghi lý do hủy.",

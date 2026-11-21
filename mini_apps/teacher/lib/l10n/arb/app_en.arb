@@ -914,6 +914,8 @@
   "billingErrDescription": "Enter a description, up to 200 characters.",
   "billingErrReason": "Enter a reason, up to 300 characters.",
   "billingErrImmutable": "This invoice is already issued and cannot be edited. Void it and create a replacement.",
+  "billingErrStaleUnverified": "Could not confirm the result. Pull to reload and check before sending again.",
+  "billingErrStale": "This invoice just changed, so we loaded the latest status. Check it and try again.",
   "billingVoid": "Void invoice",
   "billingVoidTitle": "Void this invoice?",
   "billingVoidBody": "Parents will no longer see the invoice's QR code. A reason is required.",

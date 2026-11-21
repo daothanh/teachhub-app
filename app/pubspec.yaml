@@ -108,6 +108,9 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # Kịch bản học phí (S5-FL-08): CSDL teacher trong bộ nhớ và kiểm mã QR ở P03.
+  drift: ^2.32.0
+  qr_flutter: ^4.1.0
 
 flutter:
   generate: true
