@@ -1307,4 +1307,293 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   @override
   String get onboardingPayoutIntro =>
       'Add at least one account to receive tuition.';
+
+  @override
+  String get todayBillingEntry => 'Tuition periods';
+
+  @override
+  String get billingTitle => 'Tuition periods';
+
+  @override
+  String get billingPeriodsEmpty => 'No billing periods yet';
+
+  @override
+  String get billingPeriodsEmptyBody =>
+      'On the closing date the app drafts the month\'s invoices so you can check them before sending.';
+
+  @override
+  String get billingLoadFailed => 'Could not load tuition data.';
+
+  @override
+  String billingPeriodMonth(int month, int year) {
+    return '$month/$year';
+  }
+
+  @override
+  String billingPeriodDates(String close, String due) {
+    return 'Closes $close · Due $due';
+  }
+
+  @override
+  String get billingPeriodDrafting => 'In progress';
+
+  @override
+  String get billingPeriodClosed => 'All issued';
+
+  @override
+  String billingDraftSummary(int count, String amount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count drafts',
+      one: '1 draft',
+    );
+    return '$_temp0 · $amount';
+  }
+
+  @override
+  String billingIssuedSummary(int count, String amount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count invoices sent',
+      one: '1 invoice sent',
+    );
+    return '$_temp0 · $amount';
+  }
+
+  @override
+  String billingVoidSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count voided invoices',
+      one: '1 voided invoice',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get billingIssueAll => 'Issue & send all';
+
+  @override
+  String get billingIssueOne => 'Issue & send';
+
+  @override
+  String get billingIssueConfirmTitle => 'Send invoices to parents?';
+
+  @override
+  String billingIssueAllConfirmBody(int count, String amount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count invoices',
+      one: '1 invoice',
+    );
+    return 'Issue $_temp0, $amount in total. Parents are notified right away and issued invoices cannot be edited.';
+  }
+
+  @override
+  String billingIssueOneConfirmBody(String student, String amount) {
+    return 'Issue the invoice for $student, $amount. Parents are notified right away and issued invoices cannot be edited.';
+  }
+
+  @override
+  String billingIssued(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count invoices sent.',
+      one: '1 invoice sent.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get billingIssuedNone => 'No invoices needed sending.';
+
+  @override
+  String billingIssuedSkippedZero(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count invoices',
+      one: '1 invoice',
+    );
+    return '$_temp0 of 0 đ not sent.';
+  }
+
+  @override
+  String get billingNoPayableDrafts => 'No drafts with an amount left to send.';
+
+  @override
+  String billingZeroDraftNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count invoices',
+      one: '1 invoice',
+    );
+    return '$_temp0 of 0 đ will not be sent.';
+  }
+
+  @override
+  String get billingInvoicesEmpty => 'No invoices in this period.';
+
+  @override
+  String get billingNoSend => 'Not sent';
+
+  @override
+  String get billingHasOverride => 'Custom rate';
+
+  @override
+  String get billingStatusDraft => 'Draft';
+
+  @override
+  String get billingStatusIssued => 'Issued';
+
+  @override
+  String get billingStatusPending => 'Awaiting confirmation';
+
+  @override
+  String get billingStatusPartial => 'Partly paid';
+
+  @override
+  String get billingStatusPaid => 'Paid';
+
+  @override
+  String get billingStatusVoid => 'Voided';
+
+  @override
+  String get billingInvoiceTitle => 'Invoice';
+
+  @override
+  String get billingLinesSessions => 'Sessions';
+
+  @override
+  String get billingLinesOther => 'Other items';
+
+  @override
+  String billingSessionLine(String date, String className) {
+    return '$date · $className';
+  }
+
+  @override
+  String get billingSessionCharged => 'Charged';
+
+  @override
+  String billingSessionNotCharged(String reason) {
+    return 'Not charged: $reason';
+  }
+
+  @override
+  String get billingReasonExcused => 'excused absence';
+
+  @override
+  String get billingReasonUnexcused => 'unexcused absence';
+
+  @override
+  String get billingReasonCancelled => 'session cancelled';
+
+  @override
+  String get billingReasonMakeup => 'makeup session';
+
+  @override
+  String get billingReasonOther => 'per the class rules';
+
+  @override
+  String billingAdjustmentReasonLine(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String get billingTotal => 'Total';
+
+  @override
+  String billingClamped(String amount) {
+    return 'The adjustment made the total negative, so it is held at 0 đ; the negative part of $amount is not carried to the next period yet.';
+  }
+
+  @override
+  String get billingAddAdjustment => 'Add adjustment';
+
+  @override
+  String get billingAdjustTitle => 'Adjust invoice';
+
+  @override
+  String get billingAdjustHint =>
+      'Adjustments cannot be deleted yet. If you entered one wrongly, add a line with the opposite sign.';
+
+  @override
+  String get billingAdjustDecrease => 'Discount';
+
+  @override
+  String get billingAdjustIncrease => 'Surcharge';
+
+  @override
+  String get billingAdjustAmount => 'Amount';
+
+  @override
+  String get billingAdjustDescription => 'Description';
+
+  @override
+  String get billingAdjustReason => 'Reason (required)';
+
+  @override
+  String get billingAdjustSave => 'Save adjustment';
+
+  @override
+  String get billingAdjusted => 'Adjustment added.';
+
+  @override
+  String get billingErrAmount =>
+      'Enter an amount above 0 and up to 1.000.000.000 đ.';
+
+  @override
+  String get billingErrDescription =>
+      'Enter a description, up to 200 characters.';
+
+  @override
+  String get billingErrReason => 'Enter a reason, up to 300 characters.';
+
+  @override
+  String get billingErrImmutable =>
+      'This invoice is already issued and cannot be edited. Void it and create a replacement.';
+
+  @override
+  String get billingVoid => 'Void invoice';
+
+  @override
+  String get billingVoidTitle => 'Void this invoice?';
+
+  @override
+  String get billingVoidBody =>
+      'Parents will no longer see the invoice\'s QR code. A reason is required.';
+
+  @override
+  String get billingVoidReason => 'Reason for voiding';
+
+  @override
+  String get billingVoidKeep => 'Keep it';
+
+  @override
+  String get billingVoidConfirm => 'Void invoice';
+
+  @override
+  String get billingVoided => 'Invoice voided.';
+
+  @override
+  String billingVoidedBanner(String reason) {
+    return 'Invoice voided. Reason: $reason';
+  }
+
+  @override
+  String get billingPayoutMissingTitle => 'No payout account';
+
+  @override
+  String get billingPayoutMissingBody =>
+      'Add a payout account so parents know where to send tuition. Come back here afterwards to continue.';
+
+  @override
+  String get billingPayoutMissingAction => 'Add account';
 }

@@ -1294,4 +1294,285 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   @override
   String get onboardingPayoutIntro =>
       'Thêm ít nhất một tài khoản để nhận học phí.';
+
+  @override
+  String get todayBillingEntry => 'Học phí kỳ thu';
+
+  @override
+  String get billingTitle => 'Học phí kỳ thu';
+
+  @override
+  String get billingPeriodsEmpty => 'Chưa có kỳ thu nào';
+
+  @override
+  String get billingPeriodsEmptyBody =>
+      'Đến ngày chốt, app tự tạo bản nháp hóa đơn của tháng để bạn kiểm tra trước khi gửi.';
+
+  @override
+  String get billingLoadFailed => 'Không tải được dữ liệu học phí.';
+
+  @override
+  String billingPeriodMonth(int month, int year) {
+    return 'Tháng $month/$year';
+  }
+
+  @override
+  String billingPeriodDates(String close, String due) {
+    return 'Chốt $close · Hạn $due';
+  }
+
+  @override
+  String get billingPeriodDrafting => 'Đang soạn';
+
+  @override
+  String get billingPeriodClosed => 'Đã chốt hết';
+
+  @override
+  String billingDraftSummary(int count, String amount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count bản nháp',
+    );
+    return '$_temp0 · $amount';
+  }
+
+  @override
+  String billingIssuedSummary(int count, String amount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Đã gửi $count hóa đơn',
+    );
+    return '$_temp0 · $amount';
+  }
+
+  @override
+  String billingVoidSummary(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hóa đơn đã hủy',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get billingIssueAll => 'Chốt & gửi tất cả';
+
+  @override
+  String get billingIssueOne => 'Chốt & gửi';
+
+  @override
+  String get billingIssueConfirmTitle => 'Gửi hóa đơn cho phụ huynh?';
+
+  @override
+  String billingIssueAllConfirmBody(int count, String amount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hóa đơn',
+    );
+    return 'Chốt $_temp0, tổng $amount. Phụ huynh nhận thông báo ngay và hóa đơn không sửa được sau khi gửi.';
+  }
+
+  @override
+  String billingIssueOneConfirmBody(String student, String amount) {
+    return 'Chốt hóa đơn của $student, $amount. Phụ huynh nhận thông báo ngay và hóa đơn không sửa được sau khi gửi.';
+  }
+
+  @override
+  String billingIssued(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hóa đơn',
+    );
+    return 'Đã gửi $_temp0.';
+  }
+
+  @override
+  String get billingIssuedNone => 'Không có hóa đơn nào cần gửi.';
+
+  @override
+  String billingIssuedSkippedZero(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hóa đơn',
+    );
+    return '$_temp0 0 đ không gửi.';
+  }
+
+  @override
+  String get billingNoPayableDrafts => 'Không còn bản nháp nào có tiền để gửi.';
+
+  @override
+  String billingZeroDraftNote(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hóa đơn',
+    );
+    return '$_temp0 0 đ sẽ không được gửi.';
+  }
+
+  @override
+  String get billingInvoicesEmpty => 'Kỳ này chưa có hóa đơn.';
+
+  @override
+  String get billingNoSend => 'Không gửi';
+
+  @override
+  String get billingHasOverride => 'Giá riêng';
+
+  @override
+  String get billingStatusDraft => 'Bản nháp';
+
+  @override
+  String get billingStatusIssued => 'Đã phát hành';
+
+  @override
+  String get billingStatusPending => 'Chờ xác nhận';
+
+  @override
+  String get billingStatusPartial => 'Đã thanh toán một phần';
+
+  @override
+  String get billingStatusPaid => 'Đã thanh toán';
+
+  @override
+  String get billingStatusVoid => 'Đã hủy';
+
+  @override
+  String get billingInvoiceTitle => 'Hóa đơn';
+
+  @override
+  String get billingLinesSessions => 'Các buổi học';
+
+  @override
+  String get billingLinesOther => 'Khoản khác';
+
+  @override
+  String billingSessionLine(String date, String className) {
+    return '$date · $className';
+  }
+
+  @override
+  String get billingSessionCharged => 'Tính tiền';
+
+  @override
+  String billingSessionNotCharged(String reason) {
+    return 'Không tính: $reason';
+  }
+
+  @override
+  String get billingReasonExcused => 'vắng có phép';
+
+  @override
+  String get billingReasonUnexcused => 'vắng không phép';
+
+  @override
+  String get billingReasonCancelled => 'buổi bị hủy';
+
+  @override
+  String get billingReasonMakeup => 'buổi dạy bù';
+
+  @override
+  String get billingReasonOther => 'theo quy tắc của lớp';
+
+  @override
+  String billingAdjustmentReasonLine(String reason) {
+    return 'Lý do: $reason';
+  }
+
+  @override
+  String get billingTotal => 'Tổng cộng';
+
+  @override
+  String billingClamped(String amount) {
+    return 'Điều chỉnh làm tổng âm nên tổng được giữ ở 0 đ; phần âm $amount chưa được chuyển sang kỳ sau.';
+  }
+
+  @override
+  String get billingAddAdjustment => 'Thêm điều chỉnh';
+
+  @override
+  String get billingAdjustTitle => 'Điều chỉnh hóa đơn';
+
+  @override
+  String get billingAdjustHint =>
+      'Dòng điều chỉnh chưa xóa được. Nhập sai thì thêm một dòng ngược dấu.';
+
+  @override
+  String get billingAdjustDecrease => 'Giảm trừ';
+
+  @override
+  String get billingAdjustIncrease => 'Phụ thu';
+
+  @override
+  String get billingAdjustAmount => 'Số tiền';
+
+  @override
+  String get billingAdjustDescription => 'Mô tả';
+
+  @override
+  String get billingAdjustReason => 'Lý do (bắt buộc)';
+
+  @override
+  String get billingAdjustSave => 'Lưu điều chỉnh';
+
+  @override
+  String get billingAdjusted => 'Đã thêm điều chỉnh.';
+
+  @override
+  String get billingErrAmount =>
+      'Nhập số tiền lớn hơn 0 và không quá 1.000.000.000 đ.';
+
+  @override
+  String get billingErrDescription => 'Nhập mô tả, tối đa 200 ký tự.';
+
+  @override
+  String get billingErrReason => 'Nhập lý do, tối đa 300 ký tự.';
+
+  @override
+  String get billingErrImmutable =>
+      'Hóa đơn đã phát hành nên không sửa được. Hãy hủy rồi tạo hóa đơn thay thế.';
+
+  @override
+  String get billingVoid => 'Hủy hóa đơn';
+
+  @override
+  String get billingVoidTitle => 'Hủy hóa đơn này?';
+
+  @override
+  String get billingVoidBody =>
+      'Phụ huynh sẽ không còn thấy mã QR của hóa đơn. Cần ghi lý do hủy.';
+
+  @override
+  String get billingVoidReason => 'Lý do hủy';
+
+  @override
+  String get billingVoidKeep => 'Giữ lại';
+
+  @override
+  String get billingVoidConfirm => 'Hủy hóa đơn';
+
+  @override
+  String get billingVoided => 'Đã hủy hóa đơn.';
+
+  @override
+  String billingVoidedBanner(String reason) {
+    return 'Hóa đơn đã hủy. Lý do: $reason';
+  }
+
+  @override
+  String get billingPayoutMissingTitle => 'Chưa có tài khoản nhận tiền';
+
+  @override
+  String get billingPayoutMissingBody =>
+      'Thêm tài khoản nhận tiền để phụ huynh biết chuyển học phí về đâu. Thêm xong, quay lại đây để chốt tiếp.';
+
+  @override
+  String get billingPayoutMissingAction => 'Thêm tài khoản';
 }

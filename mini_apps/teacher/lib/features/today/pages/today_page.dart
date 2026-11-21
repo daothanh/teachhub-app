@@ -10,6 +10,7 @@ import '../../../l10n/l10n.dart';
 import '../../attendance/attendance_routes.dart';
 import '../../attendance/data/attendance_models.dart';
 import '../../attendance/data/attendance_repository.dart';
+import '../../billing/billing_routes.dart';
 import '../../classes/classes_routes.dart';
 import '../../onboarding/data/onboarding_models.dart';
 import '../../onboarding/data/onboarding_repository.dart';
@@ -164,6 +165,13 @@ class _TodayList extends StatelessWidget {
           variant: AppButtonVariant.outlinePrimary,
           width: double.infinity,
           onPressed: () => context.push(ClassesRoutes.list),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        AppButton(
+          label: l10n.todayBillingEntry,
+          variant: AppButtonVariant.outlinePrimary,
+          width: double.infinity,
+          onPressed: () => context.push(BillingRoutes.periods),
         ),
       ],
     );

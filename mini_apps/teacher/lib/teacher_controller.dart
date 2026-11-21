@@ -20,6 +20,8 @@ import 'data/sync/connectivity.dart';
 import 'data/sync/sync_engine.dart';
 import 'features/attendance/attendance_routes.dart';
 import 'features/attendance/data/attendance_repository.dart';
+import 'features/billing/billing_routes.dart';
+import 'features/billing/data/billing_repository.dart';
 import 'features/classes/classes_routes.dart';
 import 'features/fees/data/fee_repository.dart';
 import 'features/fees/fees_routes.dart';
@@ -88,6 +90,7 @@ class TeacherController {
     ),
     ...classesRoutes(moduleId),
     ...feesRoutes(moduleId),
+    ...billingRoutes(moduleId),
     ...studentsRoutes(moduleId),
     ...attendanceRoutes(moduleId),
     ...scheduleRoutes(moduleId),
@@ -145,6 +148,11 @@ class TeacherController {
     }
     if (!getIt.isRegistered<FeeRepository>()) {
       getIt.registerLazySingleton<FeeRepository>(() => DioFeeRepository(api()));
+    }
+    if (!getIt.isRegistered<BillingRepository>()) {
+      getIt.registerLazySingleton<BillingRepository>(
+        () => DioBillingRepository(api()),
+      );
     }
     if (!getIt.isRegistered<OnboardingRepository>()) {
       getIt.registerLazySingleton<OnboardingRepository>(

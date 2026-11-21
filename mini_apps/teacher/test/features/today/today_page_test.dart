@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:teacher/features/attendance/attendance_routes.dart';
 import 'package:teacher/features/attendance/data/attendance_models.dart';
 import 'package:teacher/features/attendance/data/attendance_repository.dart';
+import 'package:teacher/features/billing/billing_routes.dart';
 import 'package:teacher/features/classes/classes_routes.dart';
 import 'package:teacher/features/onboarding/data/onboarding_models.dart';
 import 'package:teacher/features/onboarding/data/onboarding_repository.dart';
@@ -95,6 +96,10 @@ GoRouter routerFor(
     GoRoute(
       path: ClassesRoutes.list,
       builder: (_, _) => const Text('classes-page'),
+    ),
+    GoRoute(
+      path: BillingRoutes.periods,
+      builder: (_, _) => const Text('billing-page'),
     ),
     GoRoute(
       path: TeachHubRoutes.rolePicker,
@@ -272,6 +277,16 @@ void main() {
       expect(find.text('classes-page'), findsOneWidget);
     },
   );
+
+  testWidgets('S5-FL-05: có lối vào Học phí kỳ thu ngay trên màn Hôm nay', (
+    tester,
+  ) async {
+    await pumpRouter(tester, routerFor(FakeAttendanceRepository()));
+    await tester.ensureVisible(find.text('Học phí kỳ thu'));
+    await tester.tap(find.text('Học phí kỳ thu'));
+    await tester.pumpAndSettle();
+    expect(find.text('billing-page'), findsOneWidget);
+  });
 
   testWidgets('AC-4: đổi vai trò khi chạy riêng mini-app', (tester) async {
     await pumpRouter(tester, routerFor(FakeAttendanceRepository()));

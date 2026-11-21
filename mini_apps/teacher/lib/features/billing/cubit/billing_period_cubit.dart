@@ -1,0 +1,117 @@
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
+
+import '../../classes/data/draft_keys.dart';
+import '../data/billing_models.dart';
+import '../data/billing_repository.dart';
+import 'billing_periods_cubit.dart';
+
+class BillingPeriodState extends Equatable {
+  const BillingPeriodState({
+    this.load = BillingLoad.loading,
+    this.detail,
+    this.issuing = false,
+    this.error,
+    this.result,
+  });
+
+  final BillingLoad load;
+  final BillingPeriodDetail? detail;
+
+  /// Đang gửi lệnh chốt: chặn bấm lặp.
+  final bool issuing;
+
+  /// Lỗi tải ([load] là failure) hoặc lỗi của lệnh chốt.
+  final ApiException? error;
+
+  /// Kết quả lệnh chốt vừa xong (một lần, để hiện thông báo).
+  final IssueResult? result;
+
+  BillingPeriodState copyWith({
+    BillingLoad? load,
+    BillingPeriodDetail? detail,
+    bool? issuing,
+    ApiException? error,
+    IssueResult? result,
+  }) => BillingPeriodState(
+    load: load ?? this.load,
+    detail: detail ?? this.detail,
+    issuing: issuing ?? this.issuing,
+    error: error,
+    result: result,
+  );
+
+  @override
+  List<Object?> get props => [load, detail, issuing, error, result];
+}
+
+/// Một kỳ thu: bản nháp của kỳ và lệnh "Chốt & gửi" (US-7.2 AC4).
+class BillingPeriodCubit extends Cubit<BillingPeriodState> {
+  BillingPeriodCubit(this._repo, this.periodId, {DraftKeys? keys})
+    : _keys = keys ?? DraftKeys(),
+      super(const BillingPeriodState());
+  final BillingRepository _repo;
+  final String periodId;
+  final DraftKeys _keys;
+
+  Future<void> load() async {
+    emit(const BillingPeriodState());
+    await _fetch();
+  }
+
+  Future<void> _fetch() async {
+    try {
+      final d = await _repo.getPeriod(periodId);
+      if (isClosed) return;
+      emit(BillingPeriodState(load: BillingLoad.ready, detail: d));
+    } on ApiException catch (e) {
+      if (isClosed) return;
+      emit(state.copyWith(load: BillingLoad.failure, error: e));
+    }
+  }
+
+  /// "Chốt & gửi tất cả" bản nháp có tiền của kỳ.
+  Future<void> issueAll() => _issue(null);
+
+  /// Chốt từng hóa đơn.
+  Future<void> issueOne(String invoiceId) => _issue([invoiceId]);
+
+  /// Xóa lỗi đã hiện (vd. sau khi quay lại từ màn tài khoản nhận tiền).
+  void clearError() {
+    if (state.error != null && state.load == BillingLoad.ready) {
+      emit(state.copyWith());
+    }
+  }
+
+  Future<void> _issue(List<String>? ids) async {
+    if (state.issuing || state.load != BillingLoad.ready) return;
+    emit(state.copyWith(issuing: true));
+    // Cùng tập hóa đơn thì cùng khóa: thử lại sau lỗi mạng không phát hành hai lần.
+    final draft = ids == null ? '*' : (ids.toList()..sort()).join(',');
+    final IssueResult result;
+    try {
+      result = await _repo.issue(
+        periodId,
+        invoiceIds: ids,
+        idempotencyKey: _keys.of('issue', draft),
+      );
+      _keys.done('issue');
+    } on ApiException catch (e) {
+      if (!e.retryable) _keys.done('issue');
+      if (isClosed) return;
+      emit(state.copyWith(issuing: false, error: e));
+      return;
+    }
+    if (isClosed) return;
+    // Lệnh đã thành công: tải lại lỗi thì giữ danh sách cũ, không báo như chốt lỗi.
+    emit(state.copyWith(issuing: false, result: result));
+    try {
+      final d = await _repo.getPeriod(periodId);
+      if (isClosed) return;
+      emit(state.copyWith(detail: d));
+    } on ApiException {
+      // Kéo để làm mới sẽ tải lại.
+    }
+  }
+}
