@@ -931,5 +931,9 @@
   },
   "billingPayoutMissingTitle": "No payout account",
   "billingPayoutMissingBody": "Add a payout account so parents know where to send tuition. Come back here afterwards to continue.",
-  "billingPayoutMissingAction": "Add account"
+  "billingPayoutMissingAction": "Add account",
+  "payoutOtpActionTitle": "Verify to continue",
+  "payoutOtpActionBody": "Changing or deleting the primary payout account needs a verification code. We sent it to your email.",
+  "payoutOtpActionConfirm": "Confirm",
+  "billingIssueAllConfirmAction": "Send all"
 }

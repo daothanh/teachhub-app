@@ -133,7 +133,7 @@ void main() {
       await tester.tap(
         find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Chốt & gửi'),
+          matching: find.text('Gửi tất cả'),
         ),
       );
       await tester.pumpAndSettle();
@@ -170,7 +170,7 @@ void main() {
         await tester.tap(
           find.descendant(
             of: find.byType(AlertDialog),
-            matching: find.text('Chốt & gửi'),
+            matching: find.text('Gửi tất cả'),
           ),
         );
         await tester.pumpAndSettle();
@@ -191,7 +191,7 @@ void main() {
         await tester.tap(
           find.descendant(
             of: find.byType(AlertDialog),
-            matching: find.text('Chốt & gửi'),
+            matching: find.text('Gửi tất cả'),
           ),
         );
         await tester.pumpAndSettle();
@@ -209,7 +209,7 @@ void main() {
       await tester.tap(
         find.descendant(
           of: find.byType(AlertDialog),
-          matching: find.text('Chốt & gửi'),
+          matching: find.text('Gửi tất cả'),
         ),
       );
       await tester.pumpAndSettle();
@@ -365,6 +365,8 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Điều chỉnh hóa đơn'), findsOneWidget);
+      // M1: lỗi không được kèm snackbar "đã thêm".
+      expect(find.text('Đã thêm điều chỉnh.'), findsNothing);
     });
 
     testWidgets('422 theo trường hiện đúng dưới ô Số tiền', (tester) async {
@@ -378,6 +380,7 @@ void main() {
       await tester.enterText(fieldOf('Lý do (bắt buộc)'), 'y');
       await tapButton(tester, 'Lưu điều chỉnh');
       expect(find.text('Số tiền vượt giới hạn'), findsOneWidget);
+      expect(find.text('Đã thêm điều chỉnh.'), findsNothing);
     });
 
     testWidgets('hóa đơn đã phát hành: có nút hủy, không có nút điều chỉnh', (
@@ -421,6 +424,42 @@ void main() {
       expect(find.text('Hóa đơn đã hủy. Lý do: Sai số buổi'), findsOneWidget);
       expect(find.text('Hủy hóa đơn'), findsNothing);
     });
+
+    for (final (name, error, text) in [
+      ('409', apiErr(ApiErrorCode.conflictStale), 'Dữ liệu vừa thay đổi'),
+      ('mạng', const ApiException.network(), 'mạng'),
+    ]) {
+      testWidgets('hủy lỗi ($name): có SnackBar lỗi, hóa đơn giữ nguyên', (
+        tester,
+      ) async {
+        repo.voidError = error;
+        await openInvoice(tester, status: InvoiceStatus.issued);
+        await tapButton(tester, 'Hủy hóa đơn');
+        await tester.enterText(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.byType(EditableText),
+          ),
+          'Sai số buổi',
+        );
+        await tester.tap(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.text('Hủy hóa đơn'),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.descendant(
+            of: find.byType(SnackBar),
+            matching: find.textContaining(text),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Đã hủy hóa đơn.'), findsNothing);
+        expect(find.text('Hủy hóa đơn'), findsOneWidget);
+      });
+    }
 
     testWidgets('tải lỗi: thử lại', (tester) async {
       repo.invoiceError = const ApiException.network();

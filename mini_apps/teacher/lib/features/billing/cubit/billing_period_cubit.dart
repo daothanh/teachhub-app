@@ -55,19 +55,32 @@ class BillingPeriodCubit extends Cubit<BillingPeriodState> {
   final String periodId;
   final DraftKeys _keys;
 
+  /// Lần đầu và "Thử lại": hiện vòng tải.
   Future<void> load() async {
+    if (isClosed) return;
     emit(const BillingPeriodState());
-    await _fetch();
-  }
-
-  Future<void> _fetch() async {
     try {
       final d = await _repo.getPeriod(periodId);
       if (isClosed) return;
       emit(BillingPeriodState(load: BillingLoad.ready, detail: d));
     } on ApiException catch (e) {
       if (isClosed) return;
-      emit(state.copyWith(load: BillingLoad.failure, error: e));
+      emit(BillingPeriodState(load: BillingLoad.failure, error: e));
+    }
+  }
+
+  /// Kéo để làm mới hoặc quay lại màn: giữ danh sách và cờ `issuing`, chỉ thay
+  /// dữ liệu khi xong. Lỗi làm mới báo bằng [BillingPeriodState.error].
+  Future<void> refresh() async {
+    if (isClosed) return;
+    if (state.load != BillingLoad.ready) return load();
+    try {
+      final d = await _repo.getPeriod(periodId);
+      if (isClosed) return;
+      emit(state.copyWith(detail: d));
+    } on ApiException catch (e) {
+      if (isClosed) return;
+      emit(state.copyWith(error: e));
     }
   }
 
@@ -79,7 +92,7 @@ class BillingPeriodCubit extends Cubit<BillingPeriodState> {
 
   /// Xóa lỗi đã hiện (vd. sau khi quay lại từ màn tài khoản nhận tiền).
   void clearError() {
-    if (state.error != null && state.load == BillingLoad.ready) {
+    if (!isClosed && state.error != null && state.load == BillingLoad.ready) {
       emit(state.copyWith());
     }
   }

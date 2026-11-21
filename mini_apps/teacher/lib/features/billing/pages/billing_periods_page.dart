@@ -49,10 +49,15 @@ class _View extends StatelessWidget {
             subMessage: l10n.billingPeriodsEmptyBody,
           ),
           BillingLoad.ready => RefreshIndicator(
-            onRefresh: cubit.load,
-            child: ListView(
+            onRefresh: cubit.refresh,
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(AppSpacing.lg),
-              children: [for (final p in s.periods) _PeriodCard(period: p)],
+              itemCount: s.periods.length,
+              itemBuilder: (_, i) => _PeriodCard(
+                key: ValueKey(s.periods[i].id),
+                period: s.periods[i],
+              ),
             ),
           ),
         },
@@ -62,7 +67,7 @@ class _View extends StatelessWidget {
 }
 
 class _PeriodCard extends StatelessWidget {
-  const _PeriodCard({required this.period});
+  const _PeriodCard({super.key, required this.period});
   final BillingPeriod period;
 
   @override
@@ -77,7 +82,7 @@ class _PeriodCard extends StatelessWidget {
         onTap: () async {
           final cubit = context.read<BillingPeriodsCubit>();
           await context.push(BillingRoutes.period(p.id));
-          await cubit.load();
+          await cubit.refresh();
         },
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),

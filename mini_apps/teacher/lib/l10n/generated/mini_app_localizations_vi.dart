@@ -1575,4 +1575,17 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get billingPayoutMissingAction => 'Thêm tài khoản';
+
+  @override
+  String get payoutOtpActionTitle => 'Xác thực để tiếp tục';
+
+  @override
+  String get payoutOtpActionBody =>
+      'Đổi hoặc xóa tài khoản nhận tiền chính cần mã xác thực. Mã đã gửi tới email của bạn.';
+
+  @override
+  String get payoutOtpActionConfirm => 'Xác nhận';
+
+  @override
+  String get billingIssueAllConfirmAction => 'Gửi tất cả';
 }

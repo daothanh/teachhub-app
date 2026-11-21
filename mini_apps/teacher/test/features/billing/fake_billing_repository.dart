@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:teacher/features/billing/data/billing_models.dart';
 import 'package:teacher/features/billing/data/billing_repository.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
@@ -108,6 +110,12 @@ class FakeBillingRepository implements BillingRepository {
   Object? issueError;
   Object? voidError;
 
+  /// Giữ lệnh chốt đang chạy tới khi test hoàn tất cổng này.
+  Completer<void>? issueGate;
+
+  /// Hóa đơn trả về cho lần `getInvoice` kế tiếp (rồi tự xóa).
+  Invoice? invoiceAfterError;
+
   @override
   Future<List<BillingPeriod>> listPeriods() async {
     calls.add('listPeriods');
@@ -126,6 +134,11 @@ class FakeBillingRepository implements BillingRepository {
   Future<Invoice> getInvoice(String id) async {
     calls.add('getInvoice:$id');
     if (invoiceError != null) throw invoiceError!;
+    if (invoiceAfterError != null) {
+      final i = invoiceAfterError!;
+      invoiceAfterError = null;
+      return invoice = i;
+    }
     return invoice!;
   }
 
@@ -172,6 +185,7 @@ class FakeBillingRepository implements BillingRepository {
     calls.add('issue:$periodId');
     keys.add(idempotencyKey);
     issuedIds.add(invoiceIds);
+    await issueGate?.future;
     if (issueError != null) {
       final e = issueError!;
       issueError = null;

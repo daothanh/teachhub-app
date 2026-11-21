@@ -2781,6 +2781,30 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Thêm tài khoản'**
   String get billingPayoutMissingAction;
+
+  /// No description provided for @payoutOtpActionTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác thực để tiếp tục'**
+  String get payoutOtpActionTitle;
+
+  /// No description provided for @payoutOtpActionBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi hoặc xóa tài khoản nhận tiền chính cần mã xác thực. Mã đã gửi tới email của bạn.'**
+  String get payoutOtpActionBody;
+
+  /// No description provided for @payoutOtpActionConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác nhận'**
+  String get payoutOtpActionConfirm;
+
+  /// No description provided for @billingIssueAllConfirmAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi tất cả'**
+  String get billingIssueAllConfirmAction;
 }
 
 class _MiniAppLocalizationsDelegate

@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 
 import '../../../l10n/l10n.dart';
-import '../../fees/data/fee_models.dart' show VndInputFormatter, parseVnd;
+import '../../fees/data/fee_models.dart'
+    show VndInputFormatter, formatVnd, parseVnd;
 import '../cubit/billing_periods_cubit.dart';
 import '../cubit/invoice_cubit.dart';
 import '../data/billing_models.dart';
@@ -37,11 +38,9 @@ class _View extends StatelessWidget {
     return BlocConsumer<InvoiceCubit, InvoiceState>(
       listenWhen: (a, b) =>
           (b.done != null && a.done != b.done) ||
-          // Lỗi của lệnh ghi ngoài form điều chỉnh (hủy hóa đơn).
-          (b.load == BillingLoad.ready &&
-              b.error != null &&
-              a.error != b.error),
+          (b.voidError != null && a.voidError != b.voidError),
       listener: (context, s) {
+        // Lỗi điều chỉnh hiện trong form; ở đây chỉ báo thành công và lỗi hủy.
         final msg = s.voidError != null
             ? billingErrorText(l10n, s.voidError!)
             : s.done == InvoiceDone.voided
@@ -121,14 +120,14 @@ class _Body extends StatelessWidget {
         Row(
           children: [
             Expanded(child: Text(l10n.billingTotal, style: text.titleMedium)),
-            Text(formatSignedVnd(inv.totalAmount), style: text.titleMedium),
+            Text(formatVnd(inv.totalAmount), style: text.titleMedium),
           ],
         ),
         if (inv.clampedAmount > 0)
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
-              l10n.billingClamped(formatSignedVnd(inv.clampedAmount)),
+              l10n.billingClamped(formatVnd(inv.clampedAmount)),
               style: text.bodySmall,
             ),
           ),
@@ -201,7 +200,7 @@ class _SessionLine extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          Text(formatSignedVnd(l.amount), style: text.bodyMedium),
+          Text(formatVnd(l.amount), style: text.bodyMedium),
         ],
       ),
     );
@@ -238,7 +237,7 @@ class _OtherLine extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          Text(formatSignedVnd(l.amount, plus: true), style: text.bodyMedium),
+          Text(formatVnd(l.amount, plus: true), style: text.bodyMedium),
         ],
       ),
     );

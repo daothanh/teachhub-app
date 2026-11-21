@@ -27,14 +27,29 @@ class BillingPeriodsCubit extends Cubit<BillingPeriodsState> {
   BillingPeriodsCubit(this._repo) : super(const BillingPeriodsState());
   final BillingRepository _repo;
 
+  /// Lần đầu và "Thử lại": hiện vòng tải.
   Future<void> load() async {
+    if (isClosed) return;
     emit(const BillingPeriodsState());
+    await _fetch();
+  }
+
+  /// Kéo để làm mới hoặc quay lại màn: giữ danh sách cũ tới khi có dữ liệu mới.
+  Future<void> refresh() async {
+    if (isClosed) return;
+    if (state.load != BillingLoad.ready) return load();
+    await _fetch();
+  }
+
+  Future<void> _fetch() async {
     try {
       final items = await _repo.listPeriods();
       if (isClosed) return;
       emit(BillingPeriodsState(load: BillingLoad.ready, periods: items));
     } on ApiException catch (e) {
       if (isClosed) return;
+      // Làm mới lỗi thì giữ danh sách đang có; chỉ lần tải đầu mới báo lỗi cả màn.
+      if (state.load == BillingLoad.ready) return;
       emit(BillingPeriodsState(load: BillingLoad.failure, error: e));
     }
   }

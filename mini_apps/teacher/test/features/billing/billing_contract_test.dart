@@ -47,6 +47,9 @@ class _Adapter implements HttpClientAdapter {
   /// Trang hóa đơn của `GET /billing-periods/{id}` phát lần lượt.
   int periodPages = 1;
 
+  /// Từ trang này trở đi server trả trang rỗng dù `total` còn lớn (đếm lệch).
+  int emptyFrom = 99;
+
   @override
   Future<ResponseBody> fetch(
     RequestOptions options,
@@ -67,7 +70,8 @@ class _Adapter implements HttpClientAdapter {
         ...period,
         'invoices': {
           'items': [
-            {...summary, 'id': 'p${options.queryParameters['page']}'},
+            if ((options.queryParameters['page'] as int) < emptyFrom)
+              {...summary, 'id': 'p${options.queryParameters['page']}'},
           ],
           'total': periodPages,
           'page': options.queryParameters['page'],
@@ -278,6 +282,15 @@ void main() {
         );
       },
     );
+
+    test('getPeriod dừng khi gặp trang rỗng dù total còn lớn', () async {
+      adapter
+        ..periodPages = 5
+        ..emptyFrom = 3;
+      final d = await repo.getPeriod('per1');
+      expect(d.invoices.map((i) => i.id), ['p1', 'p2']);
+      expect(adapter.requests, hasLength(3));
+    });
 
     test(
       'getPeriod gộp các trang hóa đơn, pageSize không vượt hợp đồng',

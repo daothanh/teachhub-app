@@ -931,5 +931,9 @@
   },
   "billingPayoutMissingTitle": "Chưa có tài khoản nhận tiền",
   "billingPayoutMissingBody": "Thêm tài khoản nhận tiền để phụ huynh biết chuyển học phí về đâu. Thêm xong, quay lại đây để chốt tiếp.",
-  "billingPayoutMissingAction": "Thêm tài khoản"
+  "billingPayoutMissingAction": "Thêm tài khoản",
+  "payoutOtpActionTitle": "Xác thực để tiếp tục",
+  "payoutOtpActionBody": "Đổi hoặc xóa tài khoản nhận tiền chính cần mã xác thực. Mã đã gửi tới email của bạn.",
+  "payoutOtpActionConfirm": "Xác nhận",
+  "billingIssueAllConfirmAction": "Gửi tất cả"
 }

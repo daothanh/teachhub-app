@@ -75,6 +75,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
   final DraftKeys _keys;
 
   Future<void> load() async {
+    if (isClosed) return;
     emit(const InvoiceState());
     try {
       final inv = await _repo.getInvoice(invoiceId);
@@ -87,7 +88,9 @@ class InvoiceCubit extends Cubit<InvoiceState> {
   }
 
   /// Xóa lỗi cũ khi mở lại form điều chỉnh.
-  void clearErrors() => emit(state.copyWith(invoice: state.invoice));
+  void clearErrors() {
+    if (!isClosed) emit(state.copyWith(invoice: state.invoice));
+  }
 
   Future<void> addAdjustment(AdjustmentInput input) async {
     if (state.busy || state.invoice == null) return;
@@ -124,6 +127,16 @@ class InvoiceCubit extends Cubit<InvoiceState> {
           error: fields.isEmpty ? e : null,
         ),
       );
+      // Hóa đơn đã đổi trạng thái ở nơi khác (đã phát hành/hủy): tải lại để
+      // trang không còn hiện nút điều chỉnh; lỗi vẫn giữ trong form.
+      if (e.code == ApiErrorCode.invoiceImmutable) {
+        try {
+          final inv = await _repo.getInvoice(invoiceId);
+          if (!isClosed) emit(state.copyWith(invoice: inv, error: e));
+        } on ApiException {
+          // Kéo làm mới/vào lại sẽ tải lại.
+        }
+      }
     }
   }
 

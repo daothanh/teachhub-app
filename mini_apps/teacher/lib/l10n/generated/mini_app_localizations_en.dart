@@ -1596,4 +1596,17 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get billingPayoutMissingAction => 'Add account';
+
+  @override
+  String get payoutOtpActionTitle => 'Verify to continue';
+
+  @override
+  String get payoutOtpActionBody =>
+      'Changing or deleting the primary payout account needs a verification code. We sent it to your email.';
+
+  @override
+  String get payoutOtpActionConfirm => 'Confirm';
+
+  @override
+  String get billingIssueAllConfirmAction => 'Send all';
 }

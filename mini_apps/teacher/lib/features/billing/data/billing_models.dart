@@ -413,22 +413,6 @@ Map<String, AdjustmentError> validateAdjustment(AdjustmentInput i) => {
     'adjustmentReason': AdjustmentError.reason,
 };
 
-/// `-150000` → `-150.000 đ`; dương có `+` khi [plus] (dòng điều chỉnh/giảm).
-String formatSignedVnd(int amount, {bool plus = false}) {
-  final digits = amount.abs().toString();
-  final out = StringBuffer();
-  for (var i = 0; i < digits.length; i++) {
-    if (i > 0 && (digits.length - i) % 3 == 0) out.write('.');
-    out.write(digits[i]);
-  }
-  final sign = amount < 0
-      ? '−'
-      : plus && amount > 0
-      ? '+'
-      : '';
-  return '$sign$out đ';
-}
-
 /// `2026-12-31` → `31/12/2026`.
 String formatIsoDate(String iso) {
   final p = iso.split('-');

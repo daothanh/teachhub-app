@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:teacher/features/billing/cubit/billing_period_cubit.dart';
 import 'package:teacher/features/billing/cubit/billing_periods_cubit.dart';
@@ -25,6 +27,18 @@ void main() {
       expect(c.state.load, BillingLoad.ready);
       expect(c.state.periods, isEmpty);
       await c.close();
+    });
+
+    test('refresh lỗi giữ danh sách đang có', () async {
+      repo.periods = [samplePeriod()];
+      final c = BillingPeriodsCubit(repo);
+      await c.load();
+      repo.listError = const ApiException.network();
+      await c.refresh();
+      expect(c.state.load, BillingLoad.ready);
+      expect(c.state.periods, hasLength(1));
+      await c.close();
+      await c.refresh();
     });
 
     test('lỗi mạng → failure, thử lại tải được', () async {
@@ -168,6 +182,44 @@ void main() {
       },
     );
 
+    test('refresh khi đang chốt: giữ issuing, không mở lại nút', () async {
+      repo.detail = sampleDetail();
+      final c = make();
+      await c.load();
+      final gate = repo.issueGate = Completer<void>();
+      final issuing = c.issueAll();
+      await pumpEventQueue();
+      expect(c.state.issuing, isTrue);
+      await c.refresh();
+      expect(c.state.issuing, isTrue);
+      expect(c.state.load, BillingLoad.ready);
+      gate.complete();
+      await issuing;
+      expect(c.state.issuing, isFalse);
+      await c.close();
+    });
+
+    test('refresh lỗi giữ danh sách, báo lỗi; không hiện vòng tải', () async {
+      repo.detail = sampleDetail();
+      final c = make();
+      await c.load();
+      repo.periodError = const ApiException.network();
+      await c.refresh();
+      expect(c.state.load, BillingLoad.ready);
+      expect(c.state.detail, isNotNull);
+      expect(c.state.error!.kind, ApiErrorKind.network);
+      await c.close();
+    });
+
+    test('đã đóng: load/refresh/clearError không ném', () async {
+      repo.detail = sampleDetail();
+      final c = make();
+      await c.close();
+      await c.load();
+      await c.refresh();
+      c.clearError();
+    });
+
     test('tải lỗi → failure', () async {
       repo.periodError = const ApiException.network();
       final c = make();
@@ -243,6 +295,22 @@ void main() {
       await c.close();
     });
 
+    test('điều chỉnh: INVOICE_IMMUTABLE tải lại hóa đơn, giữ lỗi', () async {
+      repo.invoice = sampleInvoice();
+      final c = make();
+      await c.load();
+      repo
+        ..adjustError = apiErr(ApiErrorCode.invoiceImmutable)
+        ..invoiceAfterError = sampleInvoice(status: InvoiceStatus.issued);
+      await c.addAdjustment(
+        const AdjustmentInput(amount: 1000, description: 'd', reason: 'r'),
+      );
+      expect(c.state.invoice!.status, InvoiceStatus.issued);
+      expect(c.state.error!.code, ApiErrorCode.invoiceImmutable);
+      expect(repo.calls.where((x) => x.startsWith('getInvoice')), hasLength(2));
+      await c.close();
+    });
+
     test('điều chỉnh: 422 theo trường vào đúng trường', () async {
       repo.invoice = sampleInvoice();
       final c = make();
@@ -311,9 +379,6 @@ void main() {
     expect(InvoiceStatus.fromWire('whatever'), InvoiceStatus.issued);
     expect(InvoiceLineKind.fromWire('whatever'), InvoiceLineKind.monthly);
     expect(BillingPeriodStatus.fromWire(null), BillingPeriodStatus.drafting);
-    expect(formatSignedVnd(-150000), '−150.000 đ');
-    expect(formatSignedVnd(150000, plus: true), '+150.000 đ');
-    expect(formatSignedVnd(0, plus: true), '0 đ');
     expect(formatIsoDate('2026-11-01'), '01/11/2026');
   });
 }

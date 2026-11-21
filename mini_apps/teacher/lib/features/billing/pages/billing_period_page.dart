@@ -116,7 +116,7 @@ class _View extends StatelessWidget {
               ),
             ),
             BillingLoad.ready => RefreshIndicator(
-              onRefresh: cubit.load,
+              onRefresh: cubit.refresh,
               child: _Body(detail: d!, issuing: s.issuing),
             ),
           },
@@ -129,6 +129,7 @@ class _View extends StatelessWidget {
 Future<void> _confirmIssue(
   BuildContext context, {
   required String body,
+  required String confirmLabel,
   required VoidCallback onConfirm,
 }) async {
   final l10n = context.miniAppL10n;
@@ -144,7 +145,7 @@ Future<void> _confirmIssue(
         ),
         TextButton(
           onPressed: () => Navigator.pop(ctx, true),
-          child: Text(l10n.billingIssueOne),
+          child: Text(confirmLabel),
         ),
       ],
     ),
@@ -164,9 +165,8 @@ class _Body extends StatelessWidget {
     final cubit = context.read<BillingPeriodCubit>();
     final p = detail.period;
     final payable = detail.payableDrafts;
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(AppSpacing.lg),
+    final header = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           l10n.billingPeriodDates(
@@ -195,6 +195,7 @@ class _Body extends StatelessWidget {
           disabled: issuing || payable.isEmpty,
           onPressed: () => _confirmIssue(
             context,
+            confirmLabel: l10n.billingIssueAllConfirmAction,
             body: l10n.billingIssueAllConfirmBody(
               payable.length,
               formatVnd(detail.payableTotal),
@@ -216,18 +217,30 @@ class _Body extends StatelessWidget {
             ),
           ),
         const SizedBox(height: AppSpacing.md),
-        if (detail.invoices.isEmpty)
-          AppEmptyState(message: l10n.billingInvoicesEmpty)
-        else
-          for (final i in detail.invoices)
-            _InvoiceTile(invoice: i, issuing: issuing),
       ],
+    );
+    // Phần đầu là mục 0; mỗi hóa đơn một mục dựng lười, khóa theo id.
+    final empty = detail.invoices.isEmpty;
+    return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      itemCount: 1 + (empty ? 1 : detail.invoices.length),
+      itemBuilder: (_, i) {
+        if (i == 0) return header;
+        if (empty) return AppEmptyState(message: l10n.billingInvoicesEmpty);
+        final inv = detail.invoices[i - 1];
+        return _InvoiceTile(
+          key: ValueKey(inv.id),
+          invoice: inv,
+          issuing: issuing,
+        );
+      },
     );
   }
 }
 
 class _InvoiceTile extends StatelessWidget {
-  const _InvoiceTile({required this.invoice, required this.issuing});
+  const _InvoiceTile({super.key, required this.invoice, required this.issuing});
   final InvoiceSummary invoice;
   final bool issuing;
 
@@ -242,7 +255,7 @@ class _InvoiceTile extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           await context.push(BillingRoutes.invoice(i.id));
-          await cubit.load();
+          await cubit.refresh();
         },
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
@@ -294,6 +307,7 @@ class _InvoiceTile extends StatelessWidget {
                       disabled: issuing,
                       onPressed: () => _confirmIssue(
                         context,
+                        confirmLabel: l10n.billingIssueOne,
                         body: l10n.billingIssueOneConfirmBody(
                           i.studentName,
                           formatVnd(i.totalAmount),
