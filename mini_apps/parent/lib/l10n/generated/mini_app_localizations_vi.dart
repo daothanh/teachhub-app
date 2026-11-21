@@ -231,6 +231,32 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
       'Học phí đã thanh toán đủ, bạn không cần chuyển khoản.';
 
   @override
+  String get invoiceStatusCarried => 'Đã chuyển sang kỳ sau';
+
+  @override
+  String get invoiceStatusCovered => 'Đã trừ vào số dư';
+
+  @override
+  String get invoiceLineCarryDebt => 'Nợ kỳ trước';
+
+  @override
+  String get invoiceLineCarryCredit => 'Trừ tiền trả thừa';
+
+  @override
+  String get invoiceLinePrevAdjustment => 'Điều chỉnh kỳ trước';
+
+  @override
+  String get invoiceCarriedAmount => 'Đã chuyển sang hóa đơn kỳ sau';
+
+  @override
+  String get invoiceCarriedNotice =>
+      'Khoản còn nợ của hóa đơn này đã chuyển sang hóa đơn kỳ sau. Bạn không cần chuyển khoản ở hóa đơn này, hãy thanh toán ở hóa đơn kỳ sau.';
+
+  @override
+  String get invoiceCoveredNotice =>
+      'Tiền đóng thừa trước đó đã trừ vào hóa đơn này, bạn không cần chuyển khoản.';
+
+  @override
   String get invoiceReceiptsTitle => 'Biên nhận';
 
   @override

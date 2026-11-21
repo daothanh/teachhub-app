@@ -135,7 +135,7 @@ class _Row extends StatelessWidget {
           ),
         ),
         subtitle: Text(
-          '${statusLabel(context, invoice.status)} · '
+          '${invoiceStatusLabel(context, invoice)} · '
           '${l10n.invoiceDue(formatDate(context, invoice.dueDate))}',
         ),
         trailing: Text(

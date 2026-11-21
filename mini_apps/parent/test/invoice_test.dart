@@ -45,6 +45,8 @@ Map<String, dynamic> _json({
   String status = 'issued',
   int total = 1500000,
   int paid = 0,
+  int carried = 0,
+  List<Map<String, dynamic>>? lines,
   List<Map<String, dynamic>> payments = const [],
   bool voided = false,
 }) => {
@@ -57,17 +59,20 @@ Map<String, dynamic> _json({
   'periodMonth': '2026-12-01',
   'totalAmount': total,
   'paidAmount': paid,
-  'remainingAmount': voided ? 0 : (total - paid).clamp(0, total),
+  'carriedAmount': carried,
+  'remainingAmount': voided ? 0 : (total - paid - carried).clamp(0, total),
   'dueDate': '2026-12-15',
   'issuedAt': '2026-12-01T01:00:00.000Z',
-  'lines': [
-    {
-      'kind': 'monthly',
-      'className': 'Toán 9A',
-      'description': 'Học phí tháng 12',
-      'amount': 1500000,
-    },
-  ],
+  'lines':
+      lines ??
+      [
+        {
+          'kind': 'monthly',
+          'className': 'Toán 9A',
+          'description': 'Học phí tháng 12',
+          'amount': 1500000,
+        },
+      ],
   'payments': payments,
   'transferNote': 'TH 25K7Q9',
   'qrPayload': voided ? null : 'vietqr-payload-secret',
@@ -715,6 +720,178 @@ void main() {
       await tester.pumpAndSettle();
       expect(copied, ['TH 25K7Q9', '0011223344']);
       expect(find.text('Copied.'), findsOneWidget);
+    });
+  });
+  group('số dư chuyển kỳ (S6-FL-05)', () {
+    Map<String, dynamic> line(String kind, int amount, [String? text]) => {
+      'kind': kind,
+      'className': null,
+      'description': text ?? 'server text',
+      'amount': amount,
+    };
+
+    Future<void> openDetail(
+      WidgetTester tester,
+      Map<String, dynamic> json, {
+      double textScale = 1,
+    }) => _pump(
+      tester,
+      _FakeInvoices()..detailJson = json,
+      _FakeSaver(),
+      location: '${TeachHubRoutes.parentInvoices}/$_id',
+      textScale: textScale,
+    );
+
+    test('InvoiceSummary đọc carriedAmount; isCarriedOver theo còn nợ', () {
+      final carried = InvoiceSummary.fromJson(
+        _json(status: 'partially_paid', paid: 500000, carried: 1000000),
+      );
+      expect(carried.carriedAmount, 1000000);
+      expect(carried.remainingAmount, 0);
+      expect(carried.isCarriedOver, isTrue);
+      // Còn nợ lại (hủy thanh toán): không còn là "đã chuyển hết".
+      final back = InvoiceSummary.fromJson(
+        _json(status: 'partially_paid', paid: 400000, carried: 1000000),
+      );
+      expect(back.remainingAmount, 100000);
+      expect(back.isCarriedOver, isFalse);
+      final covered = InvoiceSummary.fromJson(_json(status: 'paid', total: 0));
+      expect(covered.isCoveredByBalance, isTrue);
+    });
+
+    testWidgets(
+      'chi tiết: dòng nợ kỳ trước, trừ trả thừa, điều chỉnh kỳ trước',
+      (tester) async {
+        await openDetail(
+          tester,
+          _json(
+            total: 1650000,
+            lines: [
+              line('monthly', 1500000, 'Học phí tháng 12'),
+              line('carry_over', 300000),
+              line('prev_adjustment', 150000),
+              line('carry_over', -300000),
+            ],
+          ),
+        );
+        expect(find.text('Previous balance owed'), findsOneWidget);
+        expect(find.text('Adjustment for earlier period'), findsOneWidget);
+        expect(find.text('Overpayment credited'), findsOneWidget);
+        expect(find.text('server text'), findsNothing);
+        expect(find.text('300,000 đ'), findsOneWidget);
+        expect(find.text('-300,000 đ'), findsOneWidget);
+      },
+    );
+
+    testWidgets('hóa đơn cũ đã chuyển nợ: báo đã chuyển, không QR, không '
+        'kêu gọi chuyển khoản', (tester) async {
+      await openDetail(
+        tester,
+        _json(
+          status: 'partially_paid',
+          total: 1500000,
+          paid: 500000,
+          carried: 1000000,
+          payments: [_receipt()],
+        ),
+        textScale: 1.3,
+      );
+      expect(find.text('Moved to next period'), findsOneWidget);
+      expect(find.text('Moved to next period\'s invoice'), findsOneWidget);
+      expect(find.byType(QrImageView), findsNothing);
+      expect(find.text('Transfer'), findsNothing);
+      expect(find.text('Copy transfer note'), findsNothing);
+      expect(
+        find.textContaining('moved to the next period\'s invoice'),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('đã chuyển một phần rồi còn nợ lại: không quét QR tổng, chuyển '
+        'đúng số còn lại', (tester) async {
+      await openDetail(
+        tester,
+        _json(
+          status: 'partially_paid',
+          total: 1500000,
+          paid: 400000,
+          carried: 1000000,
+        ),
+      );
+      expect(find.byType(QrImageView), findsNothing);
+      expect(find.text('Amount to transfer: 100,000 đ'), findsOneWidget);
+    });
+
+    testWidgets('hóa đơn 0 đ đã trừ vào số dư: rõ ràng, không QR', (
+      tester,
+    ) async {
+      await openDetail(
+        tester,
+        _json(
+          status: 'paid',
+          total: 0,
+          lines: [
+            line('monthly', 1000000, 'Học phí tháng 12'),
+            line('carry_over', -1000000),
+          ],
+        ),
+      );
+      expect(find.text('Covered by balance'), findsOneWidget);
+      expect(find.textContaining('earlier overpayment'), findsOneWidget);
+      expect(find.byType(QrImageView), findsNothing);
+      expect(find.text('Transfer'), findsNothing);
+    });
+
+    testWidgets('danh sách: nhãn đã chuyển và đã trừ vào số dư', (
+      tester,
+    ) async {
+      final repo = _FakeInvoices()
+        ..pages.add(
+          _page([
+            _json(
+              id: 'o',
+              status: 'partially_paid',
+              paid: 500000,
+              carried: 1000000,
+            ),
+            _json(id: 'c', status: 'paid', total: 0),
+          ]),
+        );
+      await _pump(
+        tester,
+        repo,
+        _FakeSaver(),
+        location: TeachHubRoutes.parentInvoices,
+        textScale: 1.3,
+      );
+      expect(find.text('Moved to next period · Due $_due'), findsOneWidget);
+      expect(find.text('Covered by balance · Due $_due'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('card học phí P02 tính theo còn nợ, không cộng nợ đã chuyển', (
+      tester,
+    ) async {
+      final repo = _FakeInvoices()
+        ..pages.add(
+          _page([
+            // Đã chuyển hết nợ sang kỳ sau: không tính, không đếm.
+            _json(
+              id: 'old',
+              status: 'partially_paid',
+              paid: 500000,
+              carried: 1000000,
+            ),
+            // Hóa đơn kỳ sau đã gồm khoản chuyển: 1.000.000 + 500.000.
+            _json(id: 'new', total: 1500000),
+          ]),
+        );
+      await _pump(tester, repo, _FakeSaver());
+      expect(
+        find.text('1 invoices not settled, 1,500,000 đ outstanding'),
+        findsOneWidget,
+      );
     });
   });
 }

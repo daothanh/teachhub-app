@@ -37,7 +37,11 @@ class TuitionCubit extends Cubit<TuitionState> {
       // phần đã trả (nay đã trừ: tổng là Σ còn nợ). Sửa khi có endpoint tổng hợp.
       final page = await _repo.list(studentId: studentId, limit: 50);
       if (isClosed) return;
-      final unpaid = page.items.where((i) => i.status.isUnpaid);
+      // Hóa đơn đã chuyển hết nợ sang kỳ sau (còn nợ 0) không tính: khoản đó nằm
+      // ở hóa đơn kỳ sau, tránh cộng hai lần.
+      final unpaid = page.items.where(
+        (i) => i.status.isUnpaid && i.remainingAmount > 0,
+      );
       emit(
         TuitionState(
           loaded: true,

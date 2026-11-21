@@ -29,6 +29,26 @@ String statusLabel(BuildContext context, InvoiceStatus s) {
   };
 }
 
+/// Nhãn trạng thái của một hóa đơn: hóa đơn đã chuyển nợ hay đã trừ vào số dư
+/// có nhãn riêng thay cho "Chưa thanh toán"/"Đã thanh toán".
+String invoiceStatusLabel(BuildContext context, InvoiceSummary i) {
+  final l10n = context.miniAppL10n;
+  if (i.isCarriedOver) return l10n.invoiceStatusCarried;
+  if (i.isCoveredByBalance) return l10n.invoiceStatusCovered;
+  return statusLabel(context, i.status);
+}
+
+/// Nhãn dòng hóa đơn: dòng số dư kỳ trước có nhãn cố định theo loại và dấu.
+String invoiceLineLabel(BuildContext context, InvoiceLine l) {
+  final l10n = context.miniAppL10n;
+  return switch (l.kind) {
+    'carry_over' when l.amount < 0 => l10n.invoiceLineCarryCredit,
+    'carry_over' => l10n.invoiceLineCarryDebt,
+    'prev_adjustment' => l10n.invoiceLinePrevAdjustment,
+    _ => l.description,
+  };
+}
+
 String paymentMethodLabel(BuildContext context, PaymentMethod m) {
   final l10n = context.miniAppL10n;
   return switch (m) {

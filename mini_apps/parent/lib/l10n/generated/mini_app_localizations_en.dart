@@ -234,6 +234,32 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
       'This invoice is paid in full. No transfer needed.';
 
   @override
+  String get invoiceStatusCarried => 'Moved to next period';
+
+  @override
+  String get invoiceStatusCovered => 'Covered by balance';
+
+  @override
+  String get invoiceLineCarryDebt => 'Previous balance owed';
+
+  @override
+  String get invoiceLineCarryCredit => 'Overpayment credited';
+
+  @override
+  String get invoiceLinePrevAdjustment => 'Adjustment for earlier period';
+
+  @override
+  String get invoiceCarriedAmount => 'Moved to next period\'s invoice';
+
+  @override
+  String get invoiceCarriedNotice =>
+      'What was still owed on this invoice has moved to the next period\'s invoice. You do not need to transfer anything for this one; pay the next invoice instead.';
+
+  @override
+  String get invoiceCoveredNotice =>
+      'Your earlier overpayment already covers this invoice, so you do not need to transfer anything.';
+
+  @override
   String get invoiceReceiptsTitle => 'Receipts';
 
   @override
