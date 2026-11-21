@@ -23,6 +23,7 @@ class _FakePlugin extends Fake implements FlutterLocalNotificationsPlugin {
       <({String? title, String? body, String? channel, String? payload})>[];
   void Function(NotificationResponse)? onResponse;
   NotificationAppLaunchDetails? launch;
+  bool failInit = false;
 
   @override
   Future<bool?> initialize(
@@ -31,6 +32,7 @@ class _FakePlugin extends Fake implements FlutterLocalNotificationsPlugin {
     DidReceiveBackgroundNotificationResponseCallback?
     onDidReceiveBackgroundNotificationResponse,
   }) async {
+    if (failInit) throw StateError('init lỗi');
     onResponse = onDidReceiveNotificationResponse;
     return true;
   }
@@ -183,6 +185,35 @@ void main() {
     expect(taps, [
       {'type': 'billing_ready'},
     ]);
+  });
+
+  test('initialize ném lỗi vẫn nhận và hiện tin', () async {
+    plugin.failInit = true;
+    await build().start();
+    messages.add(msg(channel: 'billing'));
+    await pumpEventQueue();
+    expect(plugin.shown.single.channel, 'billing');
+  });
+
+  test('payload là JSON hợp lệ nhưng không phải Map: bỏ qua', () async {
+    await build().start();
+    plugin.onResponse!(
+      const NotificationResponse(
+        notificationResponseType: NotificationResponseType.selectedNotification,
+        payload: '[1,2]',
+      ),
+    );
+    await pumpEventQueue();
+    expect(taps, isEmpty);
+  });
+
+  test('stop() ngừng hiện tin', () async {
+    final n = build();
+    await n.start();
+    await n.stop();
+    messages.add(msg());
+    await pumpEventQueue();
+    expect(plugin.shown, isEmpty);
   });
 
   test(

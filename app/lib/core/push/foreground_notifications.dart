@@ -53,25 +53,41 @@ class ForegroundNotifications {
       await _presentOnIos();
       return;
     }
-    await _plugin.initialize(
-      const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-      ),
-      onDidReceiveNotificationResponse: (r) => _tap(r.payload),
-    );
-    await createChannels();
+    // Nghe trước: lỗi khởi tạo/kênh không được làm mất tin foreground.
     _sub = _messages.listen(
       (m) => unawaited(_show(m)),
       onError: (Object e) => log('Foreground push lỗi: $e', name: 'push'),
     );
-    // App bị tắt rồi người dùng chạm thông báo cục bộ còn trên khay.
-    final launch = await _plugin.getNotificationAppLaunchDetails();
-    if (launch?.didNotificationLaunchApp ?? false) {
-      _tap(launch!.notificationResponse?.payload);
+    try {
+      await _plugin.initialize(
+        const InitializationSettings(
+          android: AndroidInitializationSettings('ic_stat_notification'),
+        ),
+        onDidReceiveNotificationResponse: (r) => _tap(r.payload),
+      );
+    } catch (e) {
+      log('Khởi tạo thông báo cục bộ lỗi: ${e.runtimeType}', name: 'push');
+    }
+    try {
+      await createChannels();
+    } catch (e) {
+      log('Tạo kênh thông báo lỗi: ${e.runtimeType}', name: 'push');
+    }
+    try {
+      // App bị tắt rồi người dùng chạm thông báo cục bộ còn trên khay.
+      final launch = await _plugin.getNotificationAppLaunchDetails();
+      if (launch?.didNotificationLaunchApp ?? false) {
+        _tap(launch!.notificationResponse?.payload);
+      }
+    } catch (e) {
+      log('Đọc thông báo mở app lỗi: ${e.runtimeType}', name: 'push');
     }
   }
 
-  Future<void> stop() async => _sub?.cancel();
+  Future<void> stop() async {
+    await _sub?.cancel();
+    _sub = null;
+  }
 
   Future<void> createChannels() async {
     final l10n = lookupAppLocalizations(_supported(locale()));
@@ -104,6 +120,7 @@ class ForegroundNotifications {
           android: AndroidNotificationDetails(
             channel,
             channel,
+            icon: 'ic_stat_notification',
             importance: channel == 'attendance'
                 ? Importance.high
                 : Importance.defaultImportance,
