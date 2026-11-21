@@ -64,7 +64,7 @@
   "notificationBannerBody": "Nhận tin điểm danh và thay đổi lịch của con ngay khi giáo viên cập nhật.",
   "notificationBannerAction": "Bật thông báo",
   "invoiceTuitionTitle": "Học phí",
-  "invoiceTuitionUnpaid": "{count} hóa đơn chưa đóng xong, tổng {total}",
+  "invoiceTuitionUnpaid": "{count} hóa đơn chưa đóng xong, còn nợ {total}",
   "@invoiceTuitionUnpaid": {
     "placeholders": {
       "count": {
@@ -140,5 +140,23 @@
   "invoiceTransferNote": "Nội dung chuyển khoản",
   "invoiceNotFound": "Không tìm thấy hóa đơn",
   "invoiceNotFoundBody": "Hóa đơn không tồn tại hoặc bạn không xem được.",
-  "invoiceLoadFailed": "Không tải được hóa đơn. Hãy thử lại."
+  "invoiceLoadFailed": "Không tải được hóa đơn. Hãy thử lại.",
+  "invoicePaidAmount": "Đã thanh toán",
+  "invoiceRemainingAmount": "Còn nợ",
+  "invoicePaidNotice": "Học phí đã thanh toán đủ, bạn không cần chuyển khoản.",
+  "invoiceReceiptsTitle": "Biên nhận",
+  "invoiceReceiptLine": "{method} · Ngày thu {date}",
+  "@invoiceReceiptLine": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceReceiptVoided": "Đã hủy",
+  "invoiceMethodBank": "Chuyển khoản",
+  "invoiceMethodCash": "Tiền mặt"
 }

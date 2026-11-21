@@ -102,7 +102,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String invoiceTuitionUnpaid(int count, String total) {
-    return '$count hóa đơn chưa đóng xong, tổng $total';
+    return '$count hóa đơn chưa đóng xong, còn nợ $total';
   }
 
   @override
@@ -219,4 +219,31 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get invoiceLoadFailed => 'Không tải được hóa đơn. Hãy thử lại.';
+
+  @override
+  String get invoicePaidAmount => 'Đã thanh toán';
+
+  @override
+  String get invoiceRemainingAmount => 'Còn nợ';
+
+  @override
+  String get invoicePaidNotice =>
+      'Học phí đã thanh toán đủ, bạn không cần chuyển khoản.';
+
+  @override
+  String get invoiceReceiptsTitle => 'Biên nhận';
+
+  @override
+  String invoiceReceiptLine(String method, String date) {
+    return '$method · Ngày thu $date';
+  }
+
+  @override
+  String get invoiceReceiptVoided => 'Đã hủy';
+
+  @override
+  String get invoiceMethodBank => 'Chuyển khoản';
+
+  @override
+  String get invoiceMethodCash => 'Tiền mặt';
 }

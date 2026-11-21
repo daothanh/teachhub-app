@@ -266,7 +266,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @invoiceTuitionUnpaid.
   ///
   /// In vi, this message translates to:
-  /// **'{count} hóa đơn chưa đóng xong, tổng {total}'**
+  /// **'{count} hóa đơn chưa đóng xong, còn nợ {total}'**
   String invoiceTuitionUnpaid(int count, String total);
 
   /// No description provided for @invoiceTuitionUnpaidMore.
@@ -478,6 +478,54 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Không tải được hóa đơn. Hãy thử lại.'**
   String get invoiceLoadFailed;
+
+  /// No description provided for @invoicePaidAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thanh toán'**
+  String get invoicePaidAmount;
+
+  /// No description provided for @invoiceRemainingAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Còn nợ'**
+  String get invoiceRemainingAmount;
+
+  /// No description provided for @invoicePaidNotice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học phí đã thanh toán đủ, bạn không cần chuyển khoản.'**
+  String get invoicePaidNotice;
+
+  /// No description provided for @invoiceReceiptsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Biên nhận'**
+  String get invoiceReceiptsTitle;
+
+  /// No description provided for @invoiceReceiptLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{method} · Ngày thu {date}'**
+  String invoiceReceiptLine(String method, String date);
+
+  /// No description provided for @invoiceReceiptVoided.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy'**
+  String get invoiceReceiptVoided;
+
+  /// No description provided for @invoiceMethodBank.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển khoản'**
+  String get invoiceMethodBank;
+
+  /// No description provided for @invoiceMethodCash.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiền mặt'**
+  String get invoiceMethodCash;
 }
 
 class _MiniAppLocalizationsDelegate

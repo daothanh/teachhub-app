@@ -22,6 +22,21 @@ import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 final _rowTitle = 'Minh Anh, ${DateFormat.yM('en').format(DateTime(2026, 12))}';
+Map<String, dynamic> _receipt({
+  String id = 'p1',
+  int amount = 500000,
+  String method = 'bank_transfer',
+  String paidOn = '2026-12-05',
+  bool voided = false,
+}) => {
+  'id': id,
+  'amount': amount,
+  'method': method,
+  'paidOn': paidOn,
+  'recordedAt': '2026-12-05T02:12:00.000Z',
+  'voidedAt': voided ? '2026-12-06T02:00:00.000Z' : null,
+};
+
 final _due = DateFormat.yMd('en').format(DateTime(2026, 12, 15));
 const _id = '019c0a10-0001-7b30-8c01-000000000001';
 
@@ -29,6 +44,8 @@ Map<String, dynamic> _json({
   String id = _id,
   String status = 'issued',
   int total = 1500000,
+  int paid = 0,
+  List<Map<String, dynamic>> payments = const [],
   bool voided = false,
 }) => {
   'id': id,
@@ -39,6 +56,8 @@ Map<String, dynamic> _json({
   'teacherName': 'Cô Lan',
   'periodMonth': '2026-12-01',
   'totalAmount': total,
+  'paidAmount': paid,
+  'remainingAmount': voided ? 0 : (total - paid).clamp(0, total),
   'dueDate': '2026-12-15',
   'issuedAt': '2026-12-01T01:00:00.000Z',
   'lines': [
@@ -49,6 +68,7 @@ Map<String, dynamic> _json({
       'amount': 1500000,
     },
   ],
+  'payments': payments,
   'transferNote': 'TH 25K7Q9',
   'qrPayload': voided ? null : 'vietqr-payload-secret',
   'payout': voided
@@ -155,6 +175,7 @@ Future<void> _pump(
   _FakeInvoices repo,
   _FakeSaver saver, {
   String location = TeachHubRoutes.parent,
+  double textScale = 1,
 }) async {
   // Màn cao để nút ở cuối chi tiết hóa đơn nằm trong khung nhìn.
   tester.view
@@ -183,6 +204,12 @@ Future<void> _pump(
         ],
         supportedLocales: MiniAppLocalizations.supportedLocales,
         theme: AppTheme.v1,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child!,
+        ),
         routerConfig: router,
       ),
     ),
@@ -324,6 +351,34 @@ void main() {
       await cubit.close();
     });
 
+    test(
+      'biên nhận và số liệu thanh toán đọc đúng; method lạ → chuyển khoản',
+      () {
+        final d = InvoiceDetail.fromJson(
+          _json(
+            status: 'partially_paid',
+            paid: 500000,
+            payments: [
+              _receipt(),
+              _receipt(id: 'p2', method: 'cash', voided: true),
+              _receipt(id: 'p3', method: 'crypto'),
+            ],
+          ),
+        );
+        expect(
+          [d.summary.paidAmount, d.summary.remainingAmount],
+          [500000, 1000000],
+        );
+        expect(d.payments.map((p) => p.voided), [false, true, false]);
+        expect(d.payments.map((p) => p.method), [
+          PaymentMethod.bankTransfer,
+          PaymentMethod.cash,
+          PaymentMethod.bankTransfer,
+        ]);
+        expect(d.payments.first.paidOn, DateTime(2026, 12, 5));
+      },
+    );
+
     test('status lạ không làm vỡ model', () {
       expect(InvoiceStatus.fromWire('abc'), InvoiceStatus.unknown);
       expect(InvoiceStatus.fromWire('void'), InvoiceStatus.voided);
@@ -340,13 +395,18 @@ void main() {
         ..pages.add(
           _page([
             _json(),
-            _json(id: 'i2', total: 500000, status: 'partially_paid'),
+            _json(
+              id: 'i2',
+              total: 500000,
+              paid: 200000,
+              status: 'partially_paid',
+            ),
             _json(id: 'i3', status: 'paid'),
           ]),
         );
       await _pump(tester, repo, _FakeSaver());
       expect(
-        find.text('2 invoices not settled, 2,000,000 đ in total'),
+        find.text('2 invoices not settled, 1,800,000 đ outstanding'),
         findsOneWidget,
       );
       await tester.tap(find.text('Tuition'));
@@ -399,6 +459,133 @@ void main() {
       );
       expect(find.byType(QrImageView), findsNothing);
       expect(find.text('Account number'), findsNothing);
+    });
+
+    testWidgets('thu một phần: hiện đã thanh toán, còn nợ, biên nhận và vẫn '
+        'có QR để chuyển phần còn lại', (tester) async {
+      final repo = _FakeInvoices()
+        ..detailJson = _json(
+          status: 'partially_paid',
+          paid: 500000,
+          payments: [
+            _receipt(),
+            _receipt(id: 'p0', amount: 100000, method: 'cash'),
+          ],
+        );
+      await _pump(
+        tester,
+        repo,
+        _FakeSaver(),
+        location: '${TeachHubRoutes.parentInvoices}/$_id',
+      );
+      expect(find.text('Partially paid'), findsOneWidget);
+      expect(find.text('Paid'), findsOneWidget);
+      expect(
+        find.text('500,000 đ'),
+        findsNWidgets(2),
+        reason: 'dòng đã trả + biên nhận',
+      );
+      expect(find.text('Outstanding'), findsOneWidget);
+      expect(find.text('1,000,000 đ'), findsOneWidget);
+      expect(find.text('Receipts'), findsOneWidget);
+      final d = DateFormat.yMd('en').format(DateTime(2026, 12, 5));
+      expect(find.text('Bank transfer · Received $d'), findsOneWidget);
+      expect(find.text('Cash · Received $d'), findsOneWidget);
+      expect(find.text('Voided'), findsNothing);
+      expect(find.byType(QrImageView), findsOneWidget);
+    });
+
+    testWidgets('chưa thu: còn nợ bằng tổng, chưa có biên nhận', (
+      tester,
+    ) async {
+      await _pump(
+        tester,
+        _FakeInvoices(),
+        _FakeSaver(),
+        location: '${TeachHubRoutes.parentInvoices}/$_id',
+      );
+      expect(find.text('Outstanding'), findsOneWidget);
+      expect(find.text('Paid'), findsNothing, reason: 'chưa có khoản đã trả');
+      expect(find.text('Receipts'), findsNothing);
+      expect(find.byType(QrImageView), findsOneWidget);
+    });
+
+    testWidgets('đã thu đủ: có biên nhận, không còn kêu gọi chuyển khoản', (
+      tester,
+    ) async {
+      final repo = _FakeInvoices()
+        ..detailJson = _json(
+          status: 'paid',
+          paid: 1500000,
+          payments: [_receipt(amount: 1500000)],
+        );
+      await _pump(
+        tester,
+        repo,
+        _FakeSaver(),
+        location: '${TeachHubRoutes.parentInvoices}/$_id',
+      );
+      expect(
+        find.text('Paid'),
+        findsNWidgets(2),
+        reason: 'nhãn trạng thái + dòng đã trả',
+      );
+      expect(find.text('0 đ'), findsOneWidget);
+      expect(
+        find.text('This invoice is paid in full. No transfer needed.'),
+        findsOneWidget,
+      );
+      expect(find.text('Receipts'), findsOneWidget);
+      expect(find.byType(QrImageView), findsNothing);
+      expect(find.text('Account number'), findsNothing);
+      expect(find.text('Copy transfer note'), findsNothing);
+    });
+
+    testWidgets(
+      'biên nhận đã hủy: gạch số tiền, có nhãn Voided, không tính vào '
+      'đã trả',
+      (tester) async {
+        final repo = _FakeInvoices()
+          ..detailJson = _json(payments: [_receipt(voided: true)]);
+        await _pump(
+          tester,
+          repo,
+          _FakeSaver(),
+          location: '${TeachHubRoutes.parentInvoices}/$_id',
+        );
+        expect(find.text('Voided'), findsOneWidget);
+        final amount = tester.widget<Text>(find.text('500,000 đ'));
+        expect(amount.style?.decoration, TextDecoration.lineThrough);
+        expect(find.text('Paid'), findsNothing);
+        expect(find.text('1,500,000 đ'), findsWidgets);
+        expect(find.byType(QrImageView), findsOneWidget);
+      },
+    );
+
+    testWidgets('chữ 130% không vỡ ở chi tiết có biên nhận', (tester) async {
+      final repo = _FakeInvoices()
+        ..detailJson = _json(
+          status: 'partially_paid',
+          paid: 600000,
+          payments: [
+            _receipt(),
+            _receipt(id: 'p0', amount: 100000, voided: true),
+          ],
+        );
+      await _pump(
+        tester,
+        repo,
+        _FakeSaver(),
+        location: '${TeachHubRoutes.parentInvoices}/$_id',
+        textScale: 1.3,
+      );
+      expect(tester.takeException(), isNull);
+      await tester.scrollUntilVisible(
+        find.text('Copy account number'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('404 → màn không tìm thấy hóa đơn', (tester) async {

@@ -78,6 +78,53 @@ class InvoicePayout extends Equatable {
   List<Object?> get props => [bankBin, bankName, accountNo, accountName];
 }
 
+enum PaymentMethod {
+  bankTransfer('bank_transfer'),
+  cash('cash');
+
+  const PaymentMethod(this.wire);
+  final String wire;
+
+  /// Giá trị lạ coi như chuyển khoản để app cũ không vỡ.
+  static PaymentMethod fromWire(Object? v) =>
+      values.firstWhere((m) => m.wire == v, orElse: () => bankTransfer);
+}
+
+/// Biên nhận một lần thu (`FamilyPayment`): không có người ghi, ghi chú, lý do hủy.
+class InvoicePayment extends Equatable {
+  const InvoicePayment({
+    required this.id,
+    required this.amount,
+    required this.method,
+    required this.paidOn,
+    required this.recordedAt,
+    required this.voided,
+  });
+
+  factory InvoicePayment.fromJson(Map<String, dynamic> j) => InvoicePayment(
+    id: j['id'] as String,
+    amount: j['amount'] as int,
+    method: PaymentMethod.fromWire(j['method']),
+    paidOn: DateTime.parse(j['paidOn'] as String),
+    recordedAt: DateTime.parse(j['recordedAt'] as String),
+    voided: j['voidedAt'] != null,
+  );
+
+  final String id;
+  final int amount;
+  final PaymentMethod method;
+
+  /// Ngày thu giáo viên ghi.
+  final DateTime paidOn;
+  final DateTime recordedAt;
+
+  /// Giáo viên đã hủy (ghi nhầm): biên nhận hiện "đã hủy", không tính vào đã trả.
+  final bool voided;
+
+  @override
+  List<Object?> get props => [id, amount, method, paidOn, recordedAt, voided];
+}
+
 /// Dòng trong danh sách (`GET /family/invoices`).
 class InvoiceSummary extends Equatable {
   const InvoiceSummary({
@@ -89,6 +136,8 @@ class InvoiceSummary extends Equatable {
     required this.teacherName,
     required this.periodMonth,
     required this.totalAmount,
+    required this.paidAmount,
+    required this.remainingAmount,
     required this.dueDate,
   });
 
@@ -101,6 +150,8 @@ class InvoiceSummary extends Equatable {
     teacherName: j['teacherName'] as String,
     periodMonth: DateTime.parse(j['periodMonth'] as String),
     totalAmount: j['totalAmount'] as int,
+    paidAmount: j['paidAmount'] as int,
+    remainingAmount: j['remainingAmount'] as int,
     dueDate: DateTime.parse(j['dueDate'] as String),
   );
 
@@ -112,6 +163,12 @@ class InvoiceSummary extends Equatable {
   final String teacherName;
   final DateTime periodMonth;
   final int totalAmount;
+
+  /// Σ thanh toán còn hiệu lực; server tính.
+  final int paidAmount;
+
+  /// 0 khi hóa đơn đã hủy; còn lại max(0, tổng − đã thanh toán).
+  final int remainingAmount;
   final DateTime dueDate;
 
   @override
@@ -124,6 +181,8 @@ class InvoiceSummary extends Equatable {
     teacherName,
     periodMonth,
     totalAmount,
+    paidAmount,
+    remainingAmount,
     dueDate,
   ];
 }
@@ -155,6 +214,7 @@ class InvoiceDetail extends Equatable {
     required this.transferNote,
     required this.qrPayload,
     required this.payout,
+    required this.payments,
   });
 
   factory InvoiceDetail.fromJson(Map<String, dynamic> j) => InvoiceDetail(
@@ -168,6 +228,10 @@ class InvoiceDetail extends Equatable {
     payout: j['payout'] == null
         ? null
         : InvoicePayout.fromJson(j['payout'] as Map<String, dynamic>),
+    payments: [
+      for (final p in j['payments'] as List)
+        InvoicePayment.fromJson(p as Map<String, dynamic>),
+    ],
   );
 
   final InvoiceSummary summary;
@@ -176,6 +240,16 @@ class InvoiceDetail extends Equatable {
   final String? qrPayload;
   final InvoicePayout? payout;
 
+  /// Biên nhận, mới nhất trước, gồm cả thanh toán đã hủy; rỗng khi chưa thu.
+  final List<InvoicePayment> payments;
+
   @override
-  List<Object?> get props => [summary, lines, transferNote, qrPayload, payout];
+  List<Object?> get props => [
+    summary,
+    lines,
+    transferNote,
+    qrPayload,
+    payout,
+    payments,
+  ];
 }
