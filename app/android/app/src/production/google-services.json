@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "432762025168-47cco8hu3huom73h7eg87onsqm9e455f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "vn.dayhoc.app",
+            "certificate_hash": "398343e55f7d1aa9891b3f68f3580efc66fabb89"
+          }
+        },
+        {
           "client_id": "432762025168-jfmmmpogljjoilurl0t6i7m60d172e19.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
