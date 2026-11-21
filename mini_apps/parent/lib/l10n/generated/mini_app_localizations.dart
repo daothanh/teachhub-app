@@ -497,6 +497,54 @@ abstract class MiniAppLocalizations {
   /// **'Học phí đã thanh toán đủ, bạn không cần chuyển khoản.'**
   String get invoicePaidNotice;
 
+  /// No description provided for @invoiceStatusCarried.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã chuyển sang kỳ sau'**
+  String get invoiceStatusCarried;
+
+  /// No description provided for @invoiceStatusCovered.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã trừ vào số dư'**
+  String get invoiceStatusCovered;
+
+  /// No description provided for @invoiceLineCarryDebt.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nợ kỳ trước'**
+  String get invoiceLineCarryDebt;
+
+  /// No description provided for @invoiceLineCarryCredit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trừ tiền trả thừa'**
+  String get invoiceLineCarryCredit;
+
+  /// No description provided for @invoiceLinePrevAdjustment.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điều chỉnh kỳ trước'**
+  String get invoiceLinePrevAdjustment;
+
+  /// No description provided for @invoiceCarriedAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã chuyển sang hóa đơn kỳ sau'**
+  String get invoiceCarriedAmount;
+
+  /// No description provided for @invoiceCarriedNotice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản còn nợ của hóa đơn này đã chuyển sang hóa đơn kỳ sau. Bạn không cần chuyển khoản ở hóa đơn này, hãy thanh toán ở hóa đơn kỳ sau.'**
+  String get invoiceCarriedNotice;
+
+  /// No description provided for @invoiceCoveredNotice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiền đóng thừa trước đó đã trừ vào hóa đơn này, bạn không cần chuyển khoản.'**
+  String get invoiceCoveredNotice;
+
   /// No description provided for @invoiceReceiptsTitle.
   ///
   /// In vi, this message translates to:

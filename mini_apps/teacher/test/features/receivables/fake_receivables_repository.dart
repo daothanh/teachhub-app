@@ -42,6 +42,7 @@ StudentReceivableHistory sampleHistory({
   List<ReceivableInvoice>? invoices,
   List<ReceivablePayment>? payments,
   List<ReceivableReminder>? reminders,
+  int ledgerBalance = 0,
 }) {
   final enr =
       enrollments ??
@@ -56,7 +57,10 @@ StudentReceivableHistory sampleHistory({
   return StudentReceivableHistory(
     studentId: id,
     studentName: name,
-    outstandingAmount: 700000,
+    // Nợ ròng = hóa đơn còn nợ (700.000 đ ở hóa đơn mẫu) + số dư sổ.
+    outstandingAmount: (700000 + ledgerBalance).clamp(0, 1 << 40),
+    invoiceOutstandingAmount: 700000,
+    ledgerBalanceAmount: ledgerBalance,
     dunningEnabled: enr.any((e) => e.dunningEnabled),
     enrollments: enr,
     invoices:

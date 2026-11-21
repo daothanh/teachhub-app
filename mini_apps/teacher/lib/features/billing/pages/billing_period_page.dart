@@ -90,15 +90,20 @@ class _View extends StatelessWidget {
           return;
         }
         final r = s.result!;
+        // Tổng cuối theo phản hồi của server (đã gồm số dư lúc chốt), không dùng
+        // số xem trước của bản nháp.
         final msg = r.issuedCount == 0
             ? l10n.billingIssuedNone
-            : l10n.billingIssued(r.issuedCount);
+            : l10n.billingIssuedTotal(r.issuedCount, formatVnd(r.totalAmount));
+        final covered = r.coveredCount == 0
+            ? ''
+            : ' ${l10n.billingIssuedCovered(r.coveredCount)}';
         final zero = r.zeroSkipped == 0
             ? ''
             : ' ${l10n.billingIssuedSkippedZero(r.zeroSkipped)}';
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('$msg$zero')));
+        ).showSnackBar(SnackBar(content: Text('$msg$covered$zero')));
       },
       builder: (context, s) {
         final d = s.detail;
@@ -196,18 +201,27 @@ class _Body extends StatelessWidget {
             ),
             style: text.bodyMedium,
           ),
+        if (p.draftCount > 0)
+          Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.xs),
+            child: Text(l10n.billingDraftPreviewNote, style: text.bodySmall),
+          ),
         const SizedBox(height: AppSpacing.md),
         AppButton(
           label: l10n.billingIssueAll,
           width: double.infinity,
-          disabled: issuing || payable.isEmpty,
+          // Bản nháp 0 đ vẫn chốt được khi số dư trả đủ phần phát sinh; server
+          // bỏ qua (ZERO_AMOUNT) nếu không có phát sinh.
+          disabled: issuing || (payable.isEmpty && detail.zeroDraftCount == 0),
           onPressed: () => _confirmIssue(
             context,
             confirmLabel: l10n.billingIssueAllConfirmAction,
-            body: l10n.billingIssueAllConfirmBody(
-              payable.length,
-              formatVnd(detail.payableTotal),
-            ),
+            body: payable.isEmpty
+                ? l10n.billingIssueZeroConfirmBody
+                : l10n.billingIssueAllConfirmBody(
+                    payable.length,
+                    formatVnd(detail.payableTotal),
+                  ),
             onConfirm: cubit.issueAll,
           ),
         ),
@@ -302,6 +316,14 @@ class _InvoiceTile extends StatelessWidget {
                   Text(formatVnd(i.totalAmount), style: text.titleSmall),
                 ],
               ),
+              if (i.isCoveredByBalance)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.xs),
+                  child: Text(
+                    l10n.billingCoveredByBalance,
+                    style: text.bodySmall,
+                  ),
+                ),
               if (i.isZeroDraft)
                 Padding(
                   padding: const EdgeInsets.only(top: AppSpacing.xs),

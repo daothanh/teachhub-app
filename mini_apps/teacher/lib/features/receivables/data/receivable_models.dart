@@ -313,6 +313,8 @@ class StudentReceivableHistory extends Equatable {
     required this.studentId,
     required this.studentName,
     required this.outstandingAmount,
+    required this.invoiceOutstandingAmount,
+    required this.ledgerBalanceAmount,
     required this.dunningEnabled,
     required this.enrollments,
     required this.invoices,
@@ -325,6 +327,8 @@ class StudentReceivableHistory extends Equatable {
         studentId: json['studentId'] as String,
         studentName: json['studentName'] as String,
         outstandingAmount: json['outstandingAmount'] as int,
+        invoiceOutstandingAmount: json['invoiceOutstandingAmount'] as int,
+        ledgerBalanceAmount: json['ledgerBalanceAmount'] as int,
         dunningEnabled: json['dunningEnabled'] as bool,
         enrollments: [
           for (final e in json['enrollments'] as List)
@@ -346,7 +350,16 @@ class StudentReceivableHistory extends Equatable {
 
   final String studentId;
   final String studentName;
+
+  /// Nợ ròng = max(0, [invoiceOutstandingAmount] + [ledgerBalanceAmount]); khớp
+  /// dòng của `GET /receivables`.
   final int outstandingAmount;
+
+  /// Σ còn nợ các hóa đơn (không gồm phần đã chuyển sang hóa đơn kỳ sau).
+  final int invoiceOutstandingAmount;
+
+  /// Số dư sổ học viên: dương = nợ ở sổ chưa vào hóa đơn, âm = trả thừa.
+  final int ledgerBalanceAmount;
 
   /// Học viên có được nhắc nợ không (còn ít nhất một ghi danh bật nhắc).
   final bool dunningEnabled;
@@ -361,6 +374,8 @@ class StudentReceivableHistory extends Equatable {
         studentId: studentId,
         studentName: studentName,
         outstandingAmount: outstandingAmount,
+        invoiceOutstandingAmount: invoiceOutstandingAmount,
+        ledgerBalanceAmount: ledgerBalanceAmount,
         dunningEnabled: r.studentDunningEnabled,
         enrollments: [
           for (final e in enrollments)
@@ -373,8 +388,9 @@ class StudentReceivableHistory extends Equatable {
 
   @override
   List<Object?> get props => [
-    studentId, studentName, outstandingAmount, dunningEnabled, enrollments, //
-    invoices, payments, reminders,
+    studentId, studentName, outstandingAmount, invoiceOutstandingAmount, //
+    ledgerBalanceAmount, dunningEnabled, enrollments, invoices, payments,
+    reminders,
   ];
 }
 

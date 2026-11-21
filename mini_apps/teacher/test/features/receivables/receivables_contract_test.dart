@@ -130,7 +130,7 @@ class _Adapter implements HttpClientAdapter {
 /// Trường bắt buộc của hợp đồng mà màn hình chưa dùng nên mô hình không đọc.
 const _unread = {
   'ReceivableRow': <String>{},
-  'StudentReceivableHistory': {'ledgerBalanceAmount'},
+  'StudentReceivableHistory': <String>{},
   'ReceivableInvoice': <String>{},
   // Ghi chú, người ghi/hủy và lý do hủy chưa hiện trong lịch sử T11.
   'ReceivablePayment': {
@@ -167,6 +167,7 @@ void main() {
         expect(h.invoices, isNotEmpty);
         expect(h.payments, isNotEmpty);
         expect(h.reminders, isNotEmpty);
+        expect(h.invoiceOutstandingAmount, isNonNegative);
       },
     );
 

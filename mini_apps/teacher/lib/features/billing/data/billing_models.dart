@@ -119,8 +119,14 @@ class InvoiceSummary extends Equatable {
   /// Bản nháp 0 đ: không gửi, không nhắc nợ (US-1.3 AC3).
   bool get isZeroDraft => status == InvoiceStatus.draft && totalAmount == 0;
 
-  /// Đã phát hành, chưa hủy, chưa thu đủ: ghi thanh toán được.
+  /// Chỉ để hiện lối vào chi tiết ("Thu tiền"): tóm tắt không có số còn nợ nên
+  /// chưa biết hóa đơn đã chuyển hết nợ chưa; nút ghi thanh toán thật ở chi tiết
+  /// dùng `Invoice.canRecordPayment`.
   bool get canRecordPayment => status.isLive && status != InvoiceStatus.paid;
+
+  /// Hóa đơn 0 đ đã chốt vì tiền trả thừa đủ trả kỳ này (không QR, không thu).
+  bool get isCoveredByBalance =>
+      status == InvoiceStatus.paid && totalAmount == 0;
 
   /// Bản nháp có tiền: chốt được.
   bool get isPayableDraft => status == InvoiceStatus.draft && totalAmount > 0;
@@ -204,6 +210,9 @@ enum InvoiceLineKind {
     'manual_adjustment' => manualAdjustment,
     _ => monthly,
   };
+
+  /// Dòng số dư kỳ trước, hiện tách khỏi các dòng buổi.
+  bool get isCarry => this == carryOver || this == prevAdjustment;
 }
 
 enum NotChargedReason {
@@ -277,6 +286,7 @@ class Invoice extends Equatable {
     required this.studentName,
     required this.totalAmount,
     required this.paidAmount,
+    required this.carriedAmount,
     required this.remainingAmount,
     required this.dueDate,
     required this.voidReason,
@@ -293,6 +303,7 @@ class Invoice extends Equatable {
     studentName: json['studentName'] as String,
     totalAmount: json['totalAmount'] as int,
     paidAmount: json['paidAmount'] as int,
+    carriedAmount: json['carriedAmount'] as int,
     remainingAmount: json['remainingAmount'] as int,
     dueDate: json['dueDate'] as String,
     voidReason: json['voidReason'] as String?,
@@ -314,16 +325,42 @@ class Invoice extends Equatable {
   /// Σ thanh toán chưa hủy; server tính, app không tự cộng.
   final int paidAmount;
 
-  /// 0 khi hóa đơn nháp hoặc đã hủy, còn lại max(0, tổng − đã thu).
+  /// Phần còn nợ đã chuyển sang hóa đơn kỳ sau lúc phát hành hóa đơn đó (0 nếu
+  /// chưa); không còn tính vào [remainingAmount].
+  final int carriedAmount;
+
+  /// 0 khi hóa đơn nháp hoặc đã hủy, còn lại max(0, tổng − đã thu − đã chuyển).
   final int remainingAmount;
   final String dueDate;
   final String? voidReason;
   final List<InvoiceLine> lines;
   final int clampedAmount;
 
-  /// Còn ghi thanh toán được: đã phát hành, chưa hủy, chưa thu đủ (còn lại là
-  /// 409 `INVOICE_NOT_PAYABLE`).
-  bool get canRecordPayment => status.isLive && status != InvoiceStatus.paid;
+  /// Còn ghi thanh toán được: đã phát hành, chưa hủy, chưa thu đủ và còn nợ
+  /// (hóa đơn đã chuyển hết nợ sang kỳ sau thì còn lại là 409
+  /// `INVOICE_NOT_PAYABLE`).
+  bool get canRecordPayment =>
+      status.isLive && status != InvoiceStatus.paid && remainingAmount > 0;
+
+  /// Nợ đã chuyển sang hóa đơn kỳ sau.
+  bool get isCarriedOver => carriedAmount > 0;
+
+  /// Có dòng kết chuyển từ kỳ trước (khác 0).
+  bool get hasCarryLine =>
+      lines.any((l) => l.kind == InvoiceLineKind.carryOver && l.amount != 0);
+
+  /// Hóa đơn 0 đ đã chốt vì tiền trả thừa đủ trả kỳ này: không QR, không thu.
+  bool get isCoveredByBalance =>
+      status == InvoiceStatus.paid && totalAmount == 0;
+
+  /// Hủy được: server chỉ cho hủy hóa đơn `issued` (trạng thái khác → 409) và
+  /// trả 409 khi đã có thanh toán, đã chuyển nợ hoặc đang mang dòng kết chuyển
+  /// (chưa hỗ trợ trả khoản chuyển kỳ về).
+  bool get canVoid =>
+      status == InvoiceStatus.issued &&
+      paidAmount == 0 &&
+      !isCarriedOver &&
+      !hasCarryLine;
 
   /// Số liệu hóa đơn sau khi ghi hoặc hủy một thanh toán (lấy từ [PaymentResult]).
   Invoice afterPayment(PaymentResult r) => Invoice(
@@ -335,6 +372,7 @@ class Invoice extends Equatable {
     studentName: studentName,
     totalAmount: totalAmount,
     paidAmount: r.paidAmount,
+    carriedAmount: carriedAmount,
     remainingAmount: r.remainingAmount,
     dueDate: dueDate,
     voidReason: voidReason,
@@ -350,15 +388,23 @@ class Invoice extends Equatable {
       if (l.kind == InvoiceLineKind.session) l,
   ];
 
+  /// Số dư kỳ trước (xem trước ở bản nháp): nợ/trả thừa và điều chỉnh kỳ trước.
+  List<InvoiceLine> get carryLines => [
+    for (final l in lines)
+      // Dòng kết chuyển 0 đ không có nhãn để hiện nên bỏ.
+      if (l.kind.isCarry && l.amount != 0) l,
+  ];
+
   List<InvoiceLine> get otherLines => [
     for (final l in lines)
-      if (l.kind != InvoiceLineKind.session) l,
+      if (l.kind != InvoiceLineKind.session && !l.kind.isCarry) l,
   ];
 
   @override
   List<Object?> get props => [
     id, periodId, periodMonth, code, status, studentName, totalAmount, //
-    paidAmount, remainingAmount, dueDate, voidReason, lines, clampedAmount,
+    paidAmount, carriedAmount, remainingAmount, dueDate, voidReason, lines, //
+    clampedAmount,
   ];
 }
 
@@ -386,6 +432,7 @@ class IssueResult extends Equatable {
     required this.issuedCount,
     required this.skipped,
     required this.totalAmount,
+    this.coveredCount = 0,
   });
 
   factory IssueResult.fromJson(Map<String, dynamic> json) => IssueResult(
@@ -395,16 +442,28 @@ class IssueResult extends Equatable {
         IssueSkipped.fromJson(e as Map<String, dynamic>),
     ],
     totalAmount: json['totalAmount'] as int,
+    coveredCount: (json['invoices'] as List)
+        .where((e) => (e as Map<String, dynamic>)['totalAmount'] == 0)
+        .length,
   );
 
   final int issuedCount;
   final List<IssueSkipped> skipped;
+
+  /// Tổng cuối của các hóa đơn vừa phát hành, theo server (đã gồm số dư lúc
+  /// chốt; có thể khác số xem trước ở bản nháp).
   final int totalAmount;
+
+  /// Số hóa đơn vừa chốt 0 đ vì tiền trả thừa đủ trả: không QR, không thu. Đếm
+  /// từ `invoices` có `totalAmount` 0 (bản nháp không phát sinh nằm ở `skipped`).
+  final int coveredCount;
 
   int get zeroSkipped => skipped.where((s) => s.isZeroAmount).length;
 
   @override
-  List<Object?> get props => [issuedCount, skipped, totalAmount];
+  List<Object?> get props => [
+    issuedCount, skipped, totalAmount, coveredCount, //
+  ];
 }
 
 const adjustmentAmountMax = 1000000000;

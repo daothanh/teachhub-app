@@ -1377,6 +1377,10 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   }
 
   @override
+  String get billingIssueZeroConfirmBody =>
+      'Chốt các bản nháp 0 đ. Bản nháp không có khoản phát sinh được giữ lại; bản nháp mà tiền trả thừa trả đủ sẽ được chốt và ghi là đã trừ vào số dư.';
+
+  @override
   String billingIssueOneConfirmBody(String student, String amount) {
     return 'Chốt hóa đơn của $student, $amount. Phụ huynh nhận thông báo ngay và hóa đơn không sửa được sau khi gửi.';
   }
@@ -1414,7 +1418,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
       locale: localeName,
       other: '$count hóa đơn',
     );
-    return '$_temp0 0 đ sẽ không được gửi.';
+    return '$_temp0 0 đ: nếu không có khoản phát sinh thì sẽ không được gửi.';
   }
 
   @override
@@ -1491,8 +1495,64 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String billingClamped(String amount) {
-    return 'Điều chỉnh làm tổng âm nên tổng được giữ ở 0 đ; phần âm $amount chưa được chuyển sang kỳ sau.';
+    return 'Điều chỉnh làm tổng âm nên tổng được giữ ở 0 đ; phần âm $amount sẽ được trừ vào kỳ sau.';
   }
+
+  @override
+  String get billingCarryTitle => 'Số dư kỳ trước';
+
+  @override
+  String get billingCarryDebt => 'Nợ kỳ trước';
+
+  @override
+  String get billingCarryCredit => 'Trừ tiền trả thừa';
+
+  @override
+  String get billingPrevAdjustment => 'Điều chỉnh kỳ trước';
+
+  @override
+  String get billingCarryPreviewNote =>
+      'Số này tính theo hiện tại, có thể thay đổi khi chốt.';
+
+  @override
+  String get billingDraftPreviewNote =>
+      'Tổng mỗi bản nháp đã gồm nợ kỳ trước hoặc tiền trả thừa nếu có, có thể thay đổi khi chốt.';
+
+  @override
+  String billingIssuedTotal(int count, String amount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hóa đơn',
+    );
+    return 'Đã gửi $_temp0, tổng $amount.';
+  }
+
+  @override
+  String billingIssuedCovered(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count hóa đơn',
+    );
+    return '$_temp0 đã trừ vào số dư, không cần thu.';
+  }
+
+  @override
+  String get billingCoveredByBalance => 'Đã trừ vào số dư';
+
+  @override
+  String get billingCoveredByBalanceHint =>
+      'Tiền trả thừa của học viên đã đủ trả kỳ này nên không cần thu thêm.';
+
+  @override
+  String billingCarriedAmount(String amount) {
+    return 'Đã chuyển $amount sang kỳ sau';
+  }
+
+  @override
+  String get billingCarriedHint =>
+      'Khoản này đã nằm ở hóa đơn kỳ sau, hãy thu ở đó.';
 
   @override
   String get billingAddAdjustment => 'Thêm điều chỉnh';
@@ -1755,6 +1815,25 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String receivablesRowOwed(String amount) {
     return 'Còn nợ $amount';
   }
+
+  @override
+  String receivablesInvoiceOutstanding(String amount) {
+    return 'Hóa đơn còn nợ: $amount';
+  }
+
+  @override
+  String receivablesLedgerDebt(String amount) {
+    return 'Nợ ở sổ: $amount';
+  }
+
+  @override
+  String receivablesLedgerCredit(String amount) {
+    return 'Trả thừa: $amount';
+  }
+
+  @override
+  String get receivablesNetHint =>
+      'Nợ ròng đã trừ tiền trả thừa hoặc cộng nợ ở sổ, không đếm hai lần phần đã chuyển sang kỳ sau.';
 
   @override
   String receivablesRowMeta(String classes, int invoices) {

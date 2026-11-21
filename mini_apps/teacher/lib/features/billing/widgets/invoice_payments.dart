@@ -39,25 +39,40 @@ class InvoicePaymentsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Divider(height: AppSpacing.xl),
-        if (inv.status != InvoiceStatus.voided) ...[
+        if (inv.isCoveredByBalance) ...[
+          Text(l10n.billingCoveredByBalance, style: text.titleMedium),
+          const SizedBox(height: AppSpacing.xs),
+          Text(l10n.billingCoveredByBalanceHint, style: text.bodySmall),
+        ] else if (inv.status != InvoiceStatus.voided) ...[
           _AmountRow(l10n.billingPaidAmount, inv.paidAmount),
+          if (inv.isCarriedOver) ...[
+            const SizedBox(height: AppSpacing.xs),
+            _AmountRow(
+              l10n.billingCarriedAmount(formatVnd(inv.carriedAmount)),
+              null,
+            ),
+          ],
           const SizedBox(height: AppSpacing.xs),
           _AmountRow(
             l10n.billingRemainingAmount,
             inv.remainingAmount,
             bold: true,
           ),
+          if (inv.isCarriedOver && inv.remainingAmount == 0)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xs),
+              child: Text(l10n.billingCarriedHint, style: text.bodySmall),
+            ),
         ],
         if (inv.canRecordPayment) ...[
           const SizedBox(height: AppSpacing.md),
-          if (inv.remainingAmount > 0)
-            AppButton(
-              label: l10n.billingPayFull,
-              width: double.infinity,
-              disabled: busy,
-              onPressed: () => _openFull(context),
-            ),
-          if (inv.remainingAmount > 0) const SizedBox(height: AppSpacing.sm),
+          AppButton(
+            label: l10n.billingPayFull,
+            width: double.infinity,
+            disabled: busy,
+            onPressed: () => _openFull(context),
+          ),
+          const SizedBox(height: AppSpacing.sm),
           AppButton(
             label: l10n.billingPayPartial,
             variant: AppButtonVariant.outlinePrimary,
@@ -79,7 +94,9 @@ class InvoicePaymentsSection extends StatelessWidget {
 class _AmountRow extends StatelessWidget {
   const _AmountRow(this.label, this.amount, {this.bold = false});
   final String label;
-  final int amount;
+
+  /// `null`: dòng chỉ có nhãn (số đã nằm trong nhãn).
+  final int? amount;
   final bool bold;
 
   @override
@@ -90,7 +107,7 @@ class _AmountRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(child: Text(label, style: style)),
-        Text(formatVnd(amount), style: style),
+        if (amount != null) Text(formatVnd(amount!), style: style),
       ],
     );
   }

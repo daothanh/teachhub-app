@@ -295,6 +295,7 @@ void main() {
         billing
           ..invoice = sampleInvoice(
             status: InvoiceStatus.partiallyPaid,
+            total: 1200000,
             paid: 500000,
           )
           ..payments = [samplePayment()];

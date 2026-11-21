@@ -809,6 +809,7 @@
       }
     }
   },
+  "billingIssueZeroConfirmBody": "Send the 0 đ drafts. Drafts with nothing charged stay as drafts; drafts fully covered by overpayment are sent and marked as covered by the balance.",
   "billingIssueOneConfirmBody": "Issue the invoice for {student}, {amount}. Parents are notified right away and issued invoices cannot be edited.",
   "@billingIssueOneConfirmBody": {
     "placeholders": {
@@ -838,7 +839,7 @@
     }
   },
   "billingNoPayableDrafts": "No drafts with an amount left to send.",
-  "billingZeroDraftNote": "{count, plural, =1{1 invoice} other{{count} invoices}} of 0 đ will not be sent.",
+  "billingZeroDraftNote": "{count, plural, =1{1 invoice} other{{count} invoices}} of 0 đ: not sent when nothing was charged.",
   "@billingZeroDraftNote": {
     "placeholders": {
       "count": {
@@ -892,7 +893,7 @@
     }
   },
   "billingTotal": "Total",
-  "billingClamped": "The adjustment made the total negative, so it is held at 0 đ; the negative part of {amount} is not carried to the next period yet.",
+  "billingClamped": "The adjustment made the total negative, so it is held at 0 đ; the negative part of {amount} will be deducted next period.",
   "@billingClamped": {
     "placeholders": {
       "amount": {
@@ -900,6 +901,42 @@
       }
     }
   },
+  "billingCarryTitle": "Balance from earlier periods",
+  "billingCarryDebt": "Previous balance owed",
+  "billingCarryCredit": "Overpayment credited",
+  "billingPrevAdjustment": "Adjustment for earlier period",
+  "billingCarryPreviewNote": "This is calculated as of now and may change when you send it.",
+  "billingDraftPreviewNote": "Each draft total already includes any previous balance or overpayment and may change when you send it.",
+  "billingIssuedTotal": "{count, plural, =1{1 invoice} other{{count} invoices}} sent, total {amount}.",
+  "@billingIssuedTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingIssuedCovered": "{count, plural, =1{1 invoice was} other{{count} invoices were}} covered by the balance, nothing to collect.",
+  "@billingIssuedCovered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingCoveredByBalance": "Covered by balance",
+  "billingCoveredByBalanceHint": "The student's overpayment already covers this period, so there is nothing more to collect.",
+  "billingCarriedAmount": "{amount} carried to the next period",
+  "@billingCarriedAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingCarriedHint": "This amount is now on the next period's invoice; collect it there.",
   "billingAddAdjustment": "Add adjustment",
   "billingAdjustTitle": "Adjust invoice",
   "billingAdjustHint": "Adjustments cannot be deleted yet. If you entered one wrongly, add a line with the opposite sign.",
@@ -1065,6 +1102,31 @@
       }
     }
   },
+  "receivablesInvoiceOutstanding": "Open invoices: {amount}",
+  "@receivablesInvoiceOutstanding": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesLedgerDebt": "Owed on the ledger: {amount}",
+  "@receivablesLedgerDebt": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesLedgerCredit": "Overpaid: {amount}",
+  "@receivablesLedgerCredit": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesNetHint": "Net debt after overpayment credit or ledger debt; amounts already carried to the next period are not counted twice.",
   "receivablesRowMeta": "{classes} · {invoices, plural, =1{1 invoice} other{{invoices} invoices}}",
   "@receivablesRowMeta": {
     "placeholders": {

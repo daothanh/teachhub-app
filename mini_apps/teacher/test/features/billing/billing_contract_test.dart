@@ -116,7 +116,6 @@ const _unread = {
   'PaymentResult': {'dunningCancelled'},
   // Người ghi/hủy có thể không xác định (null) nên thiếu khóa cũng đọc được.
   'Payment': {'recordedBy', 'voidedBy'},
-  'IssueInvoicesResult': {'invoices'},
 };
 
 void main() {
@@ -145,6 +144,7 @@ void main() {
     test('Invoice: đã thu, còn nợ; ghi được thanh toán theo trạng thái', () {
       final inv = Invoice.fromJson(_example('Invoice'));
       expect([inv.paidAmount, inv.remainingAmount], [0, 150000]);
+      expect(inv.carriedAmount, 0);
       expect(inv.status, InvoiceStatus.draft);
       expect(inv.canRecordPayment, isFalse);
       final issued = Invoice.fromJson({
@@ -207,6 +207,7 @@ void main() {
       final r = IssueResult.fromJson(_example('IssueInvoicesResult'));
       expect(r.issuedCount, 1);
       expect(r.zeroSkipped, 1);
+      expect(r.coveredCount, 0);
     });
 
     test('mô hình đọc hết trường bắt buộc: thiếu trường thì ném lỗi', () {

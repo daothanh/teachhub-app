@@ -87,7 +87,7 @@ class _Detail extends StatelessWidget {
           spacing: 8,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            Chip(label: Text(statusLabel(context, s.status))),
+            Chip(label: Text(invoiceStatusLabel(context, s))),
             Text(l10n.invoiceDue(formatDate(context, s.dueDate))),
           ],
         ),
@@ -102,7 +102,7 @@ class _Detail extends StatelessWidget {
         for (final l in invoice.lines)
           ListTile(
             contentPadding: EdgeInsets.zero,
-            title: Text(l.description),
+            title: Text(invoiceLineLabel(context, l)),
             subtitle: l.className == null ? null : Text(l.className!),
             trailing: Text(formatVnd(context, l.amount)),
           ),
@@ -121,6 +121,12 @@ class _Detail extends StatelessWidget {
               contentPadding: EdgeInsets.zero,
               title: Text(l10n.invoicePaidAmount),
               trailing: Text(formatVnd(context, s.paidAmount)),
+            ),
+          if (s.carriedAmount > 0)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.invoiceCarriedAmount),
+              trailing: Text(formatVnd(context, s.carriedAmount)),
             ),
           ListTile(
             contentPadding: EdgeInsets.zero,
@@ -146,12 +152,28 @@ class _Detail extends StatelessWidget {
               child: Text(l10n.invoiceVoidNotice),
             ),
           )
+        else if (s.isCoveredByBalance)
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(l10n.invoiceCoveredNotice),
+            ),
+          )
         else if (s.status == InvoiceStatus.paid)
           Card(
             margin: EdgeInsets.zero,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Text(l10n.invoicePaidNotice),
+            ),
+          )
+        else if (s.isCarriedOver)
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(l10n.invoiceCarriedNotice),
             ),
           )
         else if (qr != null || payout != null)
@@ -226,9 +248,12 @@ class _Pay extends StatelessWidget {
     final l10n = context.miniAppL10n;
     final theme = Theme.of(context);
     final payout = invoice.payout;
-    // QR sinh lúc phát hành mang tổng tiền: đã thu một phần thì quét sẽ chuyển
-    // thừa, nên ẩn QR và hướng dẫn chuyển đúng số còn lại.
-    final partial = invoice.summary.status == InvoiceStatus.partiallyPaid;
+    // QR sinh lúc phát hành mang tổng tiền: đã thu một phần (hoặc đã chuyển một
+    // phần nợ sang kỳ sau) thì quét sẽ chuyển thừa, nên ẩn QR và hướng dẫn
+    // chuyển đúng số còn lại.
+    final partial =
+        invoice.summary.status == InvoiceStatus.partiallyPaid ||
+        invoice.summary.carriedAmount > 0;
     final qr = partial ? null : invoice.qrPayload;
     final saving =
         context.watch<InvoiceDetailCubit>().state.qrSave == QrSaveStatus.saving;

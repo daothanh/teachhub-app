@@ -137,6 +137,7 @@ class InvoiceSummary extends Equatable {
     required this.periodMonth,
     required this.totalAmount,
     required this.paidAmount,
+    required this.carriedAmount,
     required this.remainingAmount,
     required this.dueDate,
   });
@@ -151,6 +152,7 @@ class InvoiceSummary extends Equatable {
     periodMonth: DateTime.parse(j['periodMonth'] as String),
     totalAmount: j['totalAmount'] as int,
     paidAmount: j['paidAmount'] as int,
+    carriedAmount: j['carriedAmount'] as int,
     remainingAmount: j['remainingAmount'] as int,
     dueDate: DateTime.parse(j['dueDate'] as String),
   );
@@ -167,9 +169,20 @@ class InvoiceSummary extends Equatable {
   /// Σ thanh toán còn hiệu lực; server tính.
   final int paidAmount;
 
-  /// 0 khi hóa đơn đã hủy; còn lại max(0, tổng − đã thanh toán).
+  /// Phần nợ đã chuyển sang hóa đơn kỳ sau (0 nếu chưa); không còn tính vào
+  /// [remainingAmount].
+  final int carriedAmount;
+
+  /// 0 khi hóa đơn đã hủy; còn lại max(0, tổng − đã thanh toán − đã chuyển).
   final int remainingAmount;
   final DateTime dueDate;
+
+  /// Nợ của hóa đơn này đã nằm ở hóa đơn kỳ sau: không chuyển khoản ở đây.
+  bool get isCarriedOver => carriedAmount > 0 && remainingAmount == 0;
+
+  /// Hóa đơn 0 đ đã chốt vì tiền đóng thừa trước đó đủ trả kỳ này.
+  bool get isCoveredByBalance =>
+      status == InvoiceStatus.paid && totalAmount == 0;
 
   @override
   List<Object?> get props => [
@@ -182,6 +195,7 @@ class InvoiceSummary extends Equatable {
     periodMonth,
     totalAmount,
     paidAmount,
+    carriedAmount,
     remainingAmount,
     dueDate,
   ];
