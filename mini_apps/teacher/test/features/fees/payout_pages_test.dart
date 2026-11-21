@@ -90,6 +90,32 @@ void main() {
     expect(find.textContaining('******6789'), findsOneWidget);
   });
 
+  Future<void> deleteFirst(WidgetTester tester) async {
+    await tester.tap(find.byIcon(Icons.more_vert).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Xóa').last);
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('S3: xóa tài khoản duy nhất có cảnh báo chặn chốt kỳ', (
+    tester,
+  ) async {
+    fees.accounts = [sampleAccount()];
+    await open(tester);
+    await deleteFirst(tester);
+    expect(find.textContaining('tài khoản nhận tiền duy nhất'), findsOneWidget);
+  });
+
+  testWidgets('S3: còn nhiều tài khoản thì chỉ hiện câu xóa thường', (
+    tester,
+  ) async {
+    fees.accounts = [sampleAccount(), sampleAccount(id: 'a2', primary: false)];
+    await open(tester);
+    await deleteFirst(tester);
+    expect(find.textContaining('duy nhất'), findsNothing);
+    expect(find.textContaining('gỡ khỏi danh sách'), findsOneWidget);
+  });
+
   for (final path in [FeesRoutes.payoutAccounts, FeesRoutes.payoutNew]) {
     testWidgets('chữ 130%: $path không tràn', (tester) async {
       fees.accounts = [

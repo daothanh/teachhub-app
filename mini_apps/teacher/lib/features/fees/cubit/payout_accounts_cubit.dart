@@ -94,7 +94,15 @@ class PayoutAccountsCubit extends Cubit<PayoutAccountsState> {
     try {
       await run(_keys.of(op, op));
       _keys.done(op);
-      // Tải lại: xóa tài khoản chính đổi chính sang tài khoản khác (server).
+    } on ApiException catch (e) {
+      if (!e.retryable) _keys.done(op);
+      if (isClosed) return;
+      emit(state.copyWith(busy: false, error: e));
+      return;
+    }
+    // Lệnh ghi đã thành công: tải lại lỗi không được báo như ghi lỗi.
+    // Tải lại vì xóa tài khoản chính đổi chính sang tài khoản khác (server).
+    try {
       final items = await _repo.listPayoutAccounts();
       if (isClosed) return;
       emit(
@@ -105,9 +113,49 @@ class PayoutAccountsCubit extends Cubit<PayoutAccountsState> {
         ),
       );
     } on ApiException catch (e) {
-      if (!e.retryable) _keys.done(op);
       if (isClosed) return;
-      emit(state.copyWith(busy: false, error: e));
+      emit(_applyLocally(op, notice, e));
     }
+  }
+
+  /// Tải lại lỗi: cập nhật danh sách tại máy theo lệnh đã thành công. Xóa tài
+  /// khoản chính khi còn tài khoản khác thì chưa biết server chọn tài khoản
+  /// nào làm chính → trạng thái tải lỗi, có nút thử lại.
+  PayoutAccountsState _applyLocally(
+    String op,
+    PayoutNotice notice,
+    ApiException e,
+  ) {
+    final id = op.split('|').last;
+    final accounts = state.accounts;
+    if (notice == PayoutNotice.primarySet) {
+      return PayoutAccountsState(
+        load: PayoutLoad.ready,
+        notice: notice,
+        accounts: [
+          for (final a in accounts)
+            PayoutAccount(
+              id: a.id,
+              bankBin: a.bankBin,
+              accountNoMasked: a.accountNoMasked,
+              accountName: a.accountName,
+              isPrimary: a.id == id,
+            ),
+        ],
+      );
+    }
+    final removedPrimary = accounts.any((a) => a.id == id && a.isPrimary);
+    final rest = [
+      for (final a in accounts)
+        if (a.id != id) a,
+    ];
+    if (removedPrimary && rest.isNotEmpty) {
+      return PayoutAccountsState(load: PayoutLoad.failure, error: e);
+    }
+    return PayoutAccountsState(
+      load: PayoutLoad.ready,
+      accounts: rest,
+      notice: notice,
+    );
   }
 }

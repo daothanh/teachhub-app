@@ -667,6 +667,7 @@
   "payoutCancel": "Hủy",
   "payoutDeleteTitle": "Xóa tài khoản này?",
   "payoutDeleteBody": "Tài khoản sẽ bị gỡ khỏi danh sách nhận tiền.",
+  "payoutDeleteLastBody": "Đây là tài khoản nhận tiền duy nhất. Xóa xong, bạn sẽ chưa chốt được kỳ học phí cho đến khi thêm tài khoản mới.",
   "payoutLine": "{bank} · {masked}",
   "@payoutLine": {
     "placeholders": {

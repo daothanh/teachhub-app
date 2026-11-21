@@ -183,6 +183,7 @@ void main() {
         );
         await repo.listPayoutAccounts();
         await repo.sendPayoutOtp();
+        await repo.sendPayoutOtp();
         await repo.createPayoutAccount(
           const PayoutAccountInput(
             bankBin: '970436',
@@ -198,6 +199,12 @@ void main() {
           idempotencyKey: 'k4',
         );
         await repo.deletePayoutAccount('a1', idempotencyKey: 'k5');
+
+        // S4: email lấy từ /auth/me một lần.
+        expect(
+          adapter.requests.where((r) => r.path == '/auth/me'),
+          hasLength(1),
+        );
 
         final byPath = {
           for (final r in adapter.requests) '${r.method} ${r.path}': r,

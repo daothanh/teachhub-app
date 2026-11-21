@@ -41,6 +41,65 @@ void main() {
       await c.close();
     });
 
+    test(
+      'S2: xóa thành công nhưng tải lại lỗi → bỏ tài khoản tại máy, không báo lỗi ghi',
+      () async {
+        repo.accounts = [
+          sampleAccount(),
+          sampleAccount(id: 'a2', primary: false),
+        ];
+        final c = PayoutAccountsCubit(repo);
+        await c.load();
+        repo.listError = const ApiException.network();
+        await c.delete('a2');
+        expect(c.state.load, PayoutLoad.ready);
+        expect(c.state.accounts.map((a) => a.id), ['a1']);
+        expect(c.state.error, isNull);
+        expect(c.state.notice, PayoutNotice.deleted);
+        expect(c.state.busy, isFalse);
+        await c.close();
+      },
+    );
+
+    test(
+      'S2: đặt chính thành công nhưng tải lại lỗi → đánh dấu chính tại máy',
+      () async {
+        repo.accounts = [
+          sampleAccount(),
+          sampleAccount(id: 'a2', primary: false),
+        ];
+        final c = PayoutAccountsCubit(repo);
+        await c.load();
+        repo.listError = const ApiException.network();
+        await c.setPrimary('a2');
+        expect(c.state.accounts.map((a) => (a.id, a.isPrimary)), [
+          ('a1', false),
+          ('a2', true),
+        ]);
+        expect(c.state.error, isNull);
+        await c.close();
+      },
+    );
+
+    test(
+      'S2: xóa tài khoản chính, tải lại lỗi → trạng thái tải lỗi để thử lại',
+      () async {
+        repo.accounts = [
+          sampleAccount(),
+          sampleAccount(id: 'a2', primary: false),
+        ];
+        final c = PayoutAccountsCubit(repo);
+        await c.load();
+        repo.listError = const ApiException.network();
+        await c.delete('a1');
+        expect(c.state.load, PayoutLoad.failure);
+        repo.listError = null;
+        await c.load();
+        expect(c.state.accounts.single.id, 'a2');
+        await c.close();
+      },
+    );
+
     test('đặt chính: PATCH isPrimary, không OTP, tải lại', () async {
       repo.accounts = [
         sampleAccount(),

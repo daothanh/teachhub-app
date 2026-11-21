@@ -667,6 +667,7 @@
   "payoutCancel": "Cancel",
   "payoutDeleteTitle": "Delete this account?",
   "payoutDeleteBody": "The account will be removed from your payout list.",
+  "payoutDeleteLastBody": "This is your only payout account. Once it is removed, you won't be able to close a billing period until you add another one.",
   "payoutLine": "{bank} · {masked}",
   "@payoutLine": {
     "placeholders": {

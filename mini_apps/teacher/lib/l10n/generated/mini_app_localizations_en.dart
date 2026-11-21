@@ -1191,6 +1191,10 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
       'The account will be removed from your payout list.';
 
   @override
+  String get payoutDeleteLastBody =>
+      'This is your only payout account. Once it is removed, you won\'t be able to close a billing period until you add another one.';
+
+  @override
   String payoutLine(String bank, String masked) {
     return '$bank · $masked';
   }

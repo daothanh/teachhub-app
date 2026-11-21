@@ -53,6 +53,9 @@ class DioFeeRepository implements FeeRepository {
   DioFeeRepository(this._dio);
   final Dio _dio;
 
+  /// Email của user đang đăng nhập, lấy từ `/auth/me` một lần cho mỗi repository.
+  String? _email;
+
   @override
   Future<FeeOverride?> putFeeOverride(
     String enrollmentId,
@@ -81,10 +84,12 @@ class DioFeeRepository implements FeeRepository {
 
   @override
   Future<void> sendPayoutOtp() => _call(() async {
-    final me = await _dio.get<Map<String, dynamic>>('/auth/me');
+    final email = _email ??=
+        (await _dio.get<Map<String, dynamic>>('/auth/me')).data!['email']
+            as String;
     await _dio.post<void>(
       '/auth/otp/send',
-      data: {'email': me.data!['email'] as String, 'purpose': 'payout_account'},
+      data: {'email': email, 'purpose': 'payout_account'},
       // Endpoint công khai: AuthInterceptor không gắn token, không refresh.
       options: Options(extra: const {'requiresAuth': false}),
     );

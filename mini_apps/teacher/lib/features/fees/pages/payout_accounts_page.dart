@@ -140,7 +140,11 @@ class _List extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
         ],
         for (final a in state.accounts)
-          _AccountTile(account: a, busy: state.busy),
+          _AccountTile(
+            account: a,
+            busy: state.busy,
+            isLast: state.accounts.length == 1,
+          ),
         const SizedBox(height: AppSpacing.md),
         addButton,
         if (!state.canAdd)
@@ -165,9 +169,16 @@ class _List extends StatelessWidget {
 enum _Action { edit, primary, delete }
 
 class _AccountTile extends StatelessWidget {
-  const _AccountTile({required this.account, required this.busy});
+  const _AccountTile({
+    required this.account,
+    required this.busy,
+    required this.isLast,
+  });
   final PayoutAccount account;
   final bool busy;
+
+  /// Chỉ còn tài khoản này: xóa xong sẽ chặn chốt kỳ (US-7.3 AC5).
+  final bool isLast;
 
   Future<void> _confirmDelete(BuildContext context) async {
     final l10n = context.miniAppL10n;
@@ -176,7 +187,9 @@ class _AccountTile extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.payoutDeleteTitle),
-        content: Text(l10n.payoutDeleteBody),
+        content: Text(
+          isLast ? l10n.payoutDeleteLastBody : l10n.payoutDeleteBody,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),

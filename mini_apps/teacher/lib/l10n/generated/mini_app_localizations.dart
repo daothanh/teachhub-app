@@ -2152,6 +2152,12 @@ abstract class MiniAppLocalizations {
   /// **'Tài khoản sẽ bị gỡ khỏi danh sách nhận tiền.'**
   String get payoutDeleteBody;
 
+  /// No description provided for @payoutDeleteLastBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đây là tài khoản nhận tiền duy nhất. Xóa xong, bạn sẽ chưa chốt được kỳ học phí cho đến khi thêm tài khoản mới.'**
+  String get payoutDeleteLastBody;
+
   /// No description provided for @payoutLine.
   ///
   /// In vi, this message translates to:

@@ -1176,6 +1176,10 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get payoutDeleteBody => 'Tài khoản sẽ bị gỡ khỏi danh sách nhận tiền.';
 
   @override
+  String get payoutDeleteLastBody =>
+      'Đây là tài khoản nhận tiền duy nhất. Xóa xong, bạn sẽ chưa chốt được kỳ học phí cho đến khi thêm tài khoản mới.';
+
+  @override
   String payoutLine(String bank, String masked) {
     return '$bank · $masked';
   }
