@@ -110,17 +110,41 @@ iOS cần máy thật (simulator không nhận APNs); bản Debug dùng APNs san
   `e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"vn.dayhoc.app.sync-outbox"]`.
 - Callback nền chỉ chạy khi còn token đăng nhập; đăng xuất hoặc xóa dữ liệu thì hủy lịch.
 
-## Google Sign-In (iOS)
+## Google Sign-In
 
-Mỗi flavor có bundle id riêng nên cần iOS OAuth client riêng. Điền 2 build setting của target
-Runner cho từng configuration `*-<flavor>` (Xcode → Runner → Build Settings → User-Defined):
+App dùng `google_sign_in` 7.x; `GoogleSsoProvider` lấy `id_token` rồi gọi `POST /v1/auth/sso/google` (body `{id_token}`).
+`id_token` có audience = **Web client ID** của flavor (`serverClientId`, đặt trong `assets/.env.<flavor>` →
+`GOOGLE_SERVER_CLIENT_ID`); backend phải chấp nhận audience này.
 
-- `GOOGLE_CLIENT_ID` = `CLIENT_ID` trong GoogleService-Info.plist (`xxxx.apps.googleusercontent.com`)
-- `GOOGLE_REVERSED_CLIENT_ID` = `REVERSED_CLIENT_ID` (`com.googleusercontent.apps.xxxx`)
+Client ID công khai (không phải secret), hậu tố `.apps.googleusercontent.com`:
 
-Info.plist dùng chúng cho `GIDClientID` và URL scheme callback. Để trống thì build vẫn chạy
-nhưng đăng nhập Google trên iOS sẽ không hoạt động. Android dùng SHA-1/SHA-256 của keystore
-(debug + upload + Play App Signing) đăng ký trong Firebase/Google Cloud.
+| Flavor / project | Web (`serverClientId`, audience) | iOS | Android debug | Android upload |
+|---|---|---|---|---|
+| `development` / `dayhoc-dev` | `305225338991-7vf98anmjogm9jksgd9kdije4ah8ncgk` | `305225338991-eg6h9lb26na0br8qph3gaff5041dga2f` | `305225338991-r640djv4j04rhv3uqq8g4m56bs3n901a` | `305225338991-5m421cgrtvgf1flv3dhgu8i50uotj9n9` |
+| `staging` / `dayhoc-stg` | `753323722874-khh3u3aobf813cib4l2m6bvotebld0q7` | `753323722874-o79dktgt6nnak8npj90nm114p1jv6aca` | `753323722874-at7jre1ehfam9pt140oar0d3k3dqbnd2` | `753323722874-hmhkvu7f1bkgm00mgjkv40k52hrs6pig` |
+| `production` / `dayhoc-4c6db` | `432762025168-e2lo4mengjqb64e8bc2sdoat1vbqpdl8` | `432762025168-cp0i0crpa16la5fuudd95sbkfasc84tc` | `432762025168-3i1f3r2a7oelb9hg7pusr9uqc48umcdh` | `432762025168-jfmmmpogljjoilurl0t6i7m60d172e19` |
+
+iOS: mỗi flavor có bundle id riêng. Hai build setting của target Runner (đã điền cho mọi configuration, theo bundle id):
+`GOOGLE_CLIENT_ID` (= `CLIENT_ID` trong GoogleService-Info.plist) và `GOOGLE_REVERSED_CLIENT_ID` (= `REVERSED_CLIENT_ID`).
+Info.plist dùng chúng cho `GIDClientID` và URL scheme callback. Cần đổi thì sửa trong Xcode → Runner → Build Settings → User-Defined.
+
+Android: dùng `oauth_client` trong `google-services.json`; client Android khớp SHA-1 của keystore (debug, upload).
+Chưa có client cho SHA của **Play App Signing**: thêm sau khi lên Play (Play Console → App integrity → SHA-1), đăng ký
+trong Firebase rồi tải lại file; tới lúc đó bản cài từ Play có thể không đăng nhập Google được.
+
+Lấy lại file cấu hình (sau khi thêm SHA/client trong Firebase):
+
+```sh
+firebase apps:list --project dayhoc-dev                     # lấy appId
+firebase apps:sdkconfig IOS <iosAppId> --project dayhoc-dev       # → ios/config/<flavor>/GoogleService-Info.plist
+firebase apps:sdkconfig ANDROID <androidAppId> --project dayhoc-dev  # → android/app/src/<flavor>/google-services.json
+```
+
+(bỏ các dòng tiến trình CLI in ở đầu khi ghi ra file). Project: `dayhoc-dev`, `dayhoc-stg`, `dayhoc-4c6db`.
+
+Thử trên máy thật: `flutter run --flavor development -t lib/main_development.dart`, bấm "Tiếp tục với Google",
+chọn tài khoản → app vào trang chính. Android cần máy có Google Play services và SHA-1 debug của máy build đã đăng ký
+(`./gradlew signingReport`); iOS chạy được trên simulator hoặc máy thật.
 
 ## Sign in with Apple, deep link, universal/app link
 

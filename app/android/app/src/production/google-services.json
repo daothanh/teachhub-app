@@ -12,7 +12,28 @@
           "package_name": "vn.dayhoc.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "432762025168-3i1f3r2a7oelb9hg7pusr9uqc48umcdh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "vn.dayhoc.app",
+            "certificate_hash": "027c723c800879e47ebdd6f5b93430fa7e35f2ce"
+          }
+        },
+        {
+          "client_id": "432762025168-jfmmmpogljjoilurl0t6i7m60d172e19.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "vn.dayhoc.app",
+            "certificate_hash": "376837ebc8c2772fa45fb3c7a537c39dac452a01"
+          }
+        },
+        {
+          "client_id": "432762025168-e2lo4mengjqb64e8bc2sdoat1vbqpdl8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBsqDj32hKifQMicQx-e676wzcBT95rFxE"
@@ -20,7 +41,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "432762025168-e2lo4mengjqb64e8bc2sdoat1vbqpdl8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "432762025168-cp0i0crpa16la5fuudd95sbkfasc84tc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "vn.dayhoc.app"
+              }
+            }
+          ]
         }
       }
     }
