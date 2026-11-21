@@ -8,6 +8,7 @@ enum ApiErrorCode {
   badRequest('BAD_REQUEST', 400),
   validationFailed('VALIDATION_FAILED', 422),
   idempotencyKeyReused('IDEMPOTENCY_KEY_REUSED', 422),
+  trialAlreadyUsed('TRIAL_ALREADY_USED', 422),
   payoutAccountMissing('PAYOUT_ACCOUNT_MISSING', 422),
   attendanceEditWindowClosed('ATTENDANCE_EDIT_WINDOW_CLOSED', 422),
   unauthenticated('UNAUTHENTICATED', 401),

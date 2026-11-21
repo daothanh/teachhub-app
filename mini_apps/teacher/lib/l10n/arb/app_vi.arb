@@ -1447,5 +1447,95 @@
         "type": "String"
       }
     }
-  }
+  },
+  "todayPlanEntry": "Gói Pro",
+  "planTitle": "Gói của bạn",
+  "planLoadFailed": "Không tải được thông tin gói.",
+  "planNameFree": "Gói Miễn phí",
+  "planNamePro": "Gói Pro",
+  "planStatusTrialing": "Đang dùng thử Pro",
+  "planStatusActive": "Pro đang hoạt động",
+  "planStatusExpired": "Đã hết hạn, đang ở giới hạn Miễn phí",
+  "planStatusFree": "Giới hạn Miễn phí",
+  "planDaysLeft": "Còn {days} ngày",
+  "@planDaysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "planEndsOn": "Hết hạn ngày {date}",
+  "@planEndsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "planUsageTitle": "Mức dùng",
+  "planUsageClasses": "Lớp đang hoạt động",
+  "planUsageStudents": "Học viên đang học",
+  "planUsageOfLimit": "{used}/{limit}",
+  "@planUsageOfLimit": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "planUsageUnlimited": "{used} · không giới hạn",
+  "@planUsageUnlimited": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      }
+    }
+  },
+  "planReadOnlyNote": "{classes} lớp và {students} học viên đang ở chế độ chỉ đọc vì vượt giới hạn Miễn phí. Dữ liệu vẫn còn nguyên; nâng cấp Pro để mở lại ngay.",
+  "@planReadOnlyNote": {
+    "placeholders": {
+      "classes": {
+        "type": "int"
+      },
+      "students": {
+        "type": "int"
+      }
+    }
+  },
+  "planFeaturesTitle": "Tính năng Pro",
+  "planFeatureForm02": "Mẫu 02",
+  "planFeatureForm03": "Mẫu 03",
+  "planFeatureRevenueExport": "Xuất sổ doanh thu",
+  "planFeatureReportsExport": "Xuất báo cáo",
+  "planFeatureLocked": "Pro",
+  "planFeatureOn": "Đã mở",
+  "planTrialButton": "Dùng thử 14 ngày",
+  "planTrialUsed": "Bạn đã dùng thử Pro. Mỗi tài khoản chỉ dùng thử một lần.",
+  "planTrialStarted": "Đã bật Pro dùng thử · còn {days} ngày",
+  "@planTrialStarted": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "planBuyButton": "Mua Pro",
+  "planBuyButtonPrice": "Mua Pro · {price}",
+  "@planBuyButtonPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "planBuyPending": "Đang kích hoạt Pro, có thể mất tới 1 phút.",
+  "planBuyUnavailable": "Mua trong ứng dụng chưa sẵn sàng.",
+  "planBuyFailed": "Không hoàn tất được giao dịch. Thử lại sau.",
+  "planErrTrialUsed": "Bạn đã dùng thử Pro rồi.",
+  "planErrBusy": "Gói Pro đang hoạt động.",
+  "planLimitAction": "Xem gói Pro"
 }

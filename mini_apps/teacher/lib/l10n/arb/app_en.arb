@@ -1447,5 +1447,95 @@
         "type": "String"
       }
     }
-  }
+  },
+  "todayPlanEntry": "Pro plan",
+  "planTitle": "Your plan",
+  "planLoadFailed": "Couldn't load plan details.",
+  "planNameFree": "Free plan",
+  "planNamePro": "Pro plan",
+  "planStatusTrialing": "Pro trial in progress",
+  "planStatusActive": "Pro is active",
+  "planStatusExpired": "Expired, back to Free limits",
+  "planStatusFree": "Free limits",
+  "planDaysLeft": "{days} days left",
+  "@planDaysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "planEndsOn": "Ends on {date}",
+  "@planEndsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "planUsageTitle": "Usage",
+  "planUsageClasses": "Active classes",
+  "planUsageStudents": "Active students",
+  "planUsageOfLimit": "{used}/{limit}",
+  "@planUsageOfLimit": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "planUsageUnlimited": "{used} · unlimited",
+  "@planUsageUnlimited": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      }
+    }
+  },
+  "planReadOnlyNote": "{classes} classes and {students} students are read-only because they exceed the Free limit. Nothing is deleted; upgrade to Pro to unlock them right away.",
+  "@planReadOnlyNote": {
+    "placeholders": {
+      "classes": {
+        "type": "int"
+      },
+      "students": {
+        "type": "int"
+      }
+    }
+  },
+  "planFeaturesTitle": "Pro features",
+  "planFeatureForm02": "Form 02",
+  "planFeatureForm03": "Form 03",
+  "planFeatureRevenueExport": "Revenue book export",
+  "planFeatureReportsExport": "Report export",
+  "planFeatureLocked": "Pro",
+  "planFeatureOn": "Unlocked",
+  "planTrialButton": "Try 14 days free",
+  "planTrialUsed": "You have used your Pro trial. Each account can try it once.",
+  "planTrialStarted": "Pro trial on · {days} days left",
+  "@planTrialStarted": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "planBuyButton": "Buy Pro",
+  "planBuyButtonPrice": "Buy Pro · {price}",
+  "@planBuyButtonPrice": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "planBuyPending": "Activating Pro, this can take up to 1 minute.",
+  "planBuyUnavailable": "In-app purchase isn't available yet.",
+  "planBuyFailed": "The purchase didn't complete. Try again later.",
+  "planErrTrialUsed": "You have already used your Pro trial.",
+  "planErrBusy": "Pro is already active.",
+  "planLimitAction": "See Pro plan"
 }

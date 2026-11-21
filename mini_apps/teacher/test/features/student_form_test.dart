@@ -186,6 +186,11 @@ void main() {
 
       expect(find.text(message), findsOneWidget);
       expect(find.text('Minh Anh'), findsOneWidget);
+      // US-0.7 AC2: chỉ lỗi 402 mới kèm lối mở T14.
+      expect(
+        find.text('Xem gói Pro'),
+        status == 402 ? findsOneWidget : findsNothing,
+      );
       expect(saved, isEmpty);
     });
   }

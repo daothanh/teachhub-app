@@ -6,6 +6,7 @@ import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teacher/features/classes/classes_routes.dart';
 import 'package:teacher/features/classes/data/class_models.dart';
 import 'package:teacher/features/classes/data/classes_repository.dart';
+import 'package:teacher/features/plan/plan_routes.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import 'fake_classes_repository.dart';
@@ -62,6 +63,10 @@ void main() {
           ),
         ),
         ...classesRoutes('teacher'),
+        GoRoute(
+          path: PlanRoutes.plan,
+          builder: (_, _) => const Scaffold(body: Text('đích T14')),
+        ),
       ],
       initial: '/',
       textScale: scale,
@@ -184,6 +189,11 @@ void main() {
     await save(tester);
 
     expect(find.textContaining('hết hạn mức'), findsOneWidget);
+    // US-0.7 AC1: kèm lối mở T14.
+    await tester.ensureVisible(find.text('Xem gói Pro'));
+    await tester.tap(find.text('Xem gói Pro'));
+    await tester.pumpAndSettle();
+    expect(find.text('đích T14'), findsOneWidget);
   });
 
   testWidgets('thêm T3 + T5 rồi lưu: tạo lớp, đặt quy tắc, đóng form', (

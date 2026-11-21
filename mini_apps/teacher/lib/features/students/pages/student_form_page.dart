@@ -7,6 +7,7 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../../../l10n/l10n.dart';
 import '../../classes/data/draft_keys.dart';
+import '../../plan/plan_routes.dart';
 import '../cubit/student_form_cubit.dart';
 import '../data/student_models.dart';
 import '../data/student_repository.dart';
@@ -254,7 +255,16 @@ class _StudentFormViewState extends State<StudentFormView> {
             widget.onSaved(state.savedId!);
           case StudentFormStatus.failure:
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(studentErrorMessage(l10n, state.error!))),
+              SnackBar(
+                content: Text(studentErrorMessage(l10n, state.error!)),
+                // 402 hết hạn mức: mở T14 (US-0.7 AC2).
+                action: state.error!.kind == ApiErrorKind.paymentRequired
+                    ? SnackBarAction(
+                        label: l10n.planLimitAction,
+                        onPressed: () => context.push(PlanRoutes.plan),
+                      )
+                    : null,
+              ),
             );
           case StudentFormStatus.idle || StudentFormStatus.submitting:
             break;

@@ -31,6 +31,7 @@ import 'features/onboarding/data/onboarding_models.dart';
 import 'features/onboarding/data/onboarding_repository.dart';
 import 'features/onboarding/pages/onboarding_page.dart';
 import 'features/receivables/data/receivables_repository.dart';
+import 'features/plan/plan_routes.dart';
 import 'features/receivables/receivables_routes.dart';
 import 'features/reports/data/reports_repository.dart';
 import 'features/reports/reports_routes.dart';
@@ -97,6 +98,7 @@ class TeacherController {
     ...classesRoutes(moduleId),
     ...feesRoutes(moduleId),
     ...billingRoutes(moduleId),
+    ...planRoutes(moduleId),
     ...receivablesRoutes(moduleId),
     ...reportsRoutes(moduleId),
     ...studentsRoutes(moduleId),

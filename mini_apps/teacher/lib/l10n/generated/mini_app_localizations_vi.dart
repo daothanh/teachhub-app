@@ -2227,4 +2227,124 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String reportsEntryMeta(String date, String method, String code) {
     return '$date · $method · $code';
   }
+
+  @override
+  String get todayPlanEntry => 'Gói Pro';
+
+  @override
+  String get planTitle => 'Gói của bạn';
+
+  @override
+  String get planLoadFailed => 'Không tải được thông tin gói.';
+
+  @override
+  String get planNameFree => 'Gói Miễn phí';
+
+  @override
+  String get planNamePro => 'Gói Pro';
+
+  @override
+  String get planStatusTrialing => 'Đang dùng thử Pro';
+
+  @override
+  String get planStatusActive => 'Pro đang hoạt động';
+
+  @override
+  String get planStatusExpired => 'Đã hết hạn, đang ở giới hạn Miễn phí';
+
+  @override
+  String get planStatusFree => 'Giới hạn Miễn phí';
+
+  @override
+  String planDaysLeft(int days) {
+    return 'Còn $days ngày';
+  }
+
+  @override
+  String planEndsOn(String date) {
+    return 'Hết hạn ngày $date';
+  }
+
+  @override
+  String get planUsageTitle => 'Mức dùng';
+
+  @override
+  String get planUsageClasses => 'Lớp đang hoạt động';
+
+  @override
+  String get planUsageStudents => 'Học viên đang học';
+
+  @override
+  String planUsageOfLimit(int used, int limit) {
+    return '$used/$limit';
+  }
+
+  @override
+  String planUsageUnlimited(int used) {
+    return '$used · không giới hạn';
+  }
+
+  @override
+  String planReadOnlyNote(int classes, int students) {
+    return '$classes lớp và $students học viên đang ở chế độ chỉ đọc vì vượt giới hạn Miễn phí. Dữ liệu vẫn còn nguyên; nâng cấp Pro để mở lại ngay.';
+  }
+
+  @override
+  String get planFeaturesTitle => 'Tính năng Pro';
+
+  @override
+  String get planFeatureForm02 => 'Mẫu 02';
+
+  @override
+  String get planFeatureForm03 => 'Mẫu 03';
+
+  @override
+  String get planFeatureRevenueExport => 'Xuất sổ doanh thu';
+
+  @override
+  String get planFeatureReportsExport => 'Xuất báo cáo';
+
+  @override
+  String get planFeatureLocked => 'Pro';
+
+  @override
+  String get planFeatureOn => 'Đã mở';
+
+  @override
+  String get planTrialButton => 'Dùng thử 14 ngày';
+
+  @override
+  String get planTrialUsed =>
+      'Bạn đã dùng thử Pro. Mỗi tài khoản chỉ dùng thử một lần.';
+
+  @override
+  String planTrialStarted(int days) {
+    return 'Đã bật Pro dùng thử · còn $days ngày';
+  }
+
+  @override
+  String get planBuyButton => 'Mua Pro';
+
+  @override
+  String planBuyButtonPrice(String price) {
+    return 'Mua Pro · $price';
+  }
+
+  @override
+  String get planBuyPending => 'Đang kích hoạt Pro, có thể mất tới 1 phút.';
+
+  @override
+  String get planBuyUnavailable => 'Mua trong ứng dụng chưa sẵn sàng.';
+
+  @override
+  String get planBuyFailed => 'Không hoàn tất được giao dịch. Thử lại sau.';
+
+  @override
+  String get planErrTrialUsed => 'Bạn đã dùng thử Pro rồi.';
+
+  @override
+  String get planErrBusy => 'Gói Pro đang hoạt động.';
+
+  @override
+  String get planLimitAction => 'Xem gói Pro';
 }
