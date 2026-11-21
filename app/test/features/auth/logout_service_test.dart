@@ -162,4 +162,39 @@ void main() {
       expect(wipes, 1);
     });
   });
+
+  group('đăng xuất SSO (Google)', () {
+    LogoutService withSso(Future<void> Function() signOut) => LogoutService(
+      logout: () async => calls.add('logout'),
+      pendingCount: () async => 0,
+      wipeLocalData: () async => calls.add('wipe'),
+      signOutSso: signOut,
+    );
+
+    test('logout gọi signOut Google sau khi xóa phiên', () async {
+      final r = await withSso(
+        () async => calls.add('google'),
+      ).logout(confirmDiscard: (_) async => true);
+      expect(r, LogoutResult.done);
+      expect(calls, ['logout', 'google', 'wipe']);
+    });
+
+    test('signOut ném lỗi: logout vẫn xong', () async {
+      final r = await withSso(
+        () async => throw StateError('plugin'),
+      ).logout(confirmDiscard: (_) async => true);
+      expect(r, LogoutResult.done);
+      expect(calls, ['logout', 'wipe']);
+    });
+
+    test('phiên hết hạn cũng đăng xuất Google; lỗi không chặn xóa', () async {
+      final ok = await withSso(
+        () async => throw StateError('plugin'),
+      ).onSessionExpired();
+      expect(ok, isTrue);
+      expect(calls, ['wipe']);
+      await withSso(() async => calls.add('google')).onSessionExpired();
+      expect(calls, ['wipe', 'google', 'wipe']);
+    });
+  });
 }

@@ -206,7 +206,11 @@ Future<void> bootstrap({required Env env}) async {
   NotificationDirector? pushDirector;
   // ignore: unused_local_variable
   StreamSubscription<RemoteMessage>? pushTapSub;
+  final googleSso = GoogleSsoProvider(
+    serverClientId: GetIt.I<AppEnv>().googleServerClientId,
+  );
   final logoutService = LogoutService(
+    signOutSso: googleSso.signOut,
     // Gỡ token push khi còn Bearer, rồi mới xóa phiên; lỗi mạng không chặn.
     logout: () async {
       await unregisterPushBeforeLogout(pushDirector?.unregisterCurrentToken);
@@ -234,7 +238,6 @@ Future<void> bootstrap({required Env env}) async {
 
   // 6. Router.
   final api = GetIt.I<Dio>(instanceName: TeachHubDiKey.api);
-  final appEnv = GetIt.I<AppEnv>();
   // Ép cập nhật: kiểm song song, không làm chậm khởi động (spec §5.1).
   final versionGate = AppVersionGate(
     api: api,
@@ -254,7 +257,7 @@ Future<void> bootstrap({required Env env}) async {
     membershipCubit: membershipCubit,
     loginPage: () => LoginPage(
       sendOtp: emailOtpSender(api),
-      google: GoogleSsoProvider(serverClientId: appEnv.googleServerClientId),
+      google: googleSso,
       apple: AppleSsoProvider(),
       isIOS: Platform.isIOS,
     ),

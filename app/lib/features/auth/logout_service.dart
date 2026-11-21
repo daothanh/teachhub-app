@@ -22,7 +22,9 @@ class LogoutService {
     required Future<void> Function() wipeLocalData,
     Future<void> Function()? markWipePending,
     Future<void> Function()? clearWipePending,
-  }) : _logout = logout,
+    Future<void> Function()? signOutSso,
+  }) : _signOutSso = signOutSso,
+       _logout = logout,
        _pendingCount = pendingCount,
        _wipe = wipeLocalData,
        _mark = markWipePending,
@@ -33,6 +35,7 @@ class LogoutService {
   final Future<void> Function() _wipe;
   final Future<void> Function()? _mark;
   final Future<void> Function()? _clear;
+  final Future<void> Function()? _signOutSso;
   Future<bool>? _expiredRun;
 
   /// `null` = không đọc được (CSDL hỏng, mất khóa).
@@ -77,6 +80,7 @@ class LogoutService {
       asked = now;
     }
     await _logout();
+    await _safeSignOutSso();
     return await _safeWipe() ? LogoutResult.done : LogoutResult.wipeFailed;
   }
 
@@ -88,8 +92,18 @@ class LogoutService {
       _expiredRun ??= _expired().whenComplete(() => _expiredRun = null);
 
   Future<bool> _expired() async {
+    await _safeSignOutSso();
     if (await _count() != 0) return false;
     return _safeWipe();
+  }
+
+  /// Đăng xuất nhà cung cấp SSO (Google); lỗi chỉ ghi log, không chặn.
+  Future<void> _safeSignOutSso() async {
+    try {
+      await _signOutSso?.call();
+    } catch (e, st) {
+      log('Đăng xuất SSO lỗi', name: 'logout', error: e, stackTrace: st);
+    }
   }
 
   Future<bool> _safeWipe() async {
