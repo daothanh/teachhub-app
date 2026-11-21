@@ -186,10 +186,14 @@ void main() {
     // Mỗi lần gọi lấy hành vi kế tiếp: lỗi mạng, lỗi chắc chắn, hoặc thành công.
     final script = <FutureOr<int?> Function()>[];
     late MembershipCubit c;
+    var failMemberships = false;
+    var owners = 0;
 
     setUp(() {
       keys.clear();
       script.clear();
+      failMemberships = false;
+      owners = 0;
       c = MembershipCubit(
         api: Dio()
           ..interceptors.add(
@@ -198,6 +202,7 @@ void main() {
                 if (o.path == '/workspaces') {
                   keys.add(o.headers['Idempotency-Key'] as String?);
                   final status = await script.removeAt(0)();
+                  if (status != null && status < 300) owners++;
                   if (status == null) {
                     return h.reject(
                       DioException.connectionError(
@@ -218,12 +223,25 @@ void main() {
                     );
                   }
                 }
+                if (o.path == '/me/memberships' && failMemberships) {
+                  return h.reject(
+                    DioException(
+                      requestOptions: o,
+                      response: Response(requestOptions: o, statusCode: 500),
+                    ),
+                  );
+                }
                 h.resolve(
                   Response(
                     requestOptions: o,
                     statusCode: 200,
                     data: o.path == '/me/memberships'
-                        ? {'items': <Object>[]}
+                        ? {
+                            'items': [
+                              for (var i = 0; i < owners; i++)
+                                _m('o$i', 'tenant_owner'),
+                            ],
+                          }
                         : null,
                   ),
                 );
@@ -285,6 +303,31 @@ void main() {
       await first;
       expect(keys, hasLength(1));
       expect(c.state.statusCreate, LoadingStatus.success);
+    });
+
+    test(
+      'tạo xong nhưng tải lại vai trò lỗi: bấm lại dùng cùng khóa',
+      () async {
+        script
+          ..add(() => 201)
+          ..add(() => 201);
+        failMemberships = true;
+        await c.addRole(MembershipRole.tenantOwner);
+        expect(c.state.statusCreate, LoadingStatus.failure);
+        failMemberships = false;
+        await c.addRole(MembershipRole.tenantOwner);
+        expect(keys[1], keys[0]);
+      },
+    );
+
+    test('đăng xuất giữa chừng: người sau dùng khóa mới', () async {
+      script
+        ..add(() => null)
+        ..add(() => 201);
+      await c.addRole(MembershipRole.tenantOwner);
+      await c.clear();
+      await c.addRole(MembershipRole.tenantOwner);
+      expect(keys[1], isNot(keys[0]));
     });
   });
 }

@@ -161,6 +161,7 @@ class MembershipCubit extends Cubit<MembershipState> {
     // Bấm lặp khi đang gửi: một request thôi.
     if (state.statusCreate == LoadingStatus.loading) return;
     emit(state.copyWith(statusCreate: LoadingStatus.loading));
+    var posted = false;
     try {
       if (role == MembershipRole.tenantOwner) {
         final key = _workspaceKey ??= uuidV4(Random.secure());
@@ -169,19 +170,26 @@ class MembershipCubit extends Cubit<MembershipState> {
           data: const <String, dynamic>{},
           options: Options(headers: {'Idempotency-Key': key}),
         );
-        _workspaceKey = null;
       } else {
         await _api.post<void>('/me/roles', data: {'role': role.wire});
       }
+      posted = true;
       await load(silent: true);
       final created = state.memberships
           .where((m) => m.role == role)
           .firstOrNull;
-      if (created != null) await select(created);
+      // `load` nuốt lỗi: chưa thấy vai trò mới thì coi như chưa xong, giữ khóa.
+      if (created == null) throw StateError('vai trò mới chưa tải được');
+      await select(created);
+      _workspaceKey = null;
       emit(state.copyWith(statusCreate: LoadingStatus.success));
     } catch (e) {
-      // Lỗi chắc chắn (409, 422…) thì lần sau là lệnh mới; lỗi mạng giữ khóa.
-      if (ApiException.fromDio(e)?.retryable != true) _workspaceKey = null;
+      // POST bị từ chối chắc chắn (409, 422…) thì lần sau là lệnh mới. Lỗi mạng, hoặc lỗi
+      // sau khi POST đã thành công (tải lại vai trò), giữ khóa: bấm lại được server phát
+      // lại kết quả cũ, không tạo tenant thứ hai.
+      if (!posted && ApiException.fromDio(e)?.retryable != true) {
+        _workspaceKey = null;
+      }
       emit(state.copyWith(statusCreate: LoadingStatus.failure, error: e));
     }
   }
@@ -191,6 +199,7 @@ class MembershipCubit extends Cubit<MembershipState> {
 
   /// Đăng xuất: quên vai trò của phiên này.
   Future<void> clear() async {
+    _workspaceKey = null;
     await _prefs.remove(_activeKey);
     await _prefs.remove(_cacheKey);
     emit(const MembershipState());
