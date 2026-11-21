@@ -688,7 +688,7 @@ class FakeTeachHubBackend implements HttpClientAdapter {
       body,
       options.headers['Idempotency-Key'] as String?,
     );
-    if (status < 300) {
+    if (status < 300 && _openapi != null) {
       _conform(out, _responseSchema(op, status), '$method $path');
     }
     if (dropNextPayResponse &&
