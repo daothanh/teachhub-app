@@ -18,6 +18,7 @@ class ReportPaymentsState extends Equatable {
     this.totalAmount = 0,
     this.loadingMore = false,
     this.moreFailed = false,
+    this.exhausted = false,
     this.refreshError,
     this.error,
   });
@@ -33,14 +34,24 @@ class ReportPaymentsState extends Equatable {
 
   /// Tải thêm lỗi: giữ danh sách, hiện nút thử lại ở cuối.
   final bool moreFailed;
+
+  /// Trang kế rỗng hoặc không thêm dòng mới: dừng tải dù `total` còn lớn hơn.
+  final bool exhausted;
   final ApiException? refreshError;
   final ApiException? error;
 
-  bool get hasMore => items.length < total;
+  bool get hasMore => !exhausted && items.length < total;
 
   @override
   List<Object?> get props => [
-    load, items, page, total, totalAmount, loadingMore, moreFailed, //
+    load,
+    items,
+    page,
+    total,
+    totalAmount,
+    loadingMore,
+    moreFailed,
+    exhausted, //
     refreshError, error,
   ];
 }
@@ -52,8 +63,8 @@ class ReportPaymentsCubit extends Cubit<ReportPaymentsState> {
     : super(const ReportPaymentsState());
   final ReportsRepository _repo;
 
-  /// `YYYY-MM`; `null` = tháng hiện tại theo máy chủ.
-  final String? month;
+  /// `YYYY-MM` cụ thể, gửi ở mọi trang để các trang cùng một tháng.
+  final String month;
   int _seq = 0;
 
   Future<void> load() => _first(const ReportPaymentsState(), keep: false);
@@ -68,7 +79,8 @@ class ReportPaymentsCubit extends Cubit<ReportPaymentsState> {
     final seq = ++_seq;
     if (!keep) {
       emit(next);
-    } else if (state.loadingMore || state.moreFailed) {
+    } else {
+      // Xóa lỗi cũ để lỗi lặp lại vẫn báo; bỏ `loadMore` đang bay.
       emit(_copy(state));
     }
     try {
@@ -103,12 +115,22 @@ class ReportPaymentsCubit extends Cubit<ReportPaymentsState> {
       if (isClosed || seq != _seq) return;
       // Dòng đã có (dữ liệu dịch trang) không hiện hai lần.
       final seen = {for (final r in state.items) r.id};
+      final fresh = [
+        for (final r in p.items)
+          if (seen.add(r.id)) r,
+      ];
+      final next = _ready(p, [...state.items, ...fresh]);
       emit(
-        _ready(p, [
-          ...state.items,
-          for (final r in p.items)
-            if (seen.add(r.id)) r,
-        ]),
+        fresh.isEmpty
+            ? ReportPaymentsState(
+                load: next.load,
+                items: next.items,
+                page: next.page,
+                total: next.total,
+                totalAmount: next.totalAmount,
+                exhausted: true,
+              )
+            : next,
       );
     } on Object {
       if (isClosed || seq != _seq) return;
@@ -139,6 +161,7 @@ class ReportPaymentsCubit extends Cubit<ReportPaymentsState> {
     totalAmount: s.totalAmount,
     loadingMore: loadingMore,
     moreFailed: moreFailed,
+    exhausted: s.exhausted,
     refreshError: refreshError,
   );
 }

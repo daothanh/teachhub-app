@@ -14,7 +14,7 @@ void main() {
   late FakeReportsRepository repo;
   setUp(() => repo = FakeReportsRepository());
 
-  ReportsCubit cubit() => ReportsCubit(repo, now: () => DateTime(2026, 11, 21));
+  ReportsCubit cubit() => ReportsCubit(repo);
 
   test('shiftMonth qua ranh giới năm', () {
     expect(shiftMonth('2026-01', -1), '2025-12');
@@ -51,10 +51,11 @@ void main() {
     );
 
     test(
-      'previous/next đổi tháng và gọi lại; không đi quá tháng hiện tại',
+      'previous/next đổi tháng; không đi quá tháng hiện tại của máy chủ',
       () async {
         final c = cubit();
         await c.load();
+        expect(c.state.currentMonth, '2026-11');
         expect(c.canGoNext, isFalse);
         await c.next();
         expect(repo.overviewMonths, [null], reason: 'next bị chặn');
@@ -67,28 +68,69 @@ void main() {
       },
     );
 
-    test('một lệnh lỗi là lỗi cả màn, thử lại giữ tháng đang xem', () async {
+    test(
+      'đổi tháng chỉ gọi tổng quan và theo lớp; biểu đồ không trượt',
+      () async {
+        final c = cubit();
+        await c.load();
+        final chart = c.state.months;
+        await c.selectMonth('2026-05');
+        await c.previous();
+        expect(repo.months12Calls, [null], reason: 'chỉ gọi lần tải đầu');
+        expect(c.state.months, same(chart));
+      },
+    );
+
+    test('đổi tháng giữ số liệu và biểu đồ khi đang tải', () async {
       final c = cubit();
       await c.load();
-      repo.failure = const ApiException.unexpected();
+      final gate = repo.gate = Completer();
+      final f = c.selectMonth('2026-09');
+      expect(c.state.loading, isTrue);
+      expect(c.state.overview, isNotNull);
+      expect(c.state.months, isNotNull);
+      gate.complete();
+      await f;
+      expect(c.state.loading, isFalse);
+    });
+
+    test('đổi tháng lỗi: ở lại tháng cũ với số liệu cũ và báo nhẹ', () async {
+      final c = cubit();
+      await c.load();
+      repo.failOnMonth = const ApiException.unexpected();
       await c.selectMonth('2026-09');
+      expect(c.state.load, BillingLoad.ready);
+      expect(c.state.month, '2026-11');
+      expect(c.state.overview, isNotNull);
+      expect(c.state.refreshError, isNotNull);
+      expect(c.state.loading, isFalse);
+    });
+
+    test('tải đầu lỗi: màn lỗi, thử lại được', () async {
+      final c = cubit();
+      repo.failure = const ApiException.unexpected();
+      await c.load();
       expect(c.state.load, BillingLoad.failure);
       expect(c.state.error, isNotNull);
-      expect(c.state.month, '2026-09');
       repo.failure = null;
       await c.load();
       expect(c.state.load, BillingLoad.ready);
-      expect(c.state.month, '2026-09');
     });
 
-    test('làm mới lỗi: giữ số liệu cũ và báo nhẹ', () async {
+    test('làm mới lỗi lặp lại: refreshError được xóa rồi đặt lại', () async {
       final c = cubit();
       await c.load();
       repo.failure = const ApiException.unexpected();
+      final seen = <ApiException?>[];
+      final sub = c.stream.listen((s) => seen.add(s.refreshError));
       await c.refresh();
+      await c.refresh();
+      await Future<void>.delayed(Duration.zero);
+      await sub.cancel();
       expect(c.state.load, BillingLoad.ready);
       expect(c.state.overview, isNotNull);
-      expect(c.state.refreshError, isNotNull);
+      expect(seen.where((e) => e != null), hasLength(2));
+      expect(seen, contains(isNull), reason: 'lỗi cũ bị xóa giữa hai lần');
     });
 
     test('phản hồi của lần đổi tháng cũ bị bỏ', () async {
@@ -146,6 +188,72 @@ void main() {
       await c.loadMore();
       expect(c.state.items, hasLength(25));
       expect(c.state.moreFailed, isFalse);
+    });
+
+    test('mọi trang gửi cùng một tháng cụ thể', () async {
+      repo.entries = many(25);
+      final c = ReportPaymentsCubit(repo, month: '2026-11');
+      await c.load();
+      await c.loadMore();
+      expect(repo.paymentCalls.map((e) => e.month), ['2026-11', '2026-11']);
+    });
+
+    test('trang kế rỗng dù total còn lớn: dừng, không kẹt hasMore', () async {
+      repo.entries = many(20);
+      repo.totalOverride = 40;
+      final c = ReportPaymentsCubit(repo, month: '2026-11');
+      await c.load();
+      expect(c.state.hasMore, isTrue);
+      await c.loadMore();
+      expect(c.state.hasMore, isFalse);
+      expect(c.state.items, hasLength(20));
+    });
+
+    test(
+      'trang kế có dòng mới thì tiếp tục, trang sau rỗng thì dừng',
+      () async {
+        repo.entries = many(25);
+        repo.totalOverride = 99;
+        final c = ReportPaymentsCubit(repo, month: '2026-11');
+        await c.load();
+        await c.loadMore();
+        expect(c.state.items, hasLength(25));
+        expect(c.state.hasMore, isTrue);
+        await c.loadMore();
+        expect(c.state.hasMore, isFalse);
+      },
+    );
+
+    test('làm mới khi đang tải trang 2: không kẹt đang tải thêm', () async {
+      repo.entries = many(25);
+      final c = ReportPaymentsCubit(repo, month: '2026-11');
+      await c.load();
+      final gate = repo.pageGate = Completer();
+      final more = c.loadMore();
+      expect(c.state.loadingMore, isTrue);
+      repo.pageGate = null;
+      await c.refresh();
+      expect(c.state.loadingMore, isFalse);
+      expect(c.state.hasMore, isTrue);
+      gate.complete();
+      await more;
+      expect(c.state.loadingMore, isFalse);
+      await c.loadMore();
+      expect(c.state.items, hasLength(25));
+    });
+
+    test('làm mới lỗi lặp lại: refreshError được xóa rồi đặt lại', () async {
+      final c = ReportPaymentsCubit(repo, month: '2026-11');
+      await c.load();
+      repo.failure = const ApiException.unexpected();
+      final seen = <ApiException?>[];
+      final sub = c.stream.listen((s) => seen.add(s.refreshError));
+      await c.refresh();
+      await c.refresh();
+      await Future<void>.delayed(Duration.zero);
+      await sub.cancel();
+      expect(seen.where((e) => e != null), hasLength(2));
+      expect(seen, contains(isNull));
     });
 
     test('lỗi tải đầu và rỗng', () async {

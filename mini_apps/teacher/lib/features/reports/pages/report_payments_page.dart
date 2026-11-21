@@ -19,8 +19,8 @@ import '../data/reports_repository.dart';
 class ReportPaymentsPage extends StatelessWidget {
   const ReportPaymentsPage({super.key, required this.month, this.repository});
 
-  /// `YYYY-MM`; thiếu thì máy chủ lấy tháng hiện tại.
-  final String? month;
+  /// `YYYY-MM` của tháng đang xem ở tổng quan.
+  final String month;
   final ReportsRepository? repository;
 
   @override
@@ -81,7 +81,7 @@ class _View extends StatelessWidget {
                 }
                 return s.moreFailed
                     ? _MoreFailed(onRetry: cubit.loadMore)
-                    : const _AutoLoadMore();
+                    : _AutoLoadMore(state: s);
               },
             ),
           ),
@@ -146,9 +146,11 @@ class _EntryCard extends StatelessWidget {
   }
 }
 
-/// Cuối danh sách: được dựng (do cuộn tới hoặc vừa khung) thì tải trang kế.
+/// Cuối danh sách: mỗi lần dựng hoặc state đổi mà vẫn hiện (vd. làm mới đang
+/// chặn lần gọi trước) thì xin tải trang kế; cubit tự bỏ qua khi đang bận.
 class _AutoLoadMore extends StatefulWidget {
-  const _AutoLoadMore();
+  const _AutoLoadMore({required this.state});
+  final ReportPaymentsState state;
 
   @override
   State<_AutoLoadMore> createState() => _AutoLoadMoreState();
@@ -158,10 +160,18 @@ class _AutoLoadMoreState extends State<_AutoLoadMore> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) context.read<ReportPaymentsCubit>().loadMore();
-    });
+    _ask();
   }
+
+  @override
+  void didUpdateWidget(_AutoLoadMore old) {
+    super.didUpdateWidget(old);
+    _ask();
+  }
+
+  void _ask() => WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (mounted) context.read<ReportPaymentsCubit>().loadMore();
+  });
 
   @override
   Widget build(BuildContext context) => const Padding(

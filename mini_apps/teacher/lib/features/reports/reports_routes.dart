@@ -21,7 +21,11 @@ List<RouteBase> reportsRoutes(String moduleId) => [
   GoRoute(
     path: '${ReportsRoutes.overview}/payments',
     name: '$moduleId.reports.payments',
-    builder: (context, state) =>
-        ReportPaymentsPage(month: state.uri.queryParameters['month']),
+    builder: (context, state) => ReportPaymentsPage(
+      // Liên kết thiếu tháng: rơi về tháng của máy (chỉ khi link hỏng).
+      month:
+          state.uri.queryParameters['month'] ??
+          DateTime.now().toIso8601String().substring(0, 7),
+    ),
   ),
 ];

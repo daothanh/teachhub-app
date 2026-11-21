@@ -80,6 +80,11 @@ class _Report extends StatelessWidget {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(AppSpacing.lg),
       children: [
+        // Đổi tháng/làm mới: giữ nguyên khung, chỉ hiện thanh tiến độ nhỏ.
+        SizedBox(
+          height: 3,
+          child: state.loading ? const LinearProgressIndicator() : null,
+        ),
         Row(
           children: [
             IconButton(
@@ -204,11 +209,7 @@ class _Tile extends StatelessWidget {
             children: [
               Text(label, style: text.bodySmall),
               const SizedBox(height: AppSpacing.xs),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(value, style: text.titleLarge),
-              ),
+              Text(value, style: text.titleLarge),
             ],
           ),
         ),

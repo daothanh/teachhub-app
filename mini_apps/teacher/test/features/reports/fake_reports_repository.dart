@@ -81,6 +81,16 @@ class FakeReportsRepository implements ReportsRepository {
   /// Tháng đã gọi, theo thứ tự (null = không gửi `month`).
   final overviewMonths = <String?>[];
   final paymentCalls = <({String? month, int page})>[];
+  final months12Calls = <String?>[];
+
+  /// Ép `total` của `payments` (mô phỏng dữ liệu dịch trang: total lớn hơn số dòng thật).
+  int? totalOverride;
+
+  /// Chặn `payments` trang > 1 tới khi hoàn tất.
+  Completer<void>? pageGate;
+
+  /// Chỉ `monthOverview`/`revenueByClass` có `month` lỗi (đổi tháng lỗi).
+  ApiException? failOnMonth;
 
   /// Chặn `monthOverview` tới khi hoàn tất (test chạy đua).
   Completer<void>? gate;
@@ -89,7 +99,9 @@ class FakeReportsRepository implements ReportsRepository {
   Future<MonthOverview> monthOverview({String? month}) async {
     overviewMonths.add(month);
     if (gate != null) await gate!.future;
-    if (failure != null) throw failure!;
+    if (failure != null || (month != null && failOnMonth != null)) {
+      throw failure ?? failOnMonth!;
+    }
     return MonthOverview(
       month: month ?? overview.month,
       billedAmount: overview.billedAmount,
@@ -108,6 +120,7 @@ class FakeReportsRepository implements ReportsRepository {
 
   @override
   Future<Revenue12m> revenue12m({String? month}) async {
+    months12Calls.add(month);
     if (failure != null) throw failure!;
     return months12;
   }
@@ -119,13 +132,14 @@ class FakeReportsRepository implements ReportsRepository {
     int pageSize = 20,
   }) async {
     paymentCalls.add((month: month, page: page));
+    if (page > 1 && pageGate != null) await pageGate!.future;
     if (failure != null || (failMore && page > 1)) {
       throw failure ?? const ApiException.unexpected();
     }
     final from = (page - 1) * pageSize;
     return RevenueEntryPage(
       items: entries.skip(from).take(pageSize).toList(),
-      total: entries.length,
+      total: totalOverride ?? entries.length,
       page: page,
       pageSize: pageSize,
       totalAmount: entries.fold(0, (s, e) => s + e.amount),

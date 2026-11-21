@@ -101,6 +101,19 @@ void main() {
       expect(find.text('Tháng 5/2026'), findsOneWidget);
     });
 
+    testWidgets('đổi tháng lỗi: giữ biểu đồ và số liệu, hiện snackbar', (
+      tester,
+    ) async {
+      await open(tester, ReportsRoutes.overview);
+      repo.failOnMonth = const ApiException.unexpected();
+      await tester.tap(find.byTooltip('Tháng trước'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text('Tháng 11/2026'), findsOneWidget);
+      expect(find.byKey(const ValueKey('bar-2026-05')), findsOneWidget);
+      expect(find.text('Thử lại'), findsNothing);
+    });
+
     testWidgets('mỗi cột biểu đồ có nhãn đọc màn hình kèm số tiền', (
       tester,
     ) async {
@@ -194,6 +207,22 @@ void main() {
       await tester.tap(find.text('Trần Bảo Bình'));
       await tester.pumpAndSettle();
       expect(find.text('hóa đơn inv-a'), findsOneWidget);
+    });
+
+    testWidgets('total lớn hơn số dòng thật: hết dòng thì bỏ spinner', (
+      tester,
+    ) async {
+      repo.entries = [
+        for (var i = 0; i < 25; i++) sampleEntry(id: 'e$i', student: 'HV $i'),
+      ];
+      repo.totalOverride = 60;
+      await open(tester, ReportsRoutes.payments('2026-11'));
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -3000));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -3000));
+      await tester.pumpAndSettle();
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(repo.paymentCalls.map((c) => c.month).toSet(), {'2026-11'});
     });
 
     testWidgets('rỗng, lỗi (thử lại) và chữ 130%', (tester) async {
