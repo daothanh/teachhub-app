@@ -34,6 +34,9 @@ class FakeTeachHubBackend implements HttpClientAdapter {
   static final sessionId = uid(10);
   static final classId = uid(11);
   static final periodId = uid(12);
+
+  /// Kỳ liền sau (tháng kế tiếp), chỉ có khi kịch bản gọi [seedNextPeriod].
+  static final periodId2 = uid(13);
   static final minhAnh = (id: uid(1), name: 'Nguyễn Minh Anh');
   static final baoChau = (id: uid(2), name: 'Trần Bảo Châu');
   final _students = [minhAnh, baoChau];
@@ -43,6 +46,14 @@ class FakeTeachHubBackend implements HttpClientAdapter {
 
   /// Mã hóa đơn cấp lần lượt (Crockford, đúng mẫu `TH-xxxxxx` của hợp đồng).
   final _codes = ['25K7Q9', '26M8R2', '27N9S3'];
+
+  /// Học phí tháng (dòng `monthly`) của kỳ sau theo học viên; học viên không có
+  /// khoản nào thì không có hóa đơn kỳ sau (US-7.1, D5).
+  final _charges2 = <String, int>{};
+
+  /// Mở kỳ sau với khoản học phí tháng của [studentId] (VND).
+  void seedNextPeriod(String studentId, int amount) =>
+      _charges2[studentId] = amount;
 
   /// Mọi request đã nhận: `METHOD /path`, đúng thứ tự.
   final requests = <String>[];
@@ -124,9 +135,30 @@ class FakeTeachHubBackend implements HttpClientAdapter {
   Map<String, Object?>? issuedInvoiceOf(String studentId) =>
       _issued[_invoiceId(studentId)];
 
+  /// Hóa đơn kỳ sau đã chốt của học viên (bản server giữ), `null` nếu chưa chốt.
+  Map<String, Object?>? issuedInvoiceOf2(String studentId) =>
+      _issued[_invoiceId2(studentId)];
+
   static String invoiceIdOf(String studentId) => _invoiceId(studentId);
   static String _invoiceId(String studentId) =>
       uid(int.parse(studentId.substring(studentId.length - 4)) + 200);
+
+  /// Hóa đơn kỳ sau của học viên.
+  static String invoice2IdOf(String studentId) => _invoiceId2(studentId);
+  static String _invoiceId2(String studentId) =>
+      uid(int.parse(studentId.substring(studentId.length - 4)) + 1200);
+
+  /// Học viên và kỳ của một id hóa đơn (kỳ đầu hoặc kỳ sau), `null` nếu lạ.
+  ({({String id, String name}) student, bool second})? _owner(String id) {
+    for (final s in _students) {
+      if (_invoiceId(s.id) == id) return (student: s, second: false);
+      if (_invoiceId2(s.id) == id) return (student: s, second: true);
+    }
+    return null;
+  }
+
+  /// Tháng kế tiếp của [_month] (`YYYY-MM-01`).
+  String get _month2 => _isoDate(DateTime(now.year, now.month + 1, 1));
 
   Dio dio() =>
       Dio(BaseOptions(baseUrl: 'https://api.test/v1'))
@@ -190,12 +222,29 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     final id = _invoiceId(s.id);
     final frozen = _issued[id];
     if (frozen != null) return frozen;
-    final lines = _lines(s.id);
+    return _draft(
+      s,
+      id: id,
+      periodId: periodId,
+      month: _month,
+      dueDate: _dueDate(),
+      lines: _lines(s.id),
+    );
+  }
+
+  Map<String, Object?> _draft(
+    ({String id, String name}) s, {
+    required String id,
+    required String periodId,
+    required String month,
+    required String dueDate,
+    required List<Map<String, Object?>> lines,
+  }) {
     final sum = lines.fold<int>(0, (t, l) => t + (l['amount']! as int));
     return {
       'id': id,
       'periodId': periodId,
-      'periodMonth': _month,
+      'periodMonth': month,
       'code': null,
       'transferNote': null,
       'qrPayload': null,
@@ -204,8 +253,9 @@ class FakeTeachHubBackend implements HttpClientAdapter {
       'studentName': s.name,
       'totalAmount': sum < 0 ? 0 : sum,
       'paidAmount': 0,
+      'carriedAmount': 0,
       'remainingAmount': 0,
-      'dueDate': _dueDate(),
+      'dueDate': dueDate,
       'issuedAt': null,
       'payout': null,
       'voidedAt': null,
@@ -219,6 +269,54 @@ class FakeTeachHubBackend implements HttpClientAdapter {
       'createdAt': now.toUtc().toIso8601String(),
     };
   }
+
+  /// Còn nợ của các hóa đơn đã phát hành chưa hủy của học viên ở kỳ đầu: số
+  /// "Nợ kỳ trước" (D6; sổ học viên không có số dư trong kịch bản).
+  int _carryOf(String studentId) {
+    final old = _issued[_invoiceId(studentId)];
+    if (old == null || old['status'] == 'void') return 0;
+    return old['remainingAmount']! as int;
+  }
+
+  /// Hóa đơn kỳ sau: bản nháp có dòng `carry_over` XEM TRƯỚC tính lại mỗi lần đọc
+  /// (không ghi); sau khi phát hành thì đóng băng với số kết chuyển lúc chốt.
+  Map<String, Object?> _invoice2(({String id, String name}) s) {
+    final id = _invoiceId2(s.id);
+    final frozen = _issued[id];
+    if (frozen != null) return frozen;
+    final n = int.parse(s.id.substring(s.id.length - 4));
+    final lines = <Map<String, Object?>>[
+      _line2(uid(1300 + n), 'monthly', 'Học phí tháng', _charges2[s.id]!),
+      if (_carryOf(s.id) > 0)
+        _line2(uid(1400 + n), 'carry_over', 'Nợ kỳ trước', _carryOf(s.id)),
+    ];
+    return _draft(
+      s,
+      id: id,
+      periodId: periodId2,
+      month: _month2,
+      dueDate: _dueDate(second: true),
+      lines: lines,
+    );
+  }
+
+  Map<String, Object?> _line2(
+    String id,
+    String kind,
+    String description,
+    int amount,
+  ) => {
+    'id': id,
+    'kind': kind,
+    'description': description,
+    'amount': amount,
+    'charged': true,
+    'notChargedReason': null,
+    'sessionId': null,
+    'sessionDate': null,
+    'className': kind == 'monthly' ? className : null,
+    'adjustmentReason': null,
+  };
 
   /// Chỉ tính buổi đã điểm danh; vắng có phép không tính tiền.
   List<Map<String, Object?>> _lines(String studentId) {
@@ -243,8 +341,12 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     ];
   }
 
-  String _dueDate() => _isoDate(
-    DateTime(now.year, now.month + 1, 1).add(const Duration(days: 10)),
+  String _dueDate({bool second = false}) => _isoDate(
+    DateTime(
+      now.year,
+      now.month + (second ? 2 : 1),
+      1,
+    ).add(const Duration(days: 10)),
   );
 
   Map<String, Object?> _summaryOf(Map<String, Object?> inv) => {
@@ -257,8 +359,13 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     'hasOverride': false,
   };
 
-  Map<String, Object?> _period() {
-    final all = [for (final s in _students) _invoice(s)];
+  Map<String, Object?> _period({bool second = false}) {
+    final all = second
+        ? [
+            for (final s in _students)
+              if (_charges2.containsKey(s.id)) _invoice2(s),
+          ]
+        : [for (final s in _students) _invoice(s)];
     final drafts = all.where((i) => i['status'] == 'draft').toList();
     int sum(Iterable<Map<String, Object?>> l) =>
         l.fold(0, (t, i) => t + (i['totalAmount']! as int));
@@ -268,10 +375,12 @@ class FakeTeachHubBackend implements HttpClientAdapter {
         .toList();
     final pending = drafts.where((i) => (i['totalAmount']! as int) > 0);
     return {
-      'id': periodId,
-      'periodMonth': _month,
-      'closeDate': _isoDate(DateTime(now.year, now.month + 1, 0)),
-      'dueDate': _dueDate(),
+      'id': second ? periodId2 : periodId,
+      'periodMonth': second ? _month2 : _month,
+      'closeDate': _isoDate(
+        DateTime(now.year, now.month + (second ? 2 : 1), 0),
+      ),
+      'dueDate': _dueDate(second: second),
       'status': pending.isEmpty && issued.isNotEmpty ? 'closed' : 'drafting',
       'draftCount': drafts.length,
       'issuedCount': issued.length,
@@ -287,11 +396,12 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     };
   }
 
-  Map<String, Object?> _issue(List<String>? ids) {
+  Map<String, Object?> _issue(List<String>? ids, {bool second = false}) {
     final skipped = <Map<String, Object?>>[];
     final done = <Map<String, Object?>>[];
     for (final s in _students) {
-      final inv = _invoice(s);
+      if (second && !_charges2.containsKey(s.id)) continue;
+      final inv = second ? _invoice2(s) : _invoice(s);
       if (ids != null && !ids.contains(inv['id'])) continue;
       if (inv['status'] != 'draft') {
         skipped.add({
@@ -301,8 +411,9 @@ class FakeTeachHubBackend implements HttpClientAdapter {
         });
         continue;
       }
+      // Chỉ có số dư mà không có khoản phát sinh thì không phát hành (ZERO_AMOUNT).
       final total = inv['totalAmount']! as int;
-      if (total == 0) {
+      if (total == 0 || (second && _charges2[s.id] == 0)) {
         skipped.add({
           'invoiceId': inv['id'],
           'studentName': s.name,
@@ -313,6 +424,9 @@ class FakeTeachHubBackend implements HttpClientAdapter {
       final code = _codes.removeAt(0);
       final note = 'TH $code';
       final p = payout!;
+      // Kết chuyển LÚC PHÁT HÀNH: nợ còn lại của hóa đơn cũ thành `carriedAmount`,
+      // không còn tính vào `remainingAmount` của hóa đơn cũ (D6).
+      if (second) _carryOldDebt(s.id);
       final frozen = {
         ...inv,
         'code': 'TH-$code',
@@ -353,6 +467,31 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     };
   }
 
+  List<Map<String, Object?>> _newestFirst(List<Map<String, Object?>> l) {
+    final order = {for (var i = 0; i < l.length; i++) l[i]['id']: i};
+    return l..sort((a, b) {
+      final byMonth = (b['periodMonth']! as String).compareTo(
+        a['periodMonth']! as String,
+      );
+      return byMonth != 0
+          ? byMonth
+          : order[a['id']]!.compareTo(order[b['id']]!);
+    });
+  }
+
+  void _carryOldDebt(String studentId) {
+    final oldId = _invoiceId(studentId);
+    final old = _issued[oldId];
+    if (old == null || old['status'] == 'void') return;
+    final left = old['remainingAmount']! as int;
+    if (left == 0) return;
+    _issued[oldId] = {
+      ...old,
+      'carriedAmount': (old['carriedAmount']! as int) + left,
+      'remainingAmount': 0,
+    };
+  }
+
   Map<String, Object?> _familySummary(Map<String, Object?> i) => {
     'id': i['id'],
     'code': i['code'],
@@ -363,6 +502,7 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     'periodMonth': i['periodMonth'],
     'totalAmount': i['totalAmount'],
     'paidAmount': i['paidAmount'],
+    'carriedAmount': i['carriedAmount'],
     'remainingAmount': i['remainingAmount'],
     'dueDate': i['dueDate'],
     'issuedAt': i['issuedAt'],
@@ -404,6 +544,7 @@ class FakeTeachHubBackend implements HttpClientAdapter {
   void _recalc(String invoiceId) {
     final inv = _issued[invoiceId]!;
     final total = inv['totalAmount']! as int;
+    final carried = inv['carriedAmount']! as int;
     final paid = activePaymentsOf(
       invoiceId,
     ).fold<int>(0, (t, p) => t + (p['amount']! as int));
@@ -415,7 +556,8 @@ class FakeTeachHubBackend implements HttpClientAdapter {
           ? 'paid'
           : 'partially_paid',
       'paidAmount': paid,
-      'remainingAmount': paid >= total ? 0 : total - paid,
+      // max(0, tổng − đã thu − đã chuyển sang kỳ sau).
+      'remainingAmount': (total - paid - carried).clamp(0, total),
     };
   }
 
@@ -436,8 +578,15 @@ class FakeTeachHubBackend implements HttpClientAdapter {
   (int, Object) _recordPayment(String invoiceId, Map body, String key) {
     final replay = _payReplay[key];
     if (replay != null) return (replay.$1, replay.$2);
-    final status = _issued[invoiceId]!['status'];
-    if (status == 'paid') return (409, _err('INVOICE_NOT_PAYABLE'));
+    final inv = _issued[invoiceId]!;
+    // Đã thu đủ hoặc đã chuyển hết nợ sang kỳ sau: không ghi thêm.
+    if (inv['status'] == 'paid' || inv['remainingAmount'] == 0) {
+      return (409, _err('INVOICE_NOT_PAYABLE'));
+    }
+    if ((inv['carriedAmount']! as int) > 0 &&
+        (body['amount'] as int) > (inv['remainingAmount']! as int)) {
+      return (422, _err('VALIDATION_FAILED'));
+    }
     // "Hôm nay" của app lấy từ đồng hồ máy (cubit hóa đơn không tiêm được giờ),
     // nên ngày thu hợp lệ so với ngày thật chứ không so với [now] cố định.
     final today = _isoDate(DateTime.now());
@@ -595,16 +744,18 @@ class FakeTeachHubBackend implements HttpClientAdapter {
       );
     }
     if (m == 'GET /family/students') {
+      final seen = <Object?>{};
       return (
         200,
         {
           'items': [
             for (final i in _issued.values)
-              {
-                'id': i['studentId'],
-                'fullName': i['studentName'],
-                'classes': [],
-              },
+              if (seen.add(i['studentId']))
+                {
+                  'id': i['studentId'],
+                  'fullName': i['studentName'],
+                  'classes': [],
+                },
           ],
         },
       );
@@ -614,19 +765,40 @@ class FakeTeachHubBackend implements HttpClientAdapter {
         200,
         {
           'items': [
+            // Kỳ mới nhất trước.
+            if (_charges2.isNotEmpty)
+              {
+                for (final e in _period(second: true).entries)
+                  if (e.key != 'invoices') e.key: e.value,
+              },
             if (_attendance.isNotEmpty)
               {
                 for (final e in _period().entries)
                   if (e.key != 'invoices') e.key: e.value,
               },
           ],
-          'total': _attendance.isEmpty ? 0 : 1,
+          'total': (_attendance.isEmpty ? 0 : 1) + (_charges2.isEmpty ? 0 : 1),
           'page': 1,
           'pageSize': 100,
         },
       );
     }
     if (m == 'GET /billing-periods/$periodId') return (200, _period());
+    if (m == 'GET /billing-periods/$periodId2') {
+      return (200, _period(second: true));
+    }
+    if (m == 'POST /billing-periods/$periodId2/issue') {
+      issueKeys.add(key!);
+      final replay = _issueReplay[key];
+      if (replay != null) return (200, replay);
+      if (payout == null) return (422, _err('PAYOUT_ACCOUNT_MISSING'));
+      final ids = (body! as Map)['invoiceIds'] as List?;
+      issueExecutions++;
+      return (
+        200,
+        _issueReplay[key] = _issue(ids?.cast<String>(), second: true),
+      );
+    }
     if (m == 'POST /billing-periods/$periodId/issue') {
       issueKeys.add(key!);
       if (staleIssues > 0) {
@@ -645,8 +817,7 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     ).firstMatch(m);
     if (pay != null) {
       final id = pay.group(2)!;
-      final exists = _students.any((s) => _invoiceId(s.id) == id);
-      if (!exists) return (404, _err('NOT_FOUND'));
+      if (_owner(id) == null) return (404, _err('NOT_FOUND'));
       final issued = _issued.containsKey(id);
       if (pay.group(1) == 'GET') {
         return issued
@@ -666,11 +837,14 @@ class FakeTeachHubBackend implements HttpClientAdapter {
       r'^(GET|POST) /invoices/([^/]+)(/adjustments)?$',
     ).firstMatch(m);
     if (inv != null) {
-      final student = _students
-          .where((s) => _invoiceId(s.id) == inv.group(2))
-          .firstOrNull;
-      if (student == null) return (404, _err('NOT_FOUND'));
-      if (inv.group(3) == null) return (200, _invoice(student));
+      final owner = _owner(inv.group(2)!);
+      if (owner == null) return (404, _err('NOT_FOUND'));
+      final student = owner.student;
+      if (inv.group(3) == null) {
+        return (200, owner.second ? _invoice2(student) : _invoice(student));
+      }
+      // Kịch bản chưa điều chỉnh bản nháp của kỳ sau.
+      if (owner.second) return (409, _err('INVOICE_IMMUTABLE'));
       if (_issued.containsKey(inv.group(2))) {
         return (409, _err('INVOICE_IMMUTABLE'));
       }
@@ -698,7 +872,11 @@ class FakeTeachHubBackend implements HttpClientAdapter {
       return (
         200,
         {
-          'items': [for (final i in _issued.values) _familySummary(i)],
+          // Mới nhất trước (cùng kỳ giữ thứ tự phát hành).
+          'items': [
+            for (final i in _newestFirst(_issued.values.toList()))
+              _familySummary(i),
+          ],
           'nextCursor': null,
         },
       );

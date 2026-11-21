@@ -312,7 +312,10 @@ void defineBillingFlowTests() {
     await tester.pumpAndSettle();
     await confirmIssueAll(tester);
     expect(
-      find.text('${tl.billingIssued(1)} ${tl.billingIssuedSkippedZero(1)}'),
+      find.text(
+        '${tl.billingIssuedTotal(1, _vnd(total))} '
+        '${tl.billingIssuedSkippedZero(1)}',
+      ),
       findsOneWidget,
     );
     final issued = backend.issuedInvoiceOf(minhAnh.id)!;
@@ -431,14 +434,15 @@ void defineBillingFlowTests() {
     await openPeriod(tester);
     await confirmIssueAll(tester);
     expect(backend.issueExecutions, 1);
-    expect(find.text(tl.billingIssued(2)), findsNothing);
+    final issuedBoth = tl.billingIssuedTotal(2, _vnd(300000));
+    expect(find.text(issuedBoth), findsNothing);
 
     await dismissSnackBar(tester);
     await confirmIssueAll(tester);
     expect(backend.issueKeys, hasLength(2));
     expect(backend.issueKeys[1], backend.issueKeys[0]);
     expect(backend.issueExecutions, 1, reason: 'lần hai là phát lại');
-    expect(find.text(tl.billingIssued(2)), findsOneWidget);
+    expect(find.text(issuedBoth), findsOneWidget);
     final codes = [
       for (final s in [
         FakeTeachHubBackend.minhAnh,
@@ -672,6 +676,188 @@ void defineBillingFlowTests() {
     await tester.pumpAndSettle();
     await parentOpensInvoice(tester);
     expect(find.text(pl.invoiceReceiptsTitle), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await finish(tester);
+  });
+
+  /// Kỳ 1 chốt, Minh Anh thu một phần 50.000 đ qua màn hình giáo viên, rồi mở kỳ 2
+  /// (Minh Anh có học phí tháng 300.000 đ; Bảo Châu không phát sinh nên không có
+  /// hóa đơn kỳ 2 và nợ vẫn nằm ở hóa đơn kỳ 1).
+  Future<void> collectPartOfPeriod1(WidgetTester tester) async {
+    seedPayable();
+    await openPeriod(tester);
+    await confirmIssueAll(tester);
+    await dismissSnackBar(tester);
+    await tapText(tester, FakeTeachHubBackend.minhAnh.name);
+    await tapText(tester, tl.billingPayPartial);
+    await tester.enterText(fieldOf(tl.billingPayAmount), '50000');
+    await tester.tap(find.text(tl.billingPayMethodCash));
+    await tester.pumpAndSettle();
+    await tapText(tester, tl.billingPayConfirm);
+    await dismissSnackBar(tester);
+    backend.seedNextPeriod(FakeTeachHubBackend.minhAnh.id, 300000);
+  }
+
+  /// Mở lại danh sách kỳ từ đầu: đi qua màn chủ để danh sách tải lại (đi thẳng
+  /// về `/t/billing` sẽ lộ danh sách cũ còn trong ngăn xếp).
+  Future<void> freshBilling(WidgetTester tester) async {
+    router.go(TeachHubRoutes.teacher);
+    await tester.pumpAndSettle();
+    router.go(TeachHubRoutes.teacherBilling);
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> openPeriod2(WidgetTester tester) async {
+    await freshBilling(tester);
+    await tapText(
+      tester,
+      tl.billingPeriodMonth(backend.now.month + 1, backend.now.year),
+    );
+  }
+
+  testWidgets('chuyển kỳ: kỳ 1 thu một phần → kỳ 2 nháp có "Nợ kỳ trước" → '
+      'chốt kỳ 2 theo số dư lúc chốt → hóa đơn kỳ 1 "đã chuyển", phụ huynh '
+      'chỉ còn một hóa đơn cần trả', (tester) async {
+    await pump(tester);
+    final minhAnh = FakeTeachHubBackend.minhAnh;
+    final baoChau = FakeTeachHubBackend.baoChau;
+    await collectPartOfPeriod1(tester);
+    final old1 = FakeTeachHubBackend.invoiceIdOf(minhAnh.id);
+    final new2 = FakeTeachHubBackend.invoice2IdOf(minhAnh.id);
+    expect(backend.issuedInvoiceOf(minhAnh.id)!['remainingAmount'], 100000);
+
+    // Kỳ 2: bản nháp gồm học phí 300.000 đ + nợ kỳ trước 100.000 đ (xem trước).
+    await openPeriod2(tester);
+    expect(find.text(minhAnh.name), findsOneWidget);
+    expect(find.text(baoChau.name), findsNothing);
+    expect(find.text(_vnd(400000)), findsWidgets);
+    expect(find.text(tl.billingDraftPreviewNote), findsOneWidget);
+    await tapText(tester, minhAnh.name);
+    expect(find.text(tl.billingCarryTitle), findsOneWidget);
+    expect(find.text(tl.billingCarryDebt), findsOneWidget);
+    expect(find.text('+100.000 đ'), findsOneWidget);
+    expect(find.text(tl.billingCarryPreviewNote), findsOneWidget);
+    expect(find.text(tl.billingVoid), findsNothing);
+    router.pop();
+    await tester.pumpAndSettle();
+
+    // Thu thêm 20.000 đ ở kỳ 1 từ thiết bị khác trước khi chốt: số dư đổi, tổng
+    // cuối là số server tính lúc chốt (380.000 đ), không phải số xem trước.
+    backend.recordPaymentNow(minhAnh.id, 20000);
+    await confirmIssueAll(tester);
+    expect(
+      find.text(tl.billingIssuedTotal(1, _vnd(380000))),
+      findsOneWidget,
+      reason: 'tổng cuối theo phản hồi server',
+    );
+    final issued2 = backend.issuedInvoiceOf2(minhAnh.id)!;
+    expect(issued2['totalAmount'], 380000);
+    expect(
+      (issued2['lines']! as List)
+          .cast<Map>()
+          .where((l) => l['kind'] == 'carry_over')
+          .map((l) => l['amount']),
+      [80000],
+    );
+    final old = backend.issuedInvoiceOf(minhAnh.id)!;
+    expect([old['carriedAmount'], old['remainingAmount']], [80000, 0]);
+    expect(
+      backend.issuedInvoiceOf(baoChau.id)!['carriedAmount'],
+      0,
+      reason: 'Bảo Châu không có hóa đơn kỳ 2 nên nợ chưa chuyển',
+    );
+    await dismissSnackBar(tester);
+
+    // Giáo viên mở lại hóa đơn kỳ 1: ghi "đã chuyển", không còn nút thu/hủy.
+    await freshBilling(tester);
+    await tapText(
+      tester,
+      tl.billingPeriodMonth(backend.now.month, backend.now.year),
+    );
+    await tapText(tester, minhAnh.name);
+    expect(find.text(tl.billingCarriedAmount(_vnd(80000))), findsOneWidget);
+    expect(find.text(tl.billingPayFull), findsNothing);
+    expect(find.text(tl.billingPayPartial), findsNothing);
+    expect(find.text(tl.billingVoid), findsNothing);
+
+    // Phụ huynh: hóa đơn kỳ 2 đứng đầu, tổng gồm nợ cũ, có QR đúng tổng.
+    memberships.set(_state(_parent));
+    router.go(TeachHubRoutes.parentInvoices);
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining(minhAnh.name).first);
+    await tester.pumpAndSettle();
+    expect(find.text(pl.invoiceStatusIssued), findsOneWidget);
+    expect(find.text(pl.invoiceLineCarryDebt), findsOneWidget);
+    expect(find.text(_vnd(80000)), findsOneWidget);
+    expect(find.text(_vnd(380000)), findsWidgets);
+    final qr2 = issued2['qrPayload']! as String;
+    expect(qr2, contains('|380000|'));
+    expect(find.byType(QrImageView), findsOneWidget);
+    expect(backend.requests, contains('GET /family/invoices/$new2'));
+
+    // Hóa đơn kỳ 1 của phụ huynh: đã chuyển sang kỳ sau, không QR, không kêu
+    // gọi chuyển khoản.
+    router.go(TeachHubRoutes.parentInvoices);
+    await tester.pumpAndSettle();
+    expect(find.textContaining(pl.invoiceStatusCarried), findsOneWidget);
+    final rows = find.textContaining(minhAnh.name);
+    expect(rows, findsNWidgets(2));
+    await tester.tap(rows.last);
+    await tester.pumpAndSettle();
+    expect(find.text(pl.invoiceStatusCarried), findsOneWidget);
+    expect(find.text(pl.invoiceCarriedAmount), findsOneWidget);
+    expect(find.text(pl.invoiceCarriedNotice), findsOneWidget);
+    expect(find.byType(QrImageView), findsNothing);
+    expect(find.text(pl.invoiceTransferNote), findsNothing);
+    expect(backend.requests, contains('GET /family/invoices/$old1'));
+    await finish(tester);
+  });
+
+  testWidgets('chuyển kỳ: hủy thanh toán ở hóa đơn đã chuyển nợ thì còn nợ lại '
+      'đúng phần chưa chuyển, vẫn thu được; chữ 130% không vỡ', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pump(tester);
+    final minhAnh = FakeTeachHubBackend.minhAnh;
+    await collectPartOfPeriod1(tester);
+    await openPeriod2(tester);
+    await confirmIssueAll(tester);
+    await dismissSnackBar(tester);
+    expect(backend.issuedInvoiceOf(minhAnh.id)!['carriedAmount'], 100000);
+    expect(backend.issuedInvoiceOf2(minhAnh.id)!['totalAmount'], 400000);
+
+    // Hủy khoản thu 50.000 đ của hóa đơn kỳ 1: nợ quay lại đúng phần chưa chuyển.
+    await freshBilling(tester);
+    await tapText(
+      tester,
+      tl.billingPeriodMonth(backend.now.month, backend.now.year),
+    );
+    await tapText(tester, minhAnh.name);
+    expect(find.text(tl.billingPayFull), findsNothing);
+    await tapText(tester, tl.billingPaymentVoidAction);
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(EditableText),
+      ),
+      'Ghi nhầm',
+    );
+    await tester.tap(inDialog(tl.billingPaymentVoidAction));
+    await tester.pumpAndSettle();
+    final old = backend.issuedInvoiceOf(minhAnh.id)!;
+    expect([old['carriedAmount'], old['remainingAmount']], [100000, 50000]);
+    expect(find.text(tl.billingPayFull), findsOneWidget);
+    expect(find.text(tl.billingPayPartial), findsOneWidget);
+    expect(find.text(tl.billingVoid), findsNothing);
+    expect(tester.takeException(), isNull);
+
+    // Thu nốt đúng 50.000 đ còn nợ bằng "Đã thu đủ".
+    await dismissSnackBar(tester);
+    await tapText(tester, tl.billingPayFull);
+    expect(find.text(_vnd(50000)), findsWidgets);
+    await tapText(tester, tl.billingPayConfirm);
+    expect(backend.issuedInvoiceOf(minhAnh.id)!['remainingAmount'], 0);
+    expect(find.text(tl.billingPayFull), findsNothing);
     expect(tester.takeException(), isNull);
     await finish(tester);
   });
