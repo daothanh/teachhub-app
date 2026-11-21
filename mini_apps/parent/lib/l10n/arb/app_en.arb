@@ -64,7 +64,7 @@
   "notificationBannerBody": "Get attendance and schedule updates for your child as soon as the teacher posts them.",
   "notificationBannerAction": "Turn on notifications",
   "invoiceTuitionTitle": "Tuition",
-  "invoiceTuitionUnpaid": "{count} invoices not settled, {total} in total",
+  "invoiceTuitionUnpaid": "{count} invoices not settled, {total} outstanding",
   "@invoiceTuitionUnpaid": {
     "placeholders": {
       "count": {
@@ -140,5 +140,33 @@
   "invoiceTransferNote": "Transfer note",
   "invoiceNotFound": "Invoice not found",
   "invoiceNotFoundBody": "This invoice doesn't exist or you can't view it.",
-  "invoiceLoadFailed": "Couldn't load the invoice. Please try again."
+  "invoiceLoadFailed": "Couldn't load the invoice. Please try again.",
+  "invoicePaidAmount": "Paid",
+  "invoiceRemainingAmount": "Outstanding",
+  "invoicePaidNotice": "This invoice is paid in full. No transfer needed.",
+  "invoiceReceiptsTitle": "Receipts",
+  "invoiceReceiptLine": "{method} · Received {date}",
+  "@invoiceReceiptLine": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceReceiptVoided": "Voided",
+  "invoiceMethodBank": "Bank transfer",
+  "invoiceMethodCash": "Cash",
+  "invoicePartialHint": "The QR code carries the full invoice amount, so please do not scan it. Transfer exactly the remaining amount using the details below.",
+  "invoiceAmountToTransfer": "Amount to transfer: {amount}",
+  "@invoiceAmountToTransfer": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceCopyAmount": "Copy amount"
 }

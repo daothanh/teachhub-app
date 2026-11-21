@@ -18,5 +18,9 @@ class DraftKeys {
     return key;
   }
 
+  /// Đã có khóa đang chờ cho đúng draft này (lần gửi trước lỗi mạng, chưa biết
+  /// server đã làm chưa): đây là lần thử lại, server sẽ phát lại kết quả.
+  bool pending(String op, String draft) => _byOp[op]?.draft == draft;
+
   void done(String op) => _byOp.remove(op);
 }

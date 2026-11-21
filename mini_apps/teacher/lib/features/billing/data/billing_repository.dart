@@ -38,6 +38,25 @@ abstract class BillingRepository {
     required String reason,
     required String idempotencyKey,
   });
+
+  /// `GET /invoices/{id}/payments`: mới ghi trước, gồm cả thanh toán đã hủy.
+  /// Bản nháp trả 404, nên chỉ gọi cho hóa đơn đã phát hành.
+  Future<List<Payment>> listPayments(String invoiceId);
+
+  /// `POST /invoices/{id}/payments` (US-7.4 AC1, AC2): thu đủ hay một phần suy
+  /// ra từ số tiền.
+  Future<PaymentResult> recordPayment(
+    String invoiceId,
+    PaymentInput input, {
+    required String idempotencyKey,
+  });
+
+  /// `POST /payments/{id}/void` (US-7.4 AC4): lý do bắt buộc.
+  Future<PaymentResult> voidPayment(
+    String paymentId, {
+    required String reason,
+    required String idempotencyKey,
+  });
 }
 
 BillingRepository billingRepository() =>
@@ -133,6 +152,45 @@ class DioBillingRepository implements BillingRepository {
       options: _key(idempotencyKey),
     );
     return Invoice.fromJson(r.data!['invoice'] as Map<String, dynamic>);
+  });
+
+  @override
+  Future<List<Payment>> listPayments(String invoiceId) => _call(() async {
+    final r = await _dio.get<Map<String, dynamic>>(
+      '/invoices/$invoiceId/payments',
+    );
+    return [
+      for (final e in r.data!['items'] as List)
+        Payment.fromJson(e as Map<String, dynamic>),
+    ];
+  });
+
+  @override
+  Future<PaymentResult> recordPayment(
+    String invoiceId,
+    PaymentInput input, {
+    required String idempotencyKey,
+  }) => _call(() async {
+    final r = await _dio.post<Map<String, dynamic>>(
+      '/invoices/$invoiceId/payments',
+      data: input.toJson(),
+      options: _key(idempotencyKey),
+    );
+    return PaymentResult.fromJson(r.data!);
+  });
+
+  @override
+  Future<PaymentResult> voidPayment(
+    String paymentId, {
+    required String reason,
+    required String idempotencyKey,
+  }) => _call(() async {
+    final r = await _dio.post<Map<String, dynamic>>(
+      '/payments/$paymentId/void',
+      data: {'reason': reason.trim()},
+      options: _key(idempotencyKey),
+    );
+    return PaymentResult.fromJson(r.data!);
   });
 }
 

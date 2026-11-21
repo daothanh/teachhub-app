@@ -7,27 +7,40 @@ import '../data/billing_models.dart';
 import '../data/billing_repository.dart';
 import 'billing_periods_cubit.dart';
 
-enum InvoiceDone { adjusted, voided }
+enum InvoiceDone { adjusted, voided, paymentRecorded, paymentVoided }
+
+/// Thông báo về lệnh thu đủ sau khi tải lại hóa đơn: số còn nợ đã đổi (chưa gửi,
+/// cần xác nhận lại với số mới) hoặc hóa đơn không còn ghi thanh toán được.
+enum PayNotice { remainingChanged, notPayable }
 
 class InvoiceState extends Equatable {
   const InvoiceState({
     this.load = BillingLoad.loading,
     this.invoice,
+    this.payments = const [],
     this.busy = false,
     this.clientErrors = const {},
+    this.payClientErrors = const {},
     this.serverErrors = const {},
     this.error,
     this.voidError,
-    this.voidStaleUnverified = false,
+    this.staleUnverified = false,
     this.done,
+    this.notice,
   });
 
   final BillingLoad load;
   final Invoice? invoice;
 
-  /// Đang thêm điều chỉnh hoặc hủy.
+  /// Thanh toán của hóa đơn, mới ghi trước, gồm cả đã hủy.
+  final List<Payment> payments;
+
+  /// Đang thêm điều chỉnh, ghi thanh toán hoặc hủy.
   final bool busy;
   final Map<String, AdjustmentError> clientErrors;
+
+  /// Trường của form thanh toán sai ở máy (`amount`).
+  final Set<String> payClientErrors;
 
   /// 422 theo trường: `{ "amount": ["…"] }`.
   final Map<String, List<String>> serverErrors;
@@ -38,72 +51,128 @@ class InvoiceState extends Equatable {
   /// Lỗi của lệnh hủy (hiện ở trang; lỗi điều chỉnh hiện trong form).
   final ApiException? voidError;
 
-  /// Hủy gặp `CONFLICT_STALE` mà tải lại hóa đơn cũng lỗi.
-  final bool voidStaleUnverified;
+  /// Hủy hoặc ghi thanh toán gặp `CONFLICT_STALE` mà tải lại hóa đơn cũng lỗi.
+  final bool staleUnverified;
   final InvoiceDone? done;
+  final PayNotice? notice;
 
   InvoiceState copyWith({
     BillingLoad? load,
     Invoice? invoice,
+    List<Payment>? payments,
     bool? busy,
     Map<String, AdjustmentError> clientErrors = const {},
+    Set<String> payClientErrors = const {},
     Map<String, List<String>> serverErrors = const {},
     ApiException? error,
     ApiException? voidError,
-    bool voidStaleUnverified = false,
+    bool staleUnverified = false,
     InvoiceDone? done,
+    PayNotice? notice,
   }) => InvoiceState(
     load: load ?? this.load,
     invoice: invoice ?? this.invoice,
+    payments: payments ?? this.payments,
     busy: busy ?? false,
     clientErrors: clientErrors,
+    payClientErrors: payClientErrors,
     serverErrors: serverErrors,
     error: error,
     voidError: voidError,
-    voidStaleUnverified: voidStaleUnverified,
+    staleUnverified: staleUnverified,
     done: done,
+    notice: notice,
   );
 
   @override
   List<Object?> get props => [
     load,
     invoice,
+    payments,
     busy,
     clientErrors,
+    payClientErrors,
     serverErrors,
     error,
     voidError,
-    voidStaleUnverified,
-    done, //
+    staleUnverified,
+    done,
+    notice, //
   ];
 }
 
 /// Chi tiết một hóa đơn: dòng từng buổi, điều chỉnh bản nháp (US-7.2 AC2–AC3)
 /// và hủy hóa đơn đã phát hành (US-7.3 AC4). Tổng luôn lấy từ phản hồi server.
 class InvoiceCubit extends Cubit<InvoiceState> {
-  InvoiceCubit(this._repo, this.invoiceId, {DraftKeys? keys})
-    : _keys = keys ?? DraftKeys(),
-      super(const InvoiceState());
+  InvoiceCubit(
+    this._repo,
+    this.invoiceId, {
+    DraftKeys? keys,
+    DateTime Function()? now,
+  }) : _keys = keys ?? DraftKeys(),
+       _now = now ?? DateTime.now,
+       super(const InvoiceState());
   final BillingRepository _repo;
   final String invoiceId;
   final DraftKeys _keys;
+  final DateTime Function() _now;
+
+  /// Hôm nay `YYYY-MM-DD` (ngày thu mặc định và cận trên của ngày thu).
+  String get today {
+    final d = _now();
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${d.year}-${two(d.month)}-${two(d.day)}';
+  }
 
   Future<void> load() async {
     if (isClosed) return;
     emit(const InvoiceState());
     try {
-      final inv = await _repo.getInvoice(invoiceId);
+      final (inv, pays) = await _fetch();
       if (isClosed) return;
-      emit(InvoiceState(load: BillingLoad.ready, invoice: inv));
+      emit(InvoiceState(load: BillingLoad.ready, invoice: inv, payments: pays));
     } on ApiException catch (e) {
       if (isClosed) return;
       emit(InvoiceState(load: BillingLoad.failure, error: e));
     }
   }
 
-  /// Xóa lỗi cũ khi mở lại form điều chỉnh.
+  /// Bản nháp chưa có thanh toán (và `GET …/payments` trả 404 cho bản nháp).
+  Future<(Invoice, List<Payment>)> _fetch() async {
+    final inv = await _repo.getInvoice(invoiceId);
+    final pays = inv.status == InvoiceStatus.draft
+        ? const <Payment>[]
+        : await _repo.listPayments(invoiceId);
+    return (inv, pays);
+  }
+
+  /// Xóa lỗi cũ khi mở lại form điều chỉnh hoặc thanh toán.
   void clearErrors() {
-    if (!isClosed) emit(state.copyWith(invoice: state.invoice));
+    if (!isClosed) {
+      emit(state.copyWith(invoice: state.invoice, busy: state.busy));
+    }
+  }
+
+  /// Trước khi mở "Đã thu đủ": tải lại để hiện số còn nợ mới nhất. `false` khi
+  /// không mở được (hóa đơn không còn ghi thanh toán được, hoặc tải lỗi).
+  Future<bool> reloadForPayment() async {
+    if (state.busy || state.invoice == null) return false;
+    emit(state.copyWith(busy: true));
+    try {
+      final (inv, pays) = await _fetch();
+      if (isClosed) return false;
+      emit(
+        state.copyWith(
+          invoice: inv,
+          payments: pays,
+          notice: inv.canRecordPayment ? null : PayNotice.notPayable,
+        ),
+      );
+      return inv.canRecordPayment;
+    } on ApiException catch (e) {
+      if (!isClosed) emit(state.copyWith(voidError: e));
+      return false;
+    }
   }
 
   Future<void> addAdjustment(AdjustmentInput input) async {
@@ -183,8 +252,149 @@ class InvoiceCubit extends Cubit<InvoiceState> {
         state.copyWith(
           invoice: fresh,
           voidError: e,
-          voidStaleUnverified:
+          staleUnverified:
               e.code == ApiErrorCode.conflictStale && fresh == null,
+        ),
+      );
+    }
+  }
+
+  /// Ghi thanh toán. [expectedRemaining] khác null là "Đã thu đủ": số tiền là
+  /// số còn nợ người dùng đã thấy; tải lại ngay trước khi gửi, nếu số đã đổi thì
+  /// KHÔNG gửi mà báo [PayNotice.remainingChanged] để xác nhận lại với số mới.
+  Future<void> recordPayment(
+    PaymentInput input, {
+    int? expectedRemaining,
+  }) async {
+    if (state.busy || state.invoice == null) return;
+    final bad = validatePayment(input);
+    if (bad.isNotEmpty) {
+      emit(state.copyWith(payClientErrors: bad));
+      return;
+    }
+    emit(state.copyWith(busy: true));
+    final draft =
+        '${input.amount}|${input.method.wire}|${input.paidOn}|'
+        '${input.note.trim()}';
+    // Thử lại sau lỗi mạng (khóa còn chờ): vẫn tải lại hóa đơn. Server có thể đã
+    // ghi khoản của mình (hóa đơn nay `paid`) nên bỏ qua nhánh không ghi được và
+    // gửi lại cùng khóa để server phát lại kết quả; tải lại lỗi cũng gửi lại.
+    // Hóa đơn còn nhận thu mà số còn nợ khác thì khoản của mình chưa tới server
+    // và máy khác đã thu: không gửi, bỏ khóa cũ để lần xác nhận lại dùng khóa mới.
+    if (expectedRemaining != null) {
+      final retry = _keys.pending('pay', draft);
+      try {
+        final (inv, pays) = await _fetch();
+        if (isClosed) return;
+        final notice = !inv.canRecordPayment
+            ? (retry ? null : PayNotice.notPayable)
+            : inv.remainingAmount != expectedRemaining
+            ? PayNotice.remainingChanged
+            : null;
+        if (notice != null) {
+          if (retry) _keys.done('pay');
+          emit(state.copyWith(invoice: inv, payments: pays, notice: notice));
+          return;
+        }
+      } on ApiException catch (e) {
+        if (!retry) {
+          // Không kiểm lại được số còn nợ thì không gửi.
+          if (!isClosed) emit(state.copyWith(error: e));
+          return;
+        }
+      }
+    }
+    try {
+      final r = await _repo.recordPayment(
+        invoiceId,
+        input,
+        idempotencyKey: _keys.of('pay', draft),
+      );
+      _keys.done('pay');
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          invoice: state.invoice!.afterPayment(r),
+          payments: [r.payment, ...state.payments],
+          done: InvoiceDone.paymentRecorded,
+        ),
+      );
+    } on ApiException catch (e) {
+      if (!e.retryable) _keys.done('pay');
+      if (isClosed) return;
+      const known = {'amount', 'paidOn', 'method', 'note'};
+      final fields = {
+        for (final MapEntry(:key, :value) in e.fieldErrors.entries)
+          if (known.contains(key)) key: value,
+      };
+      emit(
+        state.copyWith(
+          busy: _isConflict(e),
+          serverErrors: fields,
+          error: fields.isEmpty ? e : null,
+        ),
+      );
+      await _reloadAfterConflict(e, formError: true);
+    }
+  }
+
+  Future<void> voidPayment(String paymentId, String reason) async {
+    if (state.busy || state.invoice == null) return;
+    emit(state.copyWith(busy: true));
+    try {
+      final r = await _repo.voidPayment(
+        paymentId,
+        reason: reason,
+        idempotencyKey: _keys.of('voidPay:$paymentId', reason.trim()),
+      );
+      _keys.done('voidPay:$paymentId');
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          invoice: state.invoice!.afterPayment(r),
+          payments: [for (final p in state.payments) p.replacing(r.payment)],
+          done: InvoiceDone.paymentVoided,
+        ),
+      );
+    } on ApiException catch (e) {
+      if (!e.retryable) _keys.done('voidPay:$paymentId');
+      if (isClosed) return;
+      emit(state.copyWith(busy: _isConflict(e), voidError: e));
+      await _reloadAfterConflict(e, formError: false);
+    }
+  }
+
+  static bool _isConflict(ApiException e) =>
+      e.code == ApiErrorCode.conflictStale ||
+      e.code == ApiErrorCode.invoiceNotPayable;
+
+  /// `CONFLICT_STALE` (kết quả đã lưu quá hạn phát lại) hoặc
+  /// `INVOICE_NOT_PAYABLE` (hóa đơn đổi trạng thái ở nơi khác): tải lại hóa đơn
+  /// và thanh toán, giữ lỗi; lần bấm sau dùng khóa mới. Tải lại cũng lỗi thì
+  /// không được nói là đã cập nhật.
+  Future<void> _reloadAfterConflict(
+    ApiException e, {
+    required bool formError,
+  }) async {
+    if (!_isConflict(e)) return;
+    try {
+      final (inv, pays) = await _fetch();
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          invoice: inv,
+          payments: pays,
+          error: formError ? e : null,
+          voidError: formError ? null : e,
+        ),
+      );
+    } on ApiException {
+      if (isClosed) return;
+      emit(
+        state.copyWith(
+          error: formError ? e : null,
+          voidError: formError ? null : e,
+          staleUnverified: true,
         ),
       );
     }

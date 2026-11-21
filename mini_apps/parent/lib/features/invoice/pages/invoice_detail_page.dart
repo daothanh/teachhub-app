@@ -115,8 +115,29 @@ class _Detail extends StatelessWidget {
             style: theme.textTheme.titleMedium,
           ),
         ),
+        if (s.status != InvoiceStatus.voided) ...[
+          if (s.paidAmount > 0)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(l10n.invoicePaidAmount),
+              trailing: Text(formatVnd(context, s.paidAmount)),
+            ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              l10n.invoiceRemainingAmount,
+              style: theme.textTheme.titleMedium,
+            ),
+            trailing: Text(
+              formatVnd(context, s.remainingAmount),
+              style: theme.textTheme.titleMedium,
+            ),
+          ),
+        ],
+        if (invoice.payments.isNotEmpty) _Receipts(payments: invoice.payments),
         const SizedBox(height: 16),
-        // Hóa đơn hủy: qrPayload và payout đều null, chỉ báo đã hủy.
+        // Hóa đơn hủy: qrPayload và payout đều null, chỉ báo đã hủy. Đã thu đủ
+        // thì không còn kêu gọi chuyển khoản.
         if (s.status == InvoiceStatus.voided)
           Card(
             margin: EdgeInsets.zero,
@@ -125,8 +146,71 @@ class _Detail extends StatelessWidget {
               child: Text(l10n.invoiceVoidNotice),
             ),
           )
+        else if (s.status == InvoiceStatus.paid)
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(l10n.invoicePaidNotice),
+            ),
+          )
         else if (qr != null || payout != null)
           _Pay(invoice: invoice),
+      ],
+    );
+  }
+}
+
+/// Biên nhận từng lần thu (US-7.4 AC3); thanh toán đã hủy gạch và có nhãn.
+class _Receipts extends StatelessWidget {
+  const _Receipts({required this.payments});
+
+  final List<InvoicePayment> payments;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Semantics(
+          header: true,
+          child: Text(
+            l10n.invoiceReceiptsTitle,
+            style: theme.textTheme.titleMedium,
+          ),
+        ),
+        for (final p in payments)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(
+              formatVnd(context, p.amount),
+              style: p.voided
+                  ? const TextStyle(decoration: TextDecoration.lineThrough)
+                  : null,
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.invoiceReceiptLine(
+                    paymentMethodLabel(context, p.method),
+                    formatDate(context, p.paidOn),
+                  ),
+                ),
+                if (p.voided)
+                  Text(
+                    l10n.invoiceReceiptVoided,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -142,7 +226,10 @@ class _Pay extends StatelessWidget {
     final l10n = context.miniAppL10n;
     final theme = Theme.of(context);
     final payout = invoice.payout;
-    final qr = invoice.qrPayload;
+    // QR sinh lúc phát hành mang tổng tiền: đã thu một phần thì quét sẽ chuyển
+    // thừa, nên ẩn QR và hướng dẫn chuyển đúng số còn lại.
+    final partial = invoice.summary.status == InvoiceStatus.partiallyPaid;
+    final qr = partial ? null : invoice.qrPayload;
     final saving =
         context.watch<InvoiceDetailCubit>().state.qrSave == QrSaveStatus.saving;
     Future<void> copy(String text) async {
@@ -160,6 +247,23 @@ class _Pay extends StatelessWidget {
           child: Text(l10n.invoicePayTitle, style: theme.textTheme.titleMedium),
         ),
         const SizedBox(height: 8),
+        if (partial) ...[
+          Text(l10n.invoicePartialHint),
+          const SizedBox(height: 8),
+          Text(
+            l10n.invoiceAmountToTransfer(
+              formatVnd(context, invoice.summary.remainingAmount),
+            ),
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => copy('${invoice.summary.remainingAmount}'),
+            icon: const Icon(Icons.copy),
+            label: Text(l10n.invoiceCopyAmount),
+          ),
+          const SizedBox(height: 8),
+        ],
         if (qr != null) ...[
           Center(
             child: Semantics(

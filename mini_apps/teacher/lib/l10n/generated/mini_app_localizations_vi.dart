@@ -1596,4 +1596,124 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get billingIssueAllConfirmAction => 'Gửi tất cả';
+
+  @override
+  String get billingPaidAmount => 'Đã thu';
+
+  @override
+  String get billingRemainingAmount => 'Còn nợ';
+
+  @override
+  String get billingPayRecord => 'Thu tiền';
+
+  @override
+  String get billingPayFull => 'Đã thu đủ';
+
+  @override
+  String get billingPayPartial => 'Thu một phần';
+
+  @override
+  String get billingPayFullTitle => 'Ghi nhận đã thu đủ';
+
+  @override
+  String get billingPayPartialTitle => 'Ghi nhận thu một phần';
+
+  @override
+  String get billingPayAmount => 'Số tiền thu';
+
+  @override
+  String get billingPayMethod => 'Hình thức thu';
+
+  @override
+  String get billingPayMethodBank => 'Chuyển khoản';
+
+  @override
+  String get billingPayMethodCash => 'Tiền mặt';
+
+  @override
+  String get billingPayDate => 'Ngày thu';
+
+  @override
+  String get billingPayConfirm => 'Xác nhận đã thu';
+
+  @override
+  String get billingPayOverHint =>
+      'Số tiền lớn hơn số còn nợ. Phần dư được ghi lại để trừ vào kỳ sau.';
+
+  @override
+  String get billingErrPayAmount =>
+      'Nhập số tiền thu lớn hơn 0 và không quá 100.000.000.000 đ.';
+
+  @override
+  String get billingErrPayDate => 'Ngày thu không hợp lệ hoặc sau hôm nay.';
+
+  @override
+  String get billingErrNotPayable =>
+      'Hóa đơn này không ghi thanh toán được nữa (đã thu đủ, đã hủy hoặc chưa phát hành). Đã cập nhật trạng thái mới nhất.';
+
+  @override
+  String get billingPaymentRecorded => 'Đã ghi nhận thanh toán.';
+
+  @override
+  String get billingPaymentsTitle => 'Các lần thu';
+
+  @override
+  String billingPaymentLine(String method, String date) {
+    return '$method · $date';
+  }
+
+  @override
+  String billingPaymentBy(String name, String when) {
+    return 'Ghi bởi $name lúc $when';
+  }
+
+  @override
+  String billingPaymentAt(String when) {
+    return 'Ghi lúc $when';
+  }
+
+  @override
+  String get billingPaymentVoidedLabel => 'Đã hủy';
+
+  @override
+  String billingPaymentVoidedBy(String name, String reason) {
+    return 'Hủy bởi $name. Lý do: $reason';
+  }
+
+  @override
+  String billingPaymentVoidedReason(String reason) {
+    return 'Lý do hủy: $reason';
+  }
+
+  @override
+  String get billingPaymentVoidAction => 'Hủy thanh toán';
+
+  @override
+  String get billingPaymentVoidTitle => 'Hủy thanh toán này?';
+
+  @override
+  String billingPaymentVoidBody(String amount) {
+    return 'Khoản thu $amount sẽ không còn tính vào hóa đơn. Cần ghi lý do hủy.';
+  }
+
+  @override
+  String get billingPaymentVoidDone => 'Đã hủy thanh toán.';
+
+  @override
+  String get billingPayNote => 'Ghi chú (chỉ bạn thấy)';
+
+  @override
+  String get billingErrPayNote => 'Ghi chú tối đa 300 ký tự.';
+
+  @override
+  String billingPayRemainingChanged(String amount) {
+    return 'Số còn nợ vừa thay đổi, hiện là $amount. Kiểm tra lại rồi xác nhận.';
+  }
+
+  @override
+  String get billingErrPayDateVn =>
+      'Ngày thu không hợp lệ theo giờ Việt Nam (không được sau hôm nay). Kiểm tra ngày trên máy.';
+
+  @override
+  String get billingNoReason => 'Không ghi lý do';
 }

@@ -28,3 +28,11 @@ String statusLabel(BuildContext context, InvoiceStatus s) {
     InvoiceStatus.unknown => l10n.invoiceStatusUnknown,
   };
 }
+
+String paymentMethodLabel(BuildContext context, PaymentMethod m) {
+  final l10n = context.miniAppL10n;
+  return switch (m) {
+    PaymentMethod.bankTransfer => l10n.invoiceMethodBank,
+    PaymentMethod.cash => l10n.invoiceMethodCash,
+  };
+}

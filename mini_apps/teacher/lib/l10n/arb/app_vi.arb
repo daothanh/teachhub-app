@@ -937,5 +937,97 @@
   "payoutOtpActionTitle": "Xác thực để tiếp tục",
   "payoutOtpActionBody": "Đổi hoặc xóa tài khoản nhận tiền chính cần mã xác thực. Mã đã gửi tới email của bạn.",
   "payoutOtpActionConfirm": "Xác nhận",
-  "billingIssueAllConfirmAction": "Gửi tất cả"
+  "billingIssueAllConfirmAction": "Gửi tất cả",
+  "billingPaidAmount": "Đã thu",
+  "billingRemainingAmount": "Còn nợ",
+  "billingPayRecord": "Thu tiền",
+  "billingPayFull": "Đã thu đủ",
+  "billingPayPartial": "Thu một phần",
+  "billingPayFullTitle": "Ghi nhận đã thu đủ",
+  "billingPayPartialTitle": "Ghi nhận thu một phần",
+  "billingPayAmount": "Số tiền thu",
+  "billingPayMethod": "Hình thức thu",
+  "billingPayMethodBank": "Chuyển khoản",
+  "billingPayMethodCash": "Tiền mặt",
+  "billingPayDate": "Ngày thu",
+  "billingPayConfirm": "Xác nhận đã thu",
+  "billingPayOverHint": "Số tiền lớn hơn số còn nợ. Phần dư được ghi lại để trừ vào kỳ sau.",
+  "billingErrPayAmount": "Nhập số tiền thu lớn hơn 0 và không quá 100.000.000.000 đ.",
+  "billingErrPayDate": "Ngày thu không hợp lệ hoặc sau hôm nay.",
+  "billingErrNotPayable": "Hóa đơn này không ghi thanh toán được nữa (đã thu đủ, đã hủy hoặc chưa phát hành). Đã cập nhật trạng thái mới nhất.",
+  "billingPaymentRecorded": "Đã ghi nhận thanh toán.",
+  "billingPaymentsTitle": "Các lần thu",
+  "billingPaymentLine": "{method} · {date}",
+  "@billingPaymentLine": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentBy": "Ghi bởi {name} lúc {when}",
+  "@billingPaymentBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentAt": "Ghi lúc {when}",
+  "@billingPaymentAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentVoidedLabel": "Đã hủy",
+  "billingPaymentVoidedBy": "Hủy bởi {name}. Lý do: {reason}",
+  "@billingPaymentVoidedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentVoidedReason": "Lý do hủy: {reason}",
+  "@billingPaymentVoidedReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentVoidAction": "Hủy thanh toán",
+  "billingPaymentVoidTitle": "Hủy thanh toán này?",
+  "billingPaymentVoidBody": "Khoản thu {amount} sẽ không còn tính vào hóa đơn. Cần ghi lý do hủy.",
+  "@billingPaymentVoidBody": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentVoidDone": "Đã hủy thanh toán.",
+  "billingPayNote": "Ghi chú (chỉ bạn thấy)",
+  "billingErrPayNote": "Ghi chú tối đa 300 ký tự.",
+  "billingPayRemainingChanged": "Số còn nợ vừa thay đổi, hiện là {amount}. Kiểm tra lại rồi xác nhận.",
+  "@billingPayRemainingChanged": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingErrPayDateVn": "Ngày thu không hợp lệ theo giờ Việt Nam (không được sau hôm nay). Kiểm tra ngày trên máy.",
+  "billingNoReason": "Không ghi lý do"
 }

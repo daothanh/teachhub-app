@@ -23,6 +23,7 @@ enum ApiErrorCode {
   sessionCancelled('SESSION_CANCELLED', 409),
   conflictStale('CONFLICT_STALE', 409),
   invoiceImmutable('INVOICE_IMMUTABLE', 409),
+  invoiceNotPayable('INVOICE_NOT_PAYABLE', 409),
   idempotencyInProgress('IDEMPOTENCY_IN_PROGRESS', 409),
   sessionHasAttendance('SESSION_HAS_ATTENDANCE', 409),
   inviteInvalid('INVITE_INVALID', 410),

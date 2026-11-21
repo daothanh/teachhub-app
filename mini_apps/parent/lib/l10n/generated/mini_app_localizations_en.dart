@@ -102,7 +102,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String invoiceTuitionUnpaid(int count, String total) {
-    return '$count invoices not settled, $total in total';
+    return '$count invoices not settled, $total outstanding';
   }
 
   @override
@@ -222,4 +222,43 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   @override
   String get invoiceLoadFailed =>
       'Couldn\'t load the invoice. Please try again.';
+
+  @override
+  String get invoicePaidAmount => 'Paid';
+
+  @override
+  String get invoiceRemainingAmount => 'Outstanding';
+
+  @override
+  String get invoicePaidNotice =>
+      'This invoice is paid in full. No transfer needed.';
+
+  @override
+  String get invoiceReceiptsTitle => 'Receipts';
+
+  @override
+  String invoiceReceiptLine(String method, String date) {
+    return '$method · Received $date';
+  }
+
+  @override
+  String get invoiceReceiptVoided => 'Voided';
+
+  @override
+  String get invoiceMethodBank => 'Bank transfer';
+
+  @override
+  String get invoiceMethodCash => 'Cash';
+
+  @override
+  String get invoicePartialHint =>
+      'The QR code carries the full invoice amount, so please do not scan it. Transfer exactly the remaining amount using the details below.';
+
+  @override
+  String invoiceAmountToTransfer(String amount) {
+    return 'Amount to transfer: $amount';
+  }
+
+  @override
+  String get invoiceCopyAmount => 'Copy amount';
 }

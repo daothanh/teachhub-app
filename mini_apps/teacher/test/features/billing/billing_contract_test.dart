@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:teacher/features/billing/data/billing_models.dart';
 import 'package:teacher/features/billing/data/billing_repository.dart';
 
-/// Đối chiếu client kỳ thu và hóa đơn với `contracts/openapi.json` (Sprint 5).
+/// Đối chiếu client kỳ thu và hóa đơn với `contracts/openapi.json` (Sprint 5 và 6).
 final _openapi =
     jsonDecode(
           File(
@@ -78,6 +78,12 @@ class _Adapter implements HttpClientAdapter {
           'pageSize': 100,
         },
       },
+      ('GET', final p) when p.endsWith('/payments') => {
+        'items': [_example('Payment')],
+      },
+      ('POST', final p)
+          when p.endsWith('/payments') || p.startsWith('/payments/') =>
+        _example('PaymentResult'),
       ('POST', final p) when p.endsWith('/issue') => _example(
         'IssueInvoicesResult',
       ),
@@ -89,7 +95,9 @@ class _Adapter implements HttpClientAdapter {
     };
     return ResponseBody.fromString(
       jsonEncode(body),
-      options.method == 'POST' && options.path.endsWith('/adjustments')
+      options.method == 'POST' &&
+              (options.path.endsWith('/adjustments') ||
+                  options.path.endsWith('/payments'))
           ? 201
           : 200,
       headers: {
@@ -105,6 +113,9 @@ class _Adapter implements HttpClientAdapter {
 /// Trường bắt buộc của hợp đồng mà màn hình chưa dùng nên mô hình không đọc.
 const _unread = {
   'Invoice': {'studentId', 'createdAt'},
+  'PaymentResult': {'dunningCancelled'},
+  // Người ghi/hủy có thể không xác định (null) nên thiếu khóa cũng đọc được.
+  'Payment': {'recordedBy', 'voidedBy'},
   'IssueInvoicesResult': {'invoices'},
 };
 
@@ -131,6 +142,67 @@ void main() {
       expect(inv.totalAmount, 150000);
     });
 
+    test('Invoice: đã thu, còn nợ; ghi được thanh toán theo trạng thái', () {
+      final inv = Invoice.fromJson(_example('Invoice'));
+      expect([inv.paidAmount, inv.remainingAmount], [0, 150000]);
+      expect(inv.status, InvoiceStatus.draft);
+      expect(inv.canRecordPayment, isFalse);
+      final issued = Invoice.fromJson({
+        ..._example('Invoice'),
+        'status': 'issued',
+        'remainingAmount': 150000,
+      });
+      expect(issued.canRecordPayment, isTrue);
+      for (final (status, can) in [
+        ('partially_paid', true),
+        ('paid', false),
+        ('void', false),
+        ('draft', false),
+      ]) {
+        expect(
+          Invoice.fromJson({
+            ..._example('Invoice'),
+            'status': status,
+          }).canRecordPayment,
+          can,
+          reason: status,
+        );
+      }
+    });
+
+    test('Payment: người ghi, hủy và lý do; null khi không xác định', () {
+      final p = Payment.fromJson(_example('Payment'));
+      expect(p.amount, 500000);
+      expect(p.method, PaymentMethod.bankTransfer);
+      expect(p.recordedBy!.name, 'Cô Lan');
+      expect(p.isVoided, isFalse);
+      final v = Payment.fromJson({
+        ..._example('Payment'),
+        'recordedBy': null,
+        'voidedAt': '2027-01-06T08:00:00+07:00',
+        'voidedBy': {'id': 'u', 'name': 'Cô Lan'},
+        'voidReason': 'Ghi nhầm',
+      });
+      expect(v.isVoided, isTrue);
+      expect(v.recordedBy, isNull);
+      expect(v.voidedBy!.name, 'Cô Lan');
+    });
+
+    test('PaymentResult: trạng thái và số liệu sau thao tác', () {
+      final r = PaymentResult.fromJson(_example('PaymentResult'));
+      expect(r.status, InvoiceStatus.partiallyPaid);
+      expect(
+        [r.paidAmount, r.remainingAmount, r.overpaidAmount],
+        [500000, 700000, 0],
+      );
+      final inv = Invoice.fromJson({
+        ..._example('Invoice'),
+        'status': 'issued',
+      }).afterPayment(r);
+      expect(inv.status, InvoiceStatus.partiallyPaid);
+      expect(inv.remainingAmount, 700000);
+    });
+
     test('IssueInvoicesResult: bỏ qua hóa đơn 0 đ', () {
       final r = IssueResult.fromJson(_example('IssueInvoicesResult'));
       expect(r.issuedCount, 1);
@@ -142,6 +214,8 @@ void main() {
         'BillingPeriod': BillingPeriod.fromJson,
         'InvoiceSummary': InvoiceSummary.fromJson,
         'Invoice': Invoice.fromJson,
+        'Payment': Payment.fromJson,
+        'PaymentResult': PaymentResult.fromJson,
         'IssueInvoicesResult': IssueResult.fromJson,
       }.entries) {
         final props = _schema(key)['properties'] as Map<String, dynamic>;
@@ -151,6 +225,7 @@ void main() {
           final nullable = jsonEncode(props[field]).contains('"null"');
           if (nullable ||
               field == 'status' ||
+              field == 'method' ||
               _unread[key]?.contains(field) == true) {
             continue;
           }
@@ -181,6 +256,12 @@ void main() {
     final parsed = reasons.map(NotChargedReason.fromWire).toSet();
     expect(parsed, hasLength(reasons.length));
     expect(parsed, isNot(contains(NotChargedReason.other)));
+    final methods = (_schema('PaymentMethod')['enum'] as List).cast<String>();
+    expect(
+      methods.map(PaymentMethod.fromWire).toSet(),
+      PaymentMethod.values.toSet(),
+    );
+    expect(methods, PaymentMethod.values.map((m) => m.wire));
     final period = (_schema('BillingPeriodStatus')['enum'] as List)
         .cast<String>();
     expect(
@@ -199,6 +280,14 @@ void main() {
     final v = (_body('/v1/invoices/{id}/void')['properties'] as Map)
         .cast<String, Map>();
     expect(v['reason']!['maxLength'], voidReasonMax);
+    final pay = (_body('/v1/invoices/{id}/payments')['properties'] as Map)
+        .cast<String, Map>();
+    expect(pay['amount']!['minimum'], 1);
+    expect(pay['amount']!['maximum'], paymentAmountMax);
+    expect(pay['note']!['maxLength'], paymentNoteMax);
+    final vp = (_body('/v1/payments/{id}/void')['properties'] as Map)
+        .cast<String, Map>();
+    expect(vp['reason']!['maxLength'], voidReasonMax);
   });
 
   group('DioBillingRepository', () {
@@ -282,6 +371,54 @@ void main() {
         );
       },
     );
+
+    test('thanh toán: đúng method, đường dẫn, thân và Idempotency-Key', () async {
+      final list = await repo.listPayments('inv1');
+      expect(list.single.id, _example('Payment')['id']);
+      final r = await repo.recordPayment(
+        'inv1',
+        const PaymentInput(
+          amount: 500000,
+          method: PaymentMethod.cash,
+          paidOn: '2027-01-05',
+          note: ' Đóng tiền mặt ',
+        ),
+        idempotencyKey: 'k5',
+      );
+      expect(r.status, InvoiceStatus.partiallyPaid);
+      await repo.voidPayment(
+        'pay1',
+        reason: ' Ghi nhầm ',
+        idempotencyKey: 'k6',
+      );
+
+      final byPath = {
+        for (final r in adapter.requests) '${r.method} ${r.path}': r,
+      };
+      for (final r in adapter.requests) {
+        final template = _paths.keys.firstWhere(
+          (k) => RegExp(
+            '^${k.replaceFirst('/v1', '').replaceAll(RegExp(r'\{\w+\}'), '[^/]+')}\$',
+          ).hasMatch(r.path),
+          orElse: () => fail('Hợp đồng không có ${r.method} ${r.path}'),
+        );
+        expect(_paths[template], contains(r.method.toLowerCase()));
+      }
+      final rec = byPath['POST /invoices/inv1/payments']!;
+      final recBody = _body('/v1/invoices/{id}/payments');
+      expect(rec.headers['Idempotency-Key'], 'k5');
+      expect(rec.data, {
+        'amount': 500000,
+        'method': 'cash',
+        'paidOn': '2027-01-05',
+        'note': 'Đóng tiền mặt',
+      });
+      expect(_required(recBody), isNot(contains('paidOn')));
+      expect(_props(recBody), containsAll((rec.data as Map).keys));
+      final voidReq = byPath['POST /payments/pay1/void']!;
+      expect(voidReq.headers['Idempotency-Key'], 'k6');
+      expect(voidReq.data, {'reason': 'Ghi nhầm'});
+    });
 
     test('getPeriod dừng khi gặp trang rỗng dù total còn lớn', () async {
       adapter
