@@ -1372,5 +1372,80 @@
   "dunningDiscardTitle": "Discard unsaved changes?",
   "dunningDiscardBody": "The reminder settings you changed will be lost.",
   "dunningDiscardConfirm": "Discard",
-  "dunningDiscardKeep": "Keep editing"
+  "dunningDiscardKeep": "Keep editing",
+  "reportsTitle": "Reports",
+  "reportsMonthPrev": "Previous month",
+  "reportsMonthNext": "Next month",
+  "reportsBilled": "Billed",
+  "reportsCollected": "Collected",
+  "reportsOutstanding": "Receivables",
+  "reportsStudents": "Active students",
+  "reportsNoData": "No data for this month yet",
+  "reportsNoDataBody": "No invoices issued or payments recorded this month. Receivables and student count are current figures.",
+  "reportsByClass": "Revenue by class",
+  "reportsByClassEmpty": "No class revenue this month.",
+  "reportsOtherClass": "Other",
+  "reportsOtherClassHint": "Payments that cannot be assigned to a class, such as carried-over debt or manual adjustments.",
+  "reportsArchived": "Archived",
+  "reportsAttendance": "Attendance {percent}%",
+  "@reportsAttendance": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsChartTitle": "Collected revenue, 12 months",
+  "reportsChartBar": "Month {month}: {amount}",
+  "@reportsChartBar": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsChartSelected": "{month}/{year}: {amount}",
+  "@reportsChartSelected": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsLoadFailed": "Could not load the report.",
+  "reportsPaymentsTitle": "Collected payments",
+  "reportsPaymentsTotal": "Total {amount}",
+  "@reportsPaymentsTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsPaymentsEmpty": "No payments this month.",
+  "reportsPaymentsLoadFailed": "Could not load the payments.",
+  "reportsReversal": "Payment voided",
+  "reportsEntryMeta": "{date} · {method} · {code}",
+  "@reportsEntryMeta": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  }
 }

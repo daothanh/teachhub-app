@@ -1372,5 +1372,80 @@
   "dunningDiscardTitle": "Bỏ thay đổi chưa lưu?",
   "dunningDiscardBody": "Cài đặt nhắc nợ bạn vừa sửa sẽ mất.",
   "dunningDiscardConfirm": "Bỏ thay đổi",
-  "dunningDiscardKeep": "Ở lại"
+  "dunningDiscardKeep": "Ở lại",
+  "reportsTitle": "Báo cáo",
+  "reportsMonthPrev": "Tháng trước",
+  "reportsMonthNext": "Tháng sau",
+  "reportsBilled": "Phải thu",
+  "reportsCollected": "Đã thu",
+  "reportsOutstanding": "Công nợ",
+  "reportsStudents": "Học viên đang học",
+  "reportsNoData": "Chưa có dữ liệu tháng này",
+  "reportsNoDataBody": "Tháng này chưa có hóa đơn phát hành hay khoản thu nào. Công nợ và số học viên là số hiện tại.",
+  "reportsByClass": "Doanh thu theo lớp",
+  "reportsByClassEmpty": "Chưa có doanh thu theo lớp trong tháng này.",
+  "reportsOtherClass": "Khác",
+  "reportsOtherClassHint": "Khoản thu không gán được cho lớp nào, như nợ kỳ trước hay điều chỉnh tay.",
+  "reportsArchived": "Đã lưu trữ",
+  "reportsAttendance": "Chuyên cần {percent}%",
+  "@reportsAttendance": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsChartTitle": "Doanh thu đã thu 12 tháng",
+  "reportsChartBar": "Tháng {month}: {amount}",
+  "@reportsChartBar": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsChartSelected": "{month}/{year}: {amount}",
+  "@reportsChartSelected": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsLoadFailed": "Không tải được báo cáo.",
+  "reportsPaymentsTitle": "Khoản đã thu",
+  "reportsPaymentsTotal": "Tổng {amount}",
+  "@reportsPaymentsTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "reportsPaymentsEmpty": "Tháng này chưa có khoản thu nào.",
+  "reportsPaymentsLoadFailed": "Không tải được danh sách khoản thu.",
+  "reportsReversal": "Hủy thanh toán",
+  "reportsEntryMeta": "{date} · {method} · {code}",
+  "@reportsEntryMeta": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  }
 }
