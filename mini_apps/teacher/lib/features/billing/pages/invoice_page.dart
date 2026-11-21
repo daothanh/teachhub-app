@@ -42,7 +42,11 @@ class _View extends StatelessWidget {
       listener: (context, s) {
         // Lỗi điều chỉnh hiện trong form; ở đây chỉ báo thành công và lỗi hủy.
         final msg = s.voidError != null
-            ? billingErrorText(l10n, s.voidError!)
+            ? billingErrorText(
+                l10n,
+                s.voidError!,
+                staleUnverified: s.voidStaleUnverified,
+              )
             : s.done == InvoiceDone.voided
             ? l10n.billingVoided
             : l10n.billingAdjusted;

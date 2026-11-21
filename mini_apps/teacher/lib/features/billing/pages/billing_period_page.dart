@@ -33,13 +33,21 @@ class BillingPeriodPage extends StatelessWidget {
 class _View extends StatelessWidget {
   const _View();
 
-  Future<void> _onError(BuildContext context, ApiException e) async {
+  Future<void> _onError(
+    BuildContext context,
+    ApiException e, {
+    bool staleUnverified = false,
+  }) async {
     final l10n = context.miniAppL10n;
     final cubit = context.read<BillingPeriodCubit>();
     if (e.code != ApiErrorCode.payoutAccountMissing) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(billingErrorText(l10n, e))));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            billingErrorText(l10n, e, staleUnverified: staleUnverified),
+          ),
+        ),
+      );
       return;
     }
     // US-7.3 AC5: chưa có tài khoản nhận tiền → mở màn tài khoản, quay lại chốt tiếp.
@@ -78,7 +86,7 @@ class _View extends StatelessWidget {
               a.error != b.error),
       listener: (context, s) {
         if (s.error != null) {
-          _onError(context, s.error!);
+          _onError(context, s.error!, staleUnverified: s.staleUnverified);
           return;
         }
         final r = s.result!;

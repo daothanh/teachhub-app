@@ -221,6 +221,28 @@ void main() {
       expect(repo.calls.last, 'getPeriod:$periodId');
     });
 
+    testWidgets(
+      '409 mà tải lại kỳ lỗi: báo chưa xác nhận, không nói đã cập nhật',
+      (tester) async {
+        repo.issueError = apiErr(ApiErrorCode.conflictStale);
+        await openPeriod(tester);
+        repo.periodError = const ApiException.network();
+        await tapButton(tester, 'Chốt & gửi tất cả');
+        await tester.tap(
+          find.descendant(
+            of: find.byType(AlertDialog),
+            matching: find.text('Gửi tất cả'),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.textContaining('Chưa xác nhận được kết quả'),
+          findsOneWidget,
+        );
+        expect(find.textContaining('đã cập nhật trạng thái'), findsNothing);
+      },
+    );
+
     testWidgets('lỗi mạng khi chốt: báo lỗi và vẫn bấm lại được', (
       tester,
     ) async {

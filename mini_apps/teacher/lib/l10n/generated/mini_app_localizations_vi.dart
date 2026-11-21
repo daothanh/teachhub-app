@@ -1540,6 +1540,10 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
       'Hóa đơn đã phát hành nên không sửa được. Hãy hủy rồi tạo hóa đơn thay thế.';
 
   @override
+  String get billingErrStaleUnverified =>
+      'Chưa xác nhận được kết quả. Kéo để tải lại rồi kiểm tra trước khi chốt tiếp.';
+
+  @override
   String get billingErrStale =>
       'Hóa đơn vừa có thay đổi, đã cập nhật trạng thái mới nhất. Kiểm tra lại rồi thử lần nữa.';
 

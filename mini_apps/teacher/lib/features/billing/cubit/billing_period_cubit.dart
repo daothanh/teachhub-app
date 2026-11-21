@@ -14,6 +14,7 @@ class BillingPeriodState extends Equatable {
     this.issuing = false,
     this.error,
     this.result,
+    this.staleUnverified = false,
   });
 
   final BillingLoad load;
@@ -28,22 +29,29 @@ class BillingPeriodState extends Equatable {
   /// Kết quả lệnh chốt vừa xong (một lần, để hiện thông báo).
   final IssueResult? result;
 
+  /// 409 `CONFLICT_STALE` mà tải lại kỳ cũng lỗi: chưa biết trạng thái mới.
+  final bool staleUnverified;
+
   BillingPeriodState copyWith({
     BillingLoad? load,
     BillingPeriodDetail? detail,
     bool? issuing,
     ApiException? error,
     IssueResult? result,
+    bool staleUnverified = false,
   }) => BillingPeriodState(
     load: load ?? this.load,
     detail: detail ?? this.detail,
     issuing: issuing ?? this.issuing,
     error: error,
     result: result,
+    staleUnverified: staleUnverified,
   );
 
   @override
-  List<Object?> get props => [load, detail, issuing, error, result];
+  List<Object?> get props => [
+    load, detail, issuing, error, result, staleUnverified, //
+  ];
 }
 
 /// Một kỳ thu: bản nháp của kỳ và lệnh "Chốt & gửi" (US-7.2 AC4).
@@ -123,7 +131,14 @@ class BillingPeriodCubit extends Cubit<BillingPeriodState> {
           // Giữ danh sách cũ; kéo để làm mới sẽ tải lại.
         }
         if (isClosed) return;
-        emit(state.copyWith(issuing: false, detail: fresh, error: e));
+        emit(
+          state.copyWith(
+            issuing: false,
+            detail: fresh,
+            error: e,
+            staleUnverified: fresh == null,
+          ),
+        );
         return;
       }
       emit(state.copyWith(issuing: false, error: e));

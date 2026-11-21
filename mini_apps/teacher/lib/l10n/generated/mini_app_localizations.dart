@@ -2716,6 +2716,12 @@ abstract class MiniAppLocalizations {
   /// **'Hóa đơn đã phát hành nên không sửa được. Hãy hủy rồi tạo hóa đơn thay thế.'**
   String get billingErrImmutable;
 
+  /// No description provided for @billingErrStaleUnverified.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa xác nhận được kết quả. Kéo để tải lại rồi kiểm tra trước khi chốt tiếp.'**
+  String get billingErrStaleUnverified;
+
   /// No description provided for @billingErrStale.
   ///
   /// In vi, this message translates to:
