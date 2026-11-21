@@ -735,5 +735,205 @@
   "payoutErrAccountNo": "Số tài khoản gồm 6 đến 19 chữ số.",
   "payoutErrName": "Tên tối đa 50 ký tự.",
   "payoutLoadFailed": "Không tải được danh sách tài khoản.",
-  "onboardingPayoutIntro": "Thêm ít nhất một tài khoản để nhận học phí."
+  "onboardingPayoutIntro": "Thêm ít nhất một tài khoản để nhận học phí.",
+  "todayBillingEntry": "Học phí kỳ thu",
+  "billingTitle": "Học phí kỳ thu",
+  "billingPeriodsEmpty": "Chưa có kỳ thu nào",
+  "billingPeriodsEmptyBody": "Đến ngày chốt, app tự tạo bản nháp hóa đơn của tháng để bạn kiểm tra trước khi gửi.",
+  "billingLoadFailed": "Không tải được dữ liệu học phí.",
+  "billingPeriodMonth": "Tháng {month}/{year}",
+  "@billingPeriodMonth": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "billingPeriodDates": "Chốt {close} · Hạn {due}",
+  "@billingPeriodDates": {
+    "placeholders": {
+      "close": {
+        "type": "String"
+      },
+      "due": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPeriodDrafting": "Đang soạn",
+  "billingPeriodClosed": "Đã chốt hết",
+  "billingDraftSummary": "{count, plural, other{{count} bản nháp}} · {amount}",
+  "@billingDraftSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingIssuedSummary": "{count, plural, other{Đã gửi {count} hóa đơn}} · {amount}",
+  "@billingIssuedSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingVoidSummary": "{count, plural, other{{count} hóa đơn đã hủy}}",
+  "@billingVoidSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingIssueAll": "Chốt & gửi tất cả",
+  "billingIssueOne": "Chốt & gửi",
+  "billingIssueConfirmTitle": "Gửi hóa đơn cho phụ huynh?",
+  "billingIssueAllConfirmBody": "Chốt {count, plural, other{{count} hóa đơn}}, tổng {amount}. Phụ huynh nhận thông báo ngay và hóa đơn không sửa được sau khi gửi.",
+  "@billingIssueAllConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingIssueOneConfirmBody": "Chốt hóa đơn của {student}, {amount}. Phụ huynh nhận thông báo ngay và hóa đơn không sửa được sau khi gửi.",
+  "@billingIssueOneConfirmBody": {
+    "placeholders": {
+      "student": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingIssued": "Đã gửi {count, plural, other{{count} hóa đơn}}.",
+  "@billingIssued": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingIssuedNone": "Không có hóa đơn nào cần gửi.",
+  "billingIssuedSkippedZero": "{count, plural, other{{count} hóa đơn}} 0 đ không gửi.",
+  "@billingIssuedSkippedZero": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingNoPayableDrafts": "Không còn bản nháp nào có tiền để gửi.",
+  "billingZeroDraftNote": "{count, plural, other{{count} hóa đơn}} 0 đ sẽ không được gửi.",
+  "@billingZeroDraftNote": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingInvoicesEmpty": "Kỳ này chưa có hóa đơn.",
+  "billingNoSend": "Không gửi",
+  "billingHasOverride": "Giá riêng",
+  "billingStatusDraft": "Bản nháp",
+  "billingStatusIssued": "Đã phát hành",
+  "billingStatusPending": "Chờ xác nhận",
+  "billingStatusPartial": "Đã thanh toán một phần",
+  "billingStatusPaid": "Đã thanh toán",
+  "billingStatusVoid": "Đã hủy",
+  "billingInvoiceTitle": "Hóa đơn",
+  "billingLinesSessions": "Các buổi học",
+  "billingLinesOther": "Khoản khác",
+  "billingSessionLine": "{date} · {className}",
+  "@billingSessionLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "className": {
+        "type": "String"
+      }
+    }
+  },
+  "billingSessionCharged": "Tính tiền",
+  "billingSessionNotCharged": "Không tính: {reason}",
+  "@billingSessionNotCharged": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "billingReasonExcused": "vắng có phép",
+  "billingReasonUnexcused": "vắng không phép",
+  "billingReasonCancelled": "buổi bị hủy",
+  "billingReasonMakeup": "buổi dạy bù",
+  "billingReasonOther": "theo quy tắc của lớp",
+  "billingAdjustmentReasonLine": "Lý do: {reason}",
+  "@billingAdjustmentReasonLine": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "billingTotal": "Tổng cộng",
+  "billingClamped": "Điều chỉnh làm tổng âm nên tổng được giữ ở 0 đ; phần âm {amount} chưa được chuyển sang kỳ sau.",
+  "@billingClamped": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingAddAdjustment": "Thêm điều chỉnh",
+  "billingAdjustTitle": "Điều chỉnh hóa đơn",
+  "billingAdjustHint": "Dòng điều chỉnh chưa xóa được. Nhập sai thì thêm một dòng ngược dấu.",
+  "billingAdjustDecrease": "Giảm trừ",
+  "billingAdjustIncrease": "Phụ thu",
+  "billingAdjustAmount": "Số tiền",
+  "billingAdjustDescription": "Mô tả",
+  "billingAdjustReason": "Lý do (bắt buộc)",
+  "billingAdjustSave": "Lưu điều chỉnh",
+  "billingAdjusted": "Đã thêm điều chỉnh.",
+  "billingErrAmount": "Nhập số tiền lớn hơn 0 và không quá 1.000.000.000 đ.",
+  "billingErrDescription": "Nhập mô tả, tối đa 200 ký tự.",
+  "billingErrReason": "Nhập lý do, tối đa 300 ký tự.",
+  "billingErrImmutable": "Hóa đơn đã phát hành nên không sửa được. Hãy hủy rồi tạo hóa đơn thay thế.",
+  "billingVoid": "Hủy hóa đơn",
+  "billingVoidTitle": "Hủy hóa đơn này?",
+  "billingVoidBody": "Phụ huynh sẽ không còn thấy mã QR của hóa đơn. Cần ghi lý do hủy.",
+  "billingVoidReason": "Lý do hủy",
+  "billingVoidKeep": "Giữ lại",
+  "billingVoidConfirm": "Hủy hóa đơn",
+  "billingVoided": "Đã hủy hóa đơn.",
+  "billingVoidedBanner": "Hóa đơn đã hủy. Lý do: {reason}",
+  "@billingVoidedBanner": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPayoutMissingTitle": "Chưa có tài khoản nhận tiền",
+  "billingPayoutMissingBody": "Thêm tài khoản nhận tiền để phụ huynh biết chuyển học phí về đâu. Thêm xong, quay lại đây để chốt tiếp.",
+  "billingPayoutMissingAction": "Thêm tài khoản",
+  "payoutOtpActionTitle": "Xác thực để tiếp tục",
+  "payoutOtpActionBody": "Đổi hoặc xóa tài khoản nhận tiền chính cần mã xác thực. Mã đã gửi tới email của bạn.",
+  "payoutOtpActionConfirm": "Xác nhận",
+  "billingIssueAllConfirmAction": "Gửi tất cả"
 }

@@ -301,8 +301,16 @@ Map<String, PayoutFieldError> validatePayoutInput(
   return e;
 }
 
-/// `150000` → `150.000 đ`.
-String formatVnd(int amount) => '${_group(amount.toString())} đ';
+/// `150000` → `150.000 đ`; âm → `−150.000 đ` (dấu trừ U+2212). [plus] thêm `+`
+/// cho số dương (dòng điều chỉnh).
+String formatVnd(int amount, {bool plus = false}) {
+  final sign = amount < 0
+      ? '−'
+      : plus && amount > 0
+      ? '+'
+      : '';
+  return '$sign${_group(amount.abs().toString())} đ';
+}
 
 String _group(String digits) {
   final out = StringBuffer();

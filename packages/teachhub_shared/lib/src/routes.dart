@@ -9,6 +9,9 @@ abstract final class TeachHubRoutes {
   /// P05: phụ huynh chưa có lời mời nhập link, mã hoặc quét QR.
   static const inviteEntry = '/invite';
   static const teacher = '/t';
+
+  /// T10: kỳ thu của giáo viên; chi tiết kỳ là `<teacherBilling>/<periodId>`.
+  static const teacherBilling = '/t/billing';
   static const parent = '/p';
 
   /// P03: hóa đơn của con (phụ huynh); chi tiết là `<parentInvoices>/<id>`.

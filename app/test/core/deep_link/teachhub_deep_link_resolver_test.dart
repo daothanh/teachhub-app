@@ -27,6 +27,16 @@ void main() {
     expect(target?.requiresAuth, isTrue);
   });
 
+  test('teachhub://billing/periods/<id> mở /t/billing/<id>', () {
+    final target = resolver.resolve(
+      Uri.parse(
+        'teachhub://billing/periods/019c0a00-0001-7b30-8c01-000000000001',
+      ),
+    );
+    expect(target?.path, '/t/billing/019c0a00-0001-7b30-8c01-000000000001');
+    expect(target?.requiresAuth, isTrue);
+  });
+
   test('foreign hosts, old tasco:// links and unknown paths are ignored', () {
     for (final link in [
       'https://evil.example/i/abc',

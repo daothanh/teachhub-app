@@ -9,6 +9,7 @@ import '../routing/app_routes.dart';
 /// host universal link, nên shell tự xử lý:
 /// - `https://dayhoc.app/i/<token>` và `teachhub://i/<token>` → `/invite/<token>`
 /// - `teachhub://invoices/<id>` (thông báo hóa đơn) → `/p/invoices/<id>`
+/// - `teachhub://billing/periods/<id>` (thông báo `billing_ready`) → `/t/billing/<id>`
 /// - `teachhub://<route>` → route đó nếu một mini-app nhận nó.
 ///
 /// Mọi đích đều cần đăng nhập; URI lạ trả `null`.
@@ -21,6 +22,7 @@ class TeachHubDeepLinkResolver {
   static const _hosts = {'dayhoc.app', 'www.dayhoc.app'};
   static final _invite = RegExp(r'^/i/([A-Za-z0-9_-]+)/?$');
   static final _invoice = RegExp(r'^/invoices/([A-Za-z0-9-]+)/?$');
+  static final _billingPeriod = RegExp(r'^/billing/periods/([A-Za-z0-9-]+)/?$');
 
   DeepLinkTarget? resolve(Uri uri) {
     final scheme = uri.scheme.toLowerCase();
@@ -42,6 +44,13 @@ class TeachHubDeepLinkResolver {
     if (invoice != null) {
       return DeepLinkTarget(
         path: '${TeachHubRoutes.parentInvoices}/${invoice.group(1)!}',
+      );
+    }
+
+    final billing = _billingPeriod.firstMatch(path);
+    if (billing != null) {
+      return DeepLinkTarget(
+        path: '${TeachHubRoutes.teacherBilling}/${billing.group(1)!}',
       );
     }
 

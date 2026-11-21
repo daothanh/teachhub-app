@@ -130,9 +130,11 @@ class FakeFeeRepository implements FeeRepository {
   @override
   Future<void> deletePayoutAccount(
     String id, {
+    String? otpCode,
     required String idempotencyKey,
   }) async {
     calls.add('delete:$id');
+    sentOtps.add(otpCode);
     keys.add(idempotencyKey);
     if (deleteError != null) throw deleteError!;
     accounts = [

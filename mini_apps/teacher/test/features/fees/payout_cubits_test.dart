@@ -31,6 +31,56 @@ void main() {
       await c.close();
     });
 
+    test(
+      'cần OTP: đặt chính tài khoản phụ; xóa tài khoản chính khi còn khác',
+      () async {
+        repo.accounts = [
+          sampleAccount(),
+          sampleAccount(id: 'a2', primary: false),
+        ];
+        final c = PayoutAccountsCubit(repo);
+        await c.load();
+        expect(c.setPrimaryNeedsOtp('a2'), isTrue);
+        expect(c.setPrimaryNeedsOtp('a1'), isFalse);
+        expect(c.deleteNeedsOtp('a1'), isTrue);
+        expect(c.deleteNeedsOtp('a2'), isFalse);
+        await c.close();
+
+        repo.accounts = [sampleAccount()];
+        final single = PayoutAccountsCubit(repo);
+        await single.load();
+        expect(single.deleteNeedsOtp('a1'), isFalse, reason: 'chính duy nhất');
+        await single.close();
+      },
+    );
+
+    test('đặt chính và xóa gửi otpCode lên; OTP sai báo lỗi', () async {
+      repo.accounts = [
+        sampleAccount(),
+        sampleAccount(id: 'a2', primary: false),
+      ];
+      final c = PayoutAccountsCubit(repo);
+      await c.load();
+      await c.setPrimary('a2', otpCode: '123456');
+      expect(repo.sentOtps.last, '123456');
+      repo.deleteError = apiErr(ApiErrorCode.otpInvalid);
+      await c.delete('a2', otpCode: '000000');
+      expect(c.state.error!.code, ApiErrorCode.otpInvalid);
+      expect(repo.sentOtps.last, '000000');
+      await c.close();
+    });
+
+    test('sendOtp: gửi mã; lỗi trả về, không kẹt busy', () async {
+      final c = PayoutAccountsCubit(repo);
+      expect(await c.sendOtp(), isNull);
+      expect(repo.calls, contains('otp'));
+      repo.otpError = apiErr(ApiErrorCode.rateLimited);
+      final err = await c.sendOtp();
+      expect(err!.code, ApiErrorCode.rateLimited);
+      expect(c.state.busy, isFalse);
+      await c.close();
+    });
+
     test('tối đa 5: canAdd hết khi đủ 5', () async {
       repo.accounts = [
         for (var i = 0; i < 5; i++) sampleAccount(id: 'a$i', primary: i == 0),

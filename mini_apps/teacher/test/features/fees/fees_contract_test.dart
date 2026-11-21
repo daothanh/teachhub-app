@@ -199,6 +199,17 @@ void main() {
           idempotencyKey: 'k4',
         );
         await repo.deletePayoutAccount('a1', idempotencyKey: 'k5');
+        await repo.updatePayoutAccount(
+          'a2',
+          makePrimary: true,
+          otpCode: '123456',
+          idempotencyKey: 'k6',
+        );
+        await repo.deletePayoutAccount(
+          'a2',
+          otpCode: '654321',
+          idempotencyKey: 'k7',
+        );
 
         // S4: email lấy từ /auth/me một lần.
         expect(
@@ -242,6 +253,22 @@ void main() {
           containsAll(create.keys),
         );
         expect(byPath['PATCH /payout-accounts/a1']!.data, {'isPrimary': true});
+        // Hợp đồng mới: chuyển cờ chính và xóa tài khoản chính cần otpCode.
+        expect(byPath['PATCH /payout-accounts/a2']!.data, {
+          'isPrimary': true,
+          'otpCode': '123456',
+        });
+        expect(byPath['DELETE /payout-accounts/a1']!.data, isNull);
+        final del = byPath['DELETE /payout-accounts/a2']!.data as Map;
+        expect(del, {'otpCode': '654321'});
+        expect(
+          _props(_body('/v1/payout-accounts/{id}', 'delete')),
+          containsAll(del.keys),
+        );
+        expect(
+          _props(_body('/v1/payout-accounts/{id}', 'patch')),
+          containsAll(['isPrimary', 'otpCode']),
+        );
         final otp = byPath['POST /auth/otp/send']!;
         expect(otp.data, {
           'email': 'co.lan@example.com',

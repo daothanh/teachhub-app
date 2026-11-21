@@ -2361,6 +2361,450 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Thêm ít nhất một tài khoản để nhận học phí.'**
   String get onboardingPayoutIntro;
+
+  /// No description provided for @todayBillingEntry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học phí kỳ thu'**
+  String get todayBillingEntry;
+
+  /// No description provided for @billingTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học phí kỳ thu'**
+  String get billingTitle;
+
+  /// No description provided for @billingPeriodsEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có kỳ thu nào'**
+  String get billingPeriodsEmpty;
+
+  /// No description provided for @billingPeriodsEmptyBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đến ngày chốt, app tự tạo bản nháp hóa đơn của tháng để bạn kiểm tra trước khi gửi.'**
+  String get billingPeriodsEmptyBody;
+
+  /// No description provided for @billingLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được dữ liệu học phí.'**
+  String get billingLoadFailed;
+
+  /// No description provided for @billingPeriodMonth.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng {month}/{year}'**
+  String billingPeriodMonth(int month, int year);
+
+  /// No description provided for @billingPeriodDates.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chốt {close} · Hạn {due}'**
+  String billingPeriodDates(String close, String due);
+
+  /// No description provided for @billingPeriodDrafting.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang soạn'**
+  String get billingPeriodDrafting;
+
+  /// No description provided for @billingPeriodClosed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã chốt hết'**
+  String get billingPeriodClosed;
+
+  /// No description provided for @billingDraftSummary.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count, plural, other{{count} bản nháp}} · {amount}'**
+  String billingDraftSummary(int count, String amount);
+
+  /// No description provided for @billingIssuedSummary.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count, plural, other{Đã gửi {count} hóa đơn}} · {amount}'**
+  String billingIssuedSummary(int count, String amount);
+
+  /// No description provided for @billingVoidSummary.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count, plural, other{{count} hóa đơn đã hủy}}'**
+  String billingVoidSummary(int count);
+
+  /// No description provided for @billingIssueAll.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chốt & gửi tất cả'**
+  String get billingIssueAll;
+
+  /// No description provided for @billingIssueOne.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chốt & gửi'**
+  String get billingIssueOne;
+
+  /// No description provided for @billingIssueConfirmTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi hóa đơn cho phụ huynh?'**
+  String get billingIssueConfirmTitle;
+
+  /// No description provided for @billingIssueAllConfirmBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chốt {count, plural, other{{count} hóa đơn}}, tổng {amount}. Phụ huynh nhận thông báo ngay và hóa đơn không sửa được sau khi gửi.'**
+  String billingIssueAllConfirmBody(int count, String amount);
+
+  /// No description provided for @billingIssueOneConfirmBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chốt hóa đơn của {student}, {amount}. Phụ huynh nhận thông báo ngay và hóa đơn không sửa được sau khi gửi.'**
+  String billingIssueOneConfirmBody(String student, String amount);
+
+  /// No description provided for @billingIssued.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gửi {count, plural, other{{count} hóa đơn}}.'**
+  String billingIssued(int count);
+
+  /// No description provided for @billingIssuedNone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có hóa đơn nào cần gửi.'**
+  String get billingIssuedNone;
+
+  /// No description provided for @billingIssuedSkippedZero.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count, plural, other{{count} hóa đơn}} 0 đ không gửi.'**
+  String billingIssuedSkippedZero(int count);
+
+  /// No description provided for @billingNoPayableDrafts.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không còn bản nháp nào có tiền để gửi.'**
+  String get billingNoPayableDrafts;
+
+  /// No description provided for @billingZeroDraftNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count, plural, other{{count} hóa đơn}} 0 đ sẽ không được gửi.'**
+  String billingZeroDraftNote(int count);
+
+  /// No description provided for @billingInvoicesEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Kỳ này chưa có hóa đơn.'**
+  String get billingInvoicesEmpty;
+
+  /// No description provided for @billingNoSend.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không gửi'**
+  String get billingNoSend;
+
+  /// No description provided for @billingHasOverride.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giá riêng'**
+  String get billingHasOverride;
+
+  /// No description provided for @billingStatusDraft.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bản nháp'**
+  String get billingStatusDraft;
+
+  /// No description provided for @billingStatusIssued.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã phát hành'**
+  String get billingStatusIssued;
+
+  /// No description provided for @billingStatusPending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chờ xác nhận'**
+  String get billingStatusPending;
+
+  /// No description provided for @billingStatusPartial.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thanh toán một phần'**
+  String get billingStatusPartial;
+
+  /// No description provided for @billingStatusPaid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thanh toán'**
+  String get billingStatusPaid;
+
+  /// No description provided for @billingStatusVoid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy'**
+  String get billingStatusVoid;
+
+  /// No description provided for @billingInvoiceTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn'**
+  String get billingInvoiceTitle;
+
+  /// No description provided for @billingLinesSessions.
+  ///
+  /// In vi, this message translates to:
+  /// **'Các buổi học'**
+  String get billingLinesSessions;
+
+  /// No description provided for @billingLinesOther.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản khác'**
+  String get billingLinesOther;
+
+  /// No description provided for @billingSessionLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{date} · {className}'**
+  String billingSessionLine(String date, String className);
+
+  /// No description provided for @billingSessionCharged.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính tiền'**
+  String get billingSessionCharged;
+
+  /// No description provided for @billingSessionNotCharged.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tính: {reason}'**
+  String billingSessionNotCharged(String reason);
+
+  /// No description provided for @billingReasonExcused.
+  ///
+  /// In vi, this message translates to:
+  /// **'vắng có phép'**
+  String get billingReasonExcused;
+
+  /// No description provided for @billingReasonUnexcused.
+  ///
+  /// In vi, this message translates to:
+  /// **'vắng không phép'**
+  String get billingReasonUnexcused;
+
+  /// No description provided for @billingReasonCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'buổi bị hủy'**
+  String get billingReasonCancelled;
+
+  /// No description provided for @billingReasonMakeup.
+  ///
+  /// In vi, this message translates to:
+  /// **'buổi dạy bù'**
+  String get billingReasonMakeup;
+
+  /// No description provided for @billingReasonOther.
+  ///
+  /// In vi, this message translates to:
+  /// **'theo quy tắc của lớp'**
+  String get billingReasonOther;
+
+  /// No description provided for @billingAdjustmentReasonLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do: {reason}'**
+  String billingAdjustmentReasonLine(String reason);
+
+  /// No description provided for @billingTotal.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tổng cộng'**
+  String get billingTotal;
+
+  /// No description provided for @billingClamped.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điều chỉnh làm tổng âm nên tổng được giữ ở 0 đ; phần âm {amount} chưa được chuyển sang kỳ sau.'**
+  String billingClamped(String amount);
+
+  /// No description provided for @billingAddAdjustment.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm điều chỉnh'**
+  String get billingAddAdjustment;
+
+  /// No description provided for @billingAdjustTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điều chỉnh hóa đơn'**
+  String get billingAdjustTitle;
+
+  /// No description provided for @billingAdjustHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dòng điều chỉnh chưa xóa được. Nhập sai thì thêm một dòng ngược dấu.'**
+  String get billingAdjustHint;
+
+  /// No description provided for @billingAdjustDecrease.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giảm trừ'**
+  String get billingAdjustDecrease;
+
+  /// No description provided for @billingAdjustIncrease.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phụ thu'**
+  String get billingAdjustIncrease;
+
+  /// No description provided for @billingAdjustAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tiền'**
+  String get billingAdjustAmount;
+
+  /// No description provided for @billingAdjustDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mô tả'**
+  String get billingAdjustDescription;
+
+  /// No description provided for @billingAdjustReason.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do (bắt buộc)'**
+  String get billingAdjustReason;
+
+  /// No description provided for @billingAdjustSave.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu điều chỉnh'**
+  String get billingAdjustSave;
+
+  /// No description provided for @billingAdjusted.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thêm điều chỉnh.'**
+  String get billingAdjusted;
+
+  /// No description provided for @billingErrAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập số tiền lớn hơn 0 và không quá 1.000.000.000 đ.'**
+  String get billingErrAmount;
+
+  /// No description provided for @billingErrDescription.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập mô tả, tối đa 200 ký tự.'**
+  String get billingErrDescription;
+
+  /// No description provided for @billingErrReason.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập lý do, tối đa 300 ký tự.'**
+  String get billingErrReason;
+
+  /// No description provided for @billingErrImmutable.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn đã phát hành nên không sửa được. Hãy hủy rồi tạo hóa đơn thay thế.'**
+  String get billingErrImmutable;
+
+  /// No description provided for @billingVoid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy hóa đơn'**
+  String get billingVoid;
+
+  /// No description provided for @billingVoidTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy hóa đơn này?'**
+  String get billingVoidTitle;
+
+  /// No description provided for @billingVoidBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phụ huynh sẽ không còn thấy mã QR của hóa đơn. Cần ghi lý do hủy.'**
+  String get billingVoidBody;
+
+  /// No description provided for @billingVoidReason.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do hủy'**
+  String get billingVoidReason;
+
+  /// No description provided for @billingVoidKeep.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giữ lại'**
+  String get billingVoidKeep;
+
+  /// No description provided for @billingVoidConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy hóa đơn'**
+  String get billingVoidConfirm;
+
+  /// No description provided for @billingVoided.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy hóa đơn.'**
+  String get billingVoided;
+
+  /// No description provided for @billingVoidedBanner.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn đã hủy. Lý do: {reason}'**
+  String billingVoidedBanner(String reason);
+
+  /// No description provided for @billingPayoutMissingTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có tài khoản nhận tiền'**
+  String get billingPayoutMissingTitle;
+
+  /// No description provided for @billingPayoutMissingBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm tài khoản nhận tiền để phụ huynh biết chuyển học phí về đâu. Thêm xong, quay lại đây để chốt tiếp.'**
+  String get billingPayoutMissingBody;
+
+  /// No description provided for @billingPayoutMissingAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm tài khoản'**
+  String get billingPayoutMissingAction;
+
+  /// No description provided for @payoutOtpActionTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác thực để tiếp tục'**
+  String get payoutOtpActionTitle;
+
+  /// No description provided for @payoutOtpActionBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi hoặc xóa tài khoản nhận tiền chính cần mã xác thực. Mã đã gửi tới email của bạn.'**
+  String get payoutOtpActionBody;
+
+  /// No description provided for @payoutOtpActionConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác nhận'**
+  String get payoutOtpActionConfirm;
+
+  /// No description provided for @billingIssueAllConfirmAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi tất cả'**
+  String get billingIssueAllConfirmAction;
 }
 
 class _MiniAppLocalizationsDelegate

@@ -61,6 +61,70 @@ void main() {
     },
   );
 
+  test(
+    'billing_ready (chỉ có notificationId và type) mở kỳ thu của giáo viên',
+    () async {
+      final h = _Harness(active: parent);
+      await h.nav.handle({'notificationId': 'n1', 'type': 'billing_ready'});
+      expect(h.selected, ['m-t']);
+      expect(h.routes, ['/t/billing']);
+    },
+  );
+
+  test(
+    'membershipId khác membership đang mở (cùng vai trò, khác tenant): chọn đúng membership',
+    () async {
+      const teacher2 = Membership(
+        id: 'm-t2',
+        role: MembershipRole.tenantOwner,
+        label: 'GV 2',
+      );
+      final h = _Harness(
+        memberships: const [teacher, teacher2, parent],
+        active: teacher,
+      );
+      await h.nav.handle({
+        'notificationId': 'n1',
+        'type': 'billing_ready',
+        'membershipId': 'm-t2',
+      });
+      expect(h.selected, ['m-t2']);
+      expect(h.routes, ['/t/billing']);
+    },
+  );
+
+  test(
+    'invoice_issued có membershipId của con khác: chọn đúng membership',
+    () async {
+      const parent2 = Membership(
+        id: 'm-p2',
+        role: MembershipRole.parent,
+        label: 'PH2',
+      );
+      final h = _Harness(
+        memberships: const [teacher, parent, parent2],
+        active: parent,
+      );
+      await h.nav.handle({
+        'notificationId': 'n1',
+        'type': 'invoice_issued',
+        'membershipId': 'm-p2',
+      });
+      expect(h.selected, ['m-p2']);
+      expect(h.routes, ['/p/invoices']);
+    },
+  );
+
+  test('membershipId trùng membership đang mở thì không chọn lại', () async {
+    final h = _Harness();
+    await h.nav.handle({
+      'notificationId': 'n1',
+      'type': 'billing_ready',
+      'membershipId': 'm-t',
+    });
+    expect(h.selected, isEmpty);
+  });
+
   test('đã ở đúng vai trò thì không đổi vai trò', () async {
     final h = _Harness(active: parent);
     await h.nav.handle({

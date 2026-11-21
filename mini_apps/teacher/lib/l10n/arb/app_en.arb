@@ -735,5 +735,205 @@
   "payoutErrAccountNo": "Account number has 6 to 19 digits.",
   "payoutErrName": "Name is up to 50 characters.",
   "payoutLoadFailed": "Could not load accounts.",
-  "onboardingPayoutIntro": "Add at least one account to receive tuition."
+  "onboardingPayoutIntro": "Add at least one account to receive tuition.",
+  "todayBillingEntry": "Tuition periods",
+  "billingTitle": "Tuition periods",
+  "billingPeriodsEmpty": "No billing periods yet",
+  "billingPeriodsEmptyBody": "On the closing date the app drafts the month's invoices so you can check them before sending.",
+  "billingLoadFailed": "Could not load tuition data.",
+  "billingPeriodMonth": "{month}/{year}",
+  "@billingPeriodMonth": {
+    "placeholders": {
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "billingPeriodDates": "Closes {close} · Due {due}",
+  "@billingPeriodDates": {
+    "placeholders": {
+      "close": {
+        "type": "String"
+      },
+      "due": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPeriodDrafting": "In progress",
+  "billingPeriodClosed": "All issued",
+  "billingDraftSummary": "{count, plural, =1{1 draft} other{{count} drafts}} · {amount}",
+  "@billingDraftSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingIssuedSummary": "{count, plural, =1{1 invoice sent} other{{count} invoices sent}} · {amount}",
+  "@billingIssuedSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingVoidSummary": "{count, plural, =1{1 voided invoice} other{{count} voided invoices}}",
+  "@billingVoidSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingIssueAll": "Issue & send all",
+  "billingIssueOne": "Issue & send",
+  "billingIssueConfirmTitle": "Send invoices to parents?",
+  "billingIssueAllConfirmBody": "Issue {count, plural, =1{1 invoice} other{{count} invoices}}, {amount} in total. Parents are notified right away and issued invoices cannot be edited.",
+  "@billingIssueAllConfirmBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingIssueOneConfirmBody": "Issue the invoice for {student}, {amount}. Parents are notified right away and issued invoices cannot be edited.",
+  "@billingIssueOneConfirmBody": {
+    "placeholders": {
+      "student": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingIssued": "{count, plural, =1{1 invoice sent.} other{{count} invoices sent.}}",
+  "@billingIssued": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingIssuedNone": "No invoices needed sending.",
+  "billingIssuedSkippedZero": "{count, plural, =1{1 invoice} other{{count} invoices}} of 0 đ not sent.",
+  "@billingIssuedSkippedZero": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingNoPayableDrafts": "No drafts with an amount left to send.",
+  "billingZeroDraftNote": "{count, plural, =1{1 invoice} other{{count} invoices}} of 0 đ will not be sent.",
+  "@billingZeroDraftNote": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingInvoicesEmpty": "No invoices in this period.",
+  "billingNoSend": "Not sent",
+  "billingHasOverride": "Custom rate",
+  "billingStatusDraft": "Draft",
+  "billingStatusIssued": "Issued",
+  "billingStatusPending": "Awaiting confirmation",
+  "billingStatusPartial": "Partly paid",
+  "billingStatusPaid": "Paid",
+  "billingStatusVoid": "Voided",
+  "billingInvoiceTitle": "Invoice",
+  "billingLinesSessions": "Sessions",
+  "billingLinesOther": "Other items",
+  "billingSessionLine": "{date} · {className}",
+  "@billingSessionLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "className": {
+        "type": "String"
+      }
+    }
+  },
+  "billingSessionCharged": "Charged",
+  "billingSessionNotCharged": "Not charged: {reason}",
+  "@billingSessionNotCharged": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "billingReasonExcused": "excused absence",
+  "billingReasonUnexcused": "unexcused absence",
+  "billingReasonCancelled": "session cancelled",
+  "billingReasonMakeup": "makeup session",
+  "billingReasonOther": "per the class rules",
+  "billingAdjustmentReasonLine": "Reason: {reason}",
+  "@billingAdjustmentReasonLine": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "billingTotal": "Total",
+  "billingClamped": "The adjustment made the total negative, so it is held at 0 đ; the negative part of {amount} is not carried to the next period yet.",
+  "@billingClamped": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingAddAdjustment": "Add adjustment",
+  "billingAdjustTitle": "Adjust invoice",
+  "billingAdjustHint": "Adjustments cannot be deleted yet. If you entered one wrongly, add a line with the opposite sign.",
+  "billingAdjustDecrease": "Discount",
+  "billingAdjustIncrease": "Surcharge",
+  "billingAdjustAmount": "Amount",
+  "billingAdjustDescription": "Description",
+  "billingAdjustReason": "Reason (required)",
+  "billingAdjustSave": "Save adjustment",
+  "billingAdjusted": "Adjustment added.",
+  "billingErrAmount": "Enter an amount above 0 and up to 1.000.000.000 đ.",
+  "billingErrDescription": "Enter a description, up to 200 characters.",
+  "billingErrReason": "Enter a reason, up to 300 characters.",
+  "billingErrImmutable": "This invoice is already issued and cannot be edited. Void it and create a replacement.",
+  "billingVoid": "Void invoice",
+  "billingVoidTitle": "Void this invoice?",
+  "billingVoidBody": "Parents will no longer see the invoice's QR code. A reason is required.",
+  "billingVoidReason": "Reason for voiding",
+  "billingVoidKeep": "Keep it",
+  "billingVoidConfirm": "Void invoice",
+  "billingVoided": "Invoice voided.",
+  "billingVoidedBanner": "Invoice voided. Reason: {reason}",
+  "@billingVoidedBanner": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPayoutMissingTitle": "No payout account",
+  "billingPayoutMissingBody": "Add a payout account so parents know where to send tuition. Come back here afterwards to continue.",
+  "billingPayoutMissingAction": "Add account",
+  "payoutOtpActionTitle": "Verify to continue",
+  "payoutOtpActionBody": "Changing or deleting the primary payout account needs a verification code. We sent it to your email.",
+  "payoutOtpActionConfirm": "Confirm",
+  "billingIssueAllConfirmAction": "Send all"
 }

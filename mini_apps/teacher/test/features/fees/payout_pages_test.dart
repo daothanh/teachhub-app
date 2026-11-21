@@ -7,6 +7,8 @@ import 'package:teacher/features/classes/widgets/read_only_field.dart';
 import 'package:teacher/features/fees/data/fee_repository.dart';
 import 'package:teacher/features/fees/fees_routes.dart';
 
+import 'package:teachhub_shared/teachhub_shared.dart';
+
 import '../classes/pump.dart';
 import 'fake_fee_repository.dart';
 import 'finders.dart';
@@ -114,6 +116,95 @@ void main() {
     await deleteFirst(tester);
     expect(find.textContaining('duy nhất'), findsNothing);
     expect(find.textContaining('gỡ khỏi danh sách'), findsOneWidget);
+  });
+
+  Finder inDialog(String text) =>
+      find.descendant(of: find.byType(AlertDialog), matching: find.text(text));
+
+  Future<void> typeOtp(WidgetTester tester, String code) async {
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(EditableText),
+      ),
+      code,
+    );
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('P1: đặt tài khoản phụ làm chính → gửi mã, hỏi OTP, gửi kèm', (
+    tester,
+  ) async {
+    fees.accounts = [sampleAccount(), sampleAccount(id: 'a2', primary: false)];
+    await open(tester);
+    await tester.tap(find.byIcon(Icons.more_vert).at(1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Đặt làm chính'));
+    await tester.pumpAndSettle();
+    expect(fees.calls, contains('otp'));
+    expect(find.text('Xác thực để tiếp tục'), findsOneWidget);
+    // Chưa đủ 6 số thì chưa xác nhận được.
+    await typeOtp(tester, '123');
+    await tester.tap(inDialog('Xác nhận'));
+    await tester.pumpAndSettle();
+    expect(fees.calls.where((c) => c.startsWith('update')), isEmpty);
+    await typeOtp(tester, '123456');
+    await tester.tap(inDialog('Xác nhận'));
+    await tester.pumpAndSettle();
+    expect(fees.calls, contains('update:a2:primary'));
+    expect(fees.sentOtps.last, '123456');
+  });
+
+  testWidgets('P1: hủy hộp OTP thì không đặt chính', (tester) async {
+    fees.accounts = [sampleAccount(), sampleAccount(id: 'a2', primary: false)];
+    await open(tester);
+    await tester.tap(find.byIcon(Icons.more_vert).at(1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Đặt làm chính'));
+    await tester.pumpAndSettle();
+    await tester.tap(inDialog('Hủy'));
+    await tester.pumpAndSettle();
+    expect(fees.calls.where((c) => c.startsWith('update')), isEmpty);
+  });
+
+  testWidgets('P1: không gửi được mã → báo lỗi, không hỏi OTP', (tester) async {
+    fees.accounts = [sampleAccount(), sampleAccount(id: 'a2', primary: false)];
+    fees.otpError = apiErr(ApiErrorCode.rateLimited);
+    await open(tester);
+    await tester.tap(find.byIcon(Icons.more_vert).at(1));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Đặt làm chính'));
+    await tester.pumpAndSettle();
+    expect(find.text('Xác thực để tiếp tục'), findsNothing);
+    expect(find.byType(SnackBar), findsOneWidget);
+  });
+
+  testWidgets('P1: xóa tài khoản chính khi còn khác → OTP trong body', (
+    tester,
+  ) async {
+    fees.accounts = [sampleAccount(), sampleAccount(id: 'a2', primary: false)];
+    await open(tester);
+    await deleteFirst(tester);
+    await tester.tap(inDialog('Xóa'));
+    await tester.pumpAndSettle();
+    await typeOtp(tester, '654321');
+    await tester.tap(inDialog('Xác nhận'));
+    await tester.pumpAndSettle();
+    expect(fees.calls, contains('delete:a1'));
+    expect(fees.sentOtps.last, '654321');
+  });
+
+  testWidgets('P1: xóa tài khoản phụ hoặc chính duy nhất không cần OTP', (
+    tester,
+  ) async {
+    fees.accounts = [sampleAccount()];
+    await open(tester);
+    await deleteFirst(tester);
+    await tester.tap(inDialog('Xóa'));
+    await tester.pumpAndSettle();
+    expect(find.text('Xác thực để tiếp tục'), findsNothing);
+    expect(fees.calls, contains('delete:a1'));
+    expect(fees.calls, isNot(contains('otp')));
   });
 
   for (final path in [FeesRoutes.payoutAccounts, FeesRoutes.payoutNew]) {
