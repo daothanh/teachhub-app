@@ -158,7 +158,11 @@ class _Body extends StatelessWidget {
         InvoicePaymentsSection(invoice: inv, payments: payments, busy: busy),
         // Bản nháp chưa có lịch nhắc; hóa đơn đã phát hành thì xem được trạng thái nhắc.
         if (inv.status != InvoiceStatus.draft)
-          InvoiceDunningSection(key: ValueKey(inv.id), invoiceId: inv.id),
+          // Đổi trạng thái hoặc số đã thu (ghi thu, hủy thu) thì tải lại khối nhắc nợ.
+          InvoiceDunningSection(
+            key: ValueKey('${inv.id}:${inv.status}:${inv.paidAmount}'),
+            invoiceId: inv.id,
+          ),
         if (inv.status == InvoiceStatus.draft) ...[
           const SizedBox(height: AppSpacing.lg),
           AppButton(

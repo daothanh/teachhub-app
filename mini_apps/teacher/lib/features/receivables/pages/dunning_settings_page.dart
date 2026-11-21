@@ -36,23 +36,57 @@ class _View extends StatelessWidget {
       listener: (context, _) => ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.dunningSaved))),
-      builder: (context, s) => Scaffold(
-        appBar: AppBar(title: Text(l10n.dunningSettingsTitle)),
-        body: switch (s.load) {
-          BillingLoad.loading => const Center(
-            child: CircularProgressIndicator(),
-          ),
-          BillingLoad.failure => AppEmptyState(
-            message: s.error == null
-                ? l10n.billingLoadFailed
-                : billingErrorText(l10n, s.error!),
-            action: AppButton(label: l10n.classesRetry, onPressed: cubit.load),
-          ),
-          BillingLoad.ready => _Body(state: s),
+      builder: (context, s) => PopScope(
+        // Còn thay đổi chưa lưu thì hỏi trước khi thoát.
+        canPop: !s.dirty,
+        onPopInvokedWithResult: (didPop, _) async {
+          if (didPop) return;
+          final nav = Navigator.of(context);
+          final discard = await _confirmDiscard(context);
+          if (discard == true) nav.pop();
         },
+        child: Scaffold(
+          appBar: AppBar(title: Text(l10n.dunningSettingsTitle)),
+          body: switch (s.load) {
+            BillingLoad.loading => const Center(
+              child: CircularProgressIndicator(),
+            ),
+            BillingLoad.failure => AppEmptyState(
+              message: s.error == null
+                  ? l10n.billingLoadFailed
+                  : billingErrorText(l10n, s.error!),
+              action: AppButton(
+                label: l10n.classesRetry,
+                onPressed: cubit.load,
+              ),
+            ),
+            BillingLoad.ready => _Body(state: s),
+          },
+        ),
       ),
     );
   }
+}
+
+Future<bool?> _confirmDiscard(BuildContext context) {
+  final l10n = context.miniAppL10n;
+  return showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(l10n.dunningDiscardTitle),
+      content: Text(l10n.dunningDiscardBody),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: Text(l10n.dunningDiscardKeep),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: Text(l10n.dunningDiscardConfirm),
+        ),
+      ],
+    ),
+  );
 }
 
 class _Body extends StatefulWidget {
@@ -139,6 +173,9 @@ class _BodyState extends State<_Body> {
             FilteringTextInputFormatter.allow(RegExp(r'[-−0-9]')),
           ],
           errorText: _offsetError(l10n, s),
+          onChanged: (_) {
+            if (_notNumber) setState(() => _notNumber = false);
+          },
           onSubmitted: (_) => _add(),
         ),
         const SizedBox(height: AppSpacing.sm),

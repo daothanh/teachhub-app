@@ -1261,5 +1261,53 @@
   "dunningSaved": "Reminder settings saved.",
   "dunningPreviewTitle": "Sample reminder",
   "dunningPreviewFailed": "Could not load the sample.",
-  "dunningPreviewNote": "Sample data, not a real name or amount."
+  "dunningPreviewNote": "Sample data, not a real name or amount.",
+  "dunningStepOther": "Other status",
+  "receivablesAgingLine": "{bucket} · {overdue}",
+  "@receivablesAgingLine": {
+    "placeholders": {
+      "bucket": {
+        "type": "String"
+      },
+      "overdue": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesPaymentMetaCode": "Paid on {date} · {code}",
+  "@receivablesPaymentMetaCode": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "dunningStepLine": "{label} · {status}",
+  "@dunningStepLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesClassAll": "All classes",
+  "receivablesClassFilter": "Class: {name}",
+  "@receivablesClassFilter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesClassPick": "Choose a class",
+  "dunningDiscardTitle": "Discard unsaved changes?",
+  "dunningDiscardBody": "The reminder settings you changed will be lost.",
+  "dunningDiscardConfirm": "Discard",
+  "dunningDiscardKeep": "Keep editing"
 }

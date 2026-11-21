@@ -104,7 +104,10 @@ class _Steps extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
-              '${dunningOffsetLabel(l10n, s.offsetDays)} · ${dunningStepText(l10n, s)}',
+              l10n.dunningStepLine(
+                dunningOffsetLabel(l10n, s.offsetDays),
+                dunningStepText(l10n, s),
+              ),
               style: text.bodySmall,
             ),
           ),

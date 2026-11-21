@@ -126,10 +126,14 @@ class DunningSettingsCubit extends Cubit<DunningSettingsState> {
     }
   }
 
-  void setEnabled(bool v) => emit(state.copyWith(enabled: v));
+  void setEnabled(bool v) {
+    if (state.saving) return;
+    emit(state.copyWith(enabled: v));
+  }
 
   /// Thêm mốc, giữ thứ tự tăng dần.
   void addOffset(int days) {
+    if (state.saving) return;
     final cur = state.offsets;
     final err = days < dunningOffsetMin || days > dunningOffsetMax
         ? OffsetError.range
@@ -143,9 +147,12 @@ class DunningSettingsCubit extends Cubit<DunningSettingsState> {
   }
 
   void removeOffset(int days) {
+    if (state.saving) return;
     if (state.offsets.length <= 1) {
       return emit(state.copyWith(offsetError: OffsetError.tooFew));
     }
+    // Xem trước đang tải của mốc vừa xóa không được hiện lại khi về tới.
+    if (state.preview?.offsetDays == days) _previewSeq++;
     emit(
       state.copyWith(
         offsets: [...state.offsets]..remove(days),
@@ -157,8 +164,11 @@ class DunningSettingsCubit extends Cubit<DunningSettingsState> {
   }
 
   /// Đưa mốc về mặc định `-1, 0, 3, 7`.
-  void resetOffsets() =>
-      emit(state.copyWith(offsets: defaultDunningOffsets, preview: null));
+  void resetOffsets() {
+    if (state.saving) return;
+    _previewSeq++;
+    emit(state.copyWith(offsets: defaultDunningOffsets, preview: null));
+  }
 
   Future<void> save() async {
     final s = state;

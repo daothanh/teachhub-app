@@ -26,6 +26,7 @@ String dunningStepText(MiniAppLocalizations l10n, DunningStep s) =>
         formatIsoDateTime(s.scheduledFor),
       ),
       DunningStepStatus.cancelled => l10n.dunningStepCancelled,
+      DunningStepStatus.unknown => l10n.dunningStepOther,
     };
 
 String dunningReasonText(MiniAppLocalizations l10n, DunningDisabledReason r) =>

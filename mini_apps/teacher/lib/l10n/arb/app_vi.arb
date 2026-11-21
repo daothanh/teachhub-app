@@ -1261,5 +1261,53 @@
   "dunningSaved": "Đã lưu cài đặt nhắc nợ.",
   "dunningPreviewTitle": "Mẫu tin nhắc",
   "dunningPreviewFailed": "Không tải được mẫu tin.",
-  "dunningPreviewNote": "Dữ liệu mẫu, không phải tên hay số tiền thật."
+  "dunningPreviewNote": "Dữ liệu mẫu, không phải tên hay số tiền thật.",
+  "dunningStepOther": "Trạng thái khác",
+  "receivablesAgingLine": "{bucket} · {overdue}",
+  "@receivablesAgingLine": {
+    "placeholders": {
+      "bucket": {
+        "type": "String"
+      },
+      "overdue": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesPaymentMetaCode": "Ngày thu {date} · {code}",
+  "@receivablesPaymentMetaCode": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "dunningStepLine": "{label} · {status}",
+  "@dunningStepLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesClassAll": "Tất cả lớp",
+  "receivablesClassFilter": "Lớp: {name}",
+  "@receivablesClassFilter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesClassPick": "Chọn lớp",
+  "dunningDiscardTitle": "Bỏ thay đổi chưa lưu?",
+  "dunningDiscardBody": "Cài đặt nhắc nợ bạn vừa sửa sẽ mất.",
+  "dunningDiscardConfirm": "Bỏ thay đổi",
+  "dunningDiscardKeep": "Ở lại"
 }

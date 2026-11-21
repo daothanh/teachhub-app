@@ -9,11 +9,13 @@ import 'receivable_models.dart';
 /// idempotent theo giá trị nên hợp đồng không đòi `Idempotency-Key`.
 abstract class ReceivablesRepository {
   /// `GET /receivables`: một trang học viên còn nợ kèm tổng theo nhóm.
-  /// [agingBucket] chỉ lọc danh sách, tổng theo nhóm không bị lọc.
+  /// [agingBucket] chỉ lọc danh sách, tổng theo nhóm không bị lọc; [classId]
+  /// chỉ học viên đang học lớp đó.
   Future<ReceivablePage> list({
     int page = 1,
     int pageSize = 20,
     AgingBucket? agingBucket,
+    String? classId,
     String? query,
     ReceivableSort sort = ReceivableSort.amount,
     bool ascending = false,
@@ -55,6 +57,7 @@ class DioReceivablesRepository implements ReceivablesRepository {
     int page = 1,
     int pageSize = 20,
     AgingBucket? agingBucket,
+    String? classId,
     String? query,
     ReceivableSort sort = ReceivableSort.amount,
     bool ascending = false,
@@ -65,6 +68,7 @@ class DioReceivablesRepository implements ReceivablesRepository {
         'page': page,
         'pageSize': pageSize,
         'agingBucket': ?agingBucket?.wire,
+        'classId': ?classId,
         'q': ?query,
         'sortField': sort.wire,
         'sortOrder': ascending ? 'asc' : 'desc',

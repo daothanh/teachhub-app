@@ -96,10 +96,16 @@ StudentReceivableHistory sampleHistory({
 /// Các `*Error` ném một lần rồi tự xóa (mô phỏng lỗi chập chờn).
 class FakeReceivablesRepository implements ReceivablesRepository {
   final calls = <String>[];
-  final listArgs = <({int page, AgingBucket? bucket, String? q, bool asc})>[];
+  final listArgs =
+      <
+        ({int page, AgingBucket? bucket, String? classId, String? q, bool asc})
+      >[];
   final putBodies = <DunningSettings>[];
 
   List<ReceivableRow> rows = [];
+
+  /// Lớp của từng học viên (chỉ cho bộ lọc `classId`).
+  final studentClass = <String, String>{};
   final histories = <String, StudentReceivableHistory>{};
   DunningSettings settings = const DunningSettings(
     enabled: true,
@@ -118,18 +124,34 @@ class FakeReceivablesRepository implements ReceivablesRepository {
   /// Giữ `list` đang chạy tới khi test hoàn tất cổng này.
   Completer<void>? listGate;
 
+  /// Cổng riêng theo số trang (chỉ trang đó bị giữ).
+  final pageGates = <int, Completer<void>>{};
+
+  /// Giữ `history`, `preview`, `putSettings` đang chạy (đọc dữ liệu trước cổng).
+  Completer<void>? historyGate;
+  Completer<void>? previewGate;
+  Completer<void>? putGate;
+
   @override
   Future<ReceivablePage> list({
     int page = 1,
     int pageSize = 20,
     AgingBucket? agingBucket,
+    String? classId,
     String? query,
     ReceivableSort sort = ReceivableSort.amount,
     bool ascending = false,
   }) async {
     calls.add('list:$page');
-    listArgs.add((page: page, bucket: agingBucket, q: query, asc: ascending));
+    listArgs.add((
+      page: page,
+      bucket: agingBucket,
+      classId: classId,
+      q: query,
+      asc: ascending,
+    ));
     await listGate?.future;
+    await pageGates[page]?.future;
     if (listError != null) {
       final e = listError!;
       listError = null;
@@ -137,8 +159,10 @@ class FakeReceivablesRepository implements ReceivablesRepository {
     }
     final byQuery = [
       for (final r in rows)
-        if (query == null ||
-            r.studentName.toLowerCase().contains(query.toLowerCase()))
+        if ((query == null ||
+                r.studentName.toLowerCase().contains(query.toLowerCase())) &&
+            // Tổng theo nhóm tính theo đúng lớp và từ khóa đang áp.
+            (classId == null || studentClass[r.studentId] == classId))
           r,
     ];
     final filtered =
@@ -177,7 +201,9 @@ class FakeReceivablesRepository implements ReceivablesRepository {
       historyError = null;
       throw e;
     }
-    return histories[studentId] ?? sampleHistory(id: studentId);
+    final h = histories[studentId] ?? sampleHistory(id: studentId);
+    await historyGate?.future;
+    return h;
   }
 
   @override
@@ -195,6 +221,7 @@ class FakeReceivablesRepository implements ReceivablesRepository {
   Future<DunningSettings> putSettings(DunningSettings s) async {
     calls.add('putSettings');
     putBodies.add(s);
+    await putGate?.future;
     if (putError != null) {
       final e = putError!;
       putError = null;
@@ -206,6 +233,7 @@ class FakeReceivablesRepository implements ReceivablesRepository {
   @override
   Future<DunningPreview> preview(int offsetDays) async {
     calls.add('preview:$offsetDays');
+    await previewGate?.future;
     if (previewError != null) {
       final e = previewError!;
       previewError = null;

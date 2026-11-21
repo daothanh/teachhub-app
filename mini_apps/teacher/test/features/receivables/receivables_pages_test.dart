@@ -1,18 +1,23 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:teacher/features/billing/billing_routes.dart';
 import 'package:teacher/features/billing/data/billing_models.dart';
 import 'package:teacher/features/billing/data/billing_repository.dart';
+import 'package:teacher/features/billing/pages/invoice_page.dart'
+    show InvoicePage;
 import 'package:teacher/features/classes/classes_routes.dart';
 import 'package:teacher/features/classes/data/class_models.dart';
 import 'package:teacher/features/classes/data/classes_repository.dart';
-import 'package:teacher/features/billing/pages/invoice_page.dart'
-    show InvoicePage;
+import 'package:teacher/features/receivables/cubit/receivables_cubit.dart';
 import 'package:teacher/features/receivables/data/receivable_models.dart';
 import 'package:teacher/features/receivables/data/receivables_repository.dart';
 import 'package:teacher/features/receivables/receivables_routes.dart';
+import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../billing/fake_billing_repository.dart';
@@ -173,6 +178,55 @@ void main() {
     testWidgets('không ai còn nợ: trạng thái rỗng', (tester) async {
       await open(tester, ReceivablesRoutes.list);
       expect(find.text('Không ai còn nợ'), findsOneWidget);
+    });
+
+    testWidgets('lọc theo lớp: chọn lớp trong danh sách, chọn lại tất cả', (
+      tester,
+    ) async {
+      classes.active = [
+        sampleClass(id: 'c1', name: 'Toán 9A'),
+        sampleClass(id: 'c2', name: 'Lý 9A'),
+      ];
+      repo.rows = rows;
+      repo.studentClass.addAll({'a': 'c1', 'b': 'c2', 'c': 'c2'});
+      await open(tester, ReceivablesRoutes.list);
+      await tester.tap(find.text('Lớp: Tất cả lớp'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Lý 9A'));
+      await tester.pumpAndSettle();
+      expect(repo.listArgs.last.classId, 'c2');
+      expect(find.text('Lớp: Lý 9A'), findsOneWidget);
+      expect(find.text('Nguyễn Minh Anh'), findsNothing);
+      expect(find.text('Lê Chi'), findsOneWidget);
+      await tester.tap(find.text('Lớp: Lý 9A'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Tất cả lớp').last);
+      await tester.pumpAndSettle();
+      expect(find.text('Nguyễn Minh Anh'), findsOneWidget);
+    });
+
+    testWidgets(
+      'không tải được danh sách lớp: ẩn bộ lọc lớp, danh sách vẫn dùng',
+      (tester) async {
+        classes.listError = const ApiException.network();
+        repo.rows = rows;
+        await open(tester, ReceivablesRoutes.list);
+        expect(find.textContaining('Lớp:'), findsNothing);
+        expect(find.text('Trần Bảo Bình'), findsOneWidget);
+      },
+    );
+
+    testWidgets('làm mới lỗi: giữ danh sách và báo nhẹ', (tester) async {
+      repo.rows = rows;
+      await open(tester, ReceivablesRoutes.list);
+      repo.listError = const ApiException.network();
+      final cubit = BlocProvider.of<ReceivablesCubit>(
+        tester.element(find.byType(ListView)),
+      );
+      await cubit.refresh();
+      await tester.pumpAndSettle();
+      expect(find.byType(SnackBar), findsOneWidget);
+      expect(find.text('Trần Bảo Bình'), findsOneWidget);
     });
 
     testWidgets('lọc không ra ai: báo khớp bộ lọc, không báo hết nợ', (
@@ -450,6 +504,51 @@ void main() {
       expect(find.text('Nhập một số nguyên.'), findsOneWidget);
     });
 
+    testWidgets('xóa lỗi "không phải số" khi sửa ô nhập', (tester) async {
+      await open(tester, ReceivablesRoutes.dunningSettings);
+      await tester.enterText(find.byType(TextField), '-');
+      await tester.tap(find.text('Thêm'));
+      await tester.pumpAndSettle();
+      expect(find.text('Nhập một số nguyên.'), findsOneWidget);
+      await tester.enterText(find.byType(TextField), '-1');
+      await tester.pumpAndSettle();
+      expect(find.text('Nhập một số nguyên.'), findsNothing);
+    });
+
+    testWidgets(
+      'thoát khi còn thay đổi chưa lưu: hỏi; ở lại giữ nguyên, bỏ thì thoát',
+      (tester) async {
+        await open(tester, '/');
+        final router = GoRouter.of(tester.element(find.byType(Scaffold)));
+        unawaited(router.push(ReceivablesRoutes.dunningSettings));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('Xóa mốc: Sau hạn 7 ngày'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byType(BackButton));
+        await tester.pumpAndSettle();
+        expect(find.text('Bỏ thay đổi chưa lưu?'), findsOneWidget);
+        await tester.tap(find.text('Ở lại'));
+        await tester.pumpAndSettle();
+        expect(find.text('Cài đặt nhắc nợ'), findsWidgets);
+        await tester.tap(find.byType(BackButton));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Bỏ thay đổi'));
+        await tester.pumpAndSettle();
+        expect(find.text('Mốc nhắc'), findsNothing);
+      },
+    );
+
+    testWidgets('chưa sửa gì thì thoát thẳng, không hỏi', (tester) async {
+      await open(tester, '/');
+      final router = GoRouter.of(tester.element(find.byType(Scaffold)));
+      unawaited(router.push(ReceivablesRoutes.dunningSettings));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(find.text('Bỏ thay đổi chưa lưu?'), findsNothing);
+      expect(find.text('Mốc nhắc'), findsNothing);
+    });
+
     testWidgets('xóa mốc; đặt lại mặc định', (tester) async {
       await open(tester, ReceivablesRoutes.dunningSettings);
       await tester.tap(find.byTooltip('Xóa mốc: Sau hạn 7 ngày'));
@@ -543,6 +642,31 @@ void main() {
       await openInvoice(tester);
       expect(find.text('Đã tắt nhắc nợ cho học viên này.'), findsOneWidget);
       expect(find.text('Chưa nhắc lần nào.'), findsOneWidget);
+      expect(find.textContaining('Lần nhắc tới'), findsNothing);
+    });
+
+    testWidgets('ghi thu trên cùng trang: khối nhắc nợ tải lại', (
+      tester,
+    ) async {
+      await openInvoice(tester);
+      expect(repo.calls.where((c) => c == 'invoiceDunning:i1'), hasLength(1));
+      final full = find.widgetWithText(AppButton, 'Đã thu đủ');
+      await tester.ensureVisible(full);
+      await tester.tap(full);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Xác nhận đã thu'));
+      await tester.pumpAndSettle();
+      expect(repo.calls.where((c) => c == 'invoiceDunning:i1'), hasLength(2));
+    });
+
+    testWidgets('mốc có trạng thái lạ: nhãn chung', (tester) async {
+      repo.invoiceDunnings['i1'] = InvoiceDunning(
+        enabled: true,
+        disabledReason: null,
+        steps: [sampleStep(status: DunningStepStatus.unknown, sentAt: null)],
+      );
+      await openInvoice(tester);
+      expect(find.textContaining('Trạng thái khác'), findsOneWidget);
       expect(find.textContaining('Lần nhắc tới'), findsNothing);
     });
 

@@ -194,13 +194,16 @@ class _PaymentTile extends StatelessWidget {
             ),
           ),
           Text(
-            [
-              l10n.receivablesPaymentDate(formatIsoDate(p.paidOn)),
-              if (p.invoiceCode != null) p.invoiceCode!,
-              if (p.voided) l10n.receivablesPaymentVoided,
-            ].join(' · '),
+            p.invoiceCode == null
+                ? l10n.receivablesPaymentDate(formatIsoDate(p.paidOn))
+                : l10n.receivablesPaymentMetaCode(
+                    formatIsoDate(p.paidOn),
+                    p.invoiceCode!,
+                  ),
             style: text.bodySmall,
           ),
+          if (p.voided)
+            Text(l10n.receivablesPaymentVoided, style: text.bodySmall),
         ],
       ),
     );

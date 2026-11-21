@@ -1938,7 +1938,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   }
 
   @override
-  String get dunningReasonTenant => 'Bạn đang tắt nhắc nợ cho cả lớp học.';
+  String get dunningReasonTenant => 'Bạn đang tắt nhắc nợ trong cài đặt chung.';
 
   @override
   String get dunningReasonStudent => 'Đã tắt nhắc nợ cho học viên này.';
@@ -2014,4 +2014,45 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   @override
   String get dunningPreviewNote =>
       'Dữ liệu mẫu, không phải tên hay số tiền thật.';
+
+  @override
+  String get dunningStepOther => 'Trạng thái khác';
+
+  @override
+  String receivablesAgingLine(String bucket, String overdue) {
+    return '$bucket · $overdue';
+  }
+
+  @override
+  String receivablesPaymentMetaCode(String date, String code) {
+    return 'Ngày thu $date · $code';
+  }
+
+  @override
+  String dunningStepLine(String label, String status) {
+    return '$label · $status';
+  }
+
+  @override
+  String get receivablesClassAll => 'Tất cả lớp';
+
+  @override
+  String receivablesClassFilter(String name) {
+    return 'Lớp: $name';
+  }
+
+  @override
+  String get receivablesClassPick => 'Chọn lớp';
+
+  @override
+  String get dunningDiscardTitle => 'Bỏ thay đổi chưa lưu?';
+
+  @override
+  String get dunningDiscardBody => 'Cài đặt nhắc nợ bạn vừa sửa sẽ mất.';
+
+  @override
+  String get dunningDiscardConfirm => 'Bỏ thay đổi';
+
+  @override
+  String get dunningDiscardKeep => 'Ở lại';
 }

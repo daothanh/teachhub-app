@@ -234,10 +234,14 @@ void main() {
         .cast<String>();
     expect(sort, ReceivableSort.values.map((s) => s.wire));
     final step = (_schema('DunningStepStatus')['enum'] as List).cast<String>();
+    // `unknown` chỉ dành cho giá trị lạ, không có trong hợp đồng.
     expect(
       step.map(DunningStepStatus.fromWire).toSet(),
-      DunningStepStatus.values.toSet(),
+      DunningStepStatus.values.toSet()..remove(DunningStepStatus.unknown),
     );
+    expect(DunningStepStatus.fromWire('paused'), DunningStepStatus.unknown);
+    expect(DunningStepStatus.fromWire(null), DunningStepStatus.unknown);
+    expect(AgingBucket.fromWire('120+'), AgingBucket.upTo30);
     final reason =
         ((_schema('InvoiceDunning')['properties'] as Map)['disabledReason']
                 as Map)['enum']
@@ -276,6 +280,7 @@ void main() {
       await repo.list(
         page: 2,
         agingBucket: AgingBucket.over60,
+        classId: 'cls1',
         query: 'minh',
         ascending: true,
       );
@@ -308,6 +313,7 @@ void main() {
         'page': 2,
         'pageSize': 20,
         'agingBucket': 'over-60',
+        'classId': 'cls1',
         'q': 'minh',
         'sortField': 'amount',
         'sortOrder': 'asc',

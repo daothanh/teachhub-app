@@ -3343,7 +3343,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @dunningReasonTenant.
   ///
   /// In vi, this message translates to:
-  /// **'Bạn đang tắt nhắc nợ cho cả lớp học.'**
+  /// **'Bạn đang tắt nhắc nợ trong cài đặt chung.'**
   String get dunningReasonTenant;
 
   /// No description provided for @dunningReasonStudent.
@@ -3489,6 +3489,72 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Dữ liệu mẫu, không phải tên hay số tiền thật.'**
   String get dunningPreviewNote;
+
+  /// No description provided for @dunningStepOther.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trạng thái khác'**
+  String get dunningStepOther;
+
+  /// No description provided for @receivablesAgingLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{bucket} · {overdue}'**
+  String receivablesAgingLine(String bucket, String overdue);
+
+  /// No description provided for @receivablesPaymentMetaCode.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày thu {date} · {code}'**
+  String receivablesPaymentMetaCode(String date, String code);
+
+  /// No description provided for @dunningStepLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{label} · {status}'**
+  String dunningStepLine(String label, String status);
+
+  /// No description provided for @receivablesClassAll.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tất cả lớp'**
+  String get receivablesClassAll;
+
+  /// No description provided for @receivablesClassFilter.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp: {name}'**
+  String receivablesClassFilter(String name);
+
+  /// No description provided for @receivablesClassPick.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn lớp'**
+  String get receivablesClassPick;
+
+  /// No description provided for @dunningDiscardTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ thay đổi chưa lưu?'**
+  String get dunningDiscardTitle;
+
+  /// No description provided for @dunningDiscardBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cài đặt nhắc nợ bạn vừa sửa sẽ mất.'**
+  String get dunningDiscardBody;
+
+  /// No description provided for @dunningDiscardConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bỏ thay đổi'**
+  String get dunningDiscardConfirm;
+
+  /// No description provided for @dunningDiscardKeep.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ở lại'**
+  String get dunningDiscardKeep;
 }
 
 class _MiniAppLocalizationsDelegate

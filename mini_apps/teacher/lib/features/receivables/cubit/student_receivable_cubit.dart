@@ -34,23 +34,25 @@ class StudentReceivableCubit extends Cubit<StudentReceivableState> {
     : super(const StudentReceivableState());
   final ReceivablesRepository _repo;
   final String studentId;
+  int _seq = 0;
 
   Future<void> load() async {
     if (isClosed) return;
     emit(const StudentReceivableState());
-    await _fetch();
+    await _fetch(++_seq);
   }
 
   /// Quay lại màn (đã ghi thu ở chi tiết hóa đơn): giữ dữ liệu cũ tới khi có mới.
   Future<void> refresh() async {
     if (state.load != BillingLoad.ready) return load();
-    await _fetch();
+    await _fetch(++_seq);
   }
 
-  Future<void> _fetch() async {
+  /// Phản hồi của lần tải cũ (đã có lần tải mới hơn) bị bỏ.
+  Future<void> _fetch(int seq) async {
     try {
       final h = await _repo.history(studentId);
-      if (isClosed) return;
+      if (isClosed || seq != _seq) return;
       emit(
         StudentReceivableState(
           load: BillingLoad.ready,
@@ -59,7 +61,7 @@ class StudentReceivableCubit extends Cubit<StudentReceivableState> {
         ),
       );
     } on ApiException catch (e) {
-      if (isClosed || state.load == BillingLoad.ready) return;
+      if (isClosed || seq != _seq || state.load == BillingLoad.ready) return;
       emit(StudentReceivableState(load: BillingLoad.failure, error: e));
     }
   }

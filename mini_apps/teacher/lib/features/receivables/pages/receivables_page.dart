@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
+import 'package:teachhub_shared/teachhub_shared.dart' show ApiException;
 
 import '../../../l10n/l10n.dart';
 import '../../billing/cubit/billing_periods_cubit.dart' show BillingLoad;
 import '../../billing/widgets/billing_error_text.dart';
+import '../../classes/data/class_models.dart' show TeachClass;
+import '../../classes/data/classes_repository.dart';
 import '../../fees/data/fee_models.dart' show formatVnd;
 import '../cubit/receivables_cubit.dart';
 import '../data/receivable_models.dart';
@@ -18,19 +21,23 @@ import '../widgets/dunning_labels.dart';
 /// T11: công nợ (US-8.3 AC1–AC2) — học viên còn nợ, tổng theo nhóm tuổi nợ,
 /// lọc theo nhóm, tìm theo tên, sắp theo số nợ, cuộn tải thêm.
 class ReceivablesPage extends StatelessWidget {
-  const ReceivablesPage({super.key, this.repository});
+  const ReceivablesPage({super.key, this.repository, this.classes});
   final ReceivablesRepository? repository;
+
+  /// Nguồn danh sách lớp cho bộ lọc lớp.
+  final ClassesRepository? classes;
 
   @override
   Widget build(BuildContext context) => BlocProvider(
     create: (_) =>
         ReceivablesCubit(repository ?? receivablesRepository())..load(),
-    child: const _View(),
+    child: _View(classes: classes),
   );
 }
 
 class _View extends StatelessWidget {
-  const _View();
+  const _View({this.classes});
+  final ClassesRepository? classes;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +54,12 @@ class _View extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<ReceivablesCubit, ReceivablesState>(
+      body: BlocConsumer<ReceivablesCubit, ReceivablesState>(
+        listenWhen: (a, b) =>
+            b.refreshError != null && a.refreshError != b.refreshError,
+        listener: (context, s) => ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(billingErrorText(l10n, s.refreshError!))),
+        ),
         builder: (context, s) => RefreshIndicator(
           onRefresh: cubit.refresh,
           // Một ListView cho mọi trạng thái: ô tìm kiếm không mất tiêu điểm khi
@@ -59,7 +71,12 @@ class _View extends StatelessWidget {
                 ? 1 + s.items.length + (s.hasMore ? 1 : 0)
                 : 2,
             itemBuilder: (context, i) {
-              if (i == 0) return const _Filters(key: ValueKey('filters'));
+              if (i == 0) {
+                return _Filters(
+                  key: const ValueKey('filters'),
+                  classes: classes,
+                );
+              }
               if (s.load != BillingLoad.ready || s.items.isEmpty) {
                 return _Status(state: s);
               }
@@ -78,7 +95,8 @@ class _View extends StatelessWidget {
 }
 
 class _Filters extends StatefulWidget {
-  const _Filters({super.key});
+  const _Filters({super.key, this.classes});
+  final ClassesRepository? classes;
 
   @override
   State<_Filters> createState() => _FiltersState();
@@ -87,6 +105,35 @@ class _Filters extends StatefulWidget {
 class _FiltersState extends State<_Filters> {
   final _query = TextEditingController();
   Timer? _debounce;
+
+  /// Lớp đang mở để chọn lọc; chỉ trang đầu (shortcut: tenant nhiều hơn một
+  /// trang lớp thì chọn lớp ngoài trang đầu chưa được, nâng lên khi cần).
+  List<TeachClass> _classes = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadClasses();
+  }
+
+  Future<void> _loadClasses() async {
+    try {
+      final r = await (widget.classes ?? classesRepository()).list();
+      if (mounted) setState(() => _classes = r.items);
+    } on ApiException {
+      // Không tải được lớp thì ẩn bộ lọc lớp, danh sách vẫn dùng được.
+    }
+  }
+
+  Future<void> _pickClass() async {
+    final cubit = context.read<ReceivablesCubit>();
+    final picked = await showModalBottomSheet<({String? id})>(
+      context: context,
+      useSafeArea: true,
+      builder: (ctx) => _ClassSheet(classes: _classes),
+    );
+    if (picked != null) await cubit.setClass(picked.id);
+  }
 
   @override
   void dispose() {
@@ -150,19 +197,66 @@ class _FiltersState extends State<_Filters> {
             ],
           ),
         ],
-        Align(
-          alignment: AlignmentDirectional.centerEnd,
-          child: TextButton.icon(
-            onPressed: cubit.toggleSort,
-            icon: Icon(
-              s.ascending ? Icons.arrow_upward : Icons.arrow_downward,
-              size: 18,
+        Wrap(
+          spacing: AppSpacing.sm,
+          children: [
+            if (_classes.isNotEmpty)
+              TextButton.icon(
+                onPressed: _pickClass,
+                icon: const Icon(Icons.class_outlined, size: 18),
+                label: Text(
+                  l10n.receivablesClassFilter(
+                    _classes
+                            .where((c) => c.id == s.classId)
+                            .map((c) => c.name)
+                            .firstOrNull ??
+                        l10n.receivablesClassAll,
+                  ),
+                ),
+              ),
+            TextButton.icon(
+              onPressed: cubit.toggleSort,
+              icon: Icon(
+                s.ascending ? Icons.arrow_upward : Icons.arrow_downward,
+                size: 18,
+              ),
+              label: Text(
+                s.ascending
+                    ? l10n.receivablesSortAsc
+                    : l10n.receivablesSortDesc,
+              ),
             ),
-            label: Text(
-              s.ascending ? l10n.receivablesSortAsc : l10n.receivablesSortDesc,
-            ),
-          ),
+          ],
         ),
+      ],
+    );
+  }
+}
+
+class _ClassSheet extends StatelessWidget {
+  const _ClassSheet({required this.classes});
+  final List<TeachClass> classes;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    return ListView(
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      children: [
+        Text(
+          l10n.receivablesClassPick,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        ListTile(
+          title: Text(l10n.receivablesClassAll),
+          onTap: () => Navigator.pop(context, (id: null)),
+        ),
+        for (final c in classes)
+          ListTile(
+            title: Text(c.name),
+            onTap: () => Navigator.pop(context, (id: c.id)),
+          ),
       ],
     );
   }
@@ -242,8 +336,10 @@ class _RowCard extends StatelessWidget {
                       style: text.bodySmall,
                     ),
                     Text(
-                      '${agingBucketLabel(l10n, r.agingBucket)} · '
-                      '${l10n.receivablesOverdue(r.overdueDays)}',
+                      l10n.receivablesAgingLine(
+                        agingBucketLabel(l10n, r.agingBucket),
+                        l10n.receivablesOverdue(r.overdueDays),
+                      ),
                       style: text.bodySmall?.copyWith(
                         color: r.agingBucket == AgingBucket.over60
                             ? scheme.error

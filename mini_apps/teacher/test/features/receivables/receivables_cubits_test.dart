@@ -387,4 +387,202 @@ void main() {
       expect(c.state.load, BillingLoad.ready);
     });
   });
+
+  group('ReceivablesCubit: chạy chồng nhau', () {
+    List<ReceivableRow> many(int n) => [
+      for (var i = 0; i < n; i++)
+        sampleRow(id: 's$i', name: 'Học viên $i', amount: 1000000 + i * 1000),
+    ];
+
+    test('loadMore đang bay rồi refresh: trang 2 cũ không nối vào', () async {
+      repo.rows = many(25);
+      final c = ReceivablesCubit(repo);
+      await c.load();
+      final gate = repo.pageGates[2] = Completer<void>();
+      final more = c.loadMore();
+      expect(c.state.loadingMore, isTrue);
+      await c.refresh();
+      // Làm mới đã bỏ lần tải thêm: cờ không kẹt.
+      expect(c.state.loadingMore, isFalse);
+      repo.pageGates.remove(2);
+      gate.complete();
+      await more;
+      expect(c.state.items, hasLength(20));
+      expect(c.state.page, 1);
+      expect(c.state.loadingMore, isFalse);
+    });
+
+    test(
+      'refresh lỗi lúc loadMore đang bay: không kẹt loadingMore, báo nhẹ',
+      () async {
+        repo.rows = many(25);
+        final c = ReceivablesCubit(repo);
+        await c.load();
+        final gate = repo.pageGates[2] = Completer<void>();
+        final more = c.loadMore();
+        repo.listError = const ApiException.network();
+        await c.refresh();
+        expect(c.state.loadingMore, isFalse);
+        expect(c.state.moreFailed, isFalse);
+        expect(c.state.refreshError, isNotNull);
+        expect(c.state.items, hasLength(20));
+        repo.pageGates.remove(2);
+        gate.complete();
+        await more;
+        expect(c.state.loadingMore, isFalse);
+        expect(c.state.items, hasLength(20));
+      },
+    );
+
+    test('đang refresh thì loadMore không chạy', () async {
+      repo.rows = many(25);
+      final c = ReceivablesCubit(repo);
+      await c.load();
+      final gate = repo.pageGates[1] = Completer<void>();
+      final refresh = c.refresh();
+      await c.loadMore();
+      expect(repo.calls.where((x) => x == 'list:2'), isEmpty);
+      repo.pageGates.remove(1);
+      gate.complete();
+      await refresh;
+      expect(c.state.items, hasLength(20));
+    });
+
+    test(
+      'đổi lọc lúc loadMore đang bay: kết quả lọc mới, không lẫn trang cũ',
+      () async {
+        repo.rows = [
+          ...many(25),
+          sampleRow(id: 'z', amount: 5, bucket: AgingBucket.over60),
+        ];
+        final c = ReceivablesCubit(repo);
+        await c.load();
+        final gate = repo.pageGates[2] = Completer<void>();
+        final more = c.loadMore();
+        await c.setBucket(AgingBucket.over60);
+        repo.pageGates.remove(2);
+        gate.complete();
+        await more;
+        expect(c.state.items.map((r) => r.studentId), ['z']);
+        expect(c.state.loadingMore, isFalse);
+        expect(c.state.bucket, AgingBucket.over60);
+      },
+    );
+
+    test('lọc theo lớp: gửi classId, tổng theo đúng lớp', () async {
+      repo.rows = [
+        sampleRow(id: 'a', amount: 100),
+        sampleRow(id: 'b', amount: 200),
+      ];
+      repo.studentClass.addAll({'a': 'c1', 'b': 'c2'});
+      final c = ReceivablesCubit(repo);
+      await c.load();
+      await c.setClass('c2');
+      expect(repo.listArgs.last.classId, 'c2');
+      expect(c.state.items.map((r) => r.studentId), ['b']);
+      expect(c.state.totalAmount, 200);
+      expect(c.state.unfiltered, isFalse);
+      await c.setClass(null);
+      expect(c.state.items, hasLength(2));
+    });
+
+    test(
+      'gõ 1 ký tự không gọi lại API; chỉ khi từ khóa hiệu lực đổi',
+      () async {
+        repo.rows = [
+          sampleRow(id: 'a', name: 'An'),
+          sampleRow(id: 'b', name: 'Bình'),
+        ];
+        final c = ReceivablesCubit(repo);
+        await c.load();
+        await c.setQuery('b');
+        expect(repo.calls, ['list:1']);
+        await c.setQuery('bì');
+        expect(repo.calls, ['list:1', 'list:1']);
+        await c.setQuery('bìn');
+        await c.setQuery('b');
+        expect(repo.listArgs.last.q, isNull);
+        expect(c.state.items, hasLength(2));
+      },
+    );
+  });
+
+  group('cubit: các nit an toàn', () {
+    test('StudentReceivableCubit: phản hồi refresh cũ bị bỏ', () async {
+      repo.histories['s1'] = sampleHistory(name: 'Cũ');
+      final c = StudentReceivableCubit(repo, 's1');
+      await c.load();
+      final gate = repo.historyGate = Completer<void>();
+      final stale = c.refresh();
+      repo.historyGate = null;
+      repo.histories['s1'] = sampleHistory(name: 'Mới');
+      await c.refresh();
+      gate.complete();
+      await stale;
+      expect(c.state.history!.studentName, 'Mới');
+    });
+
+    test('xóa mốc đang xem trước: preview đến muộn không hiện lại', () async {
+      final c = DunningSettingsCubit(repo);
+      await c.load();
+      final gate = repo.previewGate = Completer<void>();
+      final shown = c.showPreview(3);
+      c.removeOffset(3);
+      expect(c.state.preview, isNull);
+      repo.previewGate = null;
+      gate.complete();
+      await shown;
+      expect(c.state.preview, isNull);
+    });
+
+    test('đặt lại mặc định hủy preview đang chờ', () async {
+      final c = DunningSettingsCubit(repo);
+      await c.load();
+      final gate = repo.previewGate = Completer<void>();
+      final shown = c.showPreview(7);
+      c.resetOffsets();
+      repo.previewGate = null;
+      gate.complete();
+      await shown;
+      expect(c.state.preview, isNull);
+    });
+
+    test('đang lưu thì khóa thêm, xóa, đặt lại mốc và công tắc', () async {
+      final c = DunningSettingsCubit(repo);
+      await c.load();
+      c.addOffset(14);
+      final gate = repo.putGate = Completer<void>();
+      final saving = c.save();
+      expect(c.state.saving, isTrue);
+      c
+        ..addOffset(20)
+        ..removeOffset(0)
+        ..resetOffsets()
+        ..setEnabled(false);
+      expect(c.state.offsets, [-1, 0, 3, 7, 14]);
+      expect(c.state.enabled, isTrue);
+      repo.putGate = null;
+      gate.complete();
+      await saving;
+      expect(repo.putBodies.single.offsetsDays, [-1, 0, 3, 7, 14]);
+    });
+
+    test('mốc nhắc lạ không tính là lần nhắc tới', () {
+      final d = InvoiceDunning.fromJson({
+        'enabled': true,
+        'disabledReason': null,
+        'steps': [
+          {
+            'offsetDays': 0,
+            'scheduledFor': '2027-01-10T09:00:00+07:00',
+            'status': 'snoozed',
+            'sentAt': null,
+          },
+        ],
+      });
+      expect(d.steps.single.status, DunningStepStatus.unknown);
+      expect(d.next, isNull);
+      expect(d.lastSent, isNull);
+    });
+  });
 }

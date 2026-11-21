@@ -1964,7 +1964,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get dunningReasonTenant =>
-      'You have turned reminders off for the whole centre.';
+      'Reminders are turned off in your general settings.';
 
   @override
   String get dunningReasonStudent => 'Reminders are off for this student.';
@@ -2039,4 +2039,46 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get dunningPreviewNote => 'Sample data, not a real name or amount.';
+
+  @override
+  String get dunningStepOther => 'Other status';
+
+  @override
+  String receivablesAgingLine(String bucket, String overdue) {
+    return '$bucket · $overdue';
+  }
+
+  @override
+  String receivablesPaymentMetaCode(String date, String code) {
+    return 'Paid on $date · $code';
+  }
+
+  @override
+  String dunningStepLine(String label, String status) {
+    return '$label · $status';
+  }
+
+  @override
+  String get receivablesClassAll => 'All classes';
+
+  @override
+  String receivablesClassFilter(String name) {
+    return 'Class: $name';
+  }
+
+  @override
+  String get receivablesClassPick => 'Choose a class';
+
+  @override
+  String get dunningDiscardTitle => 'Discard unsaved changes?';
+
+  @override
+  String get dunningDiscardBody =>
+      'The reminder settings you changed will be lost.';
+
+  @override
+  String get dunningDiscardConfirm => 'Discard';
+
+  @override
+  String get dunningDiscardKeep => 'Keep editing';
 }

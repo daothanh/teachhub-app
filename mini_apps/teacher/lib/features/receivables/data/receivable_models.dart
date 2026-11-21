@@ -249,15 +249,18 @@ class ReceivablePayment extends Equatable {
 }
 
 /// `pending` chờ tới mốc, `sent` đã gửi, `cancelled` đã hủy (thu đủ, tắt nhắc…).
+/// Giá trị lạ là [unknown]: không tính là lần nhắc tới, hiện nhãn chung.
 enum DunningStepStatus {
   pending,
   sent,
-  cancelled;
+  cancelled,
+  unknown;
 
   static DunningStepStatus fromWire(String? v) => switch (v) {
+    'pending' => pending,
     'sent' => sent,
     'cancelled' => cancelled,
-    _ => pending,
+    _ => unknown,
   };
 }
 

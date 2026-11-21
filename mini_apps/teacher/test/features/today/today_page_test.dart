@@ -11,6 +11,7 @@ import 'package:teacher/features/billing/billing_routes.dart';
 import 'package:teacher/features/classes/classes_routes.dart';
 import 'package:teacher/features/onboarding/data/onboarding_models.dart';
 import 'package:teacher/features/onboarding/data/onboarding_repository.dart';
+import 'package:teacher/features/receivables/receivables_routes.dart';
 import 'package:teacher/features/schedule/schedule_routes.dart';
 import 'package:teacher/features/today/pages/today_page.dart';
 import 'package:teacher/teacher.dart';
@@ -96,6 +97,10 @@ GoRouter routerFor(
     GoRoute(
       path: ClassesRoutes.list,
       builder: (_, _) => const Text('classes-page'),
+    ),
+    GoRoute(
+      path: ReceivablesRoutes.list,
+      builder: (_, _) => const Text('receivables-page'),
     ),
     GoRoute(
       path: BillingRoutes.periods,
@@ -286,6 +291,14 @@ void main() {
     await tester.tap(find.text('Học phí kỳ thu'));
     await tester.pumpAndSettle();
     expect(find.text('billing-page'), findsOneWidget);
+  });
+
+  testWidgets('S6-FL-03: có lối vào Công nợ trên màn Hôm nay', (tester) async {
+    await pumpRouter(tester, routerFor(FakeAttendanceRepository()));
+    await tester.ensureVisible(find.text('Công nợ'));
+    await tester.tap(find.text('Công nợ'));
+    await tester.pumpAndSettle();
+    expect(find.text('receivables-page'), findsOneWidget);
   });
 
   testWidgets('AC-4: đổi vai trò khi chạy riêng mini-app', (tester) async {
