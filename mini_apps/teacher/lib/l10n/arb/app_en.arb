@@ -1029,5 +1029,237 @@
     }
   },
   "billingErrPayDateVn": "The date is not valid in Vietnam time (it cannot be after today). Check the date on your device.",
-  "billingNoReason": "No reason given"
+  "billingNoReason": "No reason given",
+  "receivablesTitle": "Receivables",
+  "receivablesSearchHint": "Search by student name",
+  "receivablesTotalOwed": "Total owed {amount}",
+  "@receivablesTotalOwed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesBucketAll": "All",
+  "receivablesBucket030": "0–30 days",
+  "receivablesBucket3160": "31–60 days",
+  "receivablesBucketOver60": "Over 60 days",
+  "receivablesBucketChip": "{name} · {amount}",
+  "@receivablesBucketChip": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesSortDesc": "Highest owed first",
+  "receivablesSortAsc": "Lowest owed first",
+  "receivablesRowOwed": "Owes {amount}",
+  "@receivablesRowOwed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesRowMeta": "{classes} · {invoices, plural, =1{1 invoice} other{{invoices} invoices}}",
+  "@receivablesRowMeta": {
+    "placeholders": {
+      "classes": {
+        "type": "String"
+      },
+      "invoices": {
+        "type": "int"
+      }
+    }
+  },
+  "receivablesOverdue": "{days, plural, =0{Not overdue} =1{1 day overdue} other{{days} days overdue}}",
+  "@receivablesOverdue": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "receivablesEmpty": "Nobody owes anything",
+  "receivablesEmptyBody": "Every issued invoice has been paid in full.",
+  "receivablesEmptyFiltered": "No students match the filter.",
+  "receivablesLoadFailed": "Could not load receivables.",
+  "receivablesMoreFailed": "Could not load more.",
+  "receivablesDunningSettings": "Reminder settings",
+  "receivablesDetailTitle": "Student receivables",
+  "receivablesInvoices": "Invoices",
+  "receivablesPayments": "Payments",
+  "receivablesReminders": "Reminders",
+  "receivablesNoInvoices": "No invoices yet.",
+  "receivablesNoPayments": "No payments yet.",
+  "receivablesNoReminders": "No reminders yet.",
+  "receivablesInvoiceTitle": "{code} · {month}/{year}",
+  "@receivablesInvoiceTitle": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "receivablesInvoiceDue": "Due {date}",
+  "@receivablesInvoiceDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesInvoiceRemaining": "{remaining} left of {total}",
+  "@receivablesInvoiceRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesPaymentLine": "{amount} · {method}",
+  "@receivablesPaymentLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesPaymentDate": "Paid on {date}",
+  "@receivablesPaymentDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesPaymentVoided": "Voided",
+  "receivablesReminderLine": "{label} · invoice {code}",
+  "@receivablesReminderLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesNoCode": "no code",
+  "dunningOffsetBefore": "{days, plural, =1{1 day} other{{days} days}} before due",
+  "@dunningOffsetBefore": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dunningOffsetOn": "On the due date",
+  "dunningOffsetAfter": "{days, plural, =1{1 day} other{{days} days}} after due",
+  "@dunningOffsetAfter": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dunningStepSent": "Sent {time}",
+  "@dunningStepSent": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dunningStepPending": "Scheduled {time}",
+  "@dunningStepPending": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dunningStepCancelled": "Cancelled",
+  "dunningStudentTitle": "Reminders",
+  "dunningStudentOn": "Reminders are on",
+  "dunningStudentOff": "Reminders are off",
+  "dunningStudentHint": "A student gets no reminders only when every current class is switched off.",
+  "dunningClassSwitch": "Reminders for {className}",
+  "@dunningClassSwitch": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      }
+    }
+  },
+  "dunningToggledOn": "Reminders turned on.",
+  "dunningToggledOff": "Reminders turned off.",
+  "rosterDunningAction": "Reminders",
+  "rosterDunningTitle": "Reminders for {student}",
+  "@rosterDunningTitle": {
+    "placeholders": {
+      "student": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceDunningTitle": "Payment reminders",
+  "invoiceDunningLastSent": "Last reminded {time}",
+  "@invoiceDunningLastSent": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceDunningNone": "No reminder sent yet.",
+  "invoiceDunningNext": "Next reminder: {time}",
+  "@invoiceDunningNext": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dunningReasonTenant": "Reminders are turned off in your general settings.",
+  "dunningReasonStudent": "Reminders are off for this student.",
+  "dunningReasonPaid": "Paid in full, no more reminders.",
+  "dunningReasonVoid": "Invoice voided, no more reminders.",
+  "dunningLoadFailed": "Could not load the reminder status.",
+  "dunningSettingsTitle": "Reminder settings",
+  "dunningSettingsEnabled": "Automatic reminders",
+  "dunningSettingsEnabledHint": "Reminds parents as an invoice nears or passes its due date. Sent between 07:00 and 21:30.",
+  "dunningSettingsOffsets": "Reminder schedule",
+  "dunningSettingsOffsetsHint": "Days relative to the due date. Changes only apply to invoices issued after you save.",
+  "dunningOffsetInput": "Add a day (relative to due date)",
+  "dunningOffsetAdd": "Add",
+  "dunningOffsetReset": "Reset to default",
+  "dunningOffsetPreview": "Preview",
+  "dunningOffsetRemove": "Remove",
+  "dunningOffsetErrNumber": "Enter a whole number.",
+  "dunningOffsetErrRange": "Use a value from −7 to 30 days.",
+  "dunningOffsetErrDuplicate": "That day is already in the list.",
+  "dunningOffsetErrTooMany": "At most 6 reminders.",
+  "dunningOffsetErrTooFew": "Keep at least one reminder.",
+  "dunningSave": "Save",
+  "dunningSaved": "Reminder settings saved.",
+  "dunningPreviewTitle": "Sample reminder",
+  "dunningPreviewFailed": "Could not load the sample.",
+  "dunningPreviewNote": "Sample data, not a real name or amount."
 }

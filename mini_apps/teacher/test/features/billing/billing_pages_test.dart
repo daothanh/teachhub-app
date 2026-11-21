@@ -8,11 +8,13 @@ import 'package:teacher/features/billing/data/billing_models.dart';
 import 'package:teacher/features/billing/data/billing_repository.dart';
 import 'package:teacher/features/fees/data/fee_repository.dart';
 import 'package:teacher/features/fees/fees_routes.dart';
+import 'package:teacher/features/receivables/data/receivables_repository.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../classes/pump.dart';
 import '../fees/fake_fee_repository.dart';
 import '../fees/finders.dart';
+import '../receivables/fake_receivables_repository.dart';
 import 'fake_billing_repository.dart';
 
 void main() {
@@ -23,6 +25,10 @@ void main() {
     fees = FakeFeeRepository();
     GetIt.I.registerSingleton<BillingRepository>(repo);
     GetIt.I.registerSingleton<FeeRepository>(fees);
+    // Chi tiết hóa đơn đã phát hành tự tải trạng thái nhắc nợ.
+    GetIt.I.registerSingleton<ReceivablesRepository>(
+      FakeReceivablesRepository(),
+    );
   });
   tearDown(GetIt.I.reset);
 

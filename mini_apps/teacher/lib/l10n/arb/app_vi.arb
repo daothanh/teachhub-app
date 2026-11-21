@@ -1029,5 +1029,237 @@
     }
   },
   "billingErrPayDateVn": "Ngày thu không hợp lệ theo giờ Việt Nam (không được sau hôm nay). Kiểm tra ngày trên máy.",
-  "billingNoReason": "Không ghi lý do"
+  "billingNoReason": "Không ghi lý do",
+  "receivablesTitle": "Công nợ",
+  "receivablesSearchHint": "Tìm theo tên học viên",
+  "receivablesTotalOwed": "Tổng còn nợ {amount}",
+  "@receivablesTotalOwed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesBucketAll": "Tất cả",
+  "receivablesBucket030": "0–30 ngày",
+  "receivablesBucket3160": "31–60 ngày",
+  "receivablesBucketOver60": "Trên 60 ngày",
+  "receivablesBucketChip": "{name} · {amount}",
+  "@receivablesBucketChip": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesSortDesc": "Nợ nhiều trước",
+  "receivablesSortAsc": "Nợ ít trước",
+  "receivablesRowOwed": "Còn nợ {amount}",
+  "@receivablesRowOwed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesRowMeta": "{classes} · {invoices, plural, other{{invoices} hóa đơn}}",
+  "@receivablesRowMeta": {
+    "placeholders": {
+      "classes": {
+        "type": "String"
+      },
+      "invoices": {
+        "type": "int"
+      }
+    }
+  },
+  "receivablesOverdue": "{days, plural, =0{Chưa quá hạn} other{Quá hạn {days} ngày}}",
+  "@receivablesOverdue": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "receivablesEmpty": "Không ai còn nợ",
+  "receivablesEmptyBody": "Mọi hóa đơn đã phát hành đều được thu đủ.",
+  "receivablesEmptyFiltered": "Không có học viên nào khớp bộ lọc.",
+  "receivablesLoadFailed": "Không tải được công nợ.",
+  "receivablesMoreFailed": "Không tải thêm được.",
+  "receivablesDunningSettings": "Cài đặt nhắc nợ",
+  "receivablesDetailTitle": "Công nợ học viên",
+  "receivablesInvoices": "Hóa đơn",
+  "receivablesPayments": "Thanh toán",
+  "receivablesReminders": "Nhắc nợ",
+  "receivablesNoInvoices": "Chưa có hóa đơn.",
+  "receivablesNoPayments": "Chưa có thanh toán.",
+  "receivablesNoReminders": "Chưa có lần nhắc nào.",
+  "receivablesInvoiceTitle": "{code} · {month}/{year}",
+  "@receivablesInvoiceTitle": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "receivablesInvoiceDue": "Hạn {date}",
+  "@receivablesInvoiceDue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesInvoiceRemaining": "Còn {remaining} / {total}",
+  "@receivablesInvoiceRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesPaymentLine": "{amount} · {method}",
+  "@receivablesPaymentLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesPaymentDate": "Ngày thu {date}",
+  "@receivablesPaymentDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesPaymentVoided": "Đã hủy",
+  "receivablesReminderLine": "{label} · hóa đơn {code}",
+  "@receivablesReminderLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesNoCode": "chưa có mã",
+  "dunningOffsetBefore": "Trước hạn {days, plural, other{{days} ngày}}",
+  "@dunningOffsetBefore": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dunningOffsetOn": "Đúng hạn",
+  "dunningOffsetAfter": "Sau hạn {days, plural, other{{days} ngày}}",
+  "@dunningOffsetAfter": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "dunningStepSent": "Đã gửi {time}",
+  "@dunningStepSent": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dunningStepPending": "Chờ gửi {time}",
+  "@dunningStepPending": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dunningStepCancelled": "Đã hủy",
+  "dunningStudentTitle": "Nhắc nợ",
+  "dunningStudentOn": "Đang bật nhắc nợ",
+  "dunningStudentOff": "Đang tắt nhắc nợ",
+  "dunningStudentHint": "Học viên chỉ không nhận nhắc nợ khi mọi lớp đang học đều tắt.",
+  "dunningClassSwitch": "Nhắc nợ lớp {className}",
+  "@dunningClassSwitch": {
+    "placeholders": {
+      "className": {
+        "type": "String"
+      }
+    }
+  },
+  "dunningToggledOn": "Đã bật nhắc nợ.",
+  "dunningToggledOff": "Đã tắt nhắc nợ.",
+  "rosterDunningAction": "Nhắc nợ",
+  "rosterDunningTitle": "Nhắc nợ của {student}",
+  "@rosterDunningTitle": {
+    "placeholders": {
+      "student": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceDunningTitle": "Nhắc nợ",
+  "invoiceDunningLastSent": "Đã nhắc lúc {time}",
+  "@invoiceDunningLastSent": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceDunningNone": "Chưa nhắc lần nào.",
+  "invoiceDunningNext": "Lần nhắc tới: {time}",
+  "@invoiceDunningNext": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dunningReasonTenant": "Bạn đang tắt nhắc nợ trong cài đặt chung.",
+  "dunningReasonStudent": "Đã tắt nhắc nợ cho học viên này.",
+  "dunningReasonPaid": "Hóa đơn đã thu đủ, không nhắc nữa.",
+  "dunningReasonVoid": "Hóa đơn đã hủy, không nhắc nữa.",
+  "dunningLoadFailed": "Không tải được trạng thái nhắc nợ.",
+  "dunningSettingsTitle": "Cài đặt nhắc nợ",
+  "dunningSettingsEnabled": "Tự động nhắc nợ",
+  "dunningSettingsEnabledHint": "Nhắc phụ huynh khi hóa đơn gần hoặc quá hạn. Tin gửi trong khung 07:00 đến 21:30.",
+  "dunningSettingsOffsets": "Mốc nhắc",
+  "dunningSettingsOffsetsHint": "Số ngày so với hạn thanh toán. Đổi mốc chỉ áp dụng cho hóa đơn gửi sau khi lưu.",
+  "dunningOffsetInput": "Thêm mốc (ngày so với hạn)",
+  "dunningOffsetAdd": "Thêm",
+  "dunningOffsetReset": "Đặt lại mặc định",
+  "dunningOffsetPreview": "Xem trước",
+  "dunningOffsetRemove": "Xóa mốc",
+  "dunningOffsetErrNumber": "Nhập một số nguyên.",
+  "dunningOffsetErrRange": "Mốc từ −7 đến 30 ngày.",
+  "dunningOffsetErrDuplicate": "Mốc này đã có.",
+  "dunningOffsetErrTooMany": "Tối đa 6 mốc.",
+  "dunningOffsetErrTooFew": "Cần ít nhất một mốc.",
+  "dunningSave": "Lưu",
+  "dunningSaved": "Đã lưu cài đặt nhắc nợ.",
+  "dunningPreviewTitle": "Mẫu tin nhắc",
+  "dunningPreviewFailed": "Không tải được mẫu tin.",
+  "dunningPreviewNote": "Dữ liệu mẫu, không phải tên hay số tiền thật."
 }

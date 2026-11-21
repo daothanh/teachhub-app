@@ -5,6 +5,7 @@ import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import '../../../l10n/l10n.dart';
 import '../../fees/data/fee_models.dart'
     show VndInputFormatter, formatVnd, parseVnd;
+import '../../receivables/widgets/invoice_dunning_section.dart';
 import '../cubit/billing_periods_cubit.dart';
 import '../cubit/invoice_cubit.dart';
 import '../data/billing_models.dart';
@@ -155,6 +156,9 @@ class _Body extends StatelessWidget {
             ),
           ),
         InvoicePaymentsSection(invoice: inv, payments: payments, busy: busy),
+        // Bản nháp chưa có lịch nhắc; hóa đơn đã phát hành thì xem được trạng thái nhắc.
+        if (inv.status != InvoiceStatus.draft)
+          InvoiceDunningSection(key: ValueKey(inv.id), invoiceId: inv.id),
         if (inv.status == InvoiceStatus.draft) ...[
           const SizedBox(height: AppSpacing.lg),
           AppButton(

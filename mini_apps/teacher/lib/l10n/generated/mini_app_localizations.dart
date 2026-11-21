@@ -3021,6 +3021,474 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Không ghi lý do'**
   String get billingNoReason;
+
+  /// No description provided for @receivablesTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Công nợ'**
+  String get receivablesTitle;
+
+  /// No description provided for @receivablesSearchHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tìm theo tên học viên'**
+  String get receivablesSearchHint;
+
+  /// No description provided for @receivablesTotalOwed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tổng còn nợ {amount}'**
+  String receivablesTotalOwed(String amount);
+
+  /// No description provided for @receivablesBucketAll.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tất cả'**
+  String get receivablesBucketAll;
+
+  /// No description provided for @receivablesBucket030.
+  ///
+  /// In vi, this message translates to:
+  /// **'0–30 ngày'**
+  String get receivablesBucket030;
+
+  /// No description provided for @receivablesBucket3160.
+  ///
+  /// In vi, this message translates to:
+  /// **'31–60 ngày'**
+  String get receivablesBucket3160;
+
+  /// No description provided for @receivablesBucketOver60.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trên 60 ngày'**
+  String get receivablesBucketOver60;
+
+  /// No description provided for @receivablesBucketChip.
+  ///
+  /// In vi, this message translates to:
+  /// **'{name} · {amount}'**
+  String receivablesBucketChip(String name, String amount);
+
+  /// No description provided for @receivablesSortDesc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nợ nhiều trước'**
+  String get receivablesSortDesc;
+
+  /// No description provided for @receivablesSortAsc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nợ ít trước'**
+  String get receivablesSortAsc;
+
+  /// No description provided for @receivablesRowOwed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Còn nợ {amount}'**
+  String receivablesRowOwed(String amount);
+
+  /// No description provided for @receivablesRowMeta.
+  ///
+  /// In vi, this message translates to:
+  /// **'{classes} · {invoices, plural, other{{invoices} hóa đơn}}'**
+  String receivablesRowMeta(String classes, int invoices);
+
+  /// No description provided for @receivablesOverdue.
+  ///
+  /// In vi, this message translates to:
+  /// **'{days, plural, =0{Chưa quá hạn} other{Quá hạn {days} ngày}}'**
+  String receivablesOverdue(int days);
+
+  /// No description provided for @receivablesEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không ai còn nợ'**
+  String get receivablesEmpty;
+
+  /// No description provided for @receivablesEmptyBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mọi hóa đơn đã phát hành đều được thu đủ.'**
+  String get receivablesEmptyBody;
+
+  /// No description provided for @receivablesEmptyFiltered.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có học viên nào khớp bộ lọc.'**
+  String get receivablesEmptyFiltered;
+
+  /// No description provided for @receivablesLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được công nợ.'**
+  String get receivablesLoadFailed;
+
+  /// No description provided for @receivablesMoreFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải thêm được.'**
+  String get receivablesMoreFailed;
+
+  /// No description provided for @receivablesDunningSettings.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cài đặt nhắc nợ'**
+  String get receivablesDunningSettings;
+
+  /// No description provided for @receivablesDetailTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Công nợ học viên'**
+  String get receivablesDetailTitle;
+
+  /// No description provided for @receivablesInvoices.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn'**
+  String get receivablesInvoices;
+
+  /// No description provided for @receivablesPayments.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thanh toán'**
+  String get receivablesPayments;
+
+  /// No description provided for @receivablesReminders.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc nợ'**
+  String get receivablesReminders;
+
+  /// No description provided for @receivablesNoInvoices.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có hóa đơn.'**
+  String get receivablesNoInvoices;
+
+  /// No description provided for @receivablesNoPayments.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có thanh toán.'**
+  String get receivablesNoPayments;
+
+  /// No description provided for @receivablesNoReminders.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có lần nhắc nào.'**
+  String get receivablesNoReminders;
+
+  /// No description provided for @receivablesInvoiceTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'{code} · {month}/{year}'**
+  String receivablesInvoiceTitle(String code, int month, int year);
+
+  /// No description provided for @receivablesInvoiceDue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hạn {date}'**
+  String receivablesInvoiceDue(String date);
+
+  /// No description provided for @receivablesInvoiceRemaining.
+  ///
+  /// In vi, this message translates to:
+  /// **'Còn {remaining} / {total}'**
+  String receivablesInvoiceRemaining(String remaining, String total);
+
+  /// No description provided for @receivablesPaymentLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{amount} · {method}'**
+  String receivablesPaymentLine(String amount, String method);
+
+  /// No description provided for @receivablesPaymentDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày thu {date}'**
+  String receivablesPaymentDate(String date);
+
+  /// No description provided for @receivablesPaymentVoided.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy'**
+  String get receivablesPaymentVoided;
+
+  /// No description provided for @receivablesReminderLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{label} · hóa đơn {code}'**
+  String receivablesReminderLine(String label, String code);
+
+  /// No description provided for @receivablesNoCode.
+  ///
+  /// In vi, this message translates to:
+  /// **'chưa có mã'**
+  String get receivablesNoCode;
+
+  /// No description provided for @dunningOffsetBefore.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trước hạn {days, plural, other{{days} ngày}}'**
+  String dunningOffsetBefore(int days);
+
+  /// No description provided for @dunningOffsetOn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đúng hạn'**
+  String get dunningOffsetOn;
+
+  /// No description provided for @dunningOffsetAfter.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sau hạn {days, plural, other{{days} ngày}}'**
+  String dunningOffsetAfter(int days);
+
+  /// No description provided for @dunningStepSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gửi {time}'**
+  String dunningStepSent(String time);
+
+  /// No description provided for @dunningStepPending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chờ gửi {time}'**
+  String dunningStepPending(String time);
+
+  /// No description provided for @dunningStepCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy'**
+  String get dunningStepCancelled;
+
+  /// No description provided for @dunningStudentTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc nợ'**
+  String get dunningStudentTitle;
+
+  /// No description provided for @dunningStudentOn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang bật nhắc nợ'**
+  String get dunningStudentOn;
+
+  /// No description provided for @dunningStudentOff.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang tắt nhắc nợ'**
+  String get dunningStudentOff;
+
+  /// No description provided for @dunningStudentHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học viên chỉ không nhận nhắc nợ khi mọi lớp đang học đều tắt.'**
+  String get dunningStudentHint;
+
+  /// No description provided for @dunningClassSwitch.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc nợ lớp {className}'**
+  String dunningClassSwitch(String className);
+
+  /// No description provided for @dunningToggledOn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã bật nhắc nợ.'**
+  String get dunningToggledOn;
+
+  /// No description provided for @dunningToggledOff.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã tắt nhắc nợ.'**
+  String get dunningToggledOff;
+
+  /// No description provided for @rosterDunningAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc nợ'**
+  String get rosterDunningAction;
+
+  /// No description provided for @rosterDunningTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc nợ của {student}'**
+  String rosterDunningTitle(String student);
+
+  /// No description provided for @invoiceDunningTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc nợ'**
+  String get invoiceDunningTitle;
+
+  /// No description provided for @invoiceDunningLastSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã nhắc lúc {time}'**
+  String invoiceDunningLastSent(String time);
+
+  /// No description provided for @invoiceDunningNone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa nhắc lần nào.'**
+  String get invoiceDunningNone;
+
+  /// No description provided for @invoiceDunningNext.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lần nhắc tới: {time}'**
+  String invoiceDunningNext(String time);
+
+  /// No description provided for @dunningReasonTenant.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đang tắt nhắc nợ cho cả lớp học.'**
+  String get dunningReasonTenant;
+
+  /// No description provided for @dunningReasonStudent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã tắt nhắc nợ cho học viên này.'**
+  String get dunningReasonStudent;
+
+  /// No description provided for @dunningReasonPaid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn đã thu đủ, không nhắc nữa.'**
+  String get dunningReasonPaid;
+
+  /// No description provided for @dunningReasonVoid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn đã hủy, không nhắc nữa.'**
+  String get dunningReasonVoid;
+
+  /// No description provided for @dunningLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được trạng thái nhắc nợ.'**
+  String get dunningLoadFailed;
+
+  /// No description provided for @dunningSettingsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cài đặt nhắc nợ'**
+  String get dunningSettingsTitle;
+
+  /// No description provided for @dunningSettingsEnabled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tự động nhắc nợ'**
+  String get dunningSettingsEnabled;
+
+  /// No description provided for @dunningSettingsEnabledHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhắc phụ huynh khi hóa đơn gần hoặc quá hạn. Tin gửi trong khung 07:00 đến 21:30.'**
+  String get dunningSettingsEnabledHint;
+
+  /// No description provided for @dunningSettingsOffsets.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mốc nhắc'**
+  String get dunningSettingsOffsets;
+
+  /// No description provided for @dunningSettingsOffsetsHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số ngày so với hạn thanh toán. Đổi mốc chỉ áp dụng cho hóa đơn gửi sau khi lưu.'**
+  String get dunningSettingsOffsetsHint;
+
+  /// No description provided for @dunningOffsetInput.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm mốc (ngày so với hạn)'**
+  String get dunningOffsetInput;
+
+  /// No description provided for @dunningOffsetAdd.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm'**
+  String get dunningOffsetAdd;
+
+  /// No description provided for @dunningOffsetReset.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đặt lại mặc định'**
+  String get dunningOffsetReset;
+
+  /// No description provided for @dunningOffsetPreview.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem trước'**
+  String get dunningOffsetPreview;
+
+  /// No description provided for @dunningOffsetRemove.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa mốc'**
+  String get dunningOffsetRemove;
+
+  /// No description provided for @dunningOffsetErrNumber.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập một số nguyên.'**
+  String get dunningOffsetErrNumber;
+
+  /// No description provided for @dunningOffsetErrRange.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mốc từ −7 đến 30 ngày.'**
+  String get dunningOffsetErrRange;
+
+  /// No description provided for @dunningOffsetErrDuplicate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mốc này đã có.'**
+  String get dunningOffsetErrDuplicate;
+
+  /// No description provided for @dunningOffsetErrTooMany.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tối đa 6 mốc.'**
+  String get dunningOffsetErrTooMany;
+
+  /// No description provided for @dunningOffsetErrTooFew.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cần ít nhất một mốc.'**
+  String get dunningOffsetErrTooFew;
+
+  /// No description provided for @dunningSave.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu'**
+  String get dunningSave;
+
+  /// No description provided for @dunningSaved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu cài đặt nhắc nợ.'**
+  String get dunningSaved;
+
+  /// No description provided for @dunningPreviewTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mẫu tin nhắc'**
+  String get dunningPreviewTitle;
+
+  /// No description provided for @dunningPreviewFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được mẫu tin.'**
+  String get dunningPreviewFailed;
+
+  /// No description provided for @dunningPreviewNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dữ liệu mẫu, không phải tên hay số tiền thật.'**
+  String get dunningPreviewNote;
 }
 
 class _MiniAppLocalizationsDelegate

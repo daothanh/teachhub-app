@@ -1716,4 +1716,302 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get billingNoReason => 'Không ghi lý do';
+
+  @override
+  String get receivablesTitle => 'Công nợ';
+
+  @override
+  String get receivablesSearchHint => 'Tìm theo tên học viên';
+
+  @override
+  String receivablesTotalOwed(String amount) {
+    return 'Tổng còn nợ $amount';
+  }
+
+  @override
+  String get receivablesBucketAll => 'Tất cả';
+
+  @override
+  String get receivablesBucket030 => '0–30 ngày';
+
+  @override
+  String get receivablesBucket3160 => '31–60 ngày';
+
+  @override
+  String get receivablesBucketOver60 => 'Trên 60 ngày';
+
+  @override
+  String receivablesBucketChip(String name, String amount) {
+    return '$name · $amount';
+  }
+
+  @override
+  String get receivablesSortDesc => 'Nợ nhiều trước';
+
+  @override
+  String get receivablesSortAsc => 'Nợ ít trước';
+
+  @override
+  String receivablesRowOwed(String amount) {
+    return 'Còn nợ $amount';
+  }
+
+  @override
+  String receivablesRowMeta(String classes, int invoices) {
+    String _temp0 = intl.Intl.pluralLogic(
+      invoices,
+      locale: localeName,
+      other: '$invoices hóa đơn',
+    );
+    return '$classes · $_temp0';
+  }
+
+  @override
+  String receivablesOverdue(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Quá hạn $days ngày',
+      zero: 'Chưa quá hạn',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get receivablesEmpty => 'Không ai còn nợ';
+
+  @override
+  String get receivablesEmptyBody =>
+      'Mọi hóa đơn đã phát hành đều được thu đủ.';
+
+  @override
+  String get receivablesEmptyFiltered => 'Không có học viên nào khớp bộ lọc.';
+
+  @override
+  String get receivablesLoadFailed => 'Không tải được công nợ.';
+
+  @override
+  String get receivablesMoreFailed => 'Không tải thêm được.';
+
+  @override
+  String get receivablesDunningSettings => 'Cài đặt nhắc nợ';
+
+  @override
+  String get receivablesDetailTitle => 'Công nợ học viên';
+
+  @override
+  String get receivablesInvoices => 'Hóa đơn';
+
+  @override
+  String get receivablesPayments => 'Thanh toán';
+
+  @override
+  String get receivablesReminders => 'Nhắc nợ';
+
+  @override
+  String get receivablesNoInvoices => 'Chưa có hóa đơn.';
+
+  @override
+  String get receivablesNoPayments => 'Chưa có thanh toán.';
+
+  @override
+  String get receivablesNoReminders => 'Chưa có lần nhắc nào.';
+
+  @override
+  String receivablesInvoiceTitle(String code, int month, int year) {
+    return '$code · $month/$year';
+  }
+
+  @override
+  String receivablesInvoiceDue(String date) {
+    return 'Hạn $date';
+  }
+
+  @override
+  String receivablesInvoiceRemaining(String remaining, String total) {
+    return 'Còn $remaining / $total';
+  }
+
+  @override
+  String receivablesPaymentLine(String amount, String method) {
+    return '$amount · $method';
+  }
+
+  @override
+  String receivablesPaymentDate(String date) {
+    return 'Ngày thu $date';
+  }
+
+  @override
+  String get receivablesPaymentVoided => 'Đã hủy';
+
+  @override
+  String receivablesReminderLine(String label, String code) {
+    return '$label · hóa đơn $code';
+  }
+
+  @override
+  String get receivablesNoCode => 'chưa có mã';
+
+  @override
+  String dunningOffsetBefore(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days ngày',
+    );
+    return 'Trước hạn $_temp0';
+  }
+
+  @override
+  String get dunningOffsetOn => 'Đúng hạn';
+
+  @override
+  String dunningOffsetAfter(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days ngày',
+    );
+    return 'Sau hạn $_temp0';
+  }
+
+  @override
+  String dunningStepSent(String time) {
+    return 'Đã gửi $time';
+  }
+
+  @override
+  String dunningStepPending(String time) {
+    return 'Chờ gửi $time';
+  }
+
+  @override
+  String get dunningStepCancelled => 'Đã hủy';
+
+  @override
+  String get dunningStudentTitle => 'Nhắc nợ';
+
+  @override
+  String get dunningStudentOn => 'Đang bật nhắc nợ';
+
+  @override
+  String get dunningStudentOff => 'Đang tắt nhắc nợ';
+
+  @override
+  String get dunningStudentHint =>
+      'Học viên chỉ không nhận nhắc nợ khi mọi lớp đang học đều tắt.';
+
+  @override
+  String dunningClassSwitch(String className) {
+    return 'Nhắc nợ lớp $className';
+  }
+
+  @override
+  String get dunningToggledOn => 'Đã bật nhắc nợ.';
+
+  @override
+  String get dunningToggledOff => 'Đã tắt nhắc nợ.';
+
+  @override
+  String get rosterDunningAction => 'Nhắc nợ';
+
+  @override
+  String rosterDunningTitle(String student) {
+    return 'Nhắc nợ của $student';
+  }
+
+  @override
+  String get invoiceDunningTitle => 'Nhắc nợ';
+
+  @override
+  String invoiceDunningLastSent(String time) {
+    return 'Đã nhắc lúc $time';
+  }
+
+  @override
+  String get invoiceDunningNone => 'Chưa nhắc lần nào.';
+
+  @override
+  String invoiceDunningNext(String time) {
+    return 'Lần nhắc tới: $time';
+  }
+
+  @override
+  String get dunningReasonTenant => 'Bạn đang tắt nhắc nợ cho cả lớp học.';
+
+  @override
+  String get dunningReasonStudent => 'Đã tắt nhắc nợ cho học viên này.';
+
+  @override
+  String get dunningReasonPaid => 'Hóa đơn đã thu đủ, không nhắc nữa.';
+
+  @override
+  String get dunningReasonVoid => 'Hóa đơn đã hủy, không nhắc nữa.';
+
+  @override
+  String get dunningLoadFailed => 'Không tải được trạng thái nhắc nợ.';
+
+  @override
+  String get dunningSettingsTitle => 'Cài đặt nhắc nợ';
+
+  @override
+  String get dunningSettingsEnabled => 'Tự động nhắc nợ';
+
+  @override
+  String get dunningSettingsEnabledHint =>
+      'Nhắc phụ huynh khi hóa đơn gần hoặc quá hạn. Tin gửi trong khung 07:00 đến 21:30.';
+
+  @override
+  String get dunningSettingsOffsets => 'Mốc nhắc';
+
+  @override
+  String get dunningSettingsOffsetsHint =>
+      'Số ngày so với hạn thanh toán. Đổi mốc chỉ áp dụng cho hóa đơn gửi sau khi lưu.';
+
+  @override
+  String get dunningOffsetInput => 'Thêm mốc (ngày so với hạn)';
+
+  @override
+  String get dunningOffsetAdd => 'Thêm';
+
+  @override
+  String get dunningOffsetReset => 'Đặt lại mặc định';
+
+  @override
+  String get dunningOffsetPreview => 'Xem trước';
+
+  @override
+  String get dunningOffsetRemove => 'Xóa mốc';
+
+  @override
+  String get dunningOffsetErrNumber => 'Nhập một số nguyên.';
+
+  @override
+  String get dunningOffsetErrRange => 'Mốc từ −7 đến 30 ngày.';
+
+  @override
+  String get dunningOffsetErrDuplicate => 'Mốc này đã có.';
+
+  @override
+  String get dunningOffsetErrTooMany => 'Tối đa 6 mốc.';
+
+  @override
+  String get dunningOffsetErrTooFew => 'Cần ít nhất một mốc.';
+
+  @override
+  String get dunningSave => 'Lưu';
+
+  @override
+  String get dunningSaved => 'Đã lưu cài đặt nhắc nợ.';
+
+  @override
+  String get dunningPreviewTitle => 'Mẫu tin nhắc';
+
+  @override
+  String get dunningPreviewFailed => 'Không tải được mẫu tin.';
+
+  @override
+  String get dunningPreviewNote =>
+      'Dữ liệu mẫu, không phải tên hay số tiền thật.';
 }

@@ -29,6 +29,8 @@ import 'features/offline/offline_banner_shell.dart';
 import 'features/onboarding/data/onboarding_models.dart';
 import 'features/onboarding/data/onboarding_repository.dart';
 import 'features/onboarding/pages/onboarding_page.dart';
+import 'features/receivables/data/receivables_repository.dart';
+import 'features/receivables/receivables_routes.dart';
 import 'features/schedule/data/schedule_repository.dart';
 import 'features/schedule/schedule_routes.dart';
 import 'features/invites/data/invite_repository.dart';
@@ -91,6 +93,7 @@ class TeacherController {
     ...classesRoutes(moduleId),
     ...feesRoutes(moduleId),
     ...billingRoutes(moduleId),
+    ...receivablesRoutes(moduleId),
     ...studentsRoutes(moduleId),
     ...attendanceRoutes(moduleId),
     ...scheduleRoutes(moduleId),
@@ -152,6 +155,11 @@ class TeacherController {
     if (!getIt.isRegistered<BillingRepository>()) {
       getIt.registerLazySingleton<BillingRepository>(
         () => DioBillingRepository(api()),
+      );
+    }
+    if (!getIt.isRegistered<ReceivablesRepository>()) {
+      getIt.registerLazySingleton<ReceivablesRepository>(
+        () => DioReceivablesRepository(api()),
       );
     }
     if (!getIt.isRegistered<OnboardingRepository>()) {
