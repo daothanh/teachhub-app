@@ -6,6 +6,7 @@ import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../classes/data/draft_keys.dart';
 import '../cubit/student_form_cubit.dart';
 import '../data/student_models.dart';
 import '../data/student_repository.dart';
@@ -25,7 +26,15 @@ class StudentFormPage extends StatelessWidget {
 /// Form kèm cubit, dùng cho trang riêng và bước 2 của onboarding. Có [initial]
 /// thì là form sửa học viên đó (S4-FL-01).
 class StudentFormScope extends StatelessWidget {
-  const StudentFormScope({super.key, required this.onSaved, this.initial});
+  const StudentFormScope({
+    super.key,
+    required this.onSaved,
+    this.initial,
+    this.keys,
+  });
+
+  /// Khóa bền vững (onboarding); null = khóa trong bộ nhớ.
+  final DraftKeys? keys;
 
   /// Gọi với id học viên vừa tạo hoặc hồ sơ có sẵn được chọn.
   final ValueChanged<String> onSaved;
@@ -33,8 +42,11 @@ class StudentFormScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => BlocProvider(
-    create: (_) =>
-        StudentFormCubit(GetIt.I<StudentRepository>(), studentId: initial?.id),
+    create: (_) => StudentFormCubit(
+      GetIt.I<StudentRepository>(),
+      studentId: initial?.id,
+      keys: keys,
+    ),
     child: StudentFormView(onSaved: onSaved, initial: initial),
   );
 }

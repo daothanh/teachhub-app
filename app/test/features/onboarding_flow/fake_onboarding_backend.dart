@@ -170,7 +170,8 @@ class FakeOnboardingBackend implements HttpClientAdapter {
       );
     }
     final (status, out) = _route(method, path, body);
-    if (status < 300) {
+    // Chạy trên máy thật không có file hợp đồng (`_openapi == null`): bỏ đối chiếu.
+    if (status < 300 && _openapi != null) {
       _conform(out, _responseSchema(op, status), '$method $path');
     }
     return _json(status, out);

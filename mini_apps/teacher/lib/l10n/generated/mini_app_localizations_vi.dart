@@ -489,6 +489,10 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
       'Đã lưu học viên. Chưa thêm được vào lớp hoặc chưa ghi nhận bước này.';
 
   @override
+  String get onboardingScheduleChooseClass =>
+      'Bạn có nhiều lớp. Chọn lớp cần đặt lịch.';
+
+  @override
   String get onboardingScheduleNoClass =>
       'Chưa có lớp để đặt lịch. Hãy tạo lớp ở bước 1.';
 

@@ -10,9 +10,12 @@ Future<void> pumpApp(
   WidgetTester tester,
   Widget home, {
   double textScale = 1,
+  double keyboard = 0,
 }) async {
   tester.view.physicalSize = const Size(390, 1400) * 3;
   tester.view.devicePixelRatio = 3;
+  // Bàn phím mở: viewInsets đáy [keyboard] điểm logic.
+  tester.view.viewInsets = FakeViewPadding(bottom: keyboard * 3);
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ScreenUtilPlusInit(

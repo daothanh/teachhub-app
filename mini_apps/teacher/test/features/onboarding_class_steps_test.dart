@@ -4,6 +4,8 @@ import 'package:get_it/get_it.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teacher/features/classes/data/classes_repository.dart';
 import 'package:teacher/features/fees/data/fee_repository.dart';
+import 'package:tasco_storage/tasco_storage.dart';
+import 'package:teacher/features/onboarding/data/onboarding_draft.dart';
 import 'package:teacher/features/onboarding/data/onboarding_models.dart';
 import 'package:teacher/features/onboarding/data/onboarding_repository.dart';
 import 'package:teacher/features/onboarding/pages/onboarding_page.dart';
@@ -42,8 +44,17 @@ Future<void> _open(
   FakeClassesRepository classes, {
   FakeStudentRepository? students,
   double scale = 1,
+  double keyboard = 0,
+  KeyValueStore? kv,
+
+  /// Lớp đã tạo ở bước 1 (bản nháp bền vững); null = bước 1 chưa làm/bỏ qua.
+  String? classId,
 }) async {
   await GetIt.I.reset();
+  kv ??= InMemoryKeyValueStore();
+  final store = OnboardingDraftStore(kv);
+  if (classId != null) await store.update((d) => d.copyWith(classId: classId));
+  GetIt.I.registerSingleton<OnboardingDraftStore>(store);
   GetIt.I.registerSingleton<OnboardingRepository>(onboarding);
   GetIt.I.registerSingleton<ClassesRepository>(classes);
   GetIt.I.registerSingleton<FeeRepository>(FakeFeeRepository());
@@ -51,14 +62,25 @@ Future<void> _open(
     students ??
         FakeStudentRepository([const Student(id: 's1', fullName: 'Minh Anh')]),
   );
-  await pumpApp(tester, const OnboardingPage(), textScale: scale);
+  await pumpApp(
+    tester,
+    const OnboardingPage(),
+    textScale: scale,
+    keyboard: keyboard,
+  );
 }
 
 Future<void> _fillClass(WidgetTester tester) async {
-  await tester.enterText(_field('Tên lớp'), 'Toán 9A');
-  await tester.enterText(_field('Môn'), 'Toán');
-  await tester.enterText(_field('Khối (1–12)'), '9');
-  await tester.enterText(_field('Địa điểm'), 'Nhà riêng');
+  // Danh sách dựng lười: cuộn tới từng ô trước khi nhập (chữ lớn, bàn phím mở).
+  for (final (label, text) in [
+    ('Tên lớp', 'Toán 9A'),
+    ('Môn', 'Toán'),
+    ('Khối (1–12)', '9'),
+    ('Địa điểm', 'Nhà riêng'),
+  ]) {
+    await _reveal(tester, _input(label));
+    await tester.enterText(_field(label), text);
+  }
   await _reveal(tester, _input('Ngày bắt đầu'));
   await tester.tap(_input('Ngày bắt đầu'));
   await tester.pumpAndSettle();
@@ -80,94 +102,50 @@ Future<void> _addRule(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _saveStudent(WidgetTester tester) async {
+  await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
+  await tester.tap(find.text('Lưu học viên'));
+  await tester.pumpAndSettle();
+}
+
+/// Gọi thẳng handler: SnackBar lỗi ghi bước che nút ở cuối màn.
+void _retry(WidgetTester tester) => tester
+    .widget<AppButton>(find.widgetWithText(AppButton, 'Thử lại'))
+    .onPressed!();
+
+/// Kill app: gỡ cây widget; kho khóa [kv] và server (các fake) còn nguyên.
+Future<void> _kill(WidgetTester tester) => tester.pumpWidget(const SizedBox());
+
 void main() {
   tearDown(GetIt.I.reset);
 
-  group('bước 2: học viên ghi danh vào lớp bước 1', () {
-    final atStep2 = onboardingOf({OnboardingStep.createClass: _done});
-
-    Future<void> saveStudent(WidgetTester tester) async {
-      await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
-      await tester.tap(find.text('Lưu học viên'));
-      await tester.pumpAndSettle();
-    }
-
-    testWidgets('lưu học viên rồi ghi danh vào lớp, mới ghi done', (
-      tester,
-    ) async {
-      final onboarding = FakeOnboardingRepository(atStep2);
-      final classes = FakeClassesRepository()..active = [sampleClass()];
-      await _open(tester, onboarding, classes);
-      await saveStudent(tester);
-
-      expect(classes.calls.take(2), ['list:active:1', 'enroll:c1:s1']);
-      expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
-      expect(find.text('Bước 3/5'), findsOneWidget);
-    });
-
-    testWidgets(
-      'ghi danh lỗi mạng: thử lại cùng khóa, không tạo học viên hai',
-      (tester) async {
-        final onboarding = FakeOnboardingRepository(atStep2);
-        final classes = FakeClassesRepository()
-          ..active = [sampleClass()]
-          ..enrollError = const ApiException.network();
-        final students = FakeStudentRepository([
-          const Student(id: 's1', fullName: 'Minh Anh'),
-        ]);
-        await _open(tester, onboarding, classes, students: students);
-        await saveStudent(tester);
-
-        expect(onboarding.patches, isEmpty);
-        expect(find.text('Bước 2/5'), findsOneWidget);
-        classes.enrollError = null;
-        tester
-            .widget<AppButton>(find.widgetWithText(AppButton, 'Thử lại'))
-            .onPressed!();
-        await tester.pumpAndSettle();
-
-        expect(students.calls, hasLength(1));
-        expect(classes.calls.where((c) => c == 'enroll:c1:s1'), hasLength(2));
-        expect(classes.keys[0], classes.keys[1]);
-        expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
-        expect(find.text('Bước 3/5'), findsOneWidget);
-      },
-    );
-
-    testWidgets('sang bước khác thì SnackBar "đã lưu" bị gỡ', (tester) async {
-      final onboarding = FakeOnboardingRepository(onboardingOf({}));
-      await _open(tester, onboarding, FakeClassesRepository());
-      await _fillClass(tester);
-      await _save(tester);
-
-      expect(find.text('Bước 2/5'), findsOneWidget);
-      expect(find.byType(SnackBar), findsNothing);
-    });
-  });
-
+  final atStep2 = onboardingOf({OnboardingStep.createClass: _done});
   final atStep3 = onboardingOf({
     OnboardingStep.createClass: _done,
     OnboardingStep.addStudents: _done,
   });
 
   group('bước 1: form lớp có sẵn', () {
-    testWidgets('lưu thật qua API lớp, ghi done, sang bước 2; không có lịch', (
-      tester,
-    ) async {
-      final onboarding = FakeOnboardingRepository(onboardingOf({}));
-      final classes = FakeClassesRepository();
-      await _open(tester, onboarding, classes);
+    testWidgets(
+      'lưu qua API lớp, ghi done, sang bước 2; không lịch, không học phí',
+      (tester) async {
+        final onboarding = FakeOnboardingRepository(onboardingOf({}));
+        final classes = FakeClassesRepository();
+        await _open(tester, onboarding, classes);
 
-      expect(find.text('Bước 1/5'), findsOneWidget);
-      expect(find.text('Để sau'), findsNothing);
-      expect(find.text('Thêm buổi'), findsNothing); // lịch để bước 3
-      await _fillClass(tester);
-      await _save(tester);
+        expect(find.text('Bước 1/5'), findsOneWidget);
+        expect(find.text('Để sau'), findsNothing);
+        expect(find.text('Thêm buổi'), findsNothing); // lịch để bước 3
+        expect(find.text('Thu học phí'), findsNothing); // học phí cấu hình sau
+        expect(find.byType(Scaffold), findsOneWidget); // không Scaffold con
+        await _fillClass(tester);
+        await _save(tester);
 
-      expect(classes.calls, ['create']);
-      expect(onboarding.patches, [(OnboardingStep.createClass, _done)]);
-      expect(find.text('Bước 2/5'), findsOneWidget);
-    });
+        expect(classes.calls, ['create']);
+        expect(onboarding.patches, [(OnboardingStep.createClass, _done)]);
+        expect(find.text('Bước 2/5'), findsOneWidget);
+      },
+    );
 
     testWidgets('thiếu trường: báo lỗi, không gọi API, không ghi bước', (
       tester,
@@ -196,10 +174,7 @@ void main() {
 
       expect(find.text('Đã lưu. Chưa ghi nhận được bước này.'), findsOneWidget);
       onboarding.patchError = null;
-      // SnackBar lỗi ghi bước che nút ở cuối màn: gọi thẳng handler.
-      tester
-          .widget<AppButton>(find.widgetWithText(AppButton, 'Thử lại'))
-          .onPressed!();
+      _retry(tester);
       await tester.pumpAndSettle();
 
       expect(classes.calls, ['create']);
@@ -207,28 +182,274 @@ void main() {
       expect(find.text('Bước 2/5'), findsOneWidget);
     });
 
-    testWidgets('chữ 130%: không tràn', (tester) async {
+    testWidgets('kill app sau khi tạo lớp, chưa ghi done: mở lại không tạo lớp '
+        'mới, chỉ ghi lại bước', (tester) async {
+      final kv = InMemoryKeyValueStore();
+      final onboarding = FakeOnboardingRepository(
+        onboardingOf({}),
+        patchError: const ApiException.network(),
+      );
+      final classes = FakeClassesRepository();
+      await _open(tester, onboarding, classes, kv: kv);
+      await _fillClass(tester);
+      await _save(tester);
+      expect(classes.calls, ['create']);
+
+      await _kill(tester);
+      onboarding.patchError = null;
+      await _open(tester, onboarding, classes, kv: kv);
+
+      expect(classes.calls, ['create'], reason: 'không tạo lớp thứ hai');
+      expect(onboarding.patches.last, (OnboardingStep.createClass, _done));
+      expect(find.text('Bước 2/5'), findsOneWidget);
+    });
+
+    testWidgets(
+      'kill app khi phản hồi tạo lớp bị mất: gửi lại dùng cùng khóa',
+      (tester) async {
+        final kv = InMemoryKeyValueStore();
+        final onboarding = FakeOnboardingRepository(onboardingOf({}));
+        final classes = FakeClassesRepository()
+          ..createError = const ApiException.network();
+        await _open(tester, onboarding, classes, kv: kv);
+        await _fillClass(tester);
+        await _save(tester);
+        expect(onboarding.patches, isEmpty);
+
+        await _kill(tester);
+        classes.createError = null;
+        await _open(tester, onboarding, classes, kv: kv);
+        await _fillClass(tester);
+        await _save(tester);
+
+        expect(classes.keys, hasLength(2));
+        expect(classes.keys[0], classes.keys[1]);
+        expect(find.text('Bước 2/5'), findsOneWidget);
+      },
+    );
+
+    testWidgets('chữ 130%, bàn phím mở: lỗi và nút Thử lại không tràn', (
+      tester,
+    ) async {
+      final onboarding = FakeOnboardingRepository(
+        onboardingOf({}),
+        patchError: const ApiException.network(),
+      );
       await _open(
         tester,
-        FakeOnboardingRepository(onboardingOf({})),
+        onboarding,
         FakeClassesRepository(),
         scale: 1.3,
+        keyboard: 300,
       );
       await _save(tester); // hiện đủ lỗi trường
+      expect(tester.takeException(), isNull);
+      await _fillClass(tester);
+      await _save(tester);
+      expect(find.text('Thử lại'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
 
-  group('bước 3: form quy tắc lặp có sẵn', () {
-    testWidgets('lưu quy tắc cho lớp đã tạo, ghi done, sang bước 4', (
+  group('bước 2: học viên ghi danh vào lớp bước 1', () {
+    testWidgets('lưu học viên rồi ghi danh đúng lớp đã lưu, mới ghi done', (
       tester,
     ) async {
-      final onboarding = FakeOnboardingRepository(atStep3);
+      final onboarding = FakeOnboardingRepository(atStep2);
+      final classes = FakeClassesRepository()
+        ..active = [sampleClass(id: 'other'), sampleClass()];
+      await _open(tester, onboarding, classes, classId: 'c1');
+      await _saveStudent(tester);
+
+      expect(classes.calls.first, 'enroll:c1:s1');
+      expect(classes.calls, isNot(contains('list:active:1')));
+      expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
+      expect(find.text('Bước 3/5'), findsOneWidget);
+    });
+
+    testWidgets('chưa có lớp (bỏ qua bước 1): chỉ tạo học viên, không ghi danh '
+        'và không báo lỗi', (tester) async {
+      final onboarding = FakeOnboardingRepository(atStep2);
       final classes = FakeClassesRepository()..active = [sampleClass()];
       await _open(tester, onboarding, classes);
+      await _saveStudent(tester);
+
+      expect(classes.calls.where((c) => c.startsWith('enroll')), isEmpty);
+      expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
+      expect(
+        find.text('Chưa thêm được vào lớp', findRichText: true),
+        findsNothing,
+      );
+      expect(find.text('Bước 3/5'), findsOneWidget);
+    });
+
+    testWidgets(
+      'ghi danh lỗi mạng: thử lại cùng khóa, không tạo học viên hai',
+      (tester) async {
+        final onboarding = FakeOnboardingRepository(atStep2);
+        final classes = FakeClassesRepository()
+          ..enrollError = const ApiException.network();
+        final students = FakeStudentRepository([
+          const Student(id: 's1', fullName: 'Minh Anh'),
+        ]);
+        await _open(
+          tester,
+          onboarding,
+          classes,
+          students: students,
+          classId: 'c1',
+        );
+        await _saveStudent(tester);
+
+        expect(onboarding.patches, isEmpty);
+        expect(find.text('Bước 2/5'), findsOneWidget);
+        classes.enrollError = null;
+        _retry(tester);
+        await tester.pumpAndSettle();
+
+        expect(students.calls, hasLength(1));
+        expect(classes.calls.where((c) => c == 'enroll:c1:s1'), hasLength(2));
+        expect(classes.keys[0], classes.keys[1]);
+        expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
+        expect(find.text('Bước 3/5'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'lỗi cũ của bước trước không hiện "chưa ghi danh" ở lần ghi bước '
+      'khác',
+      (tester) async {
+        final onboarding = FakeOnboardingRepository(
+          atStep2,
+          patchError: const ApiException.network(),
+        );
+        await _open(tester, onboarding, FakeClassesRepository(), classId: 'c1');
+        await _saveStudent(tester);
+        expect(find.textContaining('Chưa thêm được vào lớp'), findsOneWidget);
+
+        onboarding.patchError = null;
+        _retry(tester);
+        await tester.pumpAndSettle();
+        expect(find.textContaining('Chưa thêm được vào lớp'), findsNothing);
+        expect(find.text('Bước 3/5'), findsOneWidget);
+      },
+    );
+
+    testWidgets('kill app sau khi tạo học viên, chưa ghi done: mở lại ghi danh '
+        'tiếp, không tạo học viên mới', (tester) async {
+      final kv = InMemoryKeyValueStore();
+      final onboarding = FakeOnboardingRepository(atStep2);
+      final classes = FakeClassesRepository()
+        ..enrollError = const ApiException.network();
+      final students = FakeStudentRepository([
+        const Student(id: 's1', fullName: 'Minh Anh'),
+      ]);
+      await _open(
+        tester,
+        onboarding,
+        classes,
+        students: students,
+        kv: kv,
+        classId: 'c1',
+      );
+      await _saveStudent(tester);
+      expect(students.calls, hasLength(1));
+
+      await _kill(tester);
+      classes.enrollError = null;
+      await _open(
+        tester,
+        onboarding,
+        classes,
+        students: students,
+        kv: kv,
+        classId: 'c1',
+      );
+
+      expect(
+        students.calls,
+        hasLength(1),
+        reason: 'không tạo học viên thứ hai',
+      );
+      expect(classes.calls.where((c) => c == 'enroll:c1:s1'), hasLength(2));
+      expect(classes.keys[0], classes.keys[1]);
+      expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
+      expect(find.text('Bước 3/5'), findsOneWidget);
+    });
+
+    testWidgets(
+      'kill app khi phản hồi tạo học viên bị mất: gửi lại cùng khóa',
+      (tester) async {
+        final kv = InMemoryKeyValueStore();
+        final onboarding = FakeOnboardingRepository(atStep2);
+        final students = FakeStudentRepository([
+          const ApiException.network(),
+          const Student(id: 's1', fullName: 'Minh Anh'),
+        ]);
+        await _open(
+          tester,
+          onboarding,
+          FakeClassesRepository(),
+          students: students,
+          kv: kv,
+          classId: 'c1',
+        );
+        await _saveStudent(tester);
+
+        await _kill(tester);
+        await _open(
+          tester,
+          onboarding,
+          FakeClassesRepository(),
+          students: students,
+          kv: kv,
+          classId: 'c1',
+        );
+        await _saveStudent(tester);
+
+        expect(students.calls, hasLength(2));
+        expect(students.calls[0].key, students.calls[1].key);
+      },
+    );
+
+    testWidgets('chữ 130%, bàn phím mở: nút Thử lại vẫn hiện', (tester) async {
+      await _open(
+        tester,
+        FakeOnboardingRepository(atStep2),
+        FakeClassesRepository()..enrollError = const ApiException.network(),
+        scale: 1.3,
+        keyboard: 300,
+        classId: 'c1',
+      );
+      await _saveStudent(tester);
+      expect(find.text('Thử lại'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('sang bước khác thì SnackBar "đã lưu" bị gỡ', (tester) async {
+      final onboarding = FakeOnboardingRepository(onboardingOf({}));
+      await _open(tester, onboarding, FakeClassesRepository());
+      await _fillClass(tester);
+      await _save(tester);
+
+      expect(find.text('Bước 2/5'), findsOneWidget);
+      expect(find.byType(SnackBar), findsNothing);
+    });
+  });
+
+  group('bước 3: form quy tắc lặp có sẵn', () {
+    testWidgets('lưu quy tắc cho lớp đã lưu (get theo id), ghi done, sang '
+        'bước 4', (tester) async {
+      final onboarding = FakeOnboardingRepository(atStep3);
+      final classes = FakeClassesRepository()
+        ..active = [sampleClass(id: 'other')]
+        ..current = sampleClass();
+      await _open(tester, onboarding, classes, classId: 'c1');
 
       expect(find.text('Bước 3/5'), findsOneWidget);
       expect(find.text('Để sau'), findsOneWidget);
+      expect(classes.calls.first, 'get:c1');
+      expect(classes.calls, isNot(contains('list:active:1')));
       await _addRule(tester);
       await _save(tester);
 
@@ -241,9 +462,10 @@ void main() {
     testWidgets('kill app ở bước 3, mở lại: đúng bước 3, quy tắc còn', (
       tester,
     ) async {
+      final kv = InMemoryKeyValueStore();
       final onboarding = FakeOnboardingRepository(atStep3);
-      final classes = FakeClassesRepository()..active = [sampleClass()];
-      await _open(tester, onboarding, classes);
+      final classes = FakeClassesRepository()..current = sampleClass();
+      await _open(tester, onboarding, classes, kv: kv, classId: 'c1');
       await _addRule(tester);
       // Ghi lịch thành công nhưng ghi bước lỗi (app bị kill ngay sau đó).
       onboarding.patchError = const ApiException.network();
@@ -251,17 +473,17 @@ void main() {
       expect(onboarding.patches.last.$2, _done);
 
       // Mở lại: server giữ quy tắc (bản giả không tự lưu, nên gán lại).
-      classes.active = [sampleClass(rules: classes.lastRules!)];
+      classes.current = sampleClass(rules: classes.lastRules!);
       onboarding.patchError = null;
-      await tester.pumpWidget(const SizedBox());
-      await _open(tester, onboarding, classes);
+      await _kill(tester);
+      await _open(tester, onboarding, classes, kv: kv, classId: 'c1');
 
       expect(find.text('Bước 3/5'), findsOneWidget);
       expect(find.text('Buổi 1'), findsOneWidget);
       expect(find.text('18:00'), findsOneWidget);
     });
 
-    testWidgets('chưa có lớp: báo, không có form', (tester) async {
+    testWidgets('chưa có lớp nào: báo, không có form', (tester) async {
       await _open(
         tester,
         FakeOnboardingRepository(atStep3),
@@ -274,12 +496,34 @@ void main() {
       expect(find.text('Thêm buổi'), findsNothing);
     });
 
-    testWidgets('chữ 130%: nhiều buổi và lỗi trùng không tràn', (tester) async {
+    testWidgets('chưa lưu lớp nhưng có lớp: cho chọn, rồi tải đủ trường', (
+      tester,
+    ) async {
+      final classes = FakeClassesRepository()
+        ..active = [sampleClass(id: 'a', name: 'Lý 8B'), sampleClass()]
+        ..current = sampleClass(id: 'a', name: 'Lý 8B');
+      await _open(tester, FakeOnboardingRepository(atStep3), classes);
+
+      expect(
+        find.text('Bạn có nhiều lớp. Chọn lớp cần đặt lịch.'),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Lý 8B'));
+      await tester.pumpAndSettle();
+      expect(classes.calls, contains('get:a'));
+      expect(find.text('Thêm buổi'), findsOneWidget);
+    });
+
+    testWidgets('chữ 130%, bàn phím mở: nhiều buổi và lỗi trùng không tràn', (
+      tester,
+    ) async {
       await _open(
         tester,
         FakeOnboardingRepository(atStep3),
-        FakeClassesRepository()..active = [sampleClass()],
+        FakeClassesRepository()..current = sampleClass(),
         scale: 1.3,
+        keyboard: 300,
+        classId: 'c1',
       );
       await _addRule(tester);
       await _addRule(tester);

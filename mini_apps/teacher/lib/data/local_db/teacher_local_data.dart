@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import 'package:tasco_storage/tasco_storage.dart';
 
+import '../../features/onboarding/data/onboarding_draft.dart';
 import '../sync/background_flags.dart';
 import 'teacher_database.dart';
 
@@ -97,6 +98,7 @@ class TeacherLocalData {
     try {
       await deleteTeacherDatabase(_keys, await _dir());
       await _keys.delete(ownerKey);
+      await _keys.delete(OnboardingDraftStore.key);
     } finally {
       await _reopen(); // lỗi xóa vẫn để mini-app dùng lại được CSDL
       await _resumeSync?.call();

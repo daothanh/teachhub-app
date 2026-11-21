@@ -26,6 +26,7 @@ import 'features/classes/classes_routes.dart';
 import 'features/fees/data/fee_repository.dart';
 import 'features/fees/fees_routes.dart';
 import 'features/offline/offline_banner_shell.dart';
+import 'features/onboarding/data/onboarding_draft.dart';
 import 'features/onboarding/data/onboarding_models.dart';
 import 'features/onboarding/data/onboarding_repository.dart';
 import 'features/onboarding/pages/onboarding_page.dart';
@@ -166,6 +167,11 @@ class TeacherController {
     if (!getIt.isRegistered<OnboardingRepository>()) {
       getIt.registerLazySingleton<OnboardingRepository>(
         () => DioOnboardingRepository(api()),
+      );
+    }
+    if (!getIt.isRegistered<OnboardingDraftStore>()) {
+      getIt.registerLazySingleton<OnboardingDraftStore>(
+        () => OnboardingDraftStore(keyStoreOverride ?? SecureStore()),
       );
     }
   }

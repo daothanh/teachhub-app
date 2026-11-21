@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:teacher/features/classes/data/classes_repository.dart';
 import 'package:teacher/features/fees/data/fee_repository.dart';
+import 'package:tasco_storage/tasco_storage.dart';
+import 'package:teacher/features/onboarding/data/onboarding_draft.dart';
 import 'package:teacher/features/onboarding/data/onboarding_models.dart';
 import 'package:teacher/features/onboarding/data/onboarding_repository.dart';
 import 'package:teacher/features/onboarding/pages/onboarding_page.dart';
@@ -25,6 +27,9 @@ Future<FakeOnboardingRepository> _open(
   FakeClassesRepository? classes,
 }) async {
   GetIt.I.registerSingleton<OnboardingRepository>(repo);
+  GetIt.I.registerSingleton<OnboardingDraftStore>(
+    OnboardingDraftStore(InMemoryKeyValueStore()),
+  );
   GetIt.I.registerSingleton<ClassesRepository>(
     classes ?? (FakeClassesRepository()..active = [sampleClass()]),
   );
@@ -235,7 +240,7 @@ void main() {
       await tester.tap(find.text('Lưu học viên'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Chưa thêm được vào lớp'), findsOneWidget);
+      expect(find.text('Đã lưu. Chưa ghi nhận được bước này.'), findsOneWidget);
       expect(find.text('Bước 2/5'), findsOneWidget);
 
       repo.patchError = null;

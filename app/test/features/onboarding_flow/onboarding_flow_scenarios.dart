@@ -21,6 +21,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tasco_auth/tasco_auth.dart';
 import 'package:tasco_core/tasco_core.dart';
+import 'package:tasco_storage/tasco_storage.dart';
 import 'package:tasco_module/tasco_module.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:tasco_utils/tasco_utils.dart';
@@ -75,6 +76,9 @@ void defineOnboardingFlowTests() {
   late SyncEngine engine;
   late teacher_l10n.MiniAppLocalizations tl;
 
+  /// Kho khóa của máy (Keychain/Keystore): sống qua "kill app" như thật.
+  late InMemoryKeyValueStore keyStore;
+
   /// Mở app như lần chạy mới (cây widget, CSDL máy, router đều mới); [backend]
   /// là server, sống qua các lần mở: gọi lại để mô phỏng "kill app, mở lại".
   Future<void> openApp(
@@ -86,6 +90,7 @@ void defineOnboardingFlowTests() {
     addTearDown(tester.view.reset);
 
     SharedPreferences.setMockInitialValues({});
+    TeacherController.instance.keyStoreOverride = keyStore;
     final dio = backend.dio();
     await GetIt.I.reset();
     addTearDown(GetIt.I.reset);
@@ -190,6 +195,8 @@ void defineOnboardingFlowTests() {
     );
     // 10:00 giờ Việt Nam, giữa tháng.
     backend = FakeOnboardingBackend(now: DateTime.utc(2026, 11, 15, 3));
+    keyStore = InMemoryKeyValueStore();
+    addTearDown(() => TeacherController.instance.keyStoreOverride = null);
   }
 
   Finder inputOf(String label) => find.byWidgetPredicate(
@@ -379,6 +386,46 @@ void defineOnboardingFlowTests() {
     expect(backend.studentCreates, 1);
     expect(backend.enrolled, [FakeOnboardingBackend.studentId]);
     expect(backend.steps['add_students'], 'done');
+
+    await finish(tester);
+  });
+
+  testWidgets('kill app sau khi tạo lớp mà chưa ghi done bước 1: mở lại không '
+      'tạo lớp mới, chỉ ghi lại bước', (tester) async {
+    await setUpBackend(tester);
+    backend.failStepPatches['create_class'] = 1;
+    await openApp(tester);
+    await createClass(tester);
+    expect(backend.classCreates, 1);
+    expect(backend.steps['create_class'], 'pending');
+
+    await finish(tester); // kill app
+    await openApp(tester);
+
+    expect(backend.classCreates, 1, reason: 'không tạo lớp thứ hai');
+    expect(backend.steps['create_class'], 'done');
+    expectStep(2);
+
+    await finish(tester);
+  });
+
+  testWidgets('kill app sau khi tạo học viên mà ghi danh lỗi: mở lại ghi danh '
+      'tiếp, không tạo học viên mới', (tester) async {
+    await setUpBackend(tester);
+    backend.failEnrolls = 1;
+    await openApp(tester);
+    await createClass(tester);
+    await addStudent(tester);
+    expect(backend.studentCreates, 1);
+    expect(backend.enrolled, isEmpty);
+
+    await finish(tester); // kill app
+    await openApp(tester);
+
+    expect(backend.studentCreates, 1, reason: 'không tạo học viên thứ hai');
+    expect(backend.enrolled, [FakeOnboardingBackend.studentId]);
+    expect(backend.steps['add_students'], 'done');
+    expectStep(3);
 
     await finish(tester);
   });

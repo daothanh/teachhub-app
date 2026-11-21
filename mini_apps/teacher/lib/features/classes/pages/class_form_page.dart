@@ -9,6 +9,7 @@ import '../../fees/data/fee_models.dart';
 import '../cubit/class_form_cubit.dart';
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
+import '../data/draft_keys.dart';
 import '../widgets/class_fee_section.dart';
 import '../widgets/classes_error_text.dart';
 import '../widgets/read_only_field.dart';
@@ -29,6 +30,7 @@ class ClassFormPage extends StatelessWidget {
     this.onSaved,
     this.part = ClassFormPart.all,
     this.embedded = false,
+    this.keys,
   });
   final String? classId;
   final TeachClass? initial;
@@ -41,12 +43,16 @@ class ClassFormPage extends StatelessWidget {
   /// Nhúng trong màn khác: không có thanh tiêu đề riêng.
   final bool embedded;
 
+  /// Khóa bền vững (onboarding); null = khóa trong bộ nhớ.
+  final DraftKeys? keys;
+
   @override
   Widget build(BuildContext context) => BlocProvider(
     create: (_) => ClassFormCubit(
       repository ?? classesRepository(),
       initial: initial,
       classId: classId,
+      keys: keys,
     )..load(),
     child: _FormView(onSaved: onSaved, part: part, embedded: embedded),
   );
@@ -82,27 +88,27 @@ class _FormView extends StatelessWidget {
       },
       builder: (context, s) {
         final editing = s.initial != null;
+        final body = s.loading
+            ? (s.error == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : AppEmptyState(
+                      message: classesErrorText(l10n, s.error!),
+                      action: AppButton(
+                        label: l10n.classesRetry,
+                        onPressed: context.read<ClassFormCubit>().load,
+                      ),
+                    ))
+            : _FormBody(initial: s.initial, state: s, part: part);
+        // Nhúng trong màn khác: dùng Scaffold của màn đó (không lồng Scaffold
+        // con tự co theo bàn phím lần hai).
+        if (embedded) return body;
         return Scaffold(
-          appBar: embedded
-              ? null
-              : AppBar(
-                  title: Text(
-                    editing
-                        ? l10n.classesFormEditTitle
-                        : l10n.classesFormNewTitle,
-                  ),
-                ),
-          body: s.loading
-              ? (s.error == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : AppEmptyState(
-                        message: classesErrorText(l10n, s.error!),
-                        action: AppButton(
-                          label: l10n.classesRetry,
-                          onPressed: context.read<ClassFormCubit>().load,
-                        ),
-                      ))
-              : _FormBody(initial: s.initial, state: s, part: part),
+          appBar: AppBar(
+            title: Text(
+              editing ? l10n.classesFormEditTitle : l10n.classesFormNewTitle,
+            ),
+          ),
+          body: body,
         );
       },
     );
@@ -329,7 +335,8 @@ class _FormBodyState extends State<_FormBody> {
             onChanged: (r) => setState(() => _rules = r),
           ),
         ],
-        if (part != ClassFormPart.schedule) ...[
+        // Onboarding không hỏi học phí: cấu hình sau trong màn lớp.
+        if (part == ClassFormPart.all) ...[
           gap,
           ClassFeeSection(
             enabled: _feeOn,

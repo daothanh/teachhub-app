@@ -8,11 +8,11 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 import '../../../l10n/l10n.dart';
 import '../../classes/data/class_models.dart';
 import '../../classes/data/classes_repository.dart';
-import '../../classes/data/draft_keys.dart';
 import '../../classes/pages/class_form_page.dart';
 import '../../fees/pages/payout_accounts_page.dart';
 import '../../students/pages/student_form_page.dart';
 import '../cubit/onboarding_cubit.dart';
+import '../data/onboarding_draft.dart';
 import '../data/onboarding_models.dart';
 import '../data/onboarding_repository.dart';
 
@@ -139,6 +139,12 @@ class OnboardingView extends StatelessWidget {
   }
 }
 
+/// Ghi bước `done`; `true` khi server đã nhận (cubit không có lỗi).
+Future<bool> _complete(OnboardingCubit cubit, OnboardingStep step) async {
+  await cubit.complete(step);
+  return !cubit.isClosed && cubit.state.error == null;
+}
+
 class _StepBody extends StatelessWidget {
   const _StepBody({
     required this.data,
@@ -183,18 +189,13 @@ class _StepBody extends StatelessWidget {
           key: ValueKey(step),
           child: switch (step) {
             OnboardingStep.addStudents => _AddStudentsStep(
-              onSaved: () => cubit.complete(step),
+              onSaved: () => _complete(cubit, step),
             ),
-            OnboardingStep.createClass => _SaveThenComplete(
-              builder: (onSaved) => ClassFormPage(
-                part: ClassFormPart.basics,
-                embedded: true,
-                onSaved: (_) => onSaved(),
-              ),
-              onSaved: () => cubit.complete(step),
+            OnboardingStep.createClass => _CreateClassStep(
+              onSaved: () => _complete(cubit, step),
             ),
             OnboardingStep.setSchedule => _ScheduleStep(
-              onSaved: () => cubit.complete(step),
+              onSaved: () => _complete(cubit, step),
             ),
             OnboardingStep.payoutAccount => PayoutAccountsPage(
               embedded: true,
@@ -221,186 +222,341 @@ class _StepBody extends StatelessWidget {
   }
 }
 
-/// Bước nhúng một form có sẵn (tạo lớp, thêm học viên). Lưu xong form đã gọi
-/// API thật; nếu ghi bước thất bại thì chỉ thử lại việc ghi bước, không gửi
-/// lại dữ liệu.
-class _SaveThenComplete extends StatefulWidget {
-  const _SaveThenComplete({required this.builder, required this.onSaved});
+/// Kho bản nháp onboarding (đăng ký ở `TeacherController`).
+OnboardingDraftStore _store() => GetIt.I<OnboardingDraftStore>();
 
-  final Widget Function(VoidCallback onSaved) builder;
-  final VoidCallback onSaved;
+/// Đọc [OnboardingDraft] đã lưu trước khi dựng bước (kill app giữa chừng thì
+/// bước thấy lớp/học viên đã tạo và không tạo lại).
+class _DraftGate extends StatefulWidget {
+  const _DraftGate({required this.builder});
+
+  final Widget Function(OnboardingDraft draft) builder;
 
   @override
-  State<_SaveThenComplete> createState() => _SaveThenCompleteState();
+  State<_DraftGate> createState() => _DraftGateState();
 }
 
-class _SaveThenCompleteState extends State<_SaveThenComplete> {
-  bool _saved = false;
+class _DraftGateState extends State<_DraftGate> {
+  late final Future<OnboardingDraft> _draft = _store().read();
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<OnboardingDraft>(
+    future: _draft,
+    builder: (context, snap) => snap.hasData
+        ? widget.builder(snap.data!)
+        : const Center(child: CircularProgressIndicator()),
+  );
+}
+
+/// Thông báo "đã lưu nhưng chưa xong bước" kèm Thử lại. Nằm trong vùng cuộn có
+/// giới hạn nên bàn phím mở hay chữ lớn vẫn bấm được.
+class _Notice extends StatelessWidget {
+  const _Notice({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Flexible(
+    flex: 0,
+    child: SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+      child: Column(
+        children: [
+          Text(message),
+          const SizedBox(height: 8),
+          AppButton(
+            label: context.miniAppL10n.onboardingRetry,
+            onPressed: onRetry,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+/// Bước 1: form lớp có sẵn. Lớp tạo xong thì `classId` được lưu bền vững trước
+/// khi ghi bước; mở lại khi lớp đã tạo mà bước chưa `done` thì chỉ ghi lại bước.
+class _CreateClassStep extends StatelessWidget {
+  const _CreateClassStep({required this.onSaved});
+
+  final Future<bool> Function() onSaved;
+
+  @override
+  Widget build(BuildContext context) => _DraftGate(
+    builder: (draft) => _CreateClassBody(draft: draft, onSaved: onSaved),
+  );
+}
+
+class _CreateClassBody extends StatefulWidget {
+  const _CreateClassBody({required this.draft, required this.onSaved});
+
+  final OnboardingDraft draft;
+  final Future<bool> Function() onSaved;
+
+  @override
+  State<_CreateClassBody> createState() => _CreateClassBodyState();
+}
+
+class _CreateClassBodyState extends State<_CreateClassBody> {
+  late final _keys = _store().keys(widget.draft, 'class');
+  late bool _created = widget.draft.classId != null;
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_created) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _record());
+    }
+  }
+
+  Future<void> _record() async {
+    setState(() => _failed = false);
+    final ok = await widget.onSaved();
+    if (mounted && !ok) setState(() => _failed = true);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
-    final state = context.watch<OnboardingCubit>().state;
-    final failed = _saved && !state.saving && state.error != null;
     return Column(
       children: [
         Expanded(
-          child: widget.builder(() {
-            setState(() => _saved = true);
-            widget.onSaved();
-          }),
-        ),
-        if (failed)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Column(
-              children: [
-                Text(l10n.onboardingSaved),
-                const SizedBox(height: 8),
-                AppButton(
-                  label: l10n.onboardingRetry,
-                  onPressed: widget.onSaved,
+          child: _created
+              ? (_failed
+                    ? const SizedBox.shrink()
+                    : const Center(child: CircularProgressIndicator()))
+              : ClassFormPage(
+                  part: ClassFormPart.basics,
+                  embedded: true,
+                  keys: _keys,
+                  onSaved: (c) async {
+                    await _store().update((d) => d.copyWith(classId: c.id));
+                    if (!mounted) return;
+                    setState(() => _created = true);
+                    await _record();
+                  },
                 ),
-              ],
-            ),
-          ),
+        ),
+        if (_failed) _Notice(message: l10n.onboardingSaved, onRetry: _record),
       ],
     );
   }
 }
 
-/// Bước 3: đặt lịch cho lớp đã tạo ở bước 1. Lớp lấy từ server nên mở lại app
-/// vẫn đúng lớp và quy tắc đã lưu.
-class _ScheduleStep extends StatefulWidget {
-  const _ScheduleStep({required this.onSaved});
-
-  final VoidCallback onSaved;
-
-  @override
-  State<_ScheduleStep> createState() => _ScheduleStepState();
-}
-
-class _ScheduleStepState extends State<_ScheduleStep> {
-  late Future<TeachClass?> _class = _load();
-
-  // shortcut: lấy lớp đầu danh sách; lớp mới nhất = lớp ở bước 1 khi chưa có lớp
-  // khác, đủ cho onboarding của tenant mới.
-  Future<TeachClass?> _load() async =>
-      (await classesRepository().list()).items.firstOrNull;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.miniAppL10n;
-    return FutureBuilder<TeachClass?>(
-      future: _class,
-      builder: (context, snap) {
-        if (snap.connectionState != ConnectionState.done) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final c = snap.data;
-        if (snap.hasError || c == null) {
-          return AppEmptyState(
-            message: snap.hasError
-                ? l10n.onboardingLoadFailed
-                : l10n.onboardingScheduleNoClass,
-            action: AppButton(
-              label: l10n.onboardingRetry,
-              onPressed: () => setState(() => _class = _load()),
-            ),
-          );
-        }
-        return _SaveThenComplete(
-          builder: (onSaved) => ClassFormPage(
-            initial: c,
-            part: ClassFormPart.schedule,
-            embedded: true,
-            onSaved: (_) => onSaved(),
-          ),
-          onSaved: widget.onSaved,
-        );
-      },
-    );
-  }
-}
-
-/// Bước 2: tạo học viên rồi ghi danh vào lớp ở bước 1 (lớp lấy từ server như
-/// bước 3). Lỗi giữa chừng chỉ thử lại phần còn dở: học viên đã tạo thì không
-/// tạo lại, ghi danh dùng cùng khóa nên server phát lại thay vì ghi trùng.
-class _AddStudentsStep extends StatefulWidget {
+/// Bước 2: tạo học viên rồi ghi danh vào lớp của bước 1. Chưa có lớp (bỏ qua
+/// bước 1) thì chỉ tạo học viên. `studentId` và các khóa lưu bền vững tới khi
+/// bước `done`: kill app giữa chừng thì ghi danh tiếp, không tạo học viên mới.
+class _AddStudentsStep extends StatelessWidget {
   const _AddStudentsStep({required this.onSaved});
 
-  final VoidCallback onSaved;
+  final Future<bool> Function() onSaved;
 
   @override
-  State<_AddStudentsStep> createState() => _AddStudentsStepState();
+  Widget build(BuildContext context) => _DraftGate(
+    builder: (draft) => _AddStudentsBody(draft: draft, onSaved: onSaved),
+  );
 }
 
-class _AddStudentsStepState extends State<_AddStudentsStep> {
-  final _keys = DraftKeys();
-  String? _studentId;
-  bool _enrolling = false;
-  ApiException? _error;
+class _AddStudentsBody extends StatefulWidget {
+  const _AddStudentsBody({required this.draft, required this.onSaved});
 
-  Future<void> _enroll() async {
+  final OnboardingDraft draft;
+  final Future<bool> Function() onSaved;
+
+  @override
+  State<_AddStudentsBody> createState() => _AddStudentsBodyState();
+}
+
+class _AddStudentsBodyState extends State<_AddStudentsBody> {
+  late final _studentKeys = _store().keys(widget.draft, 'student');
+  late final _enrollKeys = _store().keys(widget.draft, 'enroll');
+  late String? _studentId = widget.draft.studentId;
+  bool _running = false;
+
+  /// Lỗi của lần chạy hiện tại (đã xóa lỗi cũ trước khi chạy).
+  bool _failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_studentId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _run());
+    }
+  }
+
+  Future<void> _run() async {
     final studentId = _studentId;
-    if (studentId == null || _enrolling) return;
+    if (studentId == null || _running) return;
     setState(() {
-      _enrolling = true;
-      _error = null;
+      _running = true;
+      _failed = false;
     });
-    final repo = classesRepository();
+    var ok = false;
     try {
-      final classId = (await repo.list()).items.firstOrNull?.id;
-      if (classId == null) throw const ApiException.unexpected();
-      final draft = '$classId|$studentId';
-      await repo.enroll(
-        classId,
-        studentId,
-        idempotencyKey: _keys.of('enroll', draft),
-      );
-      _keys.done('enroll');
-      if (!mounted) return;
-      widget.onSaved();
+      final classId = widget.draft.classId;
+      if (classId != null) {
+        final enrolled = _enrollKeys.of('enroll', '$classId|$studentId');
+        await classesRepository().enroll(
+          classId,
+          studentId,
+          idempotencyKey: enrolled,
+        );
+        _enrollKeys.done('enroll');
+      }
+      ok = await widget.onSaved();
+      if (ok) {
+        await _store().update((d) => d.copyWith(clearStudent: true));
+      }
     } on ApiException catch (e) {
-      if (!e.retryable) _keys.done('enroll');
-      if (!mounted) return;
-      setState(() => _error = e);
+      if (!e.retryable) _enrollKeys.done('enroll');
     } finally {
-      if (mounted) setState(() => _enrolling = false);
+      if (mounted) {
+        setState(() {
+          _running = false;
+          _failed = !ok;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
-    // Ghi danh xong mà ghi bước lỗi: thử lại gọi lại ghi danh (phát lại) rồi ghi bước.
-    final stepFailed =
-        _studentId != null &&
-        _error == null &&
-        !_enrolling &&
-        context.watch<OnboardingCubit>().state.error != null;
     return Column(
       children: [
         Expanded(
-          child: StudentFormScope(
-            onSaved: (id) {
-              setState(() => _studentId = id);
-              _enroll();
-            },
-          ),
+          child: _studentId != null
+              ? (_failed
+                    ? const SizedBox.shrink()
+                    : const Center(child: CircularProgressIndicator()))
+              : StudentFormScope(
+                  keys: _studentKeys,
+                  onSaved: (id) async {
+                    await _store().update((d) => d.copyWith(studentId: id));
+                    if (!mounted) return;
+                    setState(() => _studentId = id);
+                    await _run();
+                  },
+                ),
         ),
-        if (_error != null || stepFailed)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Column(
-              children: [
-                Text(l10n.onboardingStudentNotEnrolled),
-                const SizedBox(height: 8),
-                AppButton(label: l10n.onboardingRetry, onPressed: _enroll),
-              ],
-            ),
+        if (_failed && !_running)
+          _Notice(
+            message: widget.draft.classId == null
+                ? l10n.onboardingSaved
+                : l10n.onboardingStudentNotEnrolled,
+            onRetry: _run,
           ),
       ],
+    );
+  }
+}
+
+/// Bước 3: đặt lịch cho lớp của bước 1 (`classId` đã lưu, tải đủ trường bằng
+/// `get`). Chưa có `classId`: có lớp thì cho chọn, không có lớp thì báo.
+class _ScheduleStep extends StatelessWidget {
+  const _ScheduleStep({required this.onSaved});
+
+  final Future<bool> Function() onSaved;
+
+  @override
+  Widget build(BuildContext context) => _DraftGate(
+    builder: (draft) => _ScheduleBody(draft: draft, onSaved: onSaved),
+  );
+}
+
+typedef _Resolved = ({TeachClass? cls, List<TeachClass> choices});
+
+class _ScheduleBody extends StatefulWidget {
+  const _ScheduleBody({required this.draft, required this.onSaved});
+
+  final OnboardingDraft draft;
+  final Future<bool> Function() onSaved;
+
+  @override
+  State<_ScheduleBody> createState() => _ScheduleBodyState();
+}
+
+class _ScheduleBodyState extends State<_ScheduleBody> {
+  late Future<_Resolved> _resolved = _resolve(widget.draft.classId);
+  bool _failed = false;
+
+  Future<_Resolved> _resolve(String? classId) async {
+    final repo = classesRepository();
+    if (classId != null) {
+      try {
+        return (cls: await repo.get(classId), choices: <TeachClass>[]);
+      } on ApiException catch (e) {
+        if (e.kind != ApiErrorKind.notFound) rethrow;
+      }
+    }
+    return (cls: null, choices: (await repo.list()).items);
+  }
+
+  Future<void> _choose(TeachClass c) async {
+    await _store().update((d) => d.copyWith(classId: c.id));
+    if (mounted) {
+      setState(() {
+        _resolved = _resolve(c.id);
+      });
+    }
+  }
+
+  Future<void> _record() async {
+    setState(() => _failed = false);
+    final ok = await widget.onSaved();
+    if (mounted && !ok) setState(() => _failed = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    return FutureBuilder<_Resolved>(
+      future: _resolved,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final r = snap.data;
+        Widget retry(String message) => AppEmptyState(
+          message: message,
+          action: AppButton(
+            label: l10n.onboardingRetry,
+            onPressed: () => setState(() {
+              _resolved = _resolve(widget.draft.classId);
+            }),
+          ),
+        );
+        if (r == null) return retry(l10n.onboardingLoadFailed);
+        if (r.cls == null && r.choices.isEmpty) {
+          return retry(l10n.onboardingScheduleNoClass);
+        }
+        if (r.cls == null) {
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              Text(l10n.onboardingScheduleChooseClass),
+              for (final c in r.choices)
+                ListTile(title: Text(c.name), onTap: () => _choose(c)),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            Expanded(
+              child: ClassFormPage(
+                initial: r.cls,
+                part: ClassFormPart.schedule,
+                embedded: true,
+                onSaved: (_) => _record(),
+              ),
+            ),
+            if (_failed)
+              _Notice(message: l10n.onboardingSaved, onRetry: _record),
+          ],
+        );
+      },
     );
   }
 }
