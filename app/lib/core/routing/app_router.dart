@@ -58,13 +58,24 @@ GoRouter buildAppRouter({
     deniedPath: AppRoutes.rolePicker,
   );
 
-  return GoRouter(
+  // go_router 14.8.1: `refreshListenable` bắn trong lúc một route đang được
+  // `push` thì kết quả của `push` không bao giờ trả về (invite → đồng ý →
+  // nhận lại treo ở "Đang tải..."). Màn đồng ý tự điều hướng khi xong nên
+  // router không cần làm mới theo trạng thái đồng ý khi đang ở đó.
+  late final GoRouter router;
+  bool atConsent() {
+    final config = router.routerDelegate.currentConfiguration;
+    return config.isNotEmpty &&
+        config.matches.last.matchedLocation == AppRoutes.consent;
+  }
+
+  return router = GoRouter(
     navigatorKey: navigatorKey,
     initialLocation: AppRoutes.splash,
     refreshListenable: Listenable.merge([
       GoRouterRefreshStream(authCubit.stream),
       GoRouterRefreshStream(membershipCubit.stream),
-      GoRouterRefreshStream(consentCubit.stream),
+      GoRouterRefreshStream(consentCubit.stream.where((_) => !atConsent())),
       ?updateRequired,
     ]),
     onException: (_, _, router) => router.go(AppRoutes.splash),
