@@ -615,6 +615,202 @@ void main() {
       },
     );
 
+    Invoice owed(int paid, {int total = 1200000}) => sampleInvoice(
+      status: paid == 0 ? InvoiceStatus.issued : InvoiceStatus.partiallyPaid,
+      total: total,
+      paid: paid,
+    );
+    int sends() => repo.calls.where((x) => x.startsWith('pay:')).length;
+
+    test(
+      'reloadForPayment: cập nhật số còn nợ; đã paid thì báo và trả false',
+      () async {
+        final c = make();
+        await c.load();
+        repo.invoice = owed(200000);
+        expect(await c.reloadForPayment(), isTrue);
+        expect(c.state.invoice!.remainingAmount, 1000000);
+        expect(c.state.busy, isFalse);
+        repo.invoice = sampleInvoice(
+          status: InvoiceStatus.paid,
+          total: 1200000,
+          paid: 1200000,
+        );
+        expect(await c.reloadForPayment(), isFalse);
+        expect(c.state.notice, PayNotice.notPayable);
+        repo.invoiceError = const ApiException.network();
+        expect(await c.reloadForPayment(), isFalse);
+        expect(c.state.voidError, isNotNull);
+        await c.close();
+      },
+    );
+
+    for (final (name, fresh, remaining) in [
+      ('nhỏ hơn', 200000, 1000000),
+      ('lớn hơn', -300000, 1500000),
+    ]) {
+      test(
+        'thu đủ khi số còn nợ đã $name: không gửi, báo, xác nhận lại với số mới',
+        () async {
+          final c = make();
+          await c.load();
+          // Số người dùng đã thấy: 1.200.000.
+          repo.invoiceAfterError = fresh > 0
+              ? owed(fresh)
+              : owed(0, total: 1200000 - fresh);
+          await c.recordPayment(pay(1200000), expectedRemaining: 1200000);
+          expect(sends(), 0);
+          expect(c.state.notice, PayNotice.remainingChanged);
+          expect(c.state.invoice!.remainingAmount, remaining);
+          expect(c.state.busy, isFalse);
+          await c.recordPayment(pay(remaining), expectedRemaining: remaining);
+          expect(sends(), 1);
+          expect(repo.paymentInputs.single.amount, remaining);
+          expect(c.state.done, InvoiceDone.paymentRecorded);
+          await c.close();
+        },
+      );
+    }
+
+    test('thu đủ khi hóa đơn đã paid: không gửi, báo không ghi được', () async {
+      final c = make();
+      await c.load();
+      repo.invoiceAfterError = sampleInvoice(
+        status: InvoiceStatus.paid,
+        total: 1200000,
+        paid: 1200000,
+      );
+      await c.recordPayment(pay(1200000), expectedRemaining: 1200000);
+      expect(sends(), 0);
+      expect(c.state.notice, PayNotice.notPayable);
+      expect(c.state.invoice!.canRecordPayment, isFalse);
+      await c.close();
+    });
+
+    test('thu đủ mà không kiểm lại được số còn nợ: không gửi', () async {
+      final c = make();
+      await c.load();
+      repo.invoiceError = const ApiException.network();
+      await c.recordPayment(pay(1200000), expectedRemaining: 1200000);
+      expect(sends(), 0);
+      expect(c.state.error!.retryable, isTrue);
+      await c.close();
+    });
+
+    test(
+      'INVOICE_NOT_PAYABLE mà tải lại lỗi → chưa xác nhận trạng thái',
+      () async {
+        final c = make();
+        await c.load();
+        repo.payError = apiErr(ApiErrorCode.invoiceNotPayable);
+        repo.invoiceError = const ApiException.network();
+        await c.recordPayment(pay(500000));
+        expect(c.state.staleUnverified, isTrue);
+        expect(c.state.error!.code, ApiErrorCode.invoiceNotPayable);
+        await c.close();
+      },
+    );
+
+    test(
+      'khóa: đổi cách thu, ngày hoặc ghi chú → khóa mới; thử lại y nguyên → khóa cũ',
+      () async {
+        final c = make();
+        await c.load();
+        for (final input in [
+          pay(500000),
+          pay(500000, method: PaymentMethod.cash),
+          pay(500000, on: '2026-11-04'),
+          PaymentInput(
+            amount: 500000,
+            method: PaymentMethod.bankTransfer,
+            paidOn: '2026-11-05',
+            note: 'Đóng cho cả tháng',
+          ),
+        ]) {
+          repo.payError = const ApiException.network();
+          await c.recordPayment(input);
+        }
+        expect(repo.keys.toSet(), hasLength(4));
+        repo.payError = const ApiException.network();
+        await c.recordPayment(pay(500000));
+        repo.payError = const ApiException.network();
+        await c.recordPayment(pay(500000));
+        expect(repo.keys[4], repo.keys[5], reason: 'y nguyên');
+        expect(repo.keys[4], isNot(repo.keys[3]));
+        await c.close();
+      },
+    );
+
+    test(
+      'hủy thanh toán: đổi lý do → khóa mới; thử lại y nguyên → khóa cũ',
+      () async {
+        final c = make();
+        await c.load();
+        await c.recordPayment(pay(500000));
+        repo.keys.clear();
+        for (final r in ['Ghi nhầm', 'Ghi nhầm', 'Sai số']) {
+          repo.voidPaymentError = const ApiException.network();
+          await c.voidPayment('p1', r);
+        }
+        expect(repo.keys[0], repo.keys[1]);
+        expect(repo.keys[2], isNot(repo.keys[1]));
+        await c.close();
+      },
+    );
+
+    test('busy không mở lại khi đang tải lại sau lỗi 409', () async {
+      final c = make();
+      await c.load();
+      repo.payError = apiErr(ApiErrorCode.invoiceNotPayable);
+      repo.invoiceGate = Completer<void>();
+      final first = c.recordPayment(pay(500000));
+      await pumpEventQueue();
+      expect(c.state.busy, isTrue, reason: 'đang tải lại');
+      await c.recordPayment(pay(500000));
+      expect(sends(), 1);
+      repo.invoiceGate!.complete();
+      await first;
+      expect(c.state.busy, isFalse);
+      await c.close();
+    });
+
+    test('clearErrors không reset busy', () async {
+      final c = make();
+      await c.load();
+      repo.payGate = Completer<void>();
+      final first = c.recordPayment(pay(500000));
+      await pumpEventQueue();
+      c.clearErrors();
+      expect(c.state.busy, isTrue);
+      repo.payGate!.complete();
+      await first;
+      await c.close();
+    });
+
+    test('biên số tiền: 0, sát trần, 12 chữ số, ghi chú quá dài', () async {
+      final c = make();
+      await c.load();
+      await c.recordPayment(pay(0));
+      expect(c.state.payClientErrors, {'amount'});
+      await c.recordPayment(pay(100000000001));
+      expect(c.state.payClientErrors, {'amount'});
+      await c.recordPayment(pay(123456789012));
+      expect(c.state.payClientErrors, {'amount'});
+      await c.recordPayment(
+        PaymentInput(
+          amount: 1000,
+          method: PaymentMethod.cash,
+          paidOn: '2026-11-05',
+          note: 'x' * 301,
+        ),
+      );
+      expect(c.state.payClientErrors, {'note'});
+      expect(sends(), 0);
+      await c.recordPayment(pay(100000000000));
+      expect(sends(), 1, reason: 'đúng trần thì gửi');
+      await c.close();
+    });
+
     test('hủy thanh toán: về đã phát hành, thanh toán gạch, có khóa', () async {
       final c = make();
       await c.load();

@@ -55,7 +55,7 @@ class InvoicePaymentsSection extends StatelessWidget {
               label: l10n.billingPayFull,
               width: double.infinity,
               disabled: busy,
-              onPressed: () => showPaymentSheet(context, full: true),
+              onPressed: () => _openFull(context),
             ),
           if (inv.remainingAmount > 0) const SizedBox(height: AppSpacing.sm),
           AppButton(
@@ -108,7 +108,7 @@ class _PaymentTile extends StatelessWidget {
     final text = theme.textTheme;
     final p = payment;
     final when = formatIsoDateTime(p.recordedAt);
-    final reason = p.voidReason ?? '—';
+    final reason = p.voidReason ?? l10n.billingNoReason;
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.md),
       child: Column(
@@ -161,6 +161,12 @@ class _PaymentTile extends StatelessWidget {
   }
 }
 
+/// "Đã thu đủ": tải lại hóa đơn trước, để sheet hiện số còn nợ mới nhất.
+Future<void> _openFull(BuildContext context) async {
+  final ok = await context.read<InvoiceCubit>().reloadForPayment();
+  if (ok && context.mounted) await showPaymentSheet(context, full: true);
+}
+
 Future<void> _openVoidPayment(BuildContext context, Payment p) async {
   final l10n = context.miniAppL10n;
   final cubit = context.read<InvoiceCubit>();
@@ -201,13 +207,19 @@ class _PaymentSheet extends StatefulWidget {
 class _PaymentSheetState extends State<_PaymentSheet> {
   final _amount = TextEditingController();
   final _date = TextEditingController();
+  final _note = TextEditingController();
   PaymentMethod _method = PaymentMethod.bankTransfer;
   late String _paidOn;
+
+  /// "Đã thu đủ": số còn nợ người dùng đang thấy và sẽ xác nhận.
+  late int _expected;
 
   @override
   void initState() {
     super.initState();
-    _paidOn = context.read<InvoiceCubit>().today;
+    final cubit = context.read<InvoiceCubit>();
+    _expected = cubit.state.invoice!.remainingAmount;
+    _paidOn = cubit.today;
     _date.text = formatIsoDate(_paidOn);
   }
 
@@ -215,11 +227,11 @@ class _PaymentSheetState extends State<_PaymentSheet> {
   void dispose() {
     _amount.dispose();
     _date.dispose();
+    _note.dispose();
     super.dispose();
   }
 
-  int _value(Invoice inv) =>
-      widget.full ? inv.remainingAmount : (parseVnd(_amount.text) ?? 0);
+  int get _value => widget.full ? _expected : (parseVnd(_amount.text) ?? 0);
 
   Future<void> _pickDate() async {
     final last = DateTime.parse(context.read<InvoiceCubit>().today);
@@ -249,11 +261,20 @@ class _PaymentSheetState extends State<_PaymentSheet> {
     final text = Theme.of(context).textTheme;
     return BlocConsumer<InvoiceCubit, InvoiceState>(
       listenWhen: (a, b) =>
-          b.done == InvoiceDone.paymentRecorded && a.done != b.done,
-      listener: (context, _) => Navigator.pop(context),
+          (b.done == InvoiceDone.paymentRecorded && a.done != b.done) ||
+          (b.notice != null && a.notice != b.notice),
+      listener: (context, s) {
+        if (s.notice == PayNotice.remainingChanged) {
+          // Hiện số mới, chờ người dùng xác nhận lại; chưa gửi gì.
+          setState(() => _expected = s.invoice!.remainingAmount);
+        } else {
+          // Đã ghi xong, hoặc hóa đơn không còn ghi được (trang báo trạng thái).
+          Navigator.pop(context);
+        }
+      },
       builder: (context, s) {
         final inv = s.invoice!;
-        final amount = _value(inv);
+        final amount = _value;
         return Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.viewInsetsOf(context).bottom,
@@ -278,6 +299,16 @@ class _PaymentSheetState extends State<_PaymentSheet> {
                       l10n,
                       s.error!,
                       staleUnverified: s.staleUnverified,
+                    ),
+                    fullWidth: true,
+                  ),
+                ],
+                if (s.notice == PayNotice.remainingChanged) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  AppBanner(
+                    tone: AppStatusTone.warning,
+                    description: l10n.billingPayRemainingChanged(
+                      formatVnd(_expected),
                     ),
                     fullWidth: true,
                   ),
@@ -325,19 +356,32 @@ class _PaymentSheetState extends State<_PaymentSheet> {
                   label: l10n.billingPayDate,
                   readOnly: true,
                   onTap: _pickDate,
-                  errorText: _error(s, 'paidOn', l10n.billingErrPayDate),
+                  errorText: s.serverErrors.containsKey('paidOn')
+                      ? l10n.billingErrPayDateVn
+                      : _error(s, 'paidOn', l10n.billingErrPayDate),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AppInput(
+                  controller: _note,
+                  label: l10n.billingPayNote,
+                  maxLines: 2,
+                  maxLength: paymentNoteMax,
+                  errorText: _error(s, 'note', l10n.billingErrPayNote),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 AppButton(
                   label: l10n.billingPayConfirm,
                   width: double.infinity,
-                  disabled: s.busy || !inv.canRecordPayment,
+                  disabled:
+                      s.busy || !inv.canRecordPayment || s.staleUnverified,
                   onPressed: () => context.read<InvoiceCubit>().recordPayment(
                     PaymentInput(
                       amount: amount,
                       method: _method,
                       paidOn: _paidOn,
+                      note: _note.text,
                     ),
+                    expectedRemaining: widget.full ? _expected : null,
                   ),
                 ),
               ],

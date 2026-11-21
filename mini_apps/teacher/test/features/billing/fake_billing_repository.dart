@@ -149,6 +149,9 @@ class FakeBillingRepository implements BillingRepository {
   /// Giữ lệnh ghi thanh toán đang chạy tới khi test hoàn tất cổng này.
   Completer<void>? payGate;
 
+  /// Giữ `getInvoice` đang chạy tới khi test hoàn tất cổng này.
+  Completer<void>? invoiceGate;
+
   /// Giữ lệnh chốt đang chạy tới khi test hoàn tất cổng này.
   Completer<void>? issueGate;
 
@@ -172,6 +175,7 @@ class FakeBillingRepository implements BillingRepository {
   @override
   Future<Invoice> getInvoice(String id) async {
     calls.add('getInvoice:$id');
+    await invoiceGate?.future;
     if (invoiceError != null) throw invoiceError!;
     if (invoiceAfterError != null) {
       final i = invoiceAfterError!;

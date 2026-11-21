@@ -1719,4 +1719,22 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get billingPaymentVoidDone => 'Payment voided.';
+
+  @override
+  String get billingPayNote => 'Note (only you can see it)';
+
+  @override
+  String get billingErrPayNote => 'The note can be up to 300 characters.';
+
+  @override
+  String billingPayRemainingChanged(String amount) {
+    return 'The amount owed just changed and is now $amount. Check it and confirm again.';
+  }
+
+  @override
+  String get billingErrPayDateVn =>
+      'The date is not valid in Vietnam time (it cannot be after today). Check the date on your device.';
+
+  @override
+  String get billingNoReason => 'No reason given';
 }

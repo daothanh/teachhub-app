@@ -1017,5 +1017,17 @@
       }
     }
   },
-  "billingPaymentVoidDone": "Đã hủy thanh toán."
+  "billingPaymentVoidDone": "Đã hủy thanh toán.",
+  "billingPayNote": "Ghi chú (chỉ bạn thấy)",
+  "billingErrPayNote": "Ghi chú tối đa 300 ký tự.",
+  "billingPayRemainingChanged": "Số còn nợ vừa thay đổi, hiện là {amount}. Kiểm tra lại rồi xác nhận.",
+  "@billingPayRemainingChanged": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingErrPayDateVn": "Ngày thu không hợp lệ theo giờ Việt Nam (không được sau hôm nay). Kiểm tra ngày trên máy.",
+  "billingNoReason": "Không ghi lý do"
 }

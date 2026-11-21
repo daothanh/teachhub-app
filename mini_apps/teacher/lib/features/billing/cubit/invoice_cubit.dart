@@ -9,6 +9,10 @@ import 'billing_periods_cubit.dart';
 
 enum InvoiceDone { adjusted, voided, paymentRecorded, paymentVoided }
 
+/// Thông báo về lệnh thu đủ sau khi tải lại hóa đơn: số còn nợ đã đổi (chưa gửi,
+/// cần xác nhận lại với số mới) hoặc hóa đơn không còn ghi thanh toán được.
+enum PayNotice { remainingChanged, notPayable }
+
 class InvoiceState extends Equatable {
   const InvoiceState({
     this.load = BillingLoad.loading,
@@ -22,6 +26,7 @@ class InvoiceState extends Equatable {
     this.voidError,
     this.staleUnverified = false,
     this.done,
+    this.notice,
   });
 
   final BillingLoad load;
@@ -49,6 +54,7 @@ class InvoiceState extends Equatable {
   /// Hủy hoặc ghi thanh toán gặp `CONFLICT_STALE` mà tải lại hóa đơn cũng lỗi.
   final bool staleUnverified;
   final InvoiceDone? done;
+  final PayNotice? notice;
 
   InvoiceState copyWith({
     BillingLoad? load,
@@ -62,6 +68,7 @@ class InvoiceState extends Equatable {
     ApiException? voidError,
     bool staleUnverified = false,
     InvoiceDone? done,
+    PayNotice? notice,
   }) => InvoiceState(
     load: load ?? this.load,
     invoice: invoice ?? this.invoice,
@@ -74,6 +81,7 @@ class InvoiceState extends Equatable {
     voidError: voidError,
     staleUnverified: staleUnverified,
     done: done,
+    notice: notice,
   );
 
   @override
@@ -88,7 +96,8 @@ class InvoiceState extends Equatable {
     error,
     voidError,
     staleUnverified,
-    done, //
+    done,
+    notice, //
   ];
 }
 
@@ -139,7 +148,31 @@ class InvoiceCubit extends Cubit<InvoiceState> {
 
   /// Xóa lỗi cũ khi mở lại form điều chỉnh hoặc thanh toán.
   void clearErrors() {
-    if (!isClosed) emit(state.copyWith(invoice: state.invoice));
+    if (!isClosed) {
+      emit(state.copyWith(invoice: state.invoice, busy: state.busy));
+    }
+  }
+
+  /// Trước khi mở "Đã thu đủ": tải lại để hiện số còn nợ mới nhất. `false` khi
+  /// không mở được (hóa đơn không còn ghi thanh toán được, hoặc tải lỗi).
+  Future<bool> reloadForPayment() async {
+    if (state.busy || state.invoice == null) return false;
+    emit(state.copyWith(busy: true));
+    try {
+      final (inv, pays) = await _fetch();
+      if (isClosed) return false;
+      emit(
+        state.copyWith(
+          invoice: inv,
+          payments: pays,
+          notice: inv.canRecordPayment ? null : PayNotice.notPayable,
+        ),
+      );
+      return inv.canRecordPayment;
+    } on ApiException catch (e) {
+      if (!isClosed) emit(state.copyWith(voidError: e));
+      return false;
+    }
   }
 
   Future<void> addAdjustment(AdjustmentInput input) async {
@@ -226,7 +259,13 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     }
   }
 
-  Future<void> recordPayment(PaymentInput input) async {
+  /// Ghi thanh toán. [expectedRemaining] khác null là "Đã thu đủ": số tiền là
+  /// số còn nợ người dùng đã thấy; tải lại ngay trước khi gửi, nếu số đã đổi thì
+  /// KHÔNG gửi mà báo [PayNotice.remainingChanged] để xác nhận lại với số mới.
+  Future<void> recordPayment(
+    PaymentInput input, {
+    int? expectedRemaining,
+  }) async {
     if (state.busy || state.invoice == null) return;
     final bad = validatePayment(input);
     if (bad.isNotEmpty) {
@@ -234,13 +273,33 @@ class InvoiceCubit extends Cubit<InvoiceState> {
       return;
     }
     emit(state.copyWith(busy: true));
+    if (expectedRemaining != null) {
+      try {
+        final (inv, pays) = await _fetch();
+        if (isClosed) return;
+        final notice = !inv.canRecordPayment
+            ? PayNotice.notPayable
+            : inv.remainingAmount != expectedRemaining
+            ? PayNotice.remainingChanged
+            : null;
+        if (notice != null) {
+          emit(state.copyWith(invoice: inv, payments: pays, notice: notice));
+          return;
+        }
+      } on ApiException catch (e) {
+        // Không kiểm lại được số còn nợ thì không gửi.
+        if (!isClosed) emit(state.copyWith(error: e));
+        return;
+      }
+    }
     try {
       final r = await _repo.recordPayment(
         invoiceId,
         input,
         idempotencyKey: _keys.of(
           'pay',
-          '${input.amount}|${input.method.wire}|${input.paidOn}',
+          '${input.amount}|${input.method.wire}|${input.paidOn}|'
+              '${input.note.trim()}',
         ),
       );
       _keys.done('pay');
@@ -255,13 +314,17 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     } on ApiException catch (e) {
       if (!e.retryable) _keys.done('pay');
       if (isClosed) return;
-      const known = {'amount', 'paidOn', 'method'};
+      const known = {'amount', 'paidOn', 'method', 'note'};
       final fields = {
         for (final MapEntry(:key, :value) in e.fieldErrors.entries)
           if (known.contains(key)) key: value,
       };
       emit(
-        state.copyWith(serverErrors: fields, error: fields.isEmpty ? e : null),
+        state.copyWith(
+          busy: _isConflict(e),
+          serverErrors: fields,
+          error: fields.isEmpty ? e : null,
+        ),
       );
       await _reloadAfterConflict(e, formError: true);
     }
@@ -288,10 +351,14 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     } on ApiException catch (e) {
       if (!e.retryable) _keys.done('voidPay:$paymentId');
       if (isClosed) return;
-      emit(state.copyWith(voidError: e));
+      emit(state.copyWith(busy: _isConflict(e), voidError: e));
       await _reloadAfterConflict(e, formError: false);
     }
   }
+
+  static bool _isConflict(ApiException e) =>
+      e.code == ApiErrorCode.conflictStale ||
+      e.code == ApiErrorCode.invoiceNotPayable;
 
   /// `CONFLICT_STALE` (kết quả đã lưu quá hạn phát lại) hoặc
   /// `INVOICE_NOT_PAYABLE` (hóa đơn đổi trạng thái ở nơi khác): tải lại hóa đơn
@@ -301,10 +368,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     ApiException e, {
     required bool formError,
   }) async {
-    if (e.code != ApiErrorCode.conflictStale &&
-        e.code != ApiErrorCode.invoiceNotPayable) {
-      return;
-    }
+    if (!_isConflict(e)) return;
     try {
       final (inv, pays) = await _fetch();
       if (isClosed) return;
@@ -322,7 +386,7 @@ class InvoiceCubit extends Cubit<InvoiceState> {
         state.copyWith(
           error: formError ? e : null,
           voidError: formError ? null : e,
-          staleUnverified: e.code == ApiErrorCode.conflictStale,
+          staleUnverified: true,
         ),
       );
     }

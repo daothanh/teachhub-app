@@ -40,10 +40,13 @@ class _View extends StatelessWidget {
     return BlocConsumer<InvoiceCubit, InvoiceState>(
       listenWhen: (a, b) =>
           (b.done != null && a.done != b.done) ||
-          (b.voidError != null && a.voidError != b.voidError),
+          (b.voidError != null && a.voidError != b.voidError) ||
+          (b.notice == PayNotice.notPayable && a.notice != b.notice),
       listener: (context, s) {
         // Lỗi điều chỉnh hiện trong form; ở đây chỉ báo thành công và lỗi hủy.
-        final msg = s.voidError != null
+        final msg = s.notice == PayNotice.notPayable
+            ? l10n.billingErrNotPayable
+            : s.voidError != null
             ? billingErrorText(
                 l10n,
                 s.voidError!,
@@ -120,7 +123,9 @@ class _Body extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           AppBanner(
             tone: AppStatusTone.warning,
-            description: l10n.billingVoidedBanner(inv.voidReason ?? '—'),
+            description: l10n.billingVoidedBanner(
+              inv.voidReason ?? l10n.billingNoReason,
+            ),
             fullWidth: true,
           ),
         ],

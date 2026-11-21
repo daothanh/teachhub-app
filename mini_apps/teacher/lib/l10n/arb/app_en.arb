@@ -1017,5 +1017,17 @@
       }
     }
   },
-  "billingPaymentVoidDone": "Payment voided."
+  "billingPaymentVoidDone": "Payment voided.",
+  "billingPayNote": "Note (only you can see it)",
+  "billingErrPayNote": "The note can be up to 300 characters.",
+  "billingPayRemainingChanged": "The amount owed just changed and is now {amount}. Check it and confirm again.",
+  "@billingPayRemainingChanged": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingErrPayDateVn": "The date is not valid in Vietnam time (it cannot be after today). Check the date on your device.",
+  "billingNoReason": "No reason given"
 }

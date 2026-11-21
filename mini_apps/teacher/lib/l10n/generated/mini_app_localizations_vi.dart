@@ -1698,4 +1698,22 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get billingPaymentVoidDone => 'Đã hủy thanh toán.';
+
+  @override
+  String get billingPayNote => 'Ghi chú (chỉ bạn thấy)';
+
+  @override
+  String get billingErrPayNote => 'Ghi chú tối đa 300 ký tự.';
+
+  @override
+  String billingPayRemainingChanged(String amount) {
+    return 'Số còn nợ vừa thay đổi, hiện là $amount. Kiểm tra lại rồi xác nhận.';
+  }
+
+  @override
+  String get billingErrPayDateVn =>
+      'Ngày thu không hợp lệ theo giờ Việt Nam (không được sau hôm nay). Kiểm tra ngày trên máy.';
+
+  @override
+  String get billingNoReason => 'Không ghi lý do';
 }

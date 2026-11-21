@@ -637,7 +637,10 @@ void main() {
       await openIssued(tester);
       await tapButton(tester, 'Đã thu đủ');
       await tapButton(tester, 'Xác nhận đã thu');
-      expect(find.text('Ngày thu không được sau hôm nay'), findsOneWidget);
+      expect(
+        find.textContaining('Ngày thu không hợp lệ theo giờ Việt Nam'),
+        findsOneWidget,
+      );
       expect(find.text('Đã ghi nhận thanh toán.'), findsNothing);
     });
 
@@ -657,11 +660,11 @@ void main() {
       },
     );
 
-    testWidgets('INVOICE_NOT_PAYABLE: báo đúng, tải lại, không ghi thêm được', (
-      tester,
-    ) async {
+    testWidgets('INVOICE_NOT_PAYABLE khi thu một phần: báo đúng, tải lại, '
+        'không ghi thêm được', (tester) async {
       await openIssued(tester);
-      await tapButton(tester, 'Đã thu đủ');
+      await tapButton(tester, 'Thu một phần');
+      await tester.enterText(fieldOf('Số tiền thu'), '500000');
       repo.payError = apiErr(ApiErrorCode.invoiceNotPayable);
       repo.payments = [samplePayment(amount: 1200000)];
       repo.invoiceAfterError = sampleInvoice(
@@ -681,6 +684,140 @@ void main() {
       expect(confirm.disabled, isTrue);
       expect(repo.paymentInputs, hasLength(1));
     });
+
+    testWidgets(
+      'INVOICE_NOT_PAYABLE mà tải lại lỗi: báo chưa xác nhận, khóa nút',
+      (tester) async {
+        await openIssued(tester);
+        await tapButton(tester, 'Thu một phần');
+        await tester.enterText(fieldOf('Số tiền thu'), '500000');
+        repo.payError = apiErr(ApiErrorCode.invoiceNotPayable);
+        repo.invoiceError = const ApiException.network();
+        await tapButton(tester, 'Xác nhận đã thu');
+        expect(
+          find.textContaining('Chưa xác nhận được kết quả'),
+          findsOneWidget,
+        );
+        expect(
+          find.textContaining('không ghi thanh toán được nữa'),
+          findsNothing,
+        );
+        final confirm = tester.widget<AppButton>(
+          find.widgetWithText(AppButton, 'Xác nhận đã thu'),
+        );
+        expect(confirm.disabled, isTrue);
+      },
+    );
+
+    group('Đã thu đủ kiểm lại số còn nợ', () {
+      Invoice withPaid(int paid, {int total = 1200000}) => sampleInvoice(
+        status: paid == 0 ? InvoiceStatus.issued : InvoiceStatus.partiallyPaid,
+        total: total,
+        paid: paid,
+      );
+
+      testWidgets('mở sheet: tải lại và hiện số còn nợ mới nhất', (
+        tester,
+      ) async {
+        await openIssued(tester);
+        repo.invoice = withPaid(200000);
+        await tapButton(tester, 'Đã thu đủ');
+        expect(find.text('1.000.000 đ'), findsWidgets);
+        expect(find.textContaining('vừa thay đổi'), findsNothing);
+        await tapButton(tester, 'Xác nhận đã thu');
+        expect(repo.paymentInputs.single.amount, 1000000);
+      });
+
+      testWidgets('mở sheet khi hóa đơn đã thu đủ: không mở, báo trạng thái', (
+        tester,
+      ) async {
+        await openIssued(tester);
+        repo.invoice = sampleInvoice(
+          status: InvoiceStatus.paid,
+          total: 1200000,
+          paid: 1200000,
+        );
+        await tapButton(tester, 'Đã thu đủ');
+        expect(find.text('Ghi nhận đã thu đủ'), findsNothing);
+        expect(
+          find.textContaining('không ghi thanh toán được nữa'),
+          findsOneWidget,
+        );
+        expect(repo.paymentInputs, isEmpty);
+        expect(find.widgetWithText(AppButton, 'Đã thu đủ'), findsNothing);
+      });
+
+      for (final (name, fresh, shown) in [
+        ('nhỏ hơn', withPaid(200000), '1.000.000 đ'),
+        ('lớn hơn', withPaid(0, total: 1500000), '1.500.000 đ'),
+      ]) {
+        testWidgets('số còn nợ đổi $name sau khi mở sheet: không gửi, hiện số '
+            'mới, xác nhận lại mới gửi', (tester) async {
+          await openIssued(tester);
+          await tapButton(tester, 'Đã thu đủ');
+          repo.invoice = fresh;
+          await tapButton(tester, 'Xác nhận đã thu');
+          expect(repo.paymentInputs, isEmpty);
+          expect(find.textContaining('Số còn nợ vừa thay đổi'), findsOneWidget);
+          expect(find.text(shown), findsWidgets);
+          await tapButton(tester, 'Xác nhận đã thu');
+          expect(repo.paymentInputs.single.amount, fresh.remainingAmount);
+          expect(find.text('Đã ghi nhận thanh toán.'), findsOneWidget);
+        });
+      }
+
+      testWidgets('hóa đơn thành đã thu đủ sau khi mở sheet: đóng sheet, báo '
+          'trạng thái, không gửi', (tester) async {
+        await openIssued(tester);
+        await tapButton(tester, 'Đã thu đủ');
+        repo.invoice = sampleInvoice(
+          status: InvoiceStatus.paid,
+          total: 1200000,
+          paid: 1200000,
+        );
+        await tapButton(tester, 'Xác nhận đã thu');
+        expect(repo.paymentInputs, isEmpty);
+        expect(find.text('Ghi nhận đã thu đủ'), findsNothing);
+        expect(
+          find.textContaining('không ghi thanh toán được nữa'),
+          findsOneWidget,
+        );
+      });
+    });
+
+    testWidgets('ghi chú tùy chọn được gửi (đã cắt khoảng trắng)', (
+      tester,
+    ) async {
+      await openIssued(tester);
+      await tapButton(tester, 'Thu một phần');
+      await tester.enterText(fieldOf('Số tiền thu'), '500000');
+      await tester.enterText(
+        fieldOf('Ghi chú (chỉ bạn thấy)'),
+        '  Đóng tiền mặt  ',
+      );
+      await tapButton(tester, 'Xác nhận đã thu');
+      expect(repo.paymentInputs.single.toJson()['note'], 'Đóng tiền mặt');
+    });
+
+    testWidgets(
+      'biên số tiền: 0 và 12 chữ số báo tại trường, đúng trần thì gửi',
+      (tester) async {
+        await openIssued(tester);
+        await tapButton(tester, 'Thu một phần');
+        const msg =
+            'Nhập số tiền thu lớn hơn 0 và không quá 100.000.000.000 đ.';
+        await tester.enterText(fieldOf('Số tiền thu'), '0');
+        await tapButton(tester, 'Xác nhận đã thu');
+        expect(find.text(msg), findsOneWidget);
+        await tester.enterText(fieldOf('Số tiền thu'), '123456789012');
+        await tapButton(tester, 'Xác nhận đã thu');
+        expect(find.text(msg), findsOneWidget);
+        expect(repo.paymentInputs, isEmpty);
+        await tester.enterText(fieldOf('Số tiền thu'), '100000000000');
+        await tapButton(tester, 'Xác nhận đã thu');
+        expect(repo.paymentInputs.single.amount, 100000000000);
+      },
+    );
 
     testWidgets('409 CONFLICT_STALE khi ghi: báo đã cập nhật', (tester) async {
       repo.payError = apiErr(ApiErrorCode.conflictStale);

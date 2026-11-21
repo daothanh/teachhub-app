@@ -566,6 +566,7 @@ class PaymentResult extends Equatable {
 }
 
 const paymentAmountMax = 100000000000;
+const paymentNoteMax = 300;
 
 /// Thanh toán gửi lên: [amount] > 0 (bằng số còn nợ là "đã thu đủ"), [paidOn]
 /// `YYYY-MM-DD` không sau hôm nay.
@@ -574,25 +575,31 @@ class PaymentInput extends Equatable {
     required this.amount,
     required this.method,
     required this.paidOn,
+    this.note = '',
   });
 
   final int amount;
   final PaymentMethod method;
   final String paidOn;
 
+  /// Ghi chú tùy chọn của giáo viên (phụ huynh không thấy); trống thì không gửi.
+  final String note;
+
   Map<String, dynamic> toJson() => {
     'amount': amount,
     'method': method.wire,
     'paidOn': paidOn,
+    if (note.trim().isNotEmpty) 'note': note.trim(),
   };
 
   @override
-  List<Object?> get props => [amount, method, paidOn];
+  List<Object?> get props => [amount, method, paidOn, note];
 }
 
-/// Kiểm tra ở máy theo hợp đồng `RecordPaymentRequest`: trường lỗi → true.
+/// Kiểm tra ở máy theo hợp đồng `RecordPaymentRequest`: tên các trường sai.
 Set<String> validatePayment(PaymentInput i) => {
   if (i.amount < 1 || i.amount > paymentAmountMax) 'amount',
+  if (i.note.trim().length > paymentNoteMax) 'note',
 };
 
 /// `2026-12-31` → `31/12/2026`.

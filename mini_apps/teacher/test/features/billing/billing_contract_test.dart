@@ -284,6 +284,7 @@ void main() {
         .cast<String, Map>();
     expect(pay['amount']!['minimum'], 1);
     expect(pay['amount']!['maximum'], paymentAmountMax);
+    expect(pay['note']!['maxLength'], paymentNoteMax);
     final vp = (_body('/v1/payments/{id}/void')['properties'] as Map)
         .cast<String, Map>();
     expect(vp['reason']!['maxLength'], voidReasonMax);
@@ -380,6 +381,7 @@ void main() {
           amount: 500000,
           method: PaymentMethod.cash,
           paidOn: '2027-01-05',
+          note: ' Đóng tiền mặt ',
         ),
         idempotencyKey: 'k5',
       );
@@ -409,6 +411,7 @@ void main() {
         'amount': 500000,
         'method': 'cash',
         'paidOn': '2027-01-05',
+        'note': 'Đóng tiền mặt',
       });
       expect(_required(recBody), isNot(contains('paidOn')));
       expect(_props(recBody), containsAll((rec.data as Map).keys));

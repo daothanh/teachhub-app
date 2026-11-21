@@ -2991,6 +2991,36 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Đã hủy thanh toán.'**
   String get billingPaymentVoidDone;
+
+  /// No description provided for @billingPayNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi chú (chỉ bạn thấy)'**
+  String get billingPayNote;
+
+  /// No description provided for @billingErrPayNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi chú tối đa 300 ký tự.'**
+  String get billingErrPayNote;
+
+  /// No description provided for @billingPayRemainingChanged.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số còn nợ vừa thay đổi, hiện là {amount}. Kiểm tra lại rồi xác nhận.'**
+  String billingPayRemainingChanged(String amount);
+
+  /// No description provided for @billingErrPayDateVn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày thu không hợp lệ theo giờ Việt Nam (không được sau hôm nay). Kiểm tra ngày trên máy.'**
+  String get billingErrPayDateVn;
+
+  /// No description provided for @billingNoReason.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không ghi lý do'**
+  String get billingNoReason;
 }
 
 class _MiniAppLocalizationsDelegate
