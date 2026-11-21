@@ -58,7 +58,7 @@ Flavor `development` chạy được khi thiếu file: `bootstrap` ghi một dò
 1. Tạo app Android + iOS cho từng flavor trong project Firebase tương ứng (bảng trên), đúng applicationId/bundle id.
 2. Đặt `google-services.json` và `GoogleService-Info.plist` vào đúng đường dẫn ở trên (đã gitignore, không commit).
 3. Upload APNs key (Auth Key `.p8`) lên Firebase Cloud Messaging của từng project; bật Push Notifications cho 3 App ID.
-4. Android 13+: quyền `POST_NOTIFICATIONS` do plugin `firebase_messaging` tự khai trong manifest; hộp thoại xin quyền hiện qua banner "bật thông báo" của P02.
+4. Android 13+: quyền `POST_NOTIFICATIONS` khai trong `AndroidManifest.xml`; hộp thoại xin quyền hiện qua banner "bật thông báo" của P02.
 5. Thử trên máy thật: xem mục "Thử push trên máy thật" bên dưới.
 
 ### iOS: entitlements theo cấu hình build
@@ -67,17 +67,17 @@ Flavor `development` chạy được khi thiếu file: `bootstrap` ghi một dò
 
 | File | Cấu hình build | `aps-environment` |
 |---|---|---|
-| `Runner.entitlements` | `Debug-*` (cả 3 flavor) | `development` |
-| `RunnerRelease.entitlements` | `Release-*`, `Profile-*` | `production` |
+| `Runner.entitlements` | `Debug-*`, `Profile-*` (cả 3 flavor) | `development` |
+| `RunnerRelease.entitlements` | `Release-*` | `production` |
 
-Cả hai giữ nguyên `applinks:dayhoc.app` và Sign in with Apple. `CODE_SIGN_ENTITLEMENTS` trỏ theo từng build configuration
+`Profile` ký bằng provisioning development nên dùng `development`. Cả hai giữ nguyên `applinks:dayhoc.app` và Sign in with Apple. `CODE_SIGN_ENTITLEMENTS` trỏ theo từng build configuration
 trong `project.pbxproj`. Kiểm nhanh:
 `xcodebuild -showBuildSettings -project ios/Runner.xcodeproj -target Runner -configuration Release-staging | grep ENTITLEMENTS`.
 
 ### Android: kênh thông báo
 
 Lúc khởi động app tạo 3 kênh (tên theo ngôn ngữ app, vi/en): `attendance` (quan trọng cao), `billing`, `general`.
-Backend gửi `channelId` thuộc nhóm này; tin không khai kênh rơi vào `general` nhờ
+Biểu tượng thông báo là `ic_stat_notification` (chữ D đơn sắc), màu `brand_logo`. Backend gửi `channelId` thuộc nhóm này; tin không khai kênh rơi vào `general` nhờ
 `com.google.firebase.messaging.default_notification_channel_id` trong `AndroidManifest.xml`.
 
 ### Hiển thị và chạm thông báo
