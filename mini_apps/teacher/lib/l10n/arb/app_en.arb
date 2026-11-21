@@ -937,5 +937,85 @@
   "payoutOtpActionTitle": "Verify to continue",
   "payoutOtpActionBody": "Changing or deleting the primary payout account needs a verification code. We sent it to your email.",
   "payoutOtpActionConfirm": "Confirm",
-  "billingIssueAllConfirmAction": "Send all"
+  "billingIssueAllConfirmAction": "Send all",
+  "billingPaidAmount": "Collected",
+  "billingRemainingAmount": "Outstanding",
+  "billingPayRecord": "Record payment",
+  "billingPayFull": "Paid in full",
+  "billingPayPartial": "Partial payment",
+  "billingPayFullTitle": "Record payment in full",
+  "billingPayPartialTitle": "Record a partial payment",
+  "billingPayAmount": "Amount received",
+  "billingPayMethod": "Payment method",
+  "billingPayMethodBank": "Bank transfer",
+  "billingPayMethodCash": "Cash",
+  "billingPayDate": "Date received",
+  "billingPayConfirm": "Confirm payment",
+  "billingPayOverHint": "This is more than the amount owed. The extra is kept as credit for the next period.",
+  "billingErrPayAmount": "Enter an amount above 0 and up to 100.000.000.000 đ.",
+  "billingErrPayDate": "The date is invalid or after today.",
+  "billingErrNotPayable": "This invoice can no longer take payments (already paid, voided or not issued). We loaded the latest status.",
+  "billingPaymentRecorded": "Payment recorded.",
+  "billingPaymentsTitle": "Payments",
+  "billingPaymentLine": "{method} · {date}",
+  "@billingPaymentLine": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentBy": "Recorded by {name} at {when}",
+  "@billingPaymentBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentAt": "Recorded at {when}",
+  "@billingPaymentAt": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentVoidedLabel": "Voided",
+  "billingPaymentVoidedBy": "Voided by {name}. Reason: {reason}",
+  "@billingPaymentVoidedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentVoidedReason": "Void reason: {reason}",
+  "@billingPaymentVoidedReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentVoidAction": "Void payment",
+  "billingPaymentVoidTitle": "Void this payment?",
+  "billingPaymentVoidBody": "The {amount} payment will no longer count toward the invoice. A reason is required.",
+  "@billingPaymentVoidBody": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPaymentVoidDone": "Payment voided."
 }

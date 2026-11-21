@@ -119,6 +119,9 @@ class InvoiceSummary extends Equatable {
   /// Bản nháp 0 đ: không gửi, không nhắc nợ (US-1.3 AC3).
   bool get isZeroDraft => status == InvoiceStatus.draft && totalAmount == 0;
 
+  /// Đã phát hành, chưa hủy, chưa thu đủ: ghi thanh toán được.
+  bool get canRecordPayment => status.isLive && status != InvoiceStatus.paid;
+
   /// Bản nháp có tiền: chốt được.
   bool get isPayableDraft => status == InvoiceStatus.draft && totalAmount > 0;
 
@@ -273,6 +276,8 @@ class Invoice extends Equatable {
     required this.status,
     required this.studentName,
     required this.totalAmount,
+    required this.paidAmount,
+    required this.remainingAmount,
     required this.dueDate,
     required this.voidReason,
     required this.lines,
@@ -287,6 +292,8 @@ class Invoice extends Equatable {
     status: InvoiceStatus.fromWire(json['status'] as String?),
     studentName: json['studentName'] as String,
     totalAmount: json['totalAmount'] as int,
+    paidAmount: json['paidAmount'] as int,
+    remainingAmount: json['remainingAmount'] as int,
     dueDate: json['dueDate'] as String,
     voidReason: json['voidReason'] as String?,
     lines: [
@@ -303,10 +310,37 @@ class Invoice extends Equatable {
   final InvoiceStatus status;
   final String studentName;
   final int totalAmount;
+
+  /// Σ thanh toán chưa hủy; server tính, app không tự cộng.
+  final int paidAmount;
+
+  /// 0 khi hóa đơn nháp hoặc đã hủy, còn lại max(0, tổng − đã thu).
+  final int remainingAmount;
   final String dueDate;
   final String? voidReason;
   final List<InvoiceLine> lines;
   final int clampedAmount;
+
+  /// Còn ghi thanh toán được: đã phát hành, chưa hủy, chưa thu đủ (còn lại là
+  /// 409 `INVOICE_NOT_PAYABLE`).
+  bool get canRecordPayment => status.isLive && status != InvoiceStatus.paid;
+
+  /// Số liệu hóa đơn sau khi ghi hoặc hủy một thanh toán (lấy từ [PaymentResult]).
+  Invoice afterPayment(PaymentResult r) => Invoice(
+    id: id,
+    periodId: periodId,
+    periodMonth: periodMonth,
+    code: code,
+    status: r.status,
+    studentName: studentName,
+    totalAmount: totalAmount,
+    paidAmount: r.paidAmount,
+    remainingAmount: r.remainingAmount,
+    dueDate: dueDate,
+    voidReason: voidReason,
+    lines: lines,
+    clampedAmount: clampedAmount,
+  );
 
   int get year => int.parse(periodMonth.substring(0, 4));
   int get month => int.parse(periodMonth.substring(5, 7));
@@ -324,7 +358,7 @@ class Invoice extends Equatable {
   @override
   List<Object?> get props => [
     id, periodId, periodMonth, code, status, studentName, totalAmount, //
-    dueDate, voidReason, lines, clampedAmount,
+    paidAmount, remainingAmount, dueDate, voidReason, lines, clampedAmount,
   ];
 }
 
@@ -413,8 +447,164 @@ Map<String, AdjustmentError> validateAdjustment(AdjustmentInput i) => {
     'adjustmentReason': AdjustmentError.reason,
 };
 
+enum PaymentMethod {
+  bankTransfer('bank_transfer'),
+  cash('cash');
+
+  const PaymentMethod(this.wire);
+  final String wire;
+
+  /// Giá trị lạ coi như chuyển khoản (mặc định của hợp đồng).
+  static PaymentMethod fromWire(String? v) =>
+      values.firstWhere((m) => m.wire == v, orElse: () => bankTransfer);
+}
+
+/// Người ghi hoặc hủy thanh toán (`PaymentActor`).
+class PaymentActor extends Equatable {
+  const PaymentActor({required this.id, required this.name});
+
+  factory PaymentActor.fromJson(Map<String, dynamic> json) =>
+      PaymentActor(id: json['id'] as String, name: json['name'] as String);
+
+  final String id;
+  final String name;
+
+  @override
+  List<Object?> get props => [id, name];
+}
+
+/// Một lần thu (`Payment`). Hủy không xóa dòng: [voidedAt] khác null.
+class Payment extends Equatable {
+  const Payment({
+    required this.id,
+    required this.invoiceId,
+    required this.amount,
+    required this.method,
+    required this.paidOn,
+    required this.note,
+    required this.recordedAt,
+    required this.recordedBy,
+    required this.voidedAt,
+    required this.voidedBy,
+    required this.voidReason,
+  });
+
+  factory Payment.fromJson(Map<String, dynamic> json) => Payment(
+    id: json['id'] as String,
+    invoiceId: json['invoiceId'] as String,
+    amount: json['amount'] as int,
+    method: PaymentMethod.fromWire(json['method'] as String?),
+    paidOn: json['paidOn'] as String,
+    note: json['note'] as String?,
+    recordedAt: json['recordedAt'] as String,
+    recordedBy: _actor(json['recordedBy']),
+    voidedAt: json['voidedAt'] as String?,
+    voidedBy: _actor(json['voidedBy']),
+    voidReason: json['voidReason'] as String?,
+  );
+
+  static PaymentActor? _actor(Object? v) =>
+      v == null ? null : PaymentActor.fromJson(v as Map<String, dynamic>);
+
+  final String id;
+  final String invoiceId;
+  final int amount;
+  final PaymentMethod method;
+
+  /// `YYYY-MM-DD`.
+  final String paidOn;
+  final String? note;
+
+  /// Thời điểm ISO có múi giờ.
+  final String recordedAt;
+
+  /// `null` khi không xác định được (tài khoản đã xóa).
+  final PaymentActor? recordedBy;
+  final String? voidedAt;
+  final PaymentActor? voidedBy;
+  final String? voidReason;
+
+  bool get isVoided => voidedAt != null;
+
+  Payment replacing(Payment other) => other.id == id ? other : this;
+
+  @override
+  List<Object?> get props => [
+    id, invoiceId, amount, method, paidOn, note, recordedAt, recordedBy, //
+    voidedAt, voidedBy, voidReason,
+  ];
+}
+
+/// Phản hồi ghi hoặc hủy thanh toán (`PaymentResult`).
+class PaymentResult extends Equatable {
+  const PaymentResult({
+    required this.payment,
+    required this.status,
+    required this.paidAmount,
+    required this.remainingAmount,
+    required this.overpaidAmount,
+  });
+
+  factory PaymentResult.fromJson(Map<String, dynamic> json) => PaymentResult(
+    payment: Payment.fromJson(json['payment'] as Map<String, dynamic>),
+    status: InvoiceStatus.fromWire(json['status'] as String?),
+    paidAmount: json['paidAmount'] as int,
+    remainingAmount: json['remainingAmount'] as int,
+    overpaidAmount: json['overpaidAmount'] as int,
+  );
+
+  final Payment payment;
+  final InvoiceStatus status;
+  final int paidAmount;
+  final int remainingAmount;
+  final int overpaidAmount;
+
+  @override
+  List<Object?> get props => [
+    payment, status, paidAmount, remainingAmount, overpaidAmount, //
+  ];
+}
+
+const paymentAmountMax = 100000000000;
+
+/// Thanh toán gửi lên: [amount] > 0 (bằng số còn nợ là "đã thu đủ"), [paidOn]
+/// `YYYY-MM-DD` không sau hôm nay.
+class PaymentInput extends Equatable {
+  const PaymentInput({
+    required this.amount,
+    required this.method,
+    required this.paidOn,
+  });
+
+  final int amount;
+  final PaymentMethod method;
+  final String paidOn;
+
+  Map<String, dynamic> toJson() => {
+    'amount': amount,
+    'method': method.wire,
+    'paidOn': paidOn,
+  };
+
+  @override
+  List<Object?> get props => [amount, method, paidOn];
+}
+
+/// Kiểm tra ở máy theo hợp đồng `RecordPaymentRequest`: trường lỗi → true.
+Set<String> validatePayment(PaymentInput i) => {
+  if (i.amount < 1 || i.amount > paymentAmountMax) 'amount',
+};
+
 /// `2026-12-31` → `31/12/2026`.
 String formatIsoDate(String iso) {
   final p = iso.split('-');
   return p.length == 3 ? '${p[2]}/${p[1]}/${p[0]}' : iso;
+}
+
+/// `2027-01-05T09:12:00+07:00` → `05/01/2027 09:12` theo giờ máy.
+String formatIsoDateTime(String iso) {
+  final t = DateTime.tryParse(iso)?.toLocal();
+  if (t == null) return iso;
+  String two(int n) => n.toString().padLeft(2, '0');
+  return '${two(t.day)}/${two(t.month)}/${t.year} ${two(t.hour)}:${two(t.minute)}';
 }

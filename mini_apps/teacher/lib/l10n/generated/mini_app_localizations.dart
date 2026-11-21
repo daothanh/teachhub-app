@@ -2817,6 +2817,180 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Gửi tất cả'**
   String get billingIssueAllConfirmAction;
+
+  /// No description provided for @billingPaidAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thu'**
+  String get billingPaidAmount;
+
+  /// No description provided for @billingRemainingAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Còn nợ'**
+  String get billingRemainingAmount;
+
+  /// No description provided for @billingPayRecord.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thu tiền'**
+  String get billingPayRecord;
+
+  /// No description provided for @billingPayFull.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thu đủ'**
+  String get billingPayFull;
+
+  /// No description provided for @billingPayPartial.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thu một phần'**
+  String get billingPayPartial;
+
+  /// No description provided for @billingPayFullTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi nhận đã thu đủ'**
+  String get billingPayFullTitle;
+
+  /// No description provided for @billingPayPartialTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi nhận thu một phần'**
+  String get billingPayPartialTitle;
+
+  /// No description provided for @billingPayAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tiền thu'**
+  String get billingPayAmount;
+
+  /// No description provided for @billingPayMethod.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hình thức thu'**
+  String get billingPayMethod;
+
+  /// No description provided for @billingPayMethodBank.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyển khoản'**
+  String get billingPayMethodBank;
+
+  /// No description provided for @billingPayMethodCash.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiền mặt'**
+  String get billingPayMethodCash;
+
+  /// No description provided for @billingPayDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày thu'**
+  String get billingPayDate;
+
+  /// No description provided for @billingPayConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác nhận đã thu'**
+  String get billingPayConfirm;
+
+  /// No description provided for @billingPayOverHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tiền lớn hơn số còn nợ. Phần dư được ghi lại để trừ vào kỳ sau.'**
+  String get billingPayOverHint;
+
+  /// No description provided for @billingErrPayAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập số tiền thu lớn hơn 0 và không quá 100.000.000.000 đ.'**
+  String get billingErrPayAmount;
+
+  /// No description provided for @billingErrPayDate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày thu không hợp lệ hoặc sau hôm nay.'**
+  String get billingErrPayDate;
+
+  /// No description provided for @billingErrNotPayable.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn này không ghi thanh toán được nữa (đã thu đủ, đã hủy hoặc chưa phát hành). Đã cập nhật trạng thái mới nhất.'**
+  String get billingErrNotPayable;
+
+  /// No description provided for @billingPaymentRecorded.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã ghi nhận thanh toán.'**
+  String get billingPaymentRecorded;
+
+  /// No description provided for @billingPaymentsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Các lần thu'**
+  String get billingPaymentsTitle;
+
+  /// No description provided for @billingPaymentLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{method} · {date}'**
+  String billingPaymentLine(String method, String date);
+
+  /// No description provided for @billingPaymentBy.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi bởi {name} lúc {when}'**
+  String billingPaymentBy(String name, String when);
+
+  /// No description provided for @billingPaymentAt.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi lúc {when}'**
+  String billingPaymentAt(String when);
+
+  /// No description provided for @billingPaymentVoidedLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy'**
+  String get billingPaymentVoidedLabel;
+
+  /// No description provided for @billingPaymentVoidedBy.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy bởi {name}. Lý do: {reason}'**
+  String billingPaymentVoidedBy(String name, String reason);
+
+  /// No description provided for @billingPaymentVoidedReason.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do hủy: {reason}'**
+  String billingPaymentVoidedReason(String reason);
+
+  /// No description provided for @billingPaymentVoidAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy thanh toán'**
+  String get billingPaymentVoidAction;
+
+  /// No description provided for @billingPaymentVoidTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy thanh toán này?'**
+  String get billingPaymentVoidTitle;
+
+  /// No description provided for @billingPaymentVoidBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản thu {amount} sẽ không còn tính vào hóa đơn. Cần ghi lý do hủy.'**
+  String billingPaymentVoidBody(String amount);
+
+  /// No description provided for @billingPaymentVoidDone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hủy thanh toán.'**
+  String get billingPaymentVoidDone;
 }
 
 class _MiniAppLocalizationsDelegate

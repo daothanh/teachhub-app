@@ -14,6 +14,7 @@ String billingErrorText(
   bool staleUnverified = false,
 }) => switch (e.code) {
   ApiErrorCode.invoiceImmutable => l10n.billingErrImmutable,
+  ApiErrorCode.invoiceNotPayable => l10n.billingErrNotPayable,
   ApiErrorCode.conflictStale =>
     staleUnverified ? l10n.billingErrStaleUnverified : l10n.billingErrStale,
   _ => feesErrorText(l10n, e),

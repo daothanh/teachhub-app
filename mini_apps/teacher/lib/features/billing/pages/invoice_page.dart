@@ -10,7 +10,9 @@ import '../cubit/invoice_cubit.dart';
 import '../data/billing_models.dart';
 import '../data/billing_repository.dart';
 import '../widgets/billing_error_text.dart';
+import '../widgets/invoice_payments.dart';
 import '../widgets/invoice_status_label.dart';
+import '../widgets/void_reason_dialog.dart';
 
 /// Chi tiết hóa đơn (US-7.2 AC2): từng buổi tính hay không và lý do, dòng giá
 /// riêng, miễn giảm, điều chỉnh; bản nháp thêm được điều chỉnh (AC3), hóa đơn
@@ -45,11 +47,14 @@ class _View extends StatelessWidget {
             ? billingErrorText(
                 l10n,
                 s.voidError!,
-                staleUnverified: s.voidStaleUnverified,
+                staleUnverified: s.staleUnverified,
               )
-            : s.done == InvoiceDone.voided
-            ? l10n.billingVoided
-            : l10n.billingAdjusted;
+            : switch (s.done) {
+                InvoiceDone.voided => l10n.billingVoided,
+                InvoiceDone.paymentRecorded => l10n.billingPaymentRecorded,
+                InvoiceDone.paymentVoided => l10n.billingPaymentVoidDone,
+                _ => l10n.billingAdjusted,
+              };
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(msg)));
@@ -66,7 +71,11 @@ class _View extends StatelessWidget {
                 : billingErrorText(l10n, s.error!),
             action: AppButton(label: l10n.classesRetry, onPressed: cubit.load),
           ),
-          BillingLoad.ready => _Body(invoice: s.invoice!, busy: s.busy),
+          BillingLoad.ready => _Body(
+            invoice: s.invoice!,
+            payments: s.payments,
+            busy: s.busy,
+          ),
         },
       ),
     );
@@ -74,8 +83,13 @@ class _View extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.invoice, required this.busy});
+  const _Body({
+    required this.invoice,
+    required this.payments,
+    required this.busy,
+  });
   final Invoice invoice;
+  final List<Payment> payments;
   final bool busy;
 
   @override
@@ -135,6 +149,7 @@ class _Body extends StatelessWidget {
               style: text.bodySmall,
             ),
           ),
+        InvoicePaymentsSection(invoice: inv, payments: payments, busy: busy),
         if (inv.status == InvoiceStatus.draft) ...[
           const SizedBox(height: AppSpacing.lg),
           AppButton(
@@ -145,7 +160,9 @@ class _Body extends StatelessWidget {
             onPressed: () => _openAdjustSheet(context),
           ),
         ],
-        if (inv.status.isLive) ...[
+        // Hóa đơn đã có thanh toán còn hiệu lực thì server từ chối hủy (409):
+        // phải hủy thanh toán trước.
+        if (inv.status.isLive && inv.paidAmount == 0) ...[
           const SizedBox(height: AppSpacing.lg),
           AppButton(
             label: l10n.billingVoid,
@@ -252,68 +269,13 @@ Future<void> _openVoidDialog(BuildContext context) async {
   final cubit = context.read<InvoiceCubit>();
   final reason = await showDialog<String>(
     context: context,
-    builder: (_) => const _VoidDialog(),
+    builder: (_) => VoidReasonDialog(
+      title: context.miniAppL10n.billingVoidTitle,
+      body: context.miniAppL10n.billingVoidBody,
+      confirmLabel: context.miniAppL10n.billingVoidConfirm,
+    ),
   );
   if (reason != null) await cubit.voidInvoice(reason);
-}
-
-class _VoidDialog extends StatefulWidget {
-  const _VoidDialog();
-
-  @override
-  State<_VoidDialog> createState() => _VoidDialogState();
-}
-
-class _VoidDialogState extends State<_VoidDialog> {
-  final _reason = TextEditingController();
-  bool _invalid = false;
-
-  @override
-  void dispose() {
-    _reason.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.miniAppL10n;
-    return AlertDialog(
-      title: Text(l10n.billingVoidTitle),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.billingVoidBody),
-            const SizedBox(height: AppSpacing.md),
-            AppInput(
-              controller: _reason,
-              label: l10n.billingVoidReason,
-              maxLines: 3,
-              errorText: _invalid ? l10n.billingErrReason : null,
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text(l10n.billingVoidKeep),
-        ),
-        TextButton(
-          onPressed: () {
-            final r = _reason.text.trim();
-            if (r.isEmpty || r.length > voidReasonMax) {
-              setState(() => _invalid = true);
-              return;
-            }
-            Navigator.pop(context, r);
-          },
-          child: Text(l10n.billingVoidConfirm),
-        ),
-      ],
-    );
-  }
 }
 
 Future<void> _openAdjustSheet(BuildContext context) {

@@ -1617,4 +1617,106 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get billingIssueAllConfirmAction => 'Send all';
+
+  @override
+  String get billingPaidAmount => 'Collected';
+
+  @override
+  String get billingRemainingAmount => 'Outstanding';
+
+  @override
+  String get billingPayRecord => 'Record payment';
+
+  @override
+  String get billingPayFull => 'Paid in full';
+
+  @override
+  String get billingPayPartial => 'Partial payment';
+
+  @override
+  String get billingPayFullTitle => 'Record payment in full';
+
+  @override
+  String get billingPayPartialTitle => 'Record a partial payment';
+
+  @override
+  String get billingPayAmount => 'Amount received';
+
+  @override
+  String get billingPayMethod => 'Payment method';
+
+  @override
+  String get billingPayMethodBank => 'Bank transfer';
+
+  @override
+  String get billingPayMethodCash => 'Cash';
+
+  @override
+  String get billingPayDate => 'Date received';
+
+  @override
+  String get billingPayConfirm => 'Confirm payment';
+
+  @override
+  String get billingPayOverHint =>
+      'This is more than the amount owed. The extra is kept as credit for the next period.';
+
+  @override
+  String get billingErrPayAmount =>
+      'Enter an amount above 0 and up to 100.000.000.000 đ.';
+
+  @override
+  String get billingErrPayDate => 'The date is invalid or after today.';
+
+  @override
+  String get billingErrNotPayable =>
+      'This invoice can no longer take payments (already paid, voided or not issued). We loaded the latest status.';
+
+  @override
+  String get billingPaymentRecorded => 'Payment recorded.';
+
+  @override
+  String get billingPaymentsTitle => 'Payments';
+
+  @override
+  String billingPaymentLine(String method, String date) {
+    return '$method · $date';
+  }
+
+  @override
+  String billingPaymentBy(String name, String when) {
+    return 'Recorded by $name at $when';
+  }
+
+  @override
+  String billingPaymentAt(String when) {
+    return 'Recorded at $when';
+  }
+
+  @override
+  String get billingPaymentVoidedLabel => 'Voided';
+
+  @override
+  String billingPaymentVoidedBy(String name, String reason) {
+    return 'Voided by $name. Reason: $reason';
+  }
+
+  @override
+  String billingPaymentVoidedReason(String reason) {
+    return 'Void reason: $reason';
+  }
+
+  @override
+  String get billingPaymentVoidAction => 'Void payment';
+
+  @override
+  String get billingPaymentVoidTitle => 'Void this payment?';
+
+  @override
+  String billingPaymentVoidBody(String amount) {
+    return 'The $amount payment will no longer count toward the invoice. A reason is required.';
+  }
+
+  @override
+  String get billingPaymentVoidDone => 'Payment voided.';
 }

@@ -72,6 +72,7 @@ Invoice sampleInvoice({
   int total = 150000,
   int clamped = 0,
   String? voidReason,
+  int paid = 0,
 }) => Invoice(
   id: id,
   periodId: periodId,
@@ -80,10 +81,38 @@ Invoice sampleInvoice({
   status: status,
   studentName: 'Nguyễn Minh Anh',
   totalAmount: total,
+  paidAmount: paid,
+  remainingAmount:
+      status == InvoiceStatus.draft || status == InvoiceStatus.voided
+      ? 0
+      : (total - paid).clamp(0, 1 << 40),
   dueDate: '2026-11-11',
   voidReason: voidReason,
   lines: lines ?? [sampleLine()],
   clampedAmount: clamped,
+);
+
+Payment samplePayment({
+  String id = 'p1',
+  int amount = 500000,
+  PaymentMethod method = PaymentMethod.bankTransfer,
+  String paidOn = '2026-11-05',
+  bool voided = false,
+  String? recordedBy = 'Cô Lan',
+}) => Payment(
+  id: id,
+  invoiceId: 'i1',
+  amount: amount,
+  method: method,
+  paidOn: paidOn,
+  note: null,
+  recordedAt: '2026-11-05T09:12:00+07:00',
+  recordedBy: recordedBy == null
+      ? null
+      : PaymentActor(id: 'u1', name: recordedBy),
+  voidedAt: voided ? '2026-11-06T08:00:00+07:00' : null,
+  voidedBy: voided ? const PaymentActor(id: 'u1', name: 'Cô Lan') : null,
+  voidReason: voided ? 'Ghi nhầm' : null,
 );
 
 /// Bản giả: `calls` ghi tên lệnh, `keys` ghi Idempotency-Key, các `*Error` ném
@@ -93,6 +122,7 @@ class FakeBillingRepository implements BillingRepository {
   final keys = <String>[];
   final adjustments = <AdjustmentInput>[];
   final issuedIds = <List<String>?>[];
+  final paymentInputs = <PaymentInput>[];
 
   List<BillingPeriod> periods = [];
   BillingPeriodDetail? detail;
@@ -109,6 +139,15 @@ class FakeBillingRepository implements BillingRepository {
   Object? adjustError;
   Object? issueError;
   Object? voidError;
+  Object? payError;
+  Object? voidPaymentError;
+  Object? listPaymentsError;
+
+  /// Thanh toán của hóa đơn (mới trước); server giả tự tính lại số liệu.
+  List<Payment> payments = [];
+
+  /// Giữ lệnh ghi thanh toán đang chạy tới khi test hoàn tất cổng này.
+  Completer<void>? payGate;
 
   /// Giữ lệnh chốt đang chạy tới khi test hoàn tất cổng này.
   Completer<void>? issueGate;
@@ -212,6 +251,89 @@ class FakeBillingRepository implements BillingRepository {
       status: InvoiceStatus.voided,
       voidReason: reason,
     );
+  }
+
+  @override
+  Future<List<Payment>> listPayments(String invoiceId) async {
+    calls.add('listPayments:$invoiceId');
+    if (listPaymentsError != null) throw listPaymentsError!;
+    return payments;
+  }
+
+  PaymentResult _result(Payment p) {
+    final inv = invoice!;
+    final paid = payments
+        .where((x) => !x.isVoided)
+        .fold<int>(0, (s, x) => s + x.amount);
+    final status = paid == 0
+        ? InvoiceStatus.issued
+        : paid >= inv.totalAmount
+        ? InvoiceStatus.paid
+        : InvoiceStatus.partiallyPaid;
+    final next = sampleInvoice(
+      id: inv.id,
+      status: status,
+      total: inv.totalAmount,
+      paid: paid,
+    );
+    invoice = next;
+    return PaymentResult(
+      payment: p,
+      status: status,
+      paidAmount: paid,
+      remainingAmount: next.remainingAmount,
+      overpaidAmount: (paid - inv.totalAmount).clamp(0, 1 << 40),
+    );
+  }
+
+  @override
+  Future<PaymentResult> recordPayment(
+    String invoiceId,
+    PaymentInput input, {
+    required String idempotencyKey,
+  }) async {
+    calls.add('pay:$invoiceId');
+    keys.add(idempotencyKey);
+    paymentInputs.add(input);
+    await payGate?.future;
+    if (payError != null) {
+      final e = payError!;
+      payError = null;
+      throw e;
+    }
+    final p = samplePayment(
+      id: 'p${payments.length + 1}',
+      amount: input.amount,
+      method: input.method,
+      paidOn: input.paidOn,
+    );
+    payments = [p, ...payments];
+    return _result(p);
+  }
+
+  @override
+  Future<PaymentResult> voidPayment(
+    String paymentId, {
+    required String reason,
+    required String idempotencyKey,
+  }) async {
+    calls.add('voidPayment:$paymentId:$reason');
+    keys.add(idempotencyKey);
+    if (voidPaymentError != null) {
+      final e = voidPaymentError!;
+      voidPaymentError = null;
+      throw e;
+    }
+    final old = payments.firstWhere((p) => p.id == paymentId);
+    final voided = samplePayment(
+      id: old.id,
+      amount: old.amount,
+      method: old.method,
+      paidOn: old.paidOn,
+      voided: true,
+    );
+    payments = [for (final p in payments) p.replacing(voided)];
+    return _result(voided);
   }
 }
 

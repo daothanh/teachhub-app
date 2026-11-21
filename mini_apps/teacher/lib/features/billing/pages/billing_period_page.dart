@@ -252,6 +252,12 @@ class _InvoiceTile extends StatelessWidget {
   final InvoiceSummary invoice;
   final bool issuing;
 
+  Future<void> _open(BuildContext context) async {
+    final cubit = context.read<BillingPeriodCubit>();
+    await context.push(BillingRoutes.invoice(invoice.id));
+    await cubit.refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
@@ -261,10 +267,7 @@ class _InvoiceTile extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: InkWell(
-        onTap: () async {
-          await context.push(BillingRoutes.invoice(i.id));
-          await cubit.refresh();
-        },
+        onTap: () => _open(context),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
@@ -303,6 +306,21 @@ class _InvoiceTile extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: AppSpacing.xs),
                   child: Text(l10n.billingNoSend, style: text.bodySmall),
+                ),
+              if (i.canRecordPayment)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.sm),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: AppButton(
+                      label: l10n.billingPayRecord,
+                      size: AppButtonSize.sm,
+                      variant: AppButtonVariant.outlinePrimary,
+                      // Tóm tắt của kỳ không có số còn nợ: mở chi tiết hóa đơn,
+                      // nơi có "Đã thu đủ" và "Thu một phần".
+                      onPressed: () => _open(context),
+                    ),
+                  ),
                 ),
               if (i.isPayableDraft)
                 Padding(
