@@ -114,6 +114,43 @@ void main() {
       expect(covered.canRecordPayment, isFalse);
     });
 
+    test('chỉ hóa đơn issued hủy được', () {
+      for (final st in InvoiceStatus.values) {
+        expect(
+          sampleInvoice(status: st).canVoid,
+          st == InvoiceStatus.issued,
+          reason: st.name,
+        );
+      }
+      // Hóa đơn 0 đ chỉ có điều chỉnh tay âm: đã `paid`, không hủy được.
+      expect(
+        sampleInvoice(
+          status: InvoiceStatus.paid,
+          total: 0,
+          lines: [
+            sampleLine(),
+            sampleLine(
+              id: 'm',
+              kind: InvoiceLineKind.manualAdjustment,
+              amount: -150000,
+            ),
+          ],
+        ).canVoid,
+        isFalse,
+      );
+    });
+
+    test('dòng chuyển kỳ 0 đ không hiện', () {
+      final inv = sampleInvoice(
+        lines: [
+          sampleLine(),
+          sampleLine(id: 'z', kind: InvoiceLineKind.carryOver, amount: 0),
+        ],
+      );
+      expect(inv.carryLines, isEmpty);
+      expect(inv.otherLines, isEmpty);
+    });
+
     test('dòng số dư tách khỏi dòng buổi và khoản khác', () {
       final inv = sampleInvoice(
         lines: [

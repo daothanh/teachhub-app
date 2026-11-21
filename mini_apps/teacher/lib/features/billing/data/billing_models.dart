@@ -119,7 +119,9 @@ class InvoiceSummary extends Equatable {
   /// Bản nháp 0 đ: không gửi, không nhắc nợ (US-1.3 AC3).
   bool get isZeroDraft => status == InvoiceStatus.draft && totalAmount == 0;
 
-  /// Đã phát hành, chưa hủy, chưa thu đủ: ghi thanh toán được.
+  /// Chỉ để hiện lối vào chi tiết ("Thu tiền"): tóm tắt không có số còn nợ nên
+  /// chưa biết hóa đơn đã chuyển hết nợ chưa; nút ghi thanh toán thật ở chi tiết
+  /// dùng `Invoice.canRecordPayment`.
   bool get canRecordPayment => status.isLive && status != InvoiceStatus.paid;
 
   /// Hóa đơn 0 đ đã chốt vì tiền trả thừa đủ trả kỳ này (không QR, không thu).
@@ -351,10 +353,14 @@ class Invoice extends Equatable {
   bool get isCoveredByBalance =>
       status == InvoiceStatus.paid && totalAmount == 0;
 
-  /// Hủy được: server trả 409 khi đã có thanh toán, đã chuyển nợ hoặc đang mang
-  /// dòng kết chuyển (chưa hỗ trợ trả khoản chuyển kỳ về).
+  /// Hủy được: server chỉ cho hủy hóa đơn `issued` (trạng thái khác → 409) và
+  /// trả 409 khi đã có thanh toán, đã chuyển nợ hoặc đang mang dòng kết chuyển
+  /// (chưa hỗ trợ trả khoản chuyển kỳ về).
   bool get canVoid =>
-      status.isLive && paidAmount == 0 && !isCarriedOver && !hasCarryLine;
+      status == InvoiceStatus.issued &&
+      paidAmount == 0 &&
+      !isCarriedOver &&
+      !hasCarryLine;
 
   /// Số liệu hóa đơn sau khi ghi hoặc hủy một thanh toán (lấy từ [PaymentResult]).
   Invoice afterPayment(PaymentResult r) => Invoice(
@@ -385,7 +391,8 @@ class Invoice extends Equatable {
   /// Số dư kỳ trước (xem trước ở bản nháp): nợ/trả thừa và điều chỉnh kỳ trước.
   List<InvoiceLine> get carryLines => [
     for (final l in lines)
-      if (l.kind.isCarry) l,
+      // Dòng kết chuyển 0 đ không có nhãn để hiện nên bỏ.
+      if (l.kind.isCarry && l.amount != 0) l,
   ];
 
   List<InvoiceLine> get otherLines => [
@@ -447,7 +454,8 @@ class IssueResult extends Equatable {
   /// chốt; có thể khác số xem trước ở bản nháp).
   final int totalAmount;
 
-  /// Số hóa đơn vừa chốt 0 đ vì tiền trả thừa đủ trả: không QR, không thu.
+  /// Số hóa đơn vừa chốt 0 đ vì tiền trả thừa đủ trả: không QR, không thu. Đếm
+  /// từ `invoices` có `totalAmount` 0 (bản nháp không phát sinh nằm ở `skipped`).
   final int coveredCount;
 
   int get zeroSkipped => skipped.where((s) => s.isZeroAmount).length;
