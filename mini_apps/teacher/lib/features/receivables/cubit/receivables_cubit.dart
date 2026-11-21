@@ -191,7 +191,8 @@ class ReceivablesCubit extends Cubit<ReceivablesState> {
       if (isClosed || seq != _seq) return;
       _firstInFlight = false;
       emit(_ready(next, p, p.items));
-    } on ApiException catch (e) {
+    } on Object catch (raw) {
+      final e = asApiException(raw);
       if (isClosed || seq != _seq) return;
       _firstInFlight = false;
       emit(
@@ -228,7 +229,7 @@ class ReceivablesCubit extends Cubit<ReceivablesState> {
             if (seen.add(r.studentId)) r,
         ]),
       );
-    } on ApiException {
+    } on Object {
       if (isClosed || seq != _seq) return;
       emit(state.copyWith(moreFailed: true));
     }

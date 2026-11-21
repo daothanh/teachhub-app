@@ -60,7 +60,8 @@ class StudentReceivableCubit extends Cubit<StudentReceivableState> {
           toggling: state.toggling,
         ),
       );
-    } on ApiException catch (e) {
+    } on Object catch (raw) {
+      final e = asApiException(raw);
       if (isClosed || seq != _seq || state.load == BillingLoad.ready) return;
       emit(StudentReceivableState(load: BillingLoad.failure, error: e));
     }
@@ -91,7 +92,8 @@ class StudentReceivableCubit extends Cubit<StudentReceivableState> {
           toggling: {...state.toggling}..remove(enrollmentId),
         ),
       );
-    } on ApiException catch (e) {
+    } on Object catch (raw) {
+      final e = asApiException(raw);
       if (isClosed) return;
       emit(
         StudentReceivableState(

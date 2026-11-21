@@ -36,7 +36,8 @@ class InvoiceDunningCubit extends Cubit<InvoiceDunningState> {
       final d = await _repo.invoiceDunning(invoiceId);
       if (isClosed) return;
       emit(InvoiceDunningState(load: BillingLoad.ready, dunning: d));
-    } on ApiException catch (e) {
+    } on Object catch (raw) {
+      final e = asApiException(raw);
       if (isClosed) return;
       emit(InvoiceDunningState(load: BillingLoad.failure, error: e));
     }

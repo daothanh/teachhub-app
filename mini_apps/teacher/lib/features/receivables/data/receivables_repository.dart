@@ -144,3 +144,8 @@ Future<T> _call<T>(Future<T> Function() run) async {
         const ApiException.unexpected();
   }
 }
+
+/// Lỗi lạ (vd. đọc phản hồi hỏng) thành lỗi máy chủ chung để cubit luôn thoát
+/// trạng thái đang tải và cho thử lại.
+ApiException asApiException(Object e) =>
+    e is ApiException ? e : const ApiException.unexpected();

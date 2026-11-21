@@ -585,4 +585,80 @@ void main() {
       expect(d.lastSent, isNull);
     });
   });
+
+  group('lỗi lạ (FormatException) không làm kẹt cờ', () {
+    const bad = FormatException('hỏng');
+
+    test('ReceivablesCubit: tải đầu, thử lại chạy được', () async {
+      repo
+        ..listError = bad
+        ..rows = [sampleRow()];
+      final c = ReceivablesCubit(repo);
+      await c.load();
+      expect(c.state.load, BillingLoad.failure);
+      expect(c.state.error, isNotNull);
+      await c.load();
+      expect(c.state.load, BillingLoad.ready);
+    });
+
+    test(
+      'ReceivablesCubit: loadMore lỗi lạ báo thử lại; refresh lỗi lạ báo nhẹ',
+      () async {
+        repo.rows = [
+          for (var i = 0; i < 25; i++) sampleRow(id: 's$i', amount: 1000 + i),
+        ];
+        final c = ReceivablesCubit(repo);
+        await c.load();
+        repo.listError = bad;
+        await c.loadMore();
+        expect(c.state.loadingMore, isFalse);
+        expect(c.state.moreFailed, isTrue);
+        await c.loadMore();
+        expect(c.state.items, hasLength(25));
+        repo.listError = bad;
+        await c.refresh();
+        expect(c.state.refreshError, isNotNull);
+        // Cờ đang tải trang 1 đã tắt: loadMore/refresh sau đó vẫn chạy.
+        await c.refresh();
+        expect(c.state.refreshError, isNull);
+      },
+    );
+
+    test('StudentReceivableCubit: tải và bật/tắt', () async {
+      repo.historyError = bad;
+      final c = StudentReceivableCubit(repo, 's1');
+      await c.load();
+      expect(c.state.load, BillingLoad.failure);
+      await c.load();
+      repo.toggleError = bad;
+      await c.setDunning('e1', false);
+      expect(c.state.toggling, isEmpty);
+      expect(c.state.error, isNotNull);
+    });
+
+    test('DunningSettingsCubit: tải, lưu, xem trước', () async {
+      repo.settingsError = bad;
+      final c = DunningSettingsCubit(repo);
+      await c.load();
+      expect(c.state.load, BillingLoad.failure);
+      await c.load();
+      c.addOffset(14);
+      repo.putError = bad;
+      await c.save();
+      expect(c.state.saving, isFalse);
+      expect(c.state.error, isNotNull);
+      repo.previewError = bad;
+      await c.showPreview(3);
+      expect(c.state.preview!.failed, isTrue);
+    });
+
+    test('InvoiceDunningCubit', () async {
+      repo.invoiceDunningError = bad;
+      final c = InvoiceDunningCubit(repo, 'i1');
+      await c.load();
+      expect(c.state.load, BillingLoad.failure);
+      await c.load();
+      expect(c.state.load, BillingLoad.ready);
+    });
+  });
 }

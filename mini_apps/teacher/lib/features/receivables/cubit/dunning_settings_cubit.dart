@@ -120,7 +120,8 @@ class DunningSettingsCubit extends Cubit<DunningSettingsState> {
           offsets: s.offsetsDays,
         ),
       );
-    } on ApiException catch (e) {
+    } on Object catch (raw) {
+      final e = asApiException(raw);
       if (isClosed) return;
       emit(DunningSettingsState(load: BillingLoad.failure, error: e));
     }
@@ -187,7 +188,8 @@ class DunningSettingsCubit extends Cubit<DunningSettingsState> {
           justSaved: true,
         ),
       );
-    } on ApiException catch (e) {
+    } on Object catch (raw) {
+      final e = asApiException(raw);
       if (isClosed) return;
       final field = e.fieldErrors['offsetsDays'] ?? const <String>[];
       emit(
@@ -212,7 +214,7 @@ class DunningSettingsCubit extends Cubit<DunningSettingsState> {
           preview: DunningPreviewState(offsetDays: offsetDays, preview: p),
         ),
       );
-    } on ApiException {
+    } on Object {
       if (isClosed || seq != _previewSeq) return;
       emit(
         state.copyWith(
