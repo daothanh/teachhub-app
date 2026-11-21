@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:math' show Random;
 
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
@@ -71,6 +72,11 @@ class MembershipCubit extends Cubit<MembershipState> {
   final Dio _api;
   final SharedPreferences _prefs;
   final ActiveMembership _active;
+
+  /// `Idempotency-Key` của lần "thêm Giáo viên" đang dở. Giữ qua các lần thử
+  /// lại sau lỗi mạng để `POST /workspaces` không tạo hai tenant; bỏ khi thành
+  /// công, khi server từ chối hẳn, hoặc khi người dùng đổi ý.
+  String? _workspaceKey;
 
   static const _activeKey = 'active_membership_id';
 
@@ -152,10 +158,18 @@ class MembershipCubit extends Cubit<MembershipState> {
   /// Thêm vai trò (T01c): Giáo viên tạo không gian (`POST /workspaces`), Phụ
   /// huynh/Học sinh thêm vai trò rỗng (`POST /me/roles`), rồi mở vai trò đó.
   Future<void> addRole(MembershipRole role) async {
+    // Bấm lặp khi đang gửi: một request thôi.
+    if (state.statusCreate == LoadingStatus.loading) return;
     emit(state.copyWith(statusCreate: LoadingStatus.loading));
     try {
       if (role == MembershipRole.tenantOwner) {
-        await _api.post<void>('/workspaces', data: const <String, dynamic>{});
+        final key = _workspaceKey ??= uuidV4(Random.secure());
+        await _api.post<void>(
+          '/workspaces',
+          data: const <String, dynamic>{},
+          options: Options(headers: {'Idempotency-Key': key}),
+        );
+        _workspaceKey = null;
       } else {
         await _api.post<void>('/me/roles', data: {'role': role.wire});
       }
@@ -166,9 +180,14 @@ class MembershipCubit extends Cubit<MembershipState> {
       if (created != null) await select(created);
       emit(state.copyWith(statusCreate: LoadingStatus.success));
     } catch (e) {
+      // Lỗi chắc chắn (409, 422…) thì lần sau là lệnh mới; lỗi mạng giữ khóa.
+      if (ApiException.fromDio(e)?.retryable != true) _workspaceKey = null;
       emit(state.copyWith(statusCreate: LoadingStatus.failure, error: e));
     }
   }
+
+  /// Người dùng đổi ý (chọn vai trò khác): lần thêm Giáo viên sau là lệnh mới.
+  void resetPendingAdd() => _workspaceKey = null;
 
   /// Đăng xuất: quên vai trò của phiên này.
   Future<void> clear() async {
