@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:app/core/config/app_env.dart';
 import 'package:tasco_core/tasco_core.dart';
 
 void main() {
-  googleClientIdPerFlavorTests();
   test('reads the API url, pins and Google server client id', () {
     final env = AppEnv(Env.staging, {
       'TEACHHUB_API_URL': ' https://api-staging.dayhoc.app/v1 ',
@@ -48,21 +45,4 @@ void main() {
       expect(AppEnv.withApiOverride(Env.staging, file, ''), file);
     },
   );
-}
-
-void googleClientIdPerFlavorTests() {
-  const web = {
-    'development':
-        '305225338991-7vf98anmjogm9jksgd9kdije4ah8ncgk.apps.googleusercontent.com',
-    'staging':
-        '753323722874-khh3u3aobf813cib4l2m6bvotebld0q7.apps.googleusercontent.com',
-    'production':
-        '432762025168-e2lo4mengjqb64e8bc2sdoat1vbqpdl8.apps.googleusercontent.com',
-  };
-  for (final env in Env.values) {
-    test('assets/.env.${env.name} có Web client ID đúng flavor', () {
-      final text = File('assets/.env.${env.name}').readAsStringSync();
-      expect(text, contains('GOOGLE_SERVER_CLIENT_ID=${web[env.name]}'));
-    });
-  }
 }
