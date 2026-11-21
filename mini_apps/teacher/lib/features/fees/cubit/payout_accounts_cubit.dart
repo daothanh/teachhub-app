@@ -70,29 +70,60 @@ class PayoutAccountsCubit extends Cubit<PayoutAccountsState> {
     }
   }
 
-  Future<void> setPrimary(String id) =>
-      _act('primary|$id', PayoutNotice.primarySet, (key) async {
+  /// Đặt tài khoản khác làm chính cần OTP (hợp đồng); tài khoản đã là chính
+  /// thì không đổi gì.
+  bool setPrimaryNeedsOtp(String id) =>
+      state.accounts.any((a) => a.id == id && !a.isPrimary);
+
+  /// Xóa tài khoản chính lúc còn tài khoản khác cần OTP; tài khoản phụ hoặc
+  /// tài khoản chính duy nhất thì không.
+  bool deleteNeedsOtp(String id) =>
+      state.accounts.length > 1 &&
+      state.accounts.any((a) => a.id == id && a.isPrimary);
+
+  /// Gửi mã `payout_account` tới email đang đăng nhập; `null` = đã gửi.
+  Future<ApiException?> sendOtp() async {
+    if (state.busy) return null;
+    emit(state.copyWith(busy: true));
+    try {
+      await _repo.sendPayoutOtp();
+      if (!isClosed) emit(state.copyWith(busy: false));
+      return null;
+    } on ApiException catch (e) {
+      if (!isClosed) emit(state.copyWith(busy: false));
+      return e;
+    }
+  }
+
+  Future<void> setPrimary(String id, {String? otpCode}) =>
+      _act('primary|$id', otpCode, PayoutNotice.primarySet, (key) async {
         await _repo.updatePayoutAccount(
           id,
           makePrimary: true,
+          otpCode: otpCode,
           idempotencyKey: key,
         );
       });
 
-  Future<void> delete(String id) =>
-      _act('delete|$id', PayoutNotice.deleted, (key) async {
-        await _repo.deletePayoutAccount(id, idempotencyKey: key);
+  Future<void> delete(String id, {String? otpCode}) =>
+      _act('delete|$id', otpCode, PayoutNotice.deleted, (key) async {
+        await _repo.deletePayoutAccount(
+          id,
+          otpCode: otpCode,
+          idempotencyKey: key,
+        );
       });
 
   Future<void> _act(
     String op,
+    String? otpCode,
     PayoutNotice notice,
     Future<void> Function(String key) run,
   ) async {
     if (state.busy) return;
     emit(state.copyWith(busy: true));
     try {
-      await run(_keys.of(op, op));
+      await run(_keys.of(op, '$op|$otpCode'));
       _keys.done(op);
     } on ApiException catch (e) {
       if (!e.retryable) _keys.done(op);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
@@ -202,7 +203,12 @@ class _AccountTile extends StatelessWidget {
         ],
       ),
     );
-    if (ok == true) await cubit.delete(account.id);
+    if (ok != true || !context.mounted) return;
+    final otp = cubit.deleteNeedsOtp(account.id)
+        ? await _askOtp(context)
+        : null;
+    if (cubit.deleteNeedsOtp(account.id) && otp == null) return;
+    await cubit.delete(account.id, otpCode: otp);
   }
 
   @override
@@ -253,7 +259,12 @@ class _AccountTile extends StatelessWidget {
                   case _Action.edit:
                     await _openForm(context, editId: a.id, extra: a);
                   case _Action.primary:
-                    await context.read<PayoutAccountsCubit>().setPrimary(a.id);
+                    final cubit = context.read<PayoutAccountsCubit>();
+                    final otp = cubit.setPrimaryNeedsOtp(a.id)
+                        ? await _askOtp(context)
+                        : null;
+                    if (cubit.setPrimaryNeedsOtp(a.id) && otp == null) return;
+                    await cubit.setPrimary(a.id, otpCode: otp);
                   case _Action.delete:
                     await _confirmDelete(context);
                 }
@@ -277,6 +288,84 @@ class _AccountTile extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Gửi mã tới email rồi hỏi mã 6 số (đổi tài khoản chính, hợp đồng US-7.3).
+/// Trả `null` khi hủy hoặc không gửi được mã (đã báo lỗi bằng SnackBar).
+Future<String?> _askOtp(BuildContext context) async {
+  final l10n = context.miniAppL10n;
+  final cubit = context.read<PayoutAccountsCubit>();
+  final messenger = ScaffoldMessenger.of(context);
+  final err = await cubit.sendOtp();
+  if (err != null) {
+    messenger.showSnackBar(SnackBar(content: Text(feesErrorText(l10n, err))));
+    return null;
+  }
+  if (!context.mounted) return null;
+  return showDialog<String>(
+    context: context,
+    builder: (_) => BlocProvider.value(value: cubit, child: const _OtpDialog()),
+  );
+}
+
+class _OtpDialog extends StatefulWidget {
+  const _OtpDialog();
+
+  @override
+  State<_OtpDialog> createState() => _OtpDialogState();
+}
+
+class _OtpDialogState extends State<_OtpDialog> {
+  final _code = TextEditingController();
+
+  @override
+  void dispose() {
+    _code.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    return AlertDialog(
+      title: Text(l10n.payoutOtpActionTitle),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.payoutOtpActionBody),
+            const SizedBox(height: AppSpacing.md),
+            AppInput(
+              controller: _code,
+              label: l10n.payoutOtpField,
+              autofillHints: const [AutofillHints.oneTimeCode],
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              onChanged: (_) => setState(() {}),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => context.read<PayoutAccountsCubit>().sendOtp(),
+          child: Text(l10n.payoutOtpResend),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.payoutCancel),
+        ),
+        TextButton(
+          onPressed: _code.text.length == 6
+              ? () => Navigator.pop(context, _code.text)
+              : null,
+          child: Text(l10n.payoutOtpActionConfirm),
+        ),
+      ],
     );
   }
 }

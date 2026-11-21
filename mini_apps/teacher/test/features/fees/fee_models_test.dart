@@ -7,6 +7,11 @@ void main() {
   test('formatVnd: 150000 → 150.000 đ', () {
     expect(formatVnd(150000), '150.000 đ');
     expect(formatVnd(999), '999 đ');
+    expect(formatVnd(0), '0 đ');
+    expect(formatVnd(-150000), '−150.000 đ');
+    expect(formatVnd(-999), '−999 đ');
+    expect(formatVnd(150000, plus: true), '+150.000 đ');
+    expect(formatVnd(0, plus: true), '0 đ');
     expect(formatVnd(1000000000), '1.000.000.000 đ');
   });
 

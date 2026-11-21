@@ -31,7 +31,7 @@ abstract class FeeRepository {
   });
 
   /// Chỉ gửi các trường có giá trị. [otpCode] bắt buộc khi đổi `bankBin` hoặc
-  /// `accountNo`; [makePrimary] đặt làm tài khoản chính.
+  /// `accountNo`, hoặc khi [makePrimary] chuyển cờ chính sang tài khoản khác.
   Future<PayoutAccount> updatePayoutAccount(
     String id, {
     String? bankBin,
@@ -42,7 +42,13 @@ abstract class FeeRepository {
     required String idempotencyKey,
   });
 
-  Future<void> deletePayoutAccount(String id, {required String idempotencyKey});
+  /// [otpCode] bắt buộc khi xóa tài khoản chính lúc còn tài khoản khác (hợp
+  /// đồng `DeletePayoutAccountRequest`); các trường hợp khác không gửi body.
+  Future<void> deletePayoutAccount(
+    String id, {
+    String? otpCode,
+    required String idempotencyKey,
+  });
 }
 
 FeeRepository feeRepository() => GetIt.I.isRegistered<FeeRepository>()
@@ -141,10 +147,12 @@ class DioFeeRepository implements FeeRepository {
   @override
   Future<void> deletePayoutAccount(
     String id, {
+    String? otpCode,
     required String idempotencyKey,
   }) => _call(
     () => _dio.delete<void>(
       '/payout-accounts/$id',
+      data: otpCode == null ? null : {'otpCode': otpCode},
       options: _key(idempotencyKey),
     ),
   );
