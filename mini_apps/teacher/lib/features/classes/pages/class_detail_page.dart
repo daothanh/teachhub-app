@@ -204,6 +204,7 @@ class _Body extends StatelessWidget {
             itemCount: state.roster.length,
             itemBuilder: (context, i) => RosterTile(
               classId: cls.id,
+              feeType: cls.feeType,
               entry: state.roster[i],
               onChanged: context.read<ClassDetailCubit>().load,
             ),

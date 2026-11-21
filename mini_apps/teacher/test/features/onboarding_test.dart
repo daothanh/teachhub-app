@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:teacher/features/fees/data/fee_repository.dart';
 import 'package:teacher/features/onboarding/data/onboarding_models.dart';
 import 'package:teacher/features/onboarding/data/onboarding_repository.dart';
 import 'package:teacher/features/onboarding/pages/onboarding_page.dart';
@@ -9,6 +10,7 @@ import 'package:teacher/features/students/data/student_repository.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../support/fakes.dart';
+import 'fees/fake_fee_repository.dart';
 import '../support/pump_app.dart';
 
 const _done = OnboardingStatus.done;
@@ -17,8 +19,10 @@ Future<FakeOnboardingRepository> _open(
   WidgetTester tester,
   FakeOnboardingRepository repo, {
   StudentRepository? students,
+  FakeFeeRepository? fees,
 }) async {
   GetIt.I.registerSingleton<OnboardingRepository>(repo);
+  GetIt.I.registerSingleton<FeeRepository>(fees ?? FakeFeeRepository());
   GetIt.I.registerSingleton<StudentRepository>(
     students ??
         FakeStudentRepository([const Student(id: 's1', fullName: 'Minh Anh')]),
@@ -75,6 +79,50 @@ void main() {
     expect(find.text('Bước 4/5'), findsOneWidget);
     expect(find.text('Tài khoản nhận tiền'), findsOneWidget);
   });
+
+  testWidgets(
+    'bước 4: danh sách tài khoản thật; có tài khoản thì Tiếp tục ghi done',
+    (tester) async {
+      final fees = FakeFeeRepository()..accounts = [sampleAccount()];
+      final repo = await _open(
+        tester,
+        FakeOnboardingRepository(
+          onboardingOf({
+            OnboardingStep.createClass: _done,
+            OnboardingStep.addStudents: _done,
+            OnboardingStep.setSchedule: OnboardingStatus.skipped,
+          }),
+        ),
+        fees: fees,
+      );
+      expect(find.text('Vietcombank · ******6789'), findsOneWidget);
+      expect(find.text('Tính năng sắp có.'), findsNothing);
+      await tester.tap(find.text('Tiếp tục'));
+      await tester.pumpAndSettle();
+      expect(repo.patches.first, (
+        OnboardingStep.payoutAccount,
+        OnboardingStatus.done,
+      ));
+    },
+  );
+
+  testWidgets(
+    'bước 4 chưa có tài khoản: chỉ có nút Thêm tài khoản, không có Tiếp tục',
+    (tester) async {
+      await _open(
+        tester,
+        FakeOnboardingRepository(
+          onboardingOf({
+            OnboardingStep.createClass: _done,
+            OnboardingStep.addStudents: _done,
+            OnboardingStep.setSchedule: OnboardingStatus.skipped,
+          }),
+        ),
+      );
+      expect(find.text('Thêm tài khoản'), findsOneWidget);
+      expect(find.text('Tiếp tục'), findsNothing);
+    },
+  );
 
   testWidgets('"Để sau" ở bước 2 gửi skipped và chuyển bước 3', (tester) async {
     final repo = await _open(

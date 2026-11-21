@@ -459,10 +459,6 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get onboardingPlaceholderBody => 'This screen is being finished.';
 
   @override
-  String get onboardingPayoutBody =>
-      'Add an account to receive tuition. Coming soon.';
-
-  @override
   String get onboardingComplianceBody =>
       'See what to do to teach within the rules. Coming soon.';
 
@@ -1013,4 +1009,302 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get todaySettings => 'Settings and account';
+
+  @override
+  String get classesFeeSection => 'Tuition';
+
+  @override
+  String get classesFeeEnabled => 'Charge tuition';
+
+  @override
+  String get classesFeeTypeLabel => 'Billing type';
+
+  @override
+  String get feeTypePerSession => 'Per session';
+
+  @override
+  String get feeTypeMonthly => 'Monthly';
+
+  @override
+  String get feeTypeCourse => 'Whole course';
+
+  @override
+  String get classesFeeAmountPerSession => 'Price per session';
+
+  @override
+  String get classesFeeAmountMonthly => 'Monthly tuition';
+
+  @override
+  String get classesFeeAmountCourse => 'Total course tuition';
+
+  @override
+  String get classesFeeChargeExcused => 'Charge excused absences';
+
+  @override
+  String get classesFeeChargeUnexcused => 'Charge unexcused absences';
+
+  @override
+  String get classesFeeDeductCancelled => 'Deduct cancelled sessions';
+
+  @override
+  String get classesFeeInstallments => 'Installments (1–36)';
+
+  @override
+  String get classesFeeNote =>
+      'Fee changes apply from the next unclosed billing period.';
+
+  @override
+  String get classesErrFeeAmountRequired => 'Enter an amount.';
+
+  @override
+  String get classesErrFeeAmountRange =>
+      'Amount must be between 1 and 1,000,000,000.';
+
+  @override
+  String get classesErrFeeInstallments =>
+      'Installments: 1 to 36, whole course only.';
+
+  @override
+  String get classesErrFeeCourseSchedule =>
+      'A whole-course fee needs an end date and at least one weekly session.';
+
+  @override
+  String get feesErrRateLimited =>
+      'You are going too fast. Wait a moment and try again.';
+
+  @override
+  String get rosterFeeOverrideBadge => 'Custom price';
+
+  @override
+  String get rosterFeeOverrideAction => 'Set custom price';
+
+  @override
+  String get feeOverrideTitle => 'Custom price';
+
+  @override
+  String feeOverrideFor(String name) {
+    return 'Custom price for $name';
+  }
+
+  @override
+  String get feeOverrideHint => 'Leave a field empty to follow the class.';
+
+  @override
+  String get feeOverrideAmount => 'Custom price';
+
+  @override
+  String get feeOverrideRulesTitle => 'Absence rules';
+
+  @override
+  String get feeOverrideInherit => 'Class default';
+
+  @override
+  String get feeOverrideYes => 'Charge';
+
+  @override
+  String get feeOverrideNo => 'Do not charge';
+
+  @override
+  String get feeOverrideInstallments => 'Installments (1–36)';
+
+  @override
+  String get feeOverrideDiscounts => 'Discounts';
+
+  @override
+  String get feeOverrideAddDiscount => 'Add a discount';
+
+  @override
+  String get feeOverrideDiscountDesc => 'Description';
+
+  @override
+  String get feeOverrideDiscountPercent => 'Percent';
+
+  @override
+  String get feeOverrideDiscountAmount => 'Amount';
+
+  @override
+  String get feeOverrideDiscountPercentValue => 'Percent (1–100)';
+
+  @override
+  String get feeOverrideDiscountAmountValue => 'Amount';
+
+  @override
+  String get feeOverrideRemoveDiscount => 'Remove discount';
+
+  @override
+  String get feeOverrideSave => 'Save custom price';
+
+  @override
+  String get feeOverrideClear => 'Remove custom price';
+
+  @override
+  String get feeOverrideSaved => 'Custom price saved.';
+
+  @override
+  String get feeOverrideCleared => 'Custom price removed.';
+
+  @override
+  String get feeOverrideErrAmount => 'Invalid amount.';
+
+  @override
+  String get feeOverrideErrInstallments => 'Installments: 1 to 36.';
+
+  @override
+  String get feeOverrideErrDiscountDesc =>
+      'Enter a description, up to 100 characters.';
+
+  @override
+  String get feeOverrideErrDiscountValue => 'Invalid value.';
+
+  @override
+  String get payoutTitle => 'Payout accounts';
+
+  @override
+  String get payoutEmpty => 'No payout account yet';
+
+  @override
+  String get payoutEmptyBody =>
+      'Add an account so parents know where to send tuition.';
+
+  @override
+  String get payoutAdd => 'Add account';
+
+  @override
+  String get payoutLimit => 'Up to 5 accounts.';
+
+  @override
+  String get payoutPrimaryBadge => 'Primary';
+
+  @override
+  String get payoutSetPrimary => 'Make primary';
+
+  @override
+  String get payoutEdit => 'Edit';
+
+  @override
+  String get payoutDelete => 'Delete';
+
+  @override
+  String get payoutCancel => 'Cancel';
+
+  @override
+  String get payoutDeleteTitle => 'Delete this account?';
+
+  @override
+  String get payoutDeleteBody =>
+      'The account will be removed from your payout list.';
+
+  @override
+  String get payoutDeleteLastBody =>
+      'This is your only payout account. Once it is removed, you won\'t be able to close a billing period until you add another one.';
+
+  @override
+  String payoutLine(String bank, String masked) {
+    return '$bank · $masked';
+  }
+
+  @override
+  String payoutUnknownBank(String bin) {
+    return 'Bank $bin';
+  }
+
+  @override
+  String payoutSemantics(String name, String line) {
+    return '$name, $line';
+  }
+
+  @override
+  String payoutActionsSemantics(String name) {
+    return 'Actions for account $name';
+  }
+
+  @override
+  String get payoutContinue => 'Continue';
+
+  @override
+  String get payoutSaved => 'Account saved.';
+
+  @override
+  String get payoutDeleted => 'Account deleted.';
+
+  @override
+  String get payoutPrimarySet => 'Primary account updated.';
+
+  @override
+  String get payoutFormNewTitle => 'Add account';
+
+  @override
+  String get payoutFormEditTitle => 'Edit account';
+
+  @override
+  String get payoutFieldBank => 'Bank';
+
+  @override
+  String get payoutPickBank => 'Choose a bank';
+
+  @override
+  String get payoutFieldAccountNo => 'Account number';
+
+  @override
+  String get payoutFieldAccountNoEditHint => 'Leave empty to keep the number';
+
+  @override
+  String get payoutFieldName => 'Account holder';
+
+  @override
+  String get payoutFieldNameHint => 'Exactly as the bank shows it';
+
+  @override
+  String get payoutOtpNeeded =>
+      'Adding an account or changing the bank or number needs a code sent by email.';
+
+  @override
+  String get payoutSendCode => 'Send code';
+
+  @override
+  String get payoutSave => 'Save';
+
+  @override
+  String get payoutOtpSent => 'We sent a code to your email.';
+
+  @override
+  String get payoutOtpField => 'Code (6 digits)';
+
+  @override
+  String get payoutOtpConfirm => 'Confirm and save';
+
+  @override
+  String get payoutOtpResend => 'Resend code';
+
+  @override
+  String get payoutOtpBack => 'Edit details';
+
+  @override
+  String get payoutErrOtpInvalid => 'Wrong code. Check the code in your email.';
+
+  @override
+  String get payoutErrOtpLocked => 'Too many wrong codes. Try again later.';
+
+  @override
+  String get payoutErrMissing =>
+      'No payout account. Add one before issuing invoices.';
+
+  @override
+  String get payoutErrBank => 'Choose a bank.';
+
+  @override
+  String get payoutErrRequired => 'Required.';
+
+  @override
+  String get payoutErrAccountNo => 'Account number has 6 to 19 digits.';
+
+  @override
+  String get payoutErrName => 'Name is up to 50 characters.';
+
+  @override
+  String get payoutLoadFailed => 'Could not load accounts.';
+
+  @override
+  String get onboardingPayoutIntro =>
+      'Add at least one account to receive tuition.';
 }

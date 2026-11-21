@@ -235,7 +235,6 @@
   "onboardingSkip": "Để sau",
   "onboardingMarkDone": "Xong bước này",
   "onboardingPlaceholderBody": "Màn này đang được hoàn thiện.",
-  "onboardingPayoutBody": "Thêm tài khoản để nhận học phí. Tính năng sắp có.",
   "onboardingComplianceBody": "Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.",
   "onboardingDoneTitle": "Bạn đã xong phần làm quen",
   "onboardingDoneBody": "Vào xem lớp và học viên của bạn.",
@@ -603,5 +602,138 @@
       }
     }
   },
-  "todaySettings": "Cài đặt và tài khoản"
+  "todaySettings": "Cài đặt và tài khoản",
+  "classesFeeSection": "Học phí",
+  "classesFeeEnabled": "Thu học phí",
+  "classesFeeTypeLabel": "Cách tính",
+  "feeTypePerSession": "Theo buổi",
+  "feeTypeMonthly": "Theo tháng",
+  "feeTypeCourse": "Trọn khóa",
+  "classesFeeAmountPerSession": "Đơn giá mỗi buổi",
+  "classesFeeAmountMonthly": "Học phí mỗi tháng",
+  "classesFeeAmountCourse": "Tổng học phí cả khóa",
+  "classesFeeChargeExcused": "Tính tiền buổi vắng có phép",
+  "classesFeeChargeUnexcused": "Tính tiền buổi vắng không phép",
+  "classesFeeDeductCancelled": "Trừ tiền buổi giáo viên hủy",
+  "classesFeeInstallments": "Số đợt thu (1–36)",
+  "classesFeeNote": "Đổi học phí chỉ áp dụng từ kỳ thu chưa chốt tiếp theo.",
+  "classesErrFeeAmountRequired": "Nhập số tiền.",
+  "classesErrFeeAmountRange": "Số tiền từ 1 đ đến 1.000.000.000 đ.",
+  "classesErrFeeInstallments": "Số đợt từ 1 đến 36, chỉ dùng cho trọn khóa.",
+  "classesErrFeeCourseSchedule": "Trọn khóa cần có ngày kết thúc và ít nhất một lịch học hằng tuần.",
+  "feesErrRateLimited": "Bạn thao tác hơi nhanh. Chờ một lúc rồi thử lại.",
+  "rosterFeeOverrideBadge": "Giá riêng",
+  "rosterFeeOverrideAction": "Giá riêng cho học viên",
+  "feeOverrideTitle": "Giá riêng",
+  "feeOverrideFor": "Giá riêng của {name}",
+  "@feeOverrideFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "feeOverrideHint": "Để trống mục nào thì mục đó theo cấu hình lớp.",
+  "feeOverrideAmount": "Giá riêng",
+  "feeOverrideRulesTitle": "Quy tắc vắng riêng",
+  "feeOverrideInherit": "Theo lớp",
+  "feeOverrideYes": "Tính",
+  "feeOverrideNo": "Không tính",
+  "feeOverrideInstallments": "Số đợt riêng (1–36)",
+  "feeOverrideDiscounts": "Miễn giảm",
+  "feeOverrideAddDiscount": "Thêm khoản miễn giảm",
+  "feeOverrideDiscountDesc": "Mô tả",
+  "feeOverrideDiscountPercent": "Theo %",
+  "feeOverrideDiscountAmount": "Theo số tiền",
+  "feeOverrideDiscountPercentValue": "Phần trăm (1–100)",
+  "feeOverrideDiscountAmountValue": "Số tiền",
+  "feeOverrideRemoveDiscount": "Xóa khoản miễn giảm",
+  "feeOverrideSave": "Lưu giá riêng",
+  "feeOverrideClear": "Xóa giá riêng",
+  "feeOverrideSaved": "Đã lưu giá riêng.",
+  "feeOverrideCleared": "Đã xóa giá riêng.",
+  "feeOverrideErrAmount": "Số tiền không hợp lệ.",
+  "feeOverrideErrInstallments": "Số đợt từ 1 đến 36.",
+  "feeOverrideErrDiscountDesc": "Nhập mô tả, tối đa 100 ký tự.",
+  "feeOverrideErrDiscountValue": "Giá trị không hợp lệ.",
+  "payoutTitle": "Tài khoản nhận tiền",
+  "payoutEmpty": "Chưa có tài khoản nhận tiền",
+  "payoutEmptyBody": "Thêm tài khoản để phụ huynh biết chuyển học phí về đâu.",
+  "payoutAdd": "Thêm tài khoản",
+  "payoutLimit": "Tối đa 5 tài khoản.",
+  "payoutPrimaryBadge": "Chính",
+  "payoutSetPrimary": "Đặt làm chính",
+  "payoutEdit": "Sửa",
+  "payoutDelete": "Xóa",
+  "payoutCancel": "Hủy",
+  "payoutDeleteTitle": "Xóa tài khoản này?",
+  "payoutDeleteBody": "Tài khoản sẽ bị gỡ khỏi danh sách nhận tiền.",
+  "payoutDeleteLastBody": "Đây là tài khoản nhận tiền duy nhất. Xóa xong, bạn sẽ chưa chốt được kỳ học phí cho đến khi thêm tài khoản mới.",
+  "payoutLine": "{bank} · {masked}",
+  "@payoutLine": {
+    "placeholders": {
+      "bank": {
+        "type": "String"
+      },
+      "masked": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutUnknownBank": "Ngân hàng {bin}",
+  "@payoutUnknownBank": {
+    "placeholders": {
+      "bin": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutSemantics": "{name}, {line}",
+  "@payoutSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutActionsSemantics": "Tác vụ cho tài khoản {name}",
+  "@payoutActionsSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutContinue": "Tiếp tục",
+  "payoutSaved": "Đã lưu tài khoản.",
+  "payoutDeleted": "Đã xóa tài khoản.",
+  "payoutPrimarySet": "Đã đặt làm tài khoản chính.",
+  "payoutFormNewTitle": "Thêm tài khoản",
+  "payoutFormEditTitle": "Sửa tài khoản",
+  "payoutFieldBank": "Ngân hàng",
+  "payoutPickBank": "Chọn ngân hàng",
+  "payoutFieldAccountNo": "Số tài khoản",
+  "payoutFieldAccountNoEditHint": "Để trống nếu không đổi số",
+  "payoutFieldName": "Tên chủ tài khoản",
+  "payoutFieldNameHint": "Viết đúng như ngân hàng ghi",
+  "payoutOtpNeeded": "Thêm tài khoản hoặc đổi ngân hàng, số tài khoản cần mã xác thực gửi qua email.",
+  "payoutSendCode": "Gửi mã xác thực",
+  "payoutSave": "Lưu",
+  "payoutOtpSent": "Đã gửi mã tới email của bạn.",
+  "payoutOtpField": "Mã xác thực (6 số)",
+  "payoutOtpConfirm": "Xác nhận và lưu",
+  "payoutOtpResend": "Gửi lại mã",
+  "payoutOtpBack": "Sửa thông tin",
+  "payoutErrOtpInvalid": "Mã chưa đúng. Kiểm tra lại mã trong email.",
+  "payoutErrOtpLocked": "Bạn nhập sai quá nhiều lần. Vui lòng thử lại sau.",
+  "payoutErrMissing": "Bạn chưa có tài khoản nhận tiền. Thêm tài khoản trước khi gửi hóa đơn.",
+  "payoutErrBank": "Chọn ngân hàng.",
+  "payoutErrRequired": "Không được để trống.",
+  "payoutErrAccountNo": "Số tài khoản gồm 6 đến 19 chữ số.",
+  "payoutErrName": "Tên tối đa 50 ký tự.",
+  "payoutLoadFailed": "Không tải được danh sách tài khoản.",
+  "onboardingPayoutIntro": "Thêm ít nhất một tài khoản để nhận học phí."
 }

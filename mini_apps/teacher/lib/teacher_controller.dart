@@ -21,6 +21,8 @@ import 'data/sync/sync_engine.dart';
 import 'features/attendance/attendance_routes.dart';
 import 'features/attendance/data/attendance_repository.dart';
 import 'features/classes/classes_routes.dart';
+import 'features/fees/data/fee_repository.dart';
+import 'features/fees/fees_routes.dart';
 import 'features/offline/offline_banner_shell.dart';
 import 'features/onboarding/data/onboarding_models.dart';
 import 'features/onboarding/data/onboarding_repository.dart';
@@ -85,6 +87,7 @@ class TeacherController {
       ],
     ),
     ...classesRoutes(moduleId),
+    ...feesRoutes(moduleId),
     ...studentsRoutes(moduleId),
     ...attendanceRoutes(moduleId),
     ...scheduleRoutes(moduleId),
@@ -139,6 +142,9 @@ class TeacherController {
       getIt.registerLazySingleton<ScheduleRepository>(
         () => DriftScheduleRepository(cache: openSessionCache),
       );
+    }
+    if (!getIt.isRegistered<FeeRepository>()) {
+      getIt.registerLazySingleton<FeeRepository>(() => DioFeeRepository(api()));
     }
     if (!getIt.isRegistered<OnboardingRepository>()) {
       getIt.registerLazySingleton<OnboardingRepository>(

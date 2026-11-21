@@ -123,8 +123,6 @@ class ClassFormCubit extends Cubit<ClassFormState> {
           idempotencyKey: _keys.of('create', body),
         )).value;
         _keys.done('create');
-        if (isClosed) return;
-        emit(state.copyWith(initial: existing));
       } else {
         op = 'update';
         existing = await _repo.update(
@@ -133,9 +131,9 @@ class ClassFormCubit extends Cubit<ClassFormState> {
           idempotencyKey: _keys.of('update', '${existing.id}|$body'),
         );
         _keys.done('update');
-        if (isClosed) return;
-        emit(state.copyWith(initial: existing));
       }
+      if (isClosed) return;
+      emit(state.copyWith(initial: existing));
       if (_rulesChanged(existing, rules)) {
         op = 'rules';
         generated = (await _repo.putRules(
@@ -147,6 +145,19 @@ class ClassFormCubit extends Cubit<ClassFormState> {
           ),
         )).sessionsGenerated;
         _keys.done('rules');
+      }
+      // Học phí đặt sau cùng: `course` cần `endDate` và quy tắc lịch đã lưu.
+      // `POST` chưa nhận học phí, `PATCH` thường không gửi nếu học phí không đổi.
+      if (!input.sameFeeAs(existing)) {
+        op = 'fee';
+        final feeBody = input.toPatchJson(withFee: true).toString();
+        existing = await _repo.update(
+          existing.id,
+          input,
+          withFee: true,
+          idempotencyKey: _keys.of('fee', '${existing.id}|$feeBody'),
+        );
+        _keys.done('fee');
       }
       if (isClosed) return;
       emit(
@@ -175,18 +186,22 @@ class ClassFormCubit extends Cubit<ClassFormState> {
 
   static const _knownFields = {
     'name', 'subject', 'grade', 'mode', 'location', 'capacity', //
-    'startDate', 'endDate', 'rules', //
+    'startDate', 'endDate', 'rules', 'feeType', 'feeAmount', 'feeRules', //
   };
 
-  /// Gộp mọi khóa `rules*` (vd. `rules.0.startTime`) vào `rules`; khóa không
-  /// thuộc form đánh dấu `unknown` để hiện lỗi chung.
+  /// Gộp mọi khóa `rules*` (vd. `rules.0.startTime`) vào `rules` và `feeRules*`
+  /// vào `feeRules`; khóa không thuộc form đánh dấu `unknown` để hiện lỗi chung.
   static (Map<String, List<String>>, bool) _splitFieldErrors(
     Map<String, List<String>> raw,
   ) {
     final out = <String, List<String>>{};
     var unknown = false;
     for (final MapEntry(:key, :value) in raw.entries) {
-      final k = key.startsWith('rules') ? 'rules' : key;
+      final k = key.startsWith('rules')
+          ? 'rules'
+          : key.startsWith('feeRules')
+          ? 'feeRules'
+          : key;
       if (_knownFields.contains(k)) {
         out[k] = [...?out[k], ...value];
       } else {

@@ -857,12 +857,6 @@ abstract class MiniAppLocalizations {
   /// **'Màn này đang được hoàn thiện.'**
   String get onboardingPlaceholderBody;
 
-  /// No description provided for @onboardingPayoutBody.
-  ///
-  /// In vi, this message translates to:
-  /// **'Thêm tài khoản để nhận học phí. Tính năng sắp có.'**
-  String get onboardingPayoutBody;
-
   /// No description provided for @onboardingComplianceBody.
   ///
   /// In vi, this message translates to:
@@ -1815,6 +1809,558 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Cài đặt và tài khoản'**
   String get todaySettings;
+
+  /// No description provided for @classesFeeSection.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học phí'**
+  String get classesFeeSection;
+
+  /// No description provided for @classesFeeEnabled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thu học phí'**
+  String get classesFeeEnabled;
+
+  /// No description provided for @classesFeeTypeLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cách tính'**
+  String get classesFeeTypeLabel;
+
+  /// No description provided for @feeTypePerSession.
+  ///
+  /// In vi, this message translates to:
+  /// **'Theo buổi'**
+  String get feeTypePerSession;
+
+  /// No description provided for @feeTypeMonthly.
+  ///
+  /// In vi, this message translates to:
+  /// **'Theo tháng'**
+  String get feeTypeMonthly;
+
+  /// No description provided for @feeTypeCourse.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trọn khóa'**
+  String get feeTypeCourse;
+
+  /// No description provided for @classesFeeAmountPerSession.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đơn giá mỗi buổi'**
+  String get classesFeeAmountPerSession;
+
+  /// No description provided for @classesFeeAmountMonthly.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học phí mỗi tháng'**
+  String get classesFeeAmountMonthly;
+
+  /// No description provided for @classesFeeAmountCourse.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tổng học phí cả khóa'**
+  String get classesFeeAmountCourse;
+
+  /// No description provided for @classesFeeChargeExcused.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính tiền buổi vắng có phép'**
+  String get classesFeeChargeExcused;
+
+  /// No description provided for @classesFeeChargeUnexcused.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính tiền buổi vắng không phép'**
+  String get classesFeeChargeUnexcused;
+
+  /// No description provided for @classesFeeDeductCancelled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trừ tiền buổi giáo viên hủy'**
+  String get classesFeeDeductCancelled;
+
+  /// No description provided for @classesFeeInstallments.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số đợt thu (1–36)'**
+  String get classesFeeInstallments;
+
+  /// No description provided for @classesFeeNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đổi học phí chỉ áp dụng từ kỳ thu chưa chốt tiếp theo.'**
+  String get classesFeeNote;
+
+  /// No description provided for @classesErrFeeAmountRequired.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập số tiền.'**
+  String get classesErrFeeAmountRequired;
+
+  /// No description provided for @classesErrFeeAmountRange.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tiền từ 1 đ đến 1.000.000.000 đ.'**
+  String get classesErrFeeAmountRange;
+
+  /// No description provided for @classesErrFeeInstallments.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số đợt từ 1 đến 36, chỉ dùng cho trọn khóa.'**
+  String get classesErrFeeInstallments;
+
+  /// No description provided for @classesErrFeeCourseSchedule.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trọn khóa cần có ngày kết thúc và ít nhất một lịch học hằng tuần.'**
+  String get classesErrFeeCourseSchedule;
+
+  /// No description provided for @feesErrRateLimited.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn thao tác hơi nhanh. Chờ một lúc rồi thử lại.'**
+  String get feesErrRateLimited;
+
+  /// No description provided for @rosterFeeOverrideBadge.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giá riêng'**
+  String get rosterFeeOverrideBadge;
+
+  /// No description provided for @rosterFeeOverrideAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giá riêng cho học viên'**
+  String get rosterFeeOverrideAction;
+
+  /// No description provided for @feeOverrideTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giá riêng'**
+  String get feeOverrideTitle;
+
+  /// No description provided for @feeOverrideFor.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giá riêng của {name}'**
+  String feeOverrideFor(String name);
+
+  /// No description provided for @feeOverrideHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Để trống mục nào thì mục đó theo cấu hình lớp.'**
+  String get feeOverrideHint;
+
+  /// No description provided for @feeOverrideAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giá riêng'**
+  String get feeOverrideAmount;
+
+  /// No description provided for @feeOverrideRulesTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Quy tắc vắng riêng'**
+  String get feeOverrideRulesTitle;
+
+  /// No description provided for @feeOverrideInherit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Theo lớp'**
+  String get feeOverrideInherit;
+
+  /// No description provided for @feeOverrideYes.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính'**
+  String get feeOverrideYes;
+
+  /// No description provided for @feeOverrideNo.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tính'**
+  String get feeOverrideNo;
+
+  /// No description provided for @feeOverrideInstallments.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số đợt riêng (1–36)'**
+  String get feeOverrideInstallments;
+
+  /// No description provided for @feeOverrideDiscounts.
+  ///
+  /// In vi, this message translates to:
+  /// **'Miễn giảm'**
+  String get feeOverrideDiscounts;
+
+  /// No description provided for @feeOverrideAddDiscount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm khoản miễn giảm'**
+  String get feeOverrideAddDiscount;
+
+  /// No description provided for @feeOverrideDiscountDesc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mô tả'**
+  String get feeOverrideDiscountDesc;
+
+  /// No description provided for @feeOverrideDiscountPercent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Theo %'**
+  String get feeOverrideDiscountPercent;
+
+  /// No description provided for @feeOverrideDiscountAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Theo số tiền'**
+  String get feeOverrideDiscountAmount;
+
+  /// No description provided for @feeOverrideDiscountPercentValue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phần trăm (1–100)'**
+  String get feeOverrideDiscountPercentValue;
+
+  /// No description provided for @feeOverrideDiscountAmountValue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tiền'**
+  String get feeOverrideDiscountAmountValue;
+
+  /// No description provided for @feeOverrideRemoveDiscount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa khoản miễn giảm'**
+  String get feeOverrideRemoveDiscount;
+
+  /// No description provided for @feeOverrideSave.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu giá riêng'**
+  String get feeOverrideSave;
+
+  /// No description provided for @feeOverrideClear.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa giá riêng'**
+  String get feeOverrideClear;
+
+  /// No description provided for @feeOverrideSaved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu giá riêng.'**
+  String get feeOverrideSaved;
+
+  /// No description provided for @feeOverrideCleared.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã xóa giá riêng.'**
+  String get feeOverrideCleared;
+
+  /// No description provided for @feeOverrideErrAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tiền không hợp lệ.'**
+  String get feeOverrideErrAmount;
+
+  /// No description provided for @feeOverrideErrInstallments.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số đợt từ 1 đến 36.'**
+  String get feeOverrideErrInstallments;
+
+  /// No description provided for @feeOverrideErrDiscountDesc.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập mô tả, tối đa 100 ký tự.'**
+  String get feeOverrideErrDiscountDesc;
+
+  /// No description provided for @feeOverrideErrDiscountValue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giá trị không hợp lệ.'**
+  String get feeOverrideErrDiscountValue;
+
+  /// No description provided for @payoutTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản nhận tiền'**
+  String get payoutTitle;
+
+  /// No description provided for @payoutEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có tài khoản nhận tiền'**
+  String get payoutEmpty;
+
+  /// No description provided for @payoutEmptyBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm tài khoản để phụ huynh biết chuyển học phí về đâu.'**
+  String get payoutEmptyBody;
+
+  /// No description provided for @payoutAdd.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm tài khoản'**
+  String get payoutAdd;
+
+  /// No description provided for @payoutLimit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tối đa 5 tài khoản.'**
+  String get payoutLimit;
+
+  /// No description provided for @payoutPrimaryBadge.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chính'**
+  String get payoutPrimaryBadge;
+
+  /// No description provided for @payoutSetPrimary.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đặt làm chính'**
+  String get payoutSetPrimary;
+
+  /// No description provided for @payoutEdit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa'**
+  String get payoutEdit;
+
+  /// No description provided for @payoutDelete.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa'**
+  String get payoutDelete;
+
+  /// No description provided for @payoutCancel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy'**
+  String get payoutCancel;
+
+  /// No description provided for @payoutDeleteTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa tài khoản này?'**
+  String get payoutDeleteTitle;
+
+  /// No description provided for @payoutDeleteBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tài khoản sẽ bị gỡ khỏi danh sách nhận tiền.'**
+  String get payoutDeleteBody;
+
+  /// No description provided for @payoutDeleteLastBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đây là tài khoản nhận tiền duy nhất. Xóa xong, bạn sẽ chưa chốt được kỳ học phí cho đến khi thêm tài khoản mới.'**
+  String get payoutDeleteLastBody;
+
+  /// No description provided for @payoutLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{bank} · {masked}'**
+  String payoutLine(String bank, String masked);
+
+  /// No description provided for @payoutUnknownBank.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngân hàng {bin}'**
+  String payoutUnknownBank(String bin);
+
+  /// No description provided for @payoutSemantics.
+  ///
+  /// In vi, this message translates to:
+  /// **'{name}, {line}'**
+  String payoutSemantics(String name, String line);
+
+  /// No description provided for @payoutActionsSemantics.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tác vụ cho tài khoản {name}'**
+  String payoutActionsSemantics(String name);
+
+  /// No description provided for @payoutContinue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục'**
+  String get payoutContinue;
+
+  /// No description provided for @payoutSaved.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu tài khoản.'**
+  String get payoutSaved;
+
+  /// No description provided for @payoutDeleted.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã xóa tài khoản.'**
+  String get payoutDeleted;
+
+  /// No description provided for @payoutPrimarySet.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã đặt làm tài khoản chính.'**
+  String get payoutPrimarySet;
+
+  /// No description provided for @payoutFormNewTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm tài khoản'**
+  String get payoutFormNewTitle;
+
+  /// No description provided for @payoutFormEditTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa tài khoản'**
+  String get payoutFormEditTitle;
+
+  /// No description provided for @payoutFieldBank.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngân hàng'**
+  String get payoutFieldBank;
+
+  /// No description provided for @payoutPickBank.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ngân hàng'**
+  String get payoutPickBank;
+
+  /// No description provided for @payoutFieldAccountNo.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tài khoản'**
+  String get payoutFieldAccountNo;
+
+  /// No description provided for @payoutFieldAccountNoEditHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Để trống nếu không đổi số'**
+  String get payoutFieldAccountNoEditHint;
+
+  /// No description provided for @payoutFieldName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tên chủ tài khoản'**
+  String get payoutFieldName;
+
+  /// No description provided for @payoutFieldNameHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Viết đúng như ngân hàng ghi'**
+  String get payoutFieldNameHint;
+
+  /// No description provided for @payoutOtpNeeded.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm tài khoản hoặc đổi ngân hàng, số tài khoản cần mã xác thực gửi qua email.'**
+  String get payoutOtpNeeded;
+
+  /// No description provided for @payoutSendCode.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi mã xác thực'**
+  String get payoutSendCode;
+
+  /// No description provided for @payoutSave.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lưu'**
+  String get payoutSave;
+
+  /// No description provided for @payoutOtpSent.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gửi mã tới email của bạn.'**
+  String get payoutOtpSent;
+
+  /// No description provided for @payoutOtpField.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã xác thực (6 số)'**
+  String get payoutOtpField;
+
+  /// No description provided for @payoutOtpConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác nhận và lưu'**
+  String get payoutOtpConfirm;
+
+  /// No description provided for @payoutOtpResend.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi lại mã'**
+  String get payoutOtpResend;
+
+  /// No description provided for @payoutOtpBack.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sửa thông tin'**
+  String get payoutOtpBack;
+
+  /// No description provided for @payoutErrOtpInvalid.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã chưa đúng. Kiểm tra lại mã trong email.'**
+  String get payoutErrOtpInvalid;
+
+  /// No description provided for @payoutErrOtpLocked.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn nhập sai quá nhiều lần. Vui lòng thử lại sau.'**
+  String get payoutErrOtpLocked;
+
+  /// No description provided for @payoutErrMissing.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn chưa có tài khoản nhận tiền. Thêm tài khoản trước khi gửi hóa đơn.'**
+  String get payoutErrMissing;
+
+  /// No description provided for @payoutErrBank.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ngân hàng.'**
+  String get payoutErrBank;
+
+  /// No description provided for @payoutErrRequired.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không được để trống.'**
+  String get payoutErrRequired;
+
+  /// No description provided for @payoutErrAccountNo.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tài khoản gồm 6 đến 19 chữ số.'**
+  String get payoutErrAccountNo;
+
+  /// No description provided for @payoutErrName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tên tối đa 50 ký tự.'**
+  String get payoutErrName;
+
+  /// No description provided for @payoutLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được danh sách tài khoản.'**
+  String get payoutLoadFailed;
+
+  /// No description provided for @onboardingPayoutIntro.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm ít nhất một tài khoản để nhận học phí.'**
+  String get onboardingPayoutIntro;
 }
 
 class _MiniAppLocalizationsDelegate

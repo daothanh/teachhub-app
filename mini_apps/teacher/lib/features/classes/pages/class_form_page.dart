@@ -5,9 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../fees/data/fee_models.dart';
 import '../cubit/class_form_cubit.dart';
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
+import '../widgets/class_fee_section.dart';
 import '../widgets/classes_error_text.dart';
 import '../widgets/read_only_field.dart';
 import '../widgets/schedule_rules_editor.dart';
@@ -116,9 +118,25 @@ class _FormBodyState extends State<_FormBody> {
   late String? _end = widget.initial?.endDate;
   late List<ScheduleRule> _rules = [...?widget.initial?.scheduleRules];
 
+  // Lớp chưa có học phí (lớp mới, lớp cũ) mở form với công tắc tắt.
+  late bool _feeOn = widget.initial?.feeType != null;
+  late FeeType _feeType = widget.initial?.feeType ?? FeeType.perSession;
+  late FeeRules _feeRules = widget.initial?.feeRules ?? const FeeRules();
+  late final _feeAmount = TextEditingController(
+    text: widget.initial?.feeAmount == null
+        ? null
+        : formatVnd(widget.initial!.feeAmount!),
+  );
+  late final _feeInstallments = TextEditingController(
+    text: (widget.initial?.feeRules?.installments ?? 1).toString(),
+  );
+
   @override
   void dispose() {
-    for (final c in [_name, _subject, _grade, _location, _capacity]) {
+    for (final c in [
+      _name, _subject, _grade, _location, _capacity, //
+      _feeAmount, _feeInstallments,
+    ]) {
       c.dispose();
     }
     super.dispose();
@@ -133,6 +151,19 @@ class _FormBodyState extends State<_FormBody> {
     capacity: int.tryParse(_capacity.text.trim()),
     startDate: _start,
     endDate: _end,
+    feeType: _feeOn ? _feeType : null,
+    // Ô trống = chưa nhập (null); chuỗi quá dài không đọc được = 0 để báo sai.
+    feeAmount: !_feeOn || _feeAmount.text.isEmpty
+        ? null
+        : (parseVnd(_feeAmount.text) ?? 0),
+    // Số đợt chỉ có nghĩa với trọn khóa; kiểu khác luôn 1.
+    feeRules: _feeOn
+        ? _feeRules.copyWith(
+            installments: _feeType == FeeType.course
+                ? int.tryParse(_feeInstallments.text.trim()) ?? 0
+                : 1,
+          )
+        : null,
   );
 
   /// Lỗi server của trường (ưu tiên) hoặc lỗi kiểm tra ở máy.
@@ -150,6 +181,11 @@ class _FormBodyState extends State<_FormBody> {
       ClassFieldError.rulesDuration => l10n.classesErrRulesDuration,
       ClassFieldError.rulesOverflow => l10n.classesErrRulesOverflow,
       ClassFieldError.rulesTooMany => l10n.classesErrRulesTooMany,
+      ClassFieldError.feeAmountRequired => l10n.classesErrFeeAmountRequired,
+      ClassFieldError.feeAmountRange => l10n.classesErrFeeAmountRange,
+      ClassFieldError.feeInstallments => l10n.classesErrFeeInstallments,
+      ClassFieldError.feeCourseNeedsSchedule =>
+        l10n.classesErrFeeCourseSchedule,
     };
   }
 
@@ -267,6 +303,20 @@ class _FormBodyState extends State<_FormBody> {
           rules: _rules,
           error: _error('rules'),
           onChanged: (r) => setState(() => _rules = r),
+        ),
+        gap,
+        ClassFeeSection(
+          enabled: _feeOn,
+          type: _feeType,
+          rules: _feeRules,
+          amount: _feeAmount,
+          installments: _feeInstallments,
+          onEnabled: (v) => setState(() => _feeOn = v),
+          onType: (t) => setState(() => _feeType = t),
+          onRules: (r) => setState(() => _feeRules = r),
+          typeError: _error('feeType'),
+          amountError: _error('feeAmount'),
+          rulesError: _error('feeRules'),
         ),
         gap,
         AppButton(

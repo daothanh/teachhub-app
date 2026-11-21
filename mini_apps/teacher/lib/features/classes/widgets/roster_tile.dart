@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../fees/data/fee_models.dart';
+import '../../fees/fees_routes.dart';
+import '../../fees/pages/fee_override_page.dart';
 import '../../invites/pages/invite_share_sheet.dart';
 import '../../students/data/student_models.dart' show GuardianRelation;
 import '../../students/pages/student_form_page.dart' show guardianRelationLabel;
@@ -26,10 +29,14 @@ class RosterTile extends StatelessWidget {
     required this.classId,
     required this.entry,
     required this.onChanged,
+    this.feeType,
   });
 
   final String classId;
   final RosterEntry entry;
+
+  /// Kiểu học phí của lớp, để màn giá riêng chỉ hiện quy tắc áp dụng.
+  final FeeType? feeType;
 
   /// Có thay đổi (đã sửa học viên, đã cấp link): màn tải lại danh sách.
   final VoidCallback onChanged;
@@ -66,12 +73,34 @@ class RosterTile extends StatelessWidget {
                   child: Row(
                     children: [
                       Expanded(child: Text(e.fullName, style: text.titleSmall)),
+                      if (e.feeOverride != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: AppSpacing.sm),
+                          child: AppTag(label: l10n.rosterFeeOverrideBadge),
+                        ),
                       if (e.studentStatus == 'paused')
                         Text(l10n.classesStudentPaused, style: text.bodySmall),
                       const Icon(Icons.chevron_right),
                     ],
                   ),
                 ),
+              ),
+            ),
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: TextButton(
+                onPressed: () async {
+                  final changed = await context.push<bool>(
+                    FeesRoutes.feeOverride(classId, e.enrollmentId),
+                    extra: FeeOverrideArgs(
+                      studentName: e.fullName,
+                      feeType: feeType,
+                      initial: e.feeOverride,
+                    ),
+                  );
+                  if (changed == true) onChanged();
+                },
+                child: Text(l10n.rosterFeeOverrideAction),
               ),
             ),
             if (e.guardians.isEmpty)

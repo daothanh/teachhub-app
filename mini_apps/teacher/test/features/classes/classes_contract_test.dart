@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:teacher/features/classes/data/class_models.dart';
 import 'package:teacher/features/classes/data/classes_repository.dart';
+import 'package:teacher/features/fees/data/fee_models.dart';
 
 /// Đối chiếu mô hình và client lớp học với `contracts/openapi.json` (bản chép
 /// từ backend, cập nhật bằng `dart run tool/sync_openapi.dart` trong
@@ -56,8 +57,8 @@ dynamic _sample(Object? node, [String? name]) {
   if (s['\$ref'] != null) {
     return _sample(_schemas[(s['\$ref'] as String).split('/').last]);
   }
-  // `anyOf`/`oneOf` (vd. `$ref` hoặc null): lấy nhánh khác null đầu tiên.
-  final branches = (s['anyOf'] ?? s['oneOf']) as List?;
+  // Nhánh đầu không phải `null` của oneOf/anyOf.
+  final branches = (s['oneOf'] ?? s['anyOf']) as List?;
   if (branches != null) {
     return _sample(
       branches.firstWhere((b) => (b as Map)['type'] != 'null'),
@@ -174,6 +175,10 @@ void main() {
     expect(spy.reads, _props(item));
   });
 
+  modelReads('FeeRules', FeeRules.fromJson);
+  modelReads('FeeOverride', FeeOverride.fromJson);
+  // App không đọc `createdAt` của tài khoản nhận tiền.
+  modelReads('PayoutAccount', PayoutAccount.fromJson, subset: true);
   modelReads('RosterGuardian', RosterGuardian.fromJson);
   modelReads('LatestInvite', LatestInvite.fromJson);
 
@@ -287,10 +292,21 @@ void main() {
     final post = body('/v1/classes', 'post');
     expect(_props(post), containsAll(input.toJson().keys));
     expect(input.toJson().keys, containsAll(post['required'] as List));
-    expect(
-      _props(body('/v1/classes/{id}', 'patch')),
-      containsAll(input.toJson().keys),
+    final patch = _props(body('/v1/classes/{id}', 'patch'));
+    expect(patch, containsAll(input.toJson().keys));
+    // Học phí (Sprint 5): chỉ PATCH nhận; POST chưa nhận học phí.
+    const withFee = ClassInput(
+      feeType: FeeType.course,
+      feeAmount: 150000,
+      feeRules: FeeRules(installments: 3),
     );
+    expect(patch, containsAll(withFee.toPatchJson(withFee: true).keys));
+    expect(withFee.toJson().keys.toSet().difference(_props(post)), isEmpty);
+    expect(const ClassInput().toPatchJson().keys, isNot(contains('feeType')));
+    final rules = (patch.contains('feeRules'))
+        ? _props(_schema('FeeRulesInput'))
+        : <String>{};
+    expect(rules, containsAll(const FeeRules().toJson().keys));
 
     // Lệnh đổi giờ / hủy / bù (US-2.2): khóa body khớp hợp đồng.
     expect(
@@ -396,6 +412,17 @@ void main() {
         expect(adapter.requests.first.queryParameters['status'], 'archived');
       },
     );
+
+    test('PATCH lớp có học phí: gọi đúng đường dẫn hợp đồng', () async {
+      await repo.update(
+        'c1',
+        const ClassInput(feeType: FeeType.monthly, feeAmount: 1),
+        withFee: true,
+      );
+      final r = adapter.requests.single;
+      _operation(r.method, r.path);
+      expect((r.data as Map)['feeType'], 'monthly');
+    });
 
     test('ghi danh: 201 là mới, 200 là đã có', () async {
       adapter.status = 201;

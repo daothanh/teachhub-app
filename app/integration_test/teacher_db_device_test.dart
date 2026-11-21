@@ -84,7 +84,7 @@ void main() {
     });
   } else {
     test(
-      'sau khởi động lại: dữ liệu còn, schema v2; xóa CSDL sạch file và khóa',
+      'sau khởi động lại: dữ liệu còn, schema đúng phiên bản hiện tại; xóa CSDL sạch file và khóa',
       () async {
         final dir = await getApplicationDocumentsDirectory();
         final store = SecureStore();
@@ -96,7 +96,12 @@ void main() {
           rows,
           hasLength(1 + 2 * 11 * 20),
         ); // marker + 2 cách ghi × 11 lần × 20
-        expect(db.schemaVersion, 2);
+        // Không hard-code số: user_version đã lưu phải khớp phiên bản của lớp.
+        final stored = await db
+            .customSelect('PRAGMA user_version')
+            .map((r) => r.read<int>('user_version'))
+            .getSingle();
+        expect(stored, db.schemaVersion);
         await db.close();
         // ignore: avoid_print
         print('TEACHER_DB after restart rows=${rows.length}');

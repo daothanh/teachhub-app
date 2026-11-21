@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:teachhub_shared/teachhub_shared.dart';
 import 'package:teacher/features/classes/data/class_models.dart';
 import 'package:teacher/features/classes/data/classes_repository.dart';
+import 'package:teacher/features/fees/data/fee_models.dart';
 
 TeachClass sampleClass({
   String id = 'c1',
@@ -10,6 +11,9 @@ TeachClass sampleClass({
   ClassStatus status = ClassStatus.active,
   List<ScheduleRule> rules = const [],
   int enrolled = 0,
+  FeeType? feeType,
+  int? feeAmount,
+  FeeRules? feeRules,
 }) => TeachClass(
   id: id,
   name: name,
@@ -24,6 +28,9 @@ TeachClass sampleClass({
   enrolledCount: enrolled,
   scheduleRules: rules,
   createdAt: '2026-12-01T00:00:00.000Z',
+  feeType: feeType,
+  feeAmount: feeAmount,
+  feeRules: feeRules,
 );
 
 ClassSession sampleSession({
@@ -62,6 +69,9 @@ class FakeClassesRepository implements ClassesRepository {
 
   /// Khóa idempotency của từng lệnh ghi, theo thứ tự gọi.
   final keys = <String?>[];
+
+  /// Body PATCH đã gửi, theo thứ tự.
+  final patchBodies = <Map<String, dynamic>>[];
   List<TeachClass> active = [];
   List<TeachClass> archived = [];
   TeachClass? current;
@@ -77,6 +87,9 @@ class FakeClassesRepository implements ClassesRepository {
   Object? getError;
   Object? createError;
   Object? updateError;
+
+  /// Lỗi chỉ cho lệnh PATCH học phí (`withFee`).
+  Object? feeUpdateError;
   Object? archiveError;
   Object? putRulesError;
   Object? enrollError;
@@ -131,13 +144,24 @@ class FakeClassesRepository implements ClassesRepository {
   Future<TeachClass> update(
     String id,
     ClassInput input, {
+    bool withFee = false,
     String? idempotencyKey,
   }) async {
-    calls.add('update:$id');
+    calls.add(withFee ? 'update:$id:fee' : 'update:$id');
     keys.add(idempotencyKey);
     lastInput = input;
+    patchBodies.add(input.toPatchJson(withFee: withFee));
+    if (withFee && feeUpdateError != null) throw feeUpdateError!;
     if (updateError != null) throw updateError!;
-    return current = sampleClass(id: id, name: input.name);
+    // Trả lại học phí của lớp đang có, trừ khi lệnh này gửi học phí mới.
+    final old = current;
+    return current = sampleClass(
+      id: id,
+      name: input.name,
+      feeType: withFee ? input.feeType : old?.feeType,
+      feeAmount: withFee ? input.feeAmount : old?.feeAmount,
+      feeRules: withFee ? input.feeRules : old?.feeRules,
+    );
   }
 
   @override

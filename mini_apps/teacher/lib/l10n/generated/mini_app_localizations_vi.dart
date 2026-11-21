@@ -453,10 +453,6 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get onboardingPlaceholderBody => 'Màn này đang được hoàn thiện.';
 
   @override
-  String get onboardingPayoutBody =>
-      'Thêm tài khoản để nhận học phí. Tính năng sắp có.';
-
-  @override
   String get onboardingComplianceBody =>
       'Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.';
 
@@ -1000,4 +996,302 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get todaySettings => 'Cài đặt và tài khoản';
+
+  @override
+  String get classesFeeSection => 'Học phí';
+
+  @override
+  String get classesFeeEnabled => 'Thu học phí';
+
+  @override
+  String get classesFeeTypeLabel => 'Cách tính';
+
+  @override
+  String get feeTypePerSession => 'Theo buổi';
+
+  @override
+  String get feeTypeMonthly => 'Theo tháng';
+
+  @override
+  String get feeTypeCourse => 'Trọn khóa';
+
+  @override
+  String get classesFeeAmountPerSession => 'Đơn giá mỗi buổi';
+
+  @override
+  String get classesFeeAmountMonthly => 'Học phí mỗi tháng';
+
+  @override
+  String get classesFeeAmountCourse => 'Tổng học phí cả khóa';
+
+  @override
+  String get classesFeeChargeExcused => 'Tính tiền buổi vắng có phép';
+
+  @override
+  String get classesFeeChargeUnexcused => 'Tính tiền buổi vắng không phép';
+
+  @override
+  String get classesFeeDeductCancelled => 'Trừ tiền buổi giáo viên hủy';
+
+  @override
+  String get classesFeeInstallments => 'Số đợt thu (1–36)';
+
+  @override
+  String get classesFeeNote =>
+      'Đổi học phí chỉ áp dụng từ kỳ thu chưa chốt tiếp theo.';
+
+  @override
+  String get classesErrFeeAmountRequired => 'Nhập số tiền.';
+
+  @override
+  String get classesErrFeeAmountRange => 'Số tiền từ 1 đ đến 1.000.000.000 đ.';
+
+  @override
+  String get classesErrFeeInstallments =>
+      'Số đợt từ 1 đến 36, chỉ dùng cho trọn khóa.';
+
+  @override
+  String get classesErrFeeCourseSchedule =>
+      'Trọn khóa cần có ngày kết thúc và ít nhất một lịch học hằng tuần.';
+
+  @override
+  String get feesErrRateLimited =>
+      'Bạn thao tác hơi nhanh. Chờ một lúc rồi thử lại.';
+
+  @override
+  String get rosterFeeOverrideBadge => 'Giá riêng';
+
+  @override
+  String get rosterFeeOverrideAction => 'Giá riêng cho học viên';
+
+  @override
+  String get feeOverrideTitle => 'Giá riêng';
+
+  @override
+  String feeOverrideFor(String name) {
+    return 'Giá riêng của $name';
+  }
+
+  @override
+  String get feeOverrideHint =>
+      'Để trống mục nào thì mục đó theo cấu hình lớp.';
+
+  @override
+  String get feeOverrideAmount => 'Giá riêng';
+
+  @override
+  String get feeOverrideRulesTitle => 'Quy tắc vắng riêng';
+
+  @override
+  String get feeOverrideInherit => 'Theo lớp';
+
+  @override
+  String get feeOverrideYes => 'Tính';
+
+  @override
+  String get feeOverrideNo => 'Không tính';
+
+  @override
+  String get feeOverrideInstallments => 'Số đợt riêng (1–36)';
+
+  @override
+  String get feeOverrideDiscounts => 'Miễn giảm';
+
+  @override
+  String get feeOverrideAddDiscount => 'Thêm khoản miễn giảm';
+
+  @override
+  String get feeOverrideDiscountDesc => 'Mô tả';
+
+  @override
+  String get feeOverrideDiscountPercent => 'Theo %';
+
+  @override
+  String get feeOverrideDiscountAmount => 'Theo số tiền';
+
+  @override
+  String get feeOverrideDiscountPercentValue => 'Phần trăm (1–100)';
+
+  @override
+  String get feeOverrideDiscountAmountValue => 'Số tiền';
+
+  @override
+  String get feeOverrideRemoveDiscount => 'Xóa khoản miễn giảm';
+
+  @override
+  String get feeOverrideSave => 'Lưu giá riêng';
+
+  @override
+  String get feeOverrideClear => 'Xóa giá riêng';
+
+  @override
+  String get feeOverrideSaved => 'Đã lưu giá riêng.';
+
+  @override
+  String get feeOverrideCleared => 'Đã xóa giá riêng.';
+
+  @override
+  String get feeOverrideErrAmount => 'Số tiền không hợp lệ.';
+
+  @override
+  String get feeOverrideErrInstallments => 'Số đợt từ 1 đến 36.';
+
+  @override
+  String get feeOverrideErrDiscountDesc => 'Nhập mô tả, tối đa 100 ký tự.';
+
+  @override
+  String get feeOverrideErrDiscountValue => 'Giá trị không hợp lệ.';
+
+  @override
+  String get payoutTitle => 'Tài khoản nhận tiền';
+
+  @override
+  String get payoutEmpty => 'Chưa có tài khoản nhận tiền';
+
+  @override
+  String get payoutEmptyBody =>
+      'Thêm tài khoản để phụ huynh biết chuyển học phí về đâu.';
+
+  @override
+  String get payoutAdd => 'Thêm tài khoản';
+
+  @override
+  String get payoutLimit => 'Tối đa 5 tài khoản.';
+
+  @override
+  String get payoutPrimaryBadge => 'Chính';
+
+  @override
+  String get payoutSetPrimary => 'Đặt làm chính';
+
+  @override
+  String get payoutEdit => 'Sửa';
+
+  @override
+  String get payoutDelete => 'Xóa';
+
+  @override
+  String get payoutCancel => 'Hủy';
+
+  @override
+  String get payoutDeleteTitle => 'Xóa tài khoản này?';
+
+  @override
+  String get payoutDeleteBody => 'Tài khoản sẽ bị gỡ khỏi danh sách nhận tiền.';
+
+  @override
+  String get payoutDeleteLastBody =>
+      'Đây là tài khoản nhận tiền duy nhất. Xóa xong, bạn sẽ chưa chốt được kỳ học phí cho đến khi thêm tài khoản mới.';
+
+  @override
+  String payoutLine(String bank, String masked) {
+    return '$bank · $masked';
+  }
+
+  @override
+  String payoutUnknownBank(String bin) {
+    return 'Ngân hàng $bin';
+  }
+
+  @override
+  String payoutSemantics(String name, String line) {
+    return '$name, $line';
+  }
+
+  @override
+  String payoutActionsSemantics(String name) {
+    return 'Tác vụ cho tài khoản $name';
+  }
+
+  @override
+  String get payoutContinue => 'Tiếp tục';
+
+  @override
+  String get payoutSaved => 'Đã lưu tài khoản.';
+
+  @override
+  String get payoutDeleted => 'Đã xóa tài khoản.';
+
+  @override
+  String get payoutPrimarySet => 'Đã đặt làm tài khoản chính.';
+
+  @override
+  String get payoutFormNewTitle => 'Thêm tài khoản';
+
+  @override
+  String get payoutFormEditTitle => 'Sửa tài khoản';
+
+  @override
+  String get payoutFieldBank => 'Ngân hàng';
+
+  @override
+  String get payoutPickBank => 'Chọn ngân hàng';
+
+  @override
+  String get payoutFieldAccountNo => 'Số tài khoản';
+
+  @override
+  String get payoutFieldAccountNoEditHint => 'Để trống nếu không đổi số';
+
+  @override
+  String get payoutFieldName => 'Tên chủ tài khoản';
+
+  @override
+  String get payoutFieldNameHint => 'Viết đúng như ngân hàng ghi';
+
+  @override
+  String get payoutOtpNeeded =>
+      'Thêm tài khoản hoặc đổi ngân hàng, số tài khoản cần mã xác thực gửi qua email.';
+
+  @override
+  String get payoutSendCode => 'Gửi mã xác thực';
+
+  @override
+  String get payoutSave => 'Lưu';
+
+  @override
+  String get payoutOtpSent => 'Đã gửi mã tới email của bạn.';
+
+  @override
+  String get payoutOtpField => 'Mã xác thực (6 số)';
+
+  @override
+  String get payoutOtpConfirm => 'Xác nhận và lưu';
+
+  @override
+  String get payoutOtpResend => 'Gửi lại mã';
+
+  @override
+  String get payoutOtpBack => 'Sửa thông tin';
+
+  @override
+  String get payoutErrOtpInvalid =>
+      'Mã chưa đúng. Kiểm tra lại mã trong email.';
+
+  @override
+  String get payoutErrOtpLocked =>
+      'Bạn nhập sai quá nhiều lần. Vui lòng thử lại sau.';
+
+  @override
+  String get payoutErrMissing =>
+      'Bạn chưa có tài khoản nhận tiền. Thêm tài khoản trước khi gửi hóa đơn.';
+
+  @override
+  String get payoutErrBank => 'Chọn ngân hàng.';
+
+  @override
+  String get payoutErrRequired => 'Không được để trống.';
+
+  @override
+  String get payoutErrAccountNo => 'Số tài khoản gồm 6 đến 19 chữ số.';
+
+  @override
+  String get payoutErrName => 'Tên tối đa 50 ký tự.';
+
+  @override
+  String get payoutLoadFailed => 'Không tải được danh sách tài khoản.';
+
+  @override
+  String get onboardingPayoutIntro =>
+      'Thêm ít nhất một tài khoản để nhận học phí.';
 }

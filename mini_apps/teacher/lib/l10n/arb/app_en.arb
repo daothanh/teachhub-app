@@ -235,7 +235,6 @@
   "onboardingSkip": "Later",
   "onboardingMarkDone": "Done with this step",
   "onboardingPlaceholderBody": "This screen is being finished.",
-  "onboardingPayoutBody": "Add an account to receive tuition. Coming soon.",
   "onboardingComplianceBody": "See what to do to teach within the rules. Coming soon.",
   "onboardingDoneTitle": "You are all set",
   "onboardingDoneBody": "Go see your classes and students.",
@@ -603,5 +602,138 @@
       }
     }
   },
-  "todaySettings": "Settings and account"
+  "todaySettings": "Settings and account",
+  "classesFeeSection": "Tuition",
+  "classesFeeEnabled": "Charge tuition",
+  "classesFeeTypeLabel": "Billing type",
+  "feeTypePerSession": "Per session",
+  "feeTypeMonthly": "Monthly",
+  "feeTypeCourse": "Whole course",
+  "classesFeeAmountPerSession": "Price per session",
+  "classesFeeAmountMonthly": "Monthly tuition",
+  "classesFeeAmountCourse": "Total course tuition",
+  "classesFeeChargeExcused": "Charge excused absences",
+  "classesFeeChargeUnexcused": "Charge unexcused absences",
+  "classesFeeDeductCancelled": "Deduct cancelled sessions",
+  "classesFeeInstallments": "Installments (1–36)",
+  "classesFeeNote": "Fee changes apply from the next unclosed billing period.",
+  "classesErrFeeAmountRequired": "Enter an amount.",
+  "classesErrFeeAmountRange": "Amount must be between 1 and 1,000,000,000.",
+  "classesErrFeeInstallments": "Installments: 1 to 36, whole course only.",
+  "classesErrFeeCourseSchedule": "A whole-course fee needs an end date and at least one weekly session.",
+  "feesErrRateLimited": "You are going too fast. Wait a moment and try again.",
+  "rosterFeeOverrideBadge": "Custom price",
+  "rosterFeeOverrideAction": "Set custom price",
+  "feeOverrideTitle": "Custom price",
+  "feeOverrideFor": "Custom price for {name}",
+  "@feeOverrideFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "feeOverrideHint": "Leave a field empty to follow the class.",
+  "feeOverrideAmount": "Custom price",
+  "feeOverrideRulesTitle": "Absence rules",
+  "feeOverrideInherit": "Class default",
+  "feeOverrideYes": "Charge",
+  "feeOverrideNo": "Do not charge",
+  "feeOverrideInstallments": "Installments (1–36)",
+  "feeOverrideDiscounts": "Discounts",
+  "feeOverrideAddDiscount": "Add a discount",
+  "feeOverrideDiscountDesc": "Description",
+  "feeOverrideDiscountPercent": "Percent",
+  "feeOverrideDiscountAmount": "Amount",
+  "feeOverrideDiscountPercentValue": "Percent (1–100)",
+  "feeOverrideDiscountAmountValue": "Amount",
+  "feeOverrideRemoveDiscount": "Remove discount",
+  "feeOverrideSave": "Save custom price",
+  "feeOverrideClear": "Remove custom price",
+  "feeOverrideSaved": "Custom price saved.",
+  "feeOverrideCleared": "Custom price removed.",
+  "feeOverrideErrAmount": "Invalid amount.",
+  "feeOverrideErrInstallments": "Installments: 1 to 36.",
+  "feeOverrideErrDiscountDesc": "Enter a description, up to 100 characters.",
+  "feeOverrideErrDiscountValue": "Invalid value.",
+  "payoutTitle": "Payout accounts",
+  "payoutEmpty": "No payout account yet",
+  "payoutEmptyBody": "Add an account so parents know where to send tuition.",
+  "payoutAdd": "Add account",
+  "payoutLimit": "Up to 5 accounts.",
+  "payoutPrimaryBadge": "Primary",
+  "payoutSetPrimary": "Make primary",
+  "payoutEdit": "Edit",
+  "payoutDelete": "Delete",
+  "payoutCancel": "Cancel",
+  "payoutDeleteTitle": "Delete this account?",
+  "payoutDeleteBody": "The account will be removed from your payout list.",
+  "payoutDeleteLastBody": "This is your only payout account. Once it is removed, you won't be able to close a billing period until you add another one.",
+  "payoutLine": "{bank} · {masked}",
+  "@payoutLine": {
+    "placeholders": {
+      "bank": {
+        "type": "String"
+      },
+      "masked": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutUnknownBank": "Bank {bin}",
+  "@payoutUnknownBank": {
+    "placeholders": {
+      "bin": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutSemantics": "{name}, {line}",
+  "@payoutSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutActionsSemantics": "Actions for account {name}",
+  "@payoutActionsSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "payoutContinue": "Continue",
+  "payoutSaved": "Account saved.",
+  "payoutDeleted": "Account deleted.",
+  "payoutPrimarySet": "Primary account updated.",
+  "payoutFormNewTitle": "Add account",
+  "payoutFormEditTitle": "Edit account",
+  "payoutFieldBank": "Bank",
+  "payoutPickBank": "Choose a bank",
+  "payoutFieldAccountNo": "Account number",
+  "payoutFieldAccountNoEditHint": "Leave empty to keep the number",
+  "payoutFieldName": "Account holder",
+  "payoutFieldNameHint": "Exactly as the bank shows it",
+  "payoutOtpNeeded": "Adding an account or changing the bank or number needs a code sent by email.",
+  "payoutSendCode": "Send code",
+  "payoutSave": "Save",
+  "payoutOtpSent": "We sent a code to your email.",
+  "payoutOtpField": "Code (6 digits)",
+  "payoutOtpConfirm": "Confirm and save",
+  "payoutOtpResend": "Resend code",
+  "payoutOtpBack": "Edit details",
+  "payoutErrOtpInvalid": "Wrong code. Check the code in your email.",
+  "payoutErrOtpLocked": "Too many wrong codes. Try again later.",
+  "payoutErrMissing": "No payout account. Add one before issuing invoices.",
+  "payoutErrBank": "Choose a bank.",
+  "payoutErrRequired": "Required.",
+  "payoutErrAccountNo": "Account number has 6 to 19 digits.",
+  "payoutErrName": "Name is up to 50 characters.",
+  "payoutLoadFailed": "Could not load accounts.",
+  "onboardingPayoutIntro": "Add at least one account to receive tuition."
 }

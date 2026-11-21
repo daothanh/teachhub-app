@@ -6,6 +6,7 @@ import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../../../l10n/l10n.dart';
+import '../../fees/pages/payout_accounts_page.dart';
 import '../../students/pages/student_form_page.dart';
 import '../cubit/onboarding_cubit.dart';
 import '../data/onboarding_models.dart';
@@ -176,8 +177,9 @@ class _StepBody extends StatelessWidget {
             OnboardingStep.setSchedule => OnboardingPlaceholderStep(
               body: l10n.onboardingPlaceholderBody,
             ),
-            OnboardingStep.payoutAccount => OnboardingPlaceholderStep(
-              body: l10n.onboardingPayoutBody,
+            OnboardingStep.payoutAccount => PayoutAccountsPage(
+              embedded: true,
+              onContinue: () => cubit.complete(step),
             ),
             OnboardingStep.complianceChecklist => OnboardingPlaceholderStep(
               body: l10n.onboardingComplianceBody,
