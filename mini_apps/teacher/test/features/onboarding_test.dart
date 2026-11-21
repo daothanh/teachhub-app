@@ -22,9 +22,12 @@ Future<FakeOnboardingRepository> _open(
   FakeOnboardingRepository repo, {
   StudentRepository? students,
   FakeFeeRepository? fees,
+  FakeClassesRepository? classes,
 }) async {
   GetIt.I.registerSingleton<OnboardingRepository>(repo);
-  GetIt.I.registerSingleton<ClassesRepository>(FakeClassesRepository());
+  GetIt.I.registerSingleton<ClassesRepository>(
+    classes ?? (FakeClassesRepository()..active = [sampleClass()]),
+  );
   GetIt.I.registerSingleton<FeeRepository>(fees ?? FakeFeeRepository());
   GetIt.I.registerSingleton<StudentRepository>(
     students ??
@@ -232,7 +235,7 @@ void main() {
       await tester.tap(find.text('Lưu học viên'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Đã lưu. Chưa ghi nhận được bước này.'), findsOneWidget);
+      expect(find.textContaining('Chưa thêm được vào lớp'), findsOneWidget);
       expect(find.text('Bước 2/5'), findsOneWidget);
 
       repo.patchError = null;

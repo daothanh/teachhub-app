@@ -917,6 +917,12 @@ abstract class MiniAppLocalizations {
   /// **'Đã lưu. Chưa ghi nhận được bước này.'**
   String get onboardingSaved;
 
+  /// No description provided for @onboardingStudentNotEnrolled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu học viên. Chưa thêm được vào lớp hoặc chưa ghi nhận bước này.'**
+  String get onboardingStudentNotEnrolled;
+
   /// No description provided for @onboardingScheduleNoClass.
   ///
   /// In vi, this message translates to:

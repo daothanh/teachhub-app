@@ -485,6 +485,10 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get onboardingSaved => 'Đã lưu. Chưa ghi nhận được bước này.';
 
   @override
+  String get onboardingStudentNotEnrolled =>
+      'Đã lưu học viên. Chưa thêm được vào lớp hoặc chưa ghi nhận bước này.';
+
+  @override
   String get onboardingScheduleNoClass =>
       'Chưa có lớp để đặt lịch. Hãy tạo lớp ở bước 1.';
 

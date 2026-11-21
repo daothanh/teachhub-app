@@ -71,7 +71,8 @@ class TeacherController {
     GoRoute(
       path: routePrefix,
       name: '$moduleId.home',
-      builder: (context, state) => const TodayPage(),
+      // `extra` đổi (rời onboarding) thì dựng lại trang để tải buổi và thẻ nhắc mới.
+      builder: (context, state) => TodayPage(key: ValueKey(state.extra)),
       routes: [
         GoRoute(
           path: 'onboarding',

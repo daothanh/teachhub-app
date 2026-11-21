@@ -40,6 +40,7 @@ Future<void> _open(
   WidgetTester tester,
   FakeOnboardingRepository onboarding,
   FakeClassesRepository classes, {
+  FakeStudentRepository? students,
   double scale = 1,
 }) async {
   await GetIt.I.reset();
@@ -47,7 +48,8 @@ Future<void> _open(
   GetIt.I.registerSingleton<ClassesRepository>(classes);
   GetIt.I.registerSingleton<FeeRepository>(FakeFeeRepository());
   GetIt.I.registerSingleton<StudentRepository>(
-    FakeStudentRepository([const Student(id: 's1', fullName: 'Minh Anh')]),
+    students ??
+        FakeStudentRepository([const Student(id: 's1', fullName: 'Minh Anh')]),
   );
   await pumpApp(tester, const OnboardingPage(), textScale: scale);
 }
@@ -80,6 +82,68 @@ Future<void> _addRule(WidgetTester tester) async {
 
 void main() {
   tearDown(GetIt.I.reset);
+
+  group('bước 2: học viên ghi danh vào lớp bước 1', () {
+    final atStep2 = onboardingOf({OnboardingStep.createClass: _done});
+
+    Future<void> saveStudent(WidgetTester tester) async {
+      await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
+      await tester.tap(find.text('Lưu học viên'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('lưu học viên rồi ghi danh vào lớp, mới ghi done', (
+      tester,
+    ) async {
+      final onboarding = FakeOnboardingRepository(atStep2);
+      final classes = FakeClassesRepository()..active = [sampleClass()];
+      await _open(tester, onboarding, classes);
+      await saveStudent(tester);
+
+      expect(classes.calls.take(2), ['list:active:1', 'enroll:c1:s1']);
+      expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
+      expect(find.text('Bước 3/5'), findsOneWidget);
+    });
+
+    testWidgets(
+      'ghi danh lỗi mạng: thử lại cùng khóa, không tạo học viên hai',
+      (tester) async {
+        final onboarding = FakeOnboardingRepository(atStep2);
+        final classes = FakeClassesRepository()
+          ..active = [sampleClass()]
+          ..enrollError = const ApiException.network();
+        final students = FakeStudentRepository([
+          const Student(id: 's1', fullName: 'Minh Anh'),
+        ]);
+        await _open(tester, onboarding, classes, students: students);
+        await saveStudent(tester);
+
+        expect(onboarding.patches, isEmpty);
+        expect(find.text('Bước 2/5'), findsOneWidget);
+        classes.enrollError = null;
+        tester
+            .widget<AppButton>(find.widgetWithText(AppButton, 'Thử lại'))
+            .onPressed!();
+        await tester.pumpAndSettle();
+
+        expect(students.calls, hasLength(1));
+        expect(classes.calls.where((c) => c == 'enroll:c1:s1'), hasLength(2));
+        expect(classes.keys[0], classes.keys[1]);
+        expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
+        expect(find.text('Bước 3/5'), findsOneWidget);
+      },
+    );
+
+    testWidgets('sang bước khác thì SnackBar "đã lưu" bị gỡ', (tester) async {
+      final onboarding = FakeOnboardingRepository(onboardingOf({}));
+      await _open(tester, onboarding, FakeClassesRepository());
+      await _fillClass(tester);
+      await _save(tester);
+
+      expect(find.text('Bước 2/5'), findsOneWidget);
+      expect(find.byType(SnackBar), findsNothing);
+    });
+  });
 
   final atStep3 = onboardingOf({
     OnboardingStep.createClass: _done,

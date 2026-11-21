@@ -491,6 +491,10 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get onboardingSaved => 'Saved. This step could not be recorded yet.';
 
   @override
+  String get onboardingStudentNotEnrolled =>
+      'Student saved. Could not add to the class or record this step yet.';
+
+  @override
   String get onboardingScheduleNoClass =>
       'There is no class to schedule yet. Create one in step 1.';
 

@@ -252,6 +252,7 @@
     }
   },
   "onboardingSaved": "Saved. This step could not be recorded yet.",
+  "onboardingStudentNotEnrolled": "Student saved. Could not add to the class or record this step yet.",
   "onboardingScheduleNoClass": "There is no class to schedule yet. Create one in step 1.",
   "todayTitle": "Today",
   "todayEmpty": "No sessions today",

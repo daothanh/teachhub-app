@@ -8,6 +8,7 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 import '../../../l10n/l10n.dart';
 import '../../classes/data/class_models.dart';
 import '../../classes/data/classes_repository.dart';
+import '../../classes/data/draft_keys.dart';
 import '../../classes/pages/class_form_page.dart';
 import '../../fees/pages/payout_accounts_page.dart';
 import '../../students/pages/student_form_page.dart';
@@ -87,39 +88,50 @@ class OnboardingView extends StatelessWidget {
         final data = state.onboarding;
         final step = initialStep ?? data?.currentStep;
         return BlocListener<OnboardingCubit, OnboardingState>(
-          // Mở một bước riêng: lưu hoặc bỏ qua xong thì quay lại màn trước.
+          // Sang bước khác: bỏ SnackBar "đã lưu" khỏi đè nút "Để sau"/"Thử lại".
           listenWhen: (a, b) =>
-              initialStep != null && a.saving && !b.saving && b.error == null,
-          listener: (context, _) {
-            if (context.canPop()) context.pop();
-          },
-          child: Scaffold(
-            appBar: AppBar(title: Text(l10n.onboardingTitle)),
-            body: switch (state.load) {
-              OnboardingLoad.loading => const Center(
-                child: CircularProgressIndicator(),
-              ),
-              OnboardingLoad.failure => AppEmptyState(
-                message: l10n.onboardingLoadFailed,
-                action: AppButton(
-                  label: l10n.onboardingRetry,
-                  onPressed: cubit.load,
-                ),
-              ),
-              OnboardingLoad.ready when step == null => AppEmptyState(
-                message: l10n.onboardingDoneTitle,
-                subMessage: l10n.onboardingDoneBody,
-                action: AppButton(
-                  label: l10n.onboardingFinish,
-                  onPressed: () => context.go(TeachHubRoutes.teacher),
-                ),
-              ),
-              OnboardingLoad.ready => _StepBody(
-                data: data!,
-                step: step!,
-                saving: state.saving,
-              ),
+              a.onboarding?.currentStep != b.onboarding?.currentStep,
+          listener: (context, _) =>
+              ScaffoldMessenger.of(context).clearSnackBars(),
+          child: BlocListener<OnboardingCubit, OnboardingState>(
+            // Mở một bước riêng: lưu hoặc bỏ qua xong thì quay lại màn trước.
+            listenWhen: (a, b) =>
+                initialStep != null && a.saving && !b.saving && b.error == null,
+            listener: (context, _) {
+              if (context.canPop()) context.pop();
             },
+            child: Scaffold(
+              appBar: AppBar(title: Text(l10n.onboardingTitle)),
+              body: switch (state.load) {
+                OnboardingLoad.loading => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                OnboardingLoad.failure => AppEmptyState(
+                  message: l10n.onboardingLoadFailed,
+                  action: AppButton(
+                    label: l10n.onboardingRetry,
+                    onPressed: cubit.load,
+                  ),
+                ),
+                OnboardingLoad.ready when step == null => AppEmptyState(
+                  message: l10n.onboardingDoneTitle,
+                  subMessage: l10n.onboardingDoneBody,
+                  action: AppButton(
+                    label: l10n.onboardingFinish,
+                    // `extra` mới = TodayPage dựng lại: thấy buổi vừa đặt và thẻ nhắc.
+                    onPressed: () => context.go(
+                      TeachHubRoutes.teacher,
+                      extra: DateTime.now(),
+                    ),
+                  ),
+                ),
+                OnboardingLoad.ready => _StepBody(
+                  data: data!,
+                  step: step!,
+                  saving: state.saving,
+                ),
+              },
+            ),
           ),
         );
       },
@@ -170,8 +182,7 @@ class _StepBody extends StatelessWidget {
         Expanded(
           key: ValueKey(step),
           child: switch (step) {
-            OnboardingStep.addStudents => _SaveThenComplete(
-              builder: (onSaved) => StudentFormScope(onSaved: (_) => onSaved()),
+            OnboardingStep.addStudents => _AddStudentsStep(
               onSaved: () => cubit.complete(step),
             ),
             OnboardingStep.createClass => _SaveThenComplete(
@@ -308,6 +319,88 @@ class _ScheduleStepState extends State<_ScheduleStep> {
           onSaved: widget.onSaved,
         );
       },
+    );
+  }
+}
+
+/// Bước 2: tạo học viên rồi ghi danh vào lớp ở bước 1 (lớp lấy từ server như
+/// bước 3). Lỗi giữa chừng chỉ thử lại phần còn dở: học viên đã tạo thì không
+/// tạo lại, ghi danh dùng cùng khóa nên server phát lại thay vì ghi trùng.
+class _AddStudentsStep extends StatefulWidget {
+  const _AddStudentsStep({required this.onSaved});
+
+  final VoidCallback onSaved;
+
+  @override
+  State<_AddStudentsStep> createState() => _AddStudentsStepState();
+}
+
+class _AddStudentsStepState extends State<_AddStudentsStep> {
+  final _keys = DraftKeys();
+  String? _studentId;
+  bool _enrolling = false;
+  ApiException? _error;
+
+  Future<void> _enroll() async {
+    final studentId = _studentId;
+    if (studentId == null || _enrolling) return;
+    setState(() {
+      _enrolling = true;
+      _error = null;
+    });
+    final repo = classesRepository();
+    try {
+      final classId = (await repo.list()).items.firstOrNull?.id;
+      if (classId == null) throw const ApiException.unexpected();
+      final draft = '$classId|$studentId';
+      await repo.enroll(
+        classId,
+        studentId,
+        idempotencyKey: _keys.of('enroll', draft),
+      );
+      _keys.done('enroll');
+      if (!mounted) return;
+      widget.onSaved();
+    } on ApiException catch (e) {
+      if (!e.retryable) _keys.done('enroll');
+      if (!mounted) return;
+      setState(() => _error = e);
+    } finally {
+      if (mounted) setState(() => _enrolling = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    // Ghi danh xong mà ghi bước lỗi: thử lại gọi lại ghi danh (phát lại) rồi ghi bước.
+    final stepFailed =
+        _studentId != null &&
+        _error == null &&
+        !_enrolling &&
+        context.watch<OnboardingCubit>().state.error != null;
+    return Column(
+      children: [
+        Expanded(
+          child: StudentFormScope(
+            onSaved: (id) {
+              setState(() => _studentId = id);
+              _enroll();
+            },
+          ),
+        ),
+        if (_error != null || stepFailed)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Column(
+              children: [
+                Text(l10n.onboardingStudentNotEnrolled),
+                const SizedBox(height: 8),
+                AppButton(label: l10n.onboardingRetry, onPressed: _enroll),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

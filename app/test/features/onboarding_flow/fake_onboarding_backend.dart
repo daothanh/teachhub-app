@@ -47,6 +47,13 @@ class FakeOnboardingBackend implements HttpClientAdapter {
   Map<String, Object?>? savedClass;
   final savedStudents = <Map<String, Object?>>[];
 
+  /// Học viên đã ghi danh vào lớp (id), và số lần `POST …/enrollments` nhận được.
+  final enrolled = <String>[];
+  int enrollCalls = 0;
+
+  /// Số lần tới `POST …/enrollments` mất mạng trước khi ghi gì.
+  int failEnrolls = 0;
+
   /// Số lần `POST /classes` và `POST /students` thật sự chạy.
   int classCreates = 0;
   int studentCreates = 0;
@@ -144,6 +151,13 @@ class FakeOnboardingBackend implements HttpClientAdapter {
     }
     if (method == 'GET' && path == '/sessions') {
       sessionDate = options.queryParameters['from'] as String? ?? sessionDate;
+    }
+    if (failEnrolls > 0 && path.endsWith('/enrollments')) {
+      failEnrolls--;
+      throw DioException.connectionError(
+        requestOptions: options,
+        reason: 'offline',
+      );
     }
     final step = RegExp(
       r'^PATCH /onboarding/steps/(.+)$',
@@ -254,6 +268,57 @@ class FakeOnboardingBackend implements HttpClientAdapter {
       };
       savedStudents.add(s);
       return (201, s);
+    }
+    if (m == 'POST /classes/$classId/enrollments' && savedClass != null) {
+      enrollCalls++;
+      final id = (body! as Map)['studentId'] as String;
+      final again = enrolled.contains(id);
+      if (!again) enrolled.add(id);
+      savedClass = {...savedClass!, 'enrolledCount': enrolled.length};
+      return (
+        again ? 200 : 201,
+        {
+          'id': uid(300),
+          'classId': classId,
+          'studentId': id,
+          'joinedOn': _isoDate(now),
+        },
+      );
+    }
+    if (m == 'GET /sessions/${uid(10)}/attendance' && rules.isNotEmpty) {
+      final session = _session();
+      return (
+        200,
+        {
+          'sessionId': session['id'],
+          'classId': classId,
+          'className': session['className'],
+          'sessionDate': sessionDate,
+          'startsAt': session['startsAt'],
+          'sessionStatus': 'planned',
+          'canEdit': true,
+          'editableUntil': now
+              .add(const Duration(days: 7))
+              .toUtc()
+              .toIso8601String(),
+          'serverTime': now.toUtc().toIso8601String(),
+          'summary': {
+            for (final k in ['present', 'late', 'excused', 'unexcused']) k: 0,
+          },
+          'items': [
+            for (final s in savedStudents)
+              if (enrolled.contains(s['id']))
+                {
+                  'studentId': s['id'],
+                  'fullName': s['fullName'],
+                  'status': null,
+                  'note': null,
+                  'clientUpdatedAt': null,
+                  'syncedAt': null,
+                },
+          ],
+        },
+      );
     }
     if (m == 'GET /sessions') {
       return (

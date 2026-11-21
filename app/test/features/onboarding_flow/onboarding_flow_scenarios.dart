@@ -235,12 +235,7 @@ void defineOnboardingFlowTests() {
     await tapButton(tester, tl.studentsSave);
   }
 
-  /// SnackBar "đã lưu" của các bước trước nằm đè nút ở cuối màn: chờ chúng tắt.
   Future<void> skip(WidgetTester tester) async {
-    for (var i = 0; i < 4; i++) {
-      await tester.pump(const Duration(seconds: 5));
-    }
-    await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(AppButton, tl.onboardingSkip));
     await tester.pumpAndSettle();
   }
@@ -271,6 +266,7 @@ void defineOnboardingFlowTests() {
     expectStep(2);
     await addStudent(tester);
     expect(backend.savedStudents.single['fullName'], 'Minh Anh');
+    expect(backend.enrolled, [FakeOnboardingBackend.studentId]);
     expect(backend.steps['add_students'], 'done');
 
     // Bước 3: đặt lịch lặp cho đúng lớp vừa tạo.
@@ -297,13 +293,22 @@ void defineOnboardingFlowTests() {
     await tester.pumpAndSettle();
     expect(router.state.uri.path, TeachHubRoutes.teacher);
 
-    // Mở lại app ở Hôm nay: buổi vừa đặt và thẻ nhắc hai bước đã bỏ qua.
-    await finish(tester);
-    await openApp(tester, route: TeachHubRoutes.teacher);
+    // Hôm nay được làm mới ngay: buổi vừa đặt và thẻ nhắc hai bước đã bỏ qua.
     expect(find.text('Toán 9A'), findsOneWidget);
     expect(find.text(tl.todayTakeAttendance), findsOneWidget);
     expect(find.text(tl.todayOnboardingTitle), findsOneWidget);
     expect(find.text(tl.onboardingStepPayoutAccount), findsOneWidget);
+
+    // Màn điểm danh của buổi đó thấy học viên đã thêm ở bước 2.
+    await tester.tap(find.text(tl.todayTakeAttendance));
+    await tester.pumpAndSettle();
+    // Danh sách lớp tải qua đồng bộ nền, chạy ngoài đồng hồ giả của test.
+    for (var i = 0; i < 100 && find.text('Minh Anh').evaluate().isEmpty; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump();
+    }
 
     await finish(tester);
   });
@@ -352,6 +357,28 @@ void defineOnboardingFlowTests() {
     expect(find.text(tl.classesRuleN(1)), findsOneWidget);
     expect(find.text('18:00'), findsOneWidget);
     expect(backend.classCreates, 1);
+
+    await finish(tester);
+  });
+
+  testWidgets('ghi danh lỗi mạng ở bước 2: thử lại không tạo trùng học viên '
+      'hay ghi danh', (tester) async {
+    await setUpBackend(tester);
+    backend.failEnrolls = 1;
+    await openApp(tester);
+    await createClass(tester);
+    await addStudent(tester);
+
+    expectStep(2);
+    expect(backend.savedStudents, hasLength(1));
+    expect(backend.enrolled, isEmpty);
+    expect(backend.steps['add_students'], 'pending');
+    await tapButton(tester, tl.onboardingRetry);
+
+    expectStep(3);
+    expect(backend.studentCreates, 1);
+    expect(backend.enrolled, [FakeOnboardingBackend.studentId]);
+    expect(backend.steps['add_students'], 'done');
 
     await finish(tester);
   });

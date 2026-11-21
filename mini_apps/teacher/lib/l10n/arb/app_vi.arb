@@ -252,6 +252,7 @@
     }
   },
   "onboardingSaved": "Đã lưu. Chưa ghi nhận được bước này.",
+  "onboardingStudentNotEnrolled": "Đã lưu học viên. Chưa thêm được vào lớp hoặc chưa ghi nhận bước này.",
   "onboardingScheduleNoClass": "Chưa có lớp để đặt lịch. Hãy tạo lớp ở bước 1.",
   "todayTitle": "Hôm nay",
   "todayEmpty": "Hôm nay không có buổi học",
