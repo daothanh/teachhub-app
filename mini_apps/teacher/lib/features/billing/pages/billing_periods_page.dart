@@ -5,6 +5,7 @@ import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 
 import '../../../l10n/l10n.dart';
 import '../../fees/data/fee_models.dart' show formatVnd;
+import '../../receivables/receivables_routes.dart';
 import '../billing_routes.dart';
 import '../cubit/billing_periods_cubit.dart';
 import '../data/billing_models.dart';
@@ -32,7 +33,16 @@ class _View extends StatelessWidget {
     final l10n = context.miniAppL10n;
     final cubit = context.read<BillingPeriodsCubit>();
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.billingTitle)),
+      appBar: AppBar(
+        title: Text(l10n.billingTitle),
+        actions: [
+          IconButton(
+            tooltip: l10n.receivablesTitle,
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            onPressed: () => context.push(ReceivablesRoutes.list),
+          ),
+        ],
+      ),
       body: BlocBuilder<BillingPeriodsCubit, BillingPeriodsState>(
         builder: (context, s) => switch (s.load) {
           BillingLoad.loading => const Center(

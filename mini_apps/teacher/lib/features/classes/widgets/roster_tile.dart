@@ -7,6 +7,7 @@ import '../../fees/data/fee_models.dart';
 import '../../fees/fees_routes.dart';
 import '../../fees/pages/fee_override_page.dart';
 import '../../invites/pages/invite_share_sheet.dart';
+import '../../receivables/widgets/roster_dunning_sheet.dart';
 import '../../students/data/student_models.dart' show GuardianRelation;
 import '../../students/pages/student_form_page.dart' show guardianRelationLabel;
 import '../../students/students_routes.dart';
@@ -86,22 +87,32 @@ class RosterTile extends StatelessWidget {
                 ),
               ),
             ),
-            Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: TextButton(
-                onPressed: () async {
-                  final changed = await context.push<bool>(
-                    FeesRoutes.feeOverride(classId, e.enrollmentId),
-                    extra: FeeOverrideArgs(
-                      studentName: e.fullName,
-                      feeType: feeType,
-                      initial: e.feeOverride,
-                    ),
-                  );
-                  if (changed == true) onChanged();
-                },
-                child: Text(l10n.rosterFeeOverrideAction),
-              ),
+            Wrap(
+              children: [
+                TextButton(
+                  onPressed: () async {
+                    final changed = await context.push<bool>(
+                      FeesRoutes.feeOverride(classId, e.enrollmentId),
+                      extra: FeeOverrideArgs(
+                        studentName: e.fullName,
+                        feeType: feeType,
+                        initial: e.feeOverride,
+                      ),
+                    );
+                    if (changed == true) onChanged();
+                  },
+                  child: Text(l10n.rosterFeeOverrideAction),
+                ),
+                TextButton(
+                  onPressed: () => showRosterDunningSheet(
+                    context,
+                    studentId: e.studentId,
+                    studentName: e.fullName,
+                    enrollmentId: e.enrollmentId,
+                  ),
+                  child: Text(l10n.rosterDunningAction),
+                ),
+              ],
             ),
             if (e.guardians.isEmpty)
               Text(l10n.rosterNoGuardians, style: text.bodySmall)

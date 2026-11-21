@@ -1737,4 +1737,348 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get billingNoReason => 'No reason given';
+
+  @override
+  String get receivablesTitle => 'Receivables';
+
+  @override
+  String get receivablesSearchHint => 'Search by student name';
+
+  @override
+  String receivablesTotalOwed(String amount) {
+    return 'Total owed $amount';
+  }
+
+  @override
+  String get receivablesBucketAll => 'All';
+
+  @override
+  String get receivablesBucket030 => '0–30 days';
+
+  @override
+  String get receivablesBucket3160 => '31–60 days';
+
+  @override
+  String get receivablesBucketOver60 => 'Over 60 days';
+
+  @override
+  String receivablesBucketChip(String name, String amount) {
+    return '$name · $amount';
+  }
+
+  @override
+  String get receivablesSortDesc => 'Highest owed first';
+
+  @override
+  String get receivablesSortAsc => 'Lowest owed first';
+
+  @override
+  String receivablesRowOwed(String amount) {
+    return 'Owes $amount';
+  }
+
+  @override
+  String receivablesRowMeta(String classes, int invoices) {
+    String _temp0 = intl.Intl.pluralLogic(
+      invoices,
+      locale: localeName,
+      other: '$invoices invoices',
+      one: '1 invoice',
+    );
+    return '$classes · $_temp0';
+  }
+
+  @override
+  String receivablesOverdue(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days overdue',
+      one: '1 day overdue',
+      zero: 'Not overdue',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get receivablesEmpty => 'Nobody owes anything';
+
+  @override
+  String get receivablesEmptyBody =>
+      'Every issued invoice has been paid in full.';
+
+  @override
+  String get receivablesEmptyFiltered => 'No students match the filter.';
+
+  @override
+  String get receivablesLoadFailed => 'Could not load receivables.';
+
+  @override
+  String get receivablesMoreFailed => 'Could not load more.';
+
+  @override
+  String get receivablesDunningSettings => 'Reminder settings';
+
+  @override
+  String get receivablesDetailTitle => 'Student receivables';
+
+  @override
+  String get receivablesInvoices => 'Invoices';
+
+  @override
+  String get receivablesPayments => 'Payments';
+
+  @override
+  String get receivablesReminders => 'Reminders';
+
+  @override
+  String get receivablesNoInvoices => 'No invoices yet.';
+
+  @override
+  String get receivablesNoPayments => 'No payments yet.';
+
+  @override
+  String get receivablesNoReminders => 'No reminders yet.';
+
+  @override
+  String receivablesInvoiceTitle(String code, int month, int year) {
+    return '$code · $month/$year';
+  }
+
+  @override
+  String receivablesInvoiceDue(String date) {
+    return 'Due $date';
+  }
+
+  @override
+  String receivablesInvoiceRemaining(String remaining, String total) {
+    return '$remaining left of $total';
+  }
+
+  @override
+  String receivablesPaymentLine(String amount, String method) {
+    return '$amount · $method';
+  }
+
+  @override
+  String receivablesPaymentDate(String date) {
+    return 'Paid on $date';
+  }
+
+  @override
+  String get receivablesPaymentVoided => 'Voided';
+
+  @override
+  String receivablesReminderLine(String label, String code) {
+    return '$label · invoice $code';
+  }
+
+  @override
+  String get receivablesNoCode => 'no code';
+
+  @override
+  String dunningOffsetBefore(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$_temp0 before due';
+  }
+
+  @override
+  String get dunningOffsetOn => 'On the due date';
+
+  @override
+  String dunningOffsetAfter(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$_temp0 after due';
+  }
+
+  @override
+  String dunningStepSent(String time) {
+    return 'Sent $time';
+  }
+
+  @override
+  String dunningStepPending(String time) {
+    return 'Scheduled $time';
+  }
+
+  @override
+  String get dunningStepCancelled => 'Cancelled';
+
+  @override
+  String get dunningStudentTitle => 'Reminders';
+
+  @override
+  String get dunningStudentOn => 'Reminders are on';
+
+  @override
+  String get dunningStudentOff => 'Reminders are off';
+
+  @override
+  String get dunningStudentHint =>
+      'A student gets no reminders only when every current class is switched off.';
+
+  @override
+  String dunningClassSwitch(String className) {
+    return 'Reminders for $className';
+  }
+
+  @override
+  String get dunningToggledOn => 'Reminders turned on.';
+
+  @override
+  String get dunningToggledOff => 'Reminders turned off.';
+
+  @override
+  String get rosterDunningAction => 'Reminders';
+
+  @override
+  String rosterDunningTitle(String student) {
+    return 'Reminders for $student';
+  }
+
+  @override
+  String get invoiceDunningTitle => 'Payment reminders';
+
+  @override
+  String invoiceDunningLastSent(String time) {
+    return 'Last reminded $time';
+  }
+
+  @override
+  String get invoiceDunningNone => 'No reminder sent yet.';
+
+  @override
+  String invoiceDunningNext(String time) {
+    return 'Next reminder: $time';
+  }
+
+  @override
+  String get dunningReasonTenant =>
+      'Reminders are turned off in your general settings.';
+
+  @override
+  String get dunningReasonStudent => 'Reminders are off for this student.';
+
+  @override
+  String get dunningReasonPaid => 'Paid in full, no more reminders.';
+
+  @override
+  String get dunningReasonVoid => 'Invoice voided, no more reminders.';
+
+  @override
+  String get dunningLoadFailed => 'Could not load the reminder status.';
+
+  @override
+  String get dunningSettingsTitle => 'Reminder settings';
+
+  @override
+  String get dunningSettingsEnabled => 'Automatic reminders';
+
+  @override
+  String get dunningSettingsEnabledHint =>
+      'Reminds parents as an invoice nears or passes its due date. Sent between 07:00 and 21:30.';
+
+  @override
+  String get dunningSettingsOffsets => 'Reminder schedule';
+
+  @override
+  String get dunningSettingsOffsetsHint =>
+      'Days relative to the due date. Changes only apply to invoices issued after you save.';
+
+  @override
+  String get dunningOffsetInput => 'Add a day (relative to due date)';
+
+  @override
+  String get dunningOffsetAdd => 'Add';
+
+  @override
+  String get dunningOffsetReset => 'Reset to default';
+
+  @override
+  String get dunningOffsetPreview => 'Preview';
+
+  @override
+  String get dunningOffsetRemove => 'Remove';
+
+  @override
+  String get dunningOffsetErrNumber => 'Enter a whole number.';
+
+  @override
+  String get dunningOffsetErrRange => 'Use a value from −7 to 30 days.';
+
+  @override
+  String get dunningOffsetErrDuplicate => 'That day is already in the list.';
+
+  @override
+  String get dunningOffsetErrTooMany => 'At most 6 reminders.';
+
+  @override
+  String get dunningOffsetErrTooFew => 'Keep at least one reminder.';
+
+  @override
+  String get dunningSave => 'Save';
+
+  @override
+  String get dunningSaved => 'Reminder settings saved.';
+
+  @override
+  String get dunningPreviewTitle => 'Sample reminder';
+
+  @override
+  String get dunningPreviewFailed => 'Could not load the sample.';
+
+  @override
+  String get dunningPreviewNote => 'Sample data, not a real name or amount.';
+
+  @override
+  String get dunningStepOther => 'Other status';
+
+  @override
+  String receivablesAgingLine(String bucket, String overdue) {
+    return '$bucket · $overdue';
+  }
+
+  @override
+  String receivablesPaymentMetaCode(String date, String code) {
+    return 'Paid on $date · $code';
+  }
+
+  @override
+  String dunningStepLine(String label, String status) {
+    return '$label · $status';
+  }
+
+  @override
+  String get receivablesClassAll => 'All classes';
+
+  @override
+  String receivablesClassFilter(String name) {
+    return 'Class: $name';
+  }
+
+  @override
+  String get receivablesClassPick => 'Choose a class';
+
+  @override
+  String get dunningDiscardTitle => 'Discard unsaved changes?';
+
+  @override
+  String get dunningDiscardBody =>
+      'The reminder settings you changed will be lost.';
+
+  @override
+  String get dunningDiscardConfirm => 'Discard';
+
+  @override
+  String get dunningDiscardKeep => 'Keep editing';
 }
