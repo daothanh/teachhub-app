@@ -687,6 +687,28 @@ void main() {
       await c.close();
     });
 
+    test(
+      'thu đủ lỗi mạng rồi thử lại: không kiểm lại, gửi lại cùng khóa (server phát lại)',
+      () async {
+        final c = make();
+        await c.load();
+        repo.payError = const ApiException.network();
+        await c.recordPayment(pay(1200000), expectedRemaining: 1200000);
+        // Server đã ghi nhưng phản hồi mất: hóa đơn nay là đã thu đủ.
+        repo.invoice = sampleInvoice(
+          status: InvoiceStatus.paid,
+          total: 1200000,
+          paid: 1200000,
+        );
+        await c.recordPayment(pay(1200000), expectedRemaining: 1200000);
+        expect(sends(), 2);
+        expect(repo.keys[0], repo.keys[1]);
+        expect(c.state.notice, isNull);
+        expect(c.state.done, InvoiceDone.paymentRecorded);
+        await c.close();
+      },
+    );
+
     test('thu đủ mà không kiểm lại được số còn nợ: không gửi', () async {
       final c = make();
       await c.load();

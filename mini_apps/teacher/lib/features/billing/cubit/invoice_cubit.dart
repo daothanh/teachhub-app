@@ -273,7 +273,12 @@ class InvoiceCubit extends Cubit<InvoiceState> {
       return;
     }
     emit(state.copyWith(busy: true));
-    if (expectedRemaining != null) {
+    final draft =
+        '${input.amount}|${input.method.wire}|${input.paidOn}|'
+        '${input.note.trim()}';
+    // Thử lại sau lỗi mạng: server có thể đã ghi (hóa đơn nay là `paid`), nên
+    // không kiểm lại mà gửi lại cùng khóa để server phát lại kết quả.
+    if (expectedRemaining != null && !_keys.pending('pay', draft)) {
       try {
         final (inv, pays) = await _fetch();
         if (isClosed) return;

@@ -551,15 +551,21 @@ void defineBillingFlowTests() {
     expect(find.textContaining('Cô Lan'), findsOneWidget);
     await dismissSnackBar(tester);
 
-    // Phụ huynh: "đã trả một phần", còn nợ, biên nhận; vẫn có QR để trả nốt.
+    // Phụ huynh: "đã trả một phần", còn nợ, biên nhận, số cần chuyển (không QR).
     await parentOpensInvoice(tester);
     expect(find.text(pl.invoiceStatusPartial), findsOneWidget);
     expect(find.text(pl.invoiceRemainingAmount), findsOneWidget);
     expect(find.text(_vnd(fee - 50000)), findsOneWidget);
     await scrollTo(tester, find.text(pl.invoiceReceiptsTitle));
     expect(find.textContaining('${pl.invoiceMethodCash} ·'), findsOneWidget);
-    await scrollTo(tester, find.byType(QrImageView));
-    expect(find.byType(QrImageView), findsOneWidget);
+    // QR mang tổng tiền nên ẩn; hướng dẫn chuyển đúng số còn lại.
+    expect(find.byType(QrImageView), findsNothing);
+    await scrollTo(tester, find.text('0123456789'));
+    expect(
+      find.text(pl.invoiceAmountToTransfer(_vnd(fee - 50000))),
+      findsOneWidget,
+    );
+    expect(find.text(pl.invoiceCopyAmount), findsOneWidget);
 
     // Giáo viên thu nốt bằng "Đã thu đủ": số tiền = còn nợ.
     memberships.set(_state(_teacher));
