@@ -249,4 +249,16 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get invoiceMethodCash => 'Cash';
+
+  @override
+  String get invoicePartialHint =>
+      'The QR code carries the full invoice amount, so please do not scan it. Transfer exactly the remaining amount using the details below.';
+
+  @override
+  String invoiceAmountToTransfer(String amount) {
+    return 'Amount to transfer: $amount';
+  }
+
+  @override
+  String get invoiceCopyAmount => 'Copy amount';
 }

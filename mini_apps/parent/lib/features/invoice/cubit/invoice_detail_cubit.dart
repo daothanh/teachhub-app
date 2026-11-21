@@ -70,6 +70,7 @@ class InvoiceDetailCubit extends Cubit<InvoiceDetailState> {
     if (inv == null ||
         payload == null ||
         inv.summary.status == InvoiceStatus.voided ||
+        inv.summary.status == InvoiceStatus.partiallyPaid ||
         state.qrSave == QrSaveStatus.saving) {
       return;
     }

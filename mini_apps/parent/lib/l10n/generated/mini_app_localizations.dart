@@ -526,6 +526,24 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Tiền mặt'**
   String get invoiceMethodCash;
+
+  /// No description provided for @invoicePartialHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mã QR chỉ có số tiền của cả hóa đơn nên bạn đừng quét. Hãy chuyển đúng số còn lại theo thông tin bên dưới.'**
+  String get invoicePartialHint;
+
+  /// No description provided for @invoiceAmountToTransfer.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số cần chuyển: {amount}'**
+  String invoiceAmountToTransfer(String amount);
+
+  /// No description provided for @invoiceCopyAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Sao chép số tiền'**
+  String get invoiceCopyAmount;
 }
 
 class _MiniAppLocalizationsDelegate

@@ -246,4 +246,16 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get invoiceMethodCash => 'Tiền mặt';
+
+  @override
+  String get invoicePartialHint =>
+      'Mã QR chỉ có số tiền của cả hóa đơn nên bạn đừng quét. Hãy chuyển đúng số còn lại theo thông tin bên dưới.';
+
+  @override
+  String invoiceAmountToTransfer(String amount) {
+    return 'Số cần chuyển: $amount';
+  }
+
+  @override
+  String get invoiceCopyAmount => 'Sao chép số tiền';
 }

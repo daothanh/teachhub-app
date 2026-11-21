@@ -462,7 +462,7 @@ void main() {
     });
 
     testWidgets('thu một phần: hiện đã thanh toán, còn nợ, biên nhận và vẫn '
-        'có QR để chuyển phần còn lại', (tester) async {
+        'ẩn QR, hướng dẫn chuyển đúng số còn lại', (tester) async {
       final repo = _FakeInvoices()
         ..detailJson = _json(
           status: 'partially_paid',
@@ -492,7 +492,13 @@ void main() {
       expect(find.text('Bank transfer · Received $d'), findsOneWidget);
       expect(find.text('Cash · Received $d'), findsOneWidget);
       expect(find.text('Voided'), findsNothing);
-      expect(find.byType(QrImageView), findsOneWidget);
+      expect(find.byType(QrImageView), findsNothing);
+      expect(find.text('Save QR image'), findsNothing);
+      expect(find.textContaining('do not scan it'), findsOneWidget);
+      expect(find.text('Amount to transfer: 1,000,000 đ'), findsOneWidget);
+      expect(find.text('Vietcombank'), findsOneWidget);
+      expect(find.text('0011223344'), findsOneWidget);
+      expect(find.text('TH 25K7Q9'), findsOneWidget);
     });
 
     testWidgets('chưa thu: còn nợ bằng tổng, chưa có biên nhận', (
@@ -559,6 +565,50 @@ void main() {
         expect(find.text('Paid'), findsNothing);
         expect(find.text('1,500,000 đ'), findsWidgets);
         expect(find.byType(QrImageView), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'thu một phần: sao chép số tiền còn lại và nội dung chuyển khoản',
+      (tester) async {
+        final copied = <String>[];
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          (call) async {
+            if (call.method == 'Clipboard.setData') {
+              copied.add((call.arguments as Map)['text'] as String);
+            }
+            return null;
+          },
+        );
+        addTearDown(
+          () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+            SystemChannels.platform,
+            null,
+          ),
+        );
+        final repo = _FakeInvoices()
+          ..detailJson = _json(
+            status: 'partially_paid',
+            paid: 500000,
+            payments: [_receipt()],
+          );
+        await _pump(
+          tester,
+          repo,
+          _FakeSaver(),
+          location: '${TeachHubRoutes.parentInvoices}/$_id',
+        );
+        await tester.scrollUntilVisible(
+          find.text('Copy transfer note'),
+          200,
+          scrollable: find.byType(Scrollable).first,
+        );
+        await tester.tap(find.text('Copy amount'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Copy transfer note'));
+        await tester.pumpAndSettle();
+        expect(copied, ['1000000', 'TH 25K7Q9']);
       },
     );
 

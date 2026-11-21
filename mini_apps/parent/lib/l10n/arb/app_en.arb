@@ -158,5 +158,15 @@
   },
   "invoiceReceiptVoided": "Voided",
   "invoiceMethodBank": "Bank transfer",
-  "invoiceMethodCash": "Cash"
+  "invoiceMethodCash": "Cash",
+  "invoicePartialHint": "The QR code carries the full invoice amount, so please do not scan it. Transfer exactly the remaining amount using the details below.",
+  "invoiceAmountToTransfer": "Amount to transfer: {amount}",
+  "@invoiceAmountToTransfer": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceCopyAmount": "Copy amount"
 }

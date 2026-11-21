@@ -158,5 +158,15 @@
   },
   "invoiceReceiptVoided": "Đã hủy",
   "invoiceMethodBank": "Chuyển khoản",
-  "invoiceMethodCash": "Tiền mặt"
+  "invoiceMethodCash": "Tiền mặt",
+  "invoicePartialHint": "Mã QR chỉ có số tiền của cả hóa đơn nên bạn đừng quét. Hãy chuyển đúng số còn lại theo thông tin bên dưới.",
+  "invoiceAmountToTransfer": "Số cần chuyển: {amount}",
+  "@invoiceAmountToTransfer": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceCopyAmount": "Sao chép số tiền"
 }

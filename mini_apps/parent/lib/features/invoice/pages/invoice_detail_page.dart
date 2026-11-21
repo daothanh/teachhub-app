@@ -226,7 +226,10 @@ class _Pay extends StatelessWidget {
     final l10n = context.miniAppL10n;
     final theme = Theme.of(context);
     final payout = invoice.payout;
-    final qr = invoice.qrPayload;
+    // QR sinh lúc phát hành mang tổng tiền: đã thu một phần thì quét sẽ chuyển
+    // thừa, nên ẩn QR và hướng dẫn chuyển đúng số còn lại.
+    final partial = invoice.summary.status == InvoiceStatus.partiallyPaid;
+    final qr = partial ? null : invoice.qrPayload;
     final saving =
         context.watch<InvoiceDetailCubit>().state.qrSave == QrSaveStatus.saving;
     Future<void> copy(String text) async {
@@ -244,6 +247,23 @@ class _Pay extends StatelessWidget {
           child: Text(l10n.invoicePayTitle, style: theme.textTheme.titleMedium),
         ),
         const SizedBox(height: 8),
+        if (partial) ...[
+          Text(l10n.invoicePartialHint),
+          const SizedBox(height: 8),
+          Text(
+            l10n.invoiceAmountToTransfer(
+              formatVnd(context, invoice.summary.remainingAmount),
+            ),
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => copy('${invoice.summary.remainingAmount}'),
+            icon: const Icon(Icons.copy),
+            label: Text(l10n.invoiceCopyAmount),
+          ),
+          const SizedBox(height: 8),
+        ],
         if (qr != null) ...[
           Center(
             child: Semantics(
