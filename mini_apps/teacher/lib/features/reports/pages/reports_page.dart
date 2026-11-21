@@ -231,9 +231,11 @@ class _ClassRow extends StatelessWidget {
       if (c.archived) l10n.reportsArchived,
       if (percent != null)
         l10n.reportsAttendance(
-          // 92.0 → 92, 92.5 giữ nguyên.
+          // 92.0 → 92; 92.5 → "92,5" (tiếng Việt dùng dấu phẩy thập phân).
           percent == percent.roundToDouble()
               ? '${percent.round()}'
+              : Localizations.localeOf(context).languageCode == 'vi'
+              ? percent.toStringAsFixed(1).replaceFirst('.', ',')
               : percent.toStringAsFixed(1),
         ),
     ].join(' · ');

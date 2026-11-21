@@ -70,7 +70,7 @@ void main() {
       expect(find.text('11/2026: 65.600.000 đ'), findsOneWidget);
       expect(find.text('Toán 9A'), findsOneWidget);
       expect(find.text('Chuyên cần 92%'), findsOneWidget);
-      expect(find.text('Đã lưu trữ · Chuyên cần 88.5%'), findsOneWidget);
+      expect(find.text('Đã lưu trữ · Chuyên cần 88,5%'), findsOneWidget);
       expect(find.text('Khác'), findsOneWidget);
       expect(find.textContaining('không gán được cho lớp nào'), findsOneWidget);
       expect(find.text('36.000.000 đ'), findsOneWidget);
