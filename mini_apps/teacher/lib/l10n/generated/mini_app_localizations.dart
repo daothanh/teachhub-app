@@ -3813,6 +3813,228 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'{date} · {method} · {code}'**
   String reportsEntryMeta(String date, String method, String code);
+
+  /// No description provided for @todayPlanEntry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gói Pro'**
+  String get todayPlanEntry;
+
+  /// No description provided for @planTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gói của bạn'**
+  String get planTitle;
+
+  /// No description provided for @planLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được thông tin gói.'**
+  String get planLoadFailed;
+
+  /// No description provided for @planNameFree.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gói Miễn phí'**
+  String get planNameFree;
+
+  /// No description provided for @planNamePro.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gói Pro'**
+  String get planNamePro;
+
+  /// No description provided for @planStatusTrialing.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang dùng thử Pro'**
+  String get planStatusTrialing;
+
+  /// No description provided for @planStatusActive.
+  ///
+  /// In vi, this message translates to:
+  /// **'Pro đang hoạt động'**
+  String get planStatusActive;
+
+  /// No description provided for @planStatusExpired.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã hết hạn, đang ở giới hạn Miễn phí'**
+  String get planStatusExpired;
+
+  /// No description provided for @planStatusFree.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giới hạn Miễn phí'**
+  String get planStatusFree;
+
+  /// No description provided for @planDaysLeft.
+  ///
+  /// In vi, this message translates to:
+  /// **'Còn {days} ngày'**
+  String planDaysLeft(int days);
+
+  /// No description provided for @planEndsOn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hết hạn ngày {date}'**
+  String planEndsOn(String date);
+
+  /// No description provided for @planUsageTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mức dùng'**
+  String get planUsageTitle;
+
+  /// No description provided for @planUsageClasses.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp đang hoạt động'**
+  String get planUsageClasses;
+
+  /// No description provided for @planUsageStudents.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học viên đang học'**
+  String get planUsageStudents;
+
+  /// No description provided for @planUsageOfLimit.
+  ///
+  /// In vi, this message translates to:
+  /// **'{used}/{limit}'**
+  String planUsageOfLimit(int used, int limit);
+
+  /// No description provided for @planUsageUnlimited.
+  ///
+  /// In vi, this message translates to:
+  /// **'{used} · không giới hạn'**
+  String planUsageUnlimited(int used);
+
+  /// No description provided for @planReadOnlyNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'{classes} lớp và {students} học viên đang ở chế độ chỉ đọc vì vượt giới hạn Miễn phí. Dữ liệu vẫn còn nguyên; nâng cấp Pro để mở lại ngay.'**
+  String planReadOnlyNote(int classes, int students);
+
+  /// No description provided for @planFeaturesTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tính năng Pro'**
+  String get planFeaturesTitle;
+
+  /// No description provided for @planFeatureForm02.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mẫu 02'**
+  String get planFeatureForm02;
+
+  /// No description provided for @planFeatureForm03.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mẫu 03'**
+  String get planFeatureForm03;
+
+  /// No description provided for @planFeatureRevenueExport.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xuất sổ doanh thu'**
+  String get planFeatureRevenueExport;
+
+  /// No description provided for @planFeatureReportsExport.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xuất báo cáo'**
+  String get planFeatureReportsExport;
+
+  /// No description provided for @planFeatureLocked.
+  ///
+  /// In vi, this message translates to:
+  /// **'Pro'**
+  String get planFeatureLocked;
+
+  /// No description provided for @planFeatureOn.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã mở'**
+  String get planFeatureOn;
+
+  /// No description provided for @planTrialButton.
+  ///
+  /// In vi, this message translates to:
+  /// **'Dùng thử 14 ngày'**
+  String get planTrialButton;
+
+  /// No description provided for @planTrialUsed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đã dùng thử Pro. Mỗi tài khoản chỉ dùng thử một lần.'**
+  String get planTrialUsed;
+
+  /// No description provided for @planTrialStarted.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã bật Pro dùng thử · còn {days} ngày'**
+  String planTrialStarted(int days);
+
+  /// No description provided for @planBuyButton.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mua Pro'**
+  String get planBuyButton;
+
+  /// No description provided for @planBuyButtonPrice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mua Pro · {price}'**
+  String planBuyButtonPrice(String price);
+
+  /// No description provided for @planBuyPending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang kích hoạt Pro, có thể mất tới 1 phút.'**
+  String get planBuyPending;
+
+  /// No description provided for @planBuyUnavailable.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mua trong ứng dụng chưa sẵn sàng.'**
+  String get planBuyUnavailable;
+
+  /// No description provided for @planBuyFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không hoàn tất được giao dịch. Thử lại sau.'**
+  String get planBuyFailed;
+
+  /// No description provided for @planWebButton.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thanh toán trên web'**
+  String get planWebButton;
+
+  /// No description provided for @planWebFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không mở được trình duyệt.'**
+  String get planWebFailed;
+
+  /// No description provided for @planErrTrialUsed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đã dùng thử Pro rồi.'**
+  String get planErrTrialUsed;
+
+  /// No description provided for @planErrBusy.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gói Pro đang hoạt động.'**
+  String get planErrBusy;
+
+  /// No description provided for @planLimitAction.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem gói Pro'**
+  String get planLimitAction;
 }
 
 class _MiniAppLocalizationsDelegate

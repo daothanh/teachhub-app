@@ -14,6 +14,7 @@ import '../../billing/billing_routes.dart';
 import '../../classes/classes_routes.dart';
 import '../../onboarding/data/onboarding_models.dart';
 import '../../onboarding/data/onboarding_repository.dart';
+import '../../plan/plan_routes.dart';
 import '../../receivables/receivables_routes.dart';
 import '../../schedule/schedule_routes.dart';
 import '../cubit/today_cubit.dart';
@@ -180,6 +181,13 @@ class _TodayList extends StatelessWidget {
           variant: AppButtonVariant.outlinePrimary,
           width: double.infinity,
           onPressed: () => context.push(ReceivablesRoutes.list),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        AppButton(
+          label: l10n.todayPlanEntry,
+          variant: AppButtonVariant.outlinePrimary,
+          width: double.infinity,
+          onPressed: () => context.push(PlanRoutes.plan),
         ),
       ],
     );

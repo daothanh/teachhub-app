@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../../../l10n/l10n.dart';
 import '../../fees/data/fee_models.dart';
@@ -10,6 +11,7 @@ import '../cubit/class_form_cubit.dart';
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
 import '../data/draft_keys.dart';
+import '../../plan/plan_routes.dart';
 import '../widgets/class_fee_section.dart';
 import '../widgets/classes_error_text.dart';
 import '../widgets/read_only_field.dart';
@@ -241,6 +243,11 @@ class _FormBodyState extends State<_FormBody> {
             tone: AppStatusTone.error,
             description: classesErrorText(l10n, s.error!),
             fullWidth: true,
+            // 402 hết hạn mức: mở T14 (US-0.7 AC1).
+            actionLabel: s.error!.kind == ApiErrorKind.paymentRequired
+                ? l10n.planLimitAction
+                : null,
+            onAction: () => context.push(PlanRoutes.plan),
           ),
           gap,
         ],

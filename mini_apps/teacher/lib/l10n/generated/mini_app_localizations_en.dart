@@ -2253,4 +2253,130 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String reportsEntryMeta(String date, String method, String code) {
     return '$date · $method · $code';
   }
+
+  @override
+  String get todayPlanEntry => 'Pro plan';
+
+  @override
+  String get planTitle => 'Your plan';
+
+  @override
+  String get planLoadFailed => 'Couldn\'t load plan details.';
+
+  @override
+  String get planNameFree => 'Free plan';
+
+  @override
+  String get planNamePro => 'Pro plan';
+
+  @override
+  String get planStatusTrialing => 'Pro trial in progress';
+
+  @override
+  String get planStatusActive => 'Pro is active';
+
+  @override
+  String get planStatusExpired => 'Expired, back to Free limits';
+
+  @override
+  String get planStatusFree => 'Free limits';
+
+  @override
+  String planDaysLeft(int days) {
+    return '$days days left';
+  }
+
+  @override
+  String planEndsOn(String date) {
+    return 'Ends on $date';
+  }
+
+  @override
+  String get planUsageTitle => 'Usage';
+
+  @override
+  String get planUsageClasses => 'Active classes';
+
+  @override
+  String get planUsageStudents => 'Active students';
+
+  @override
+  String planUsageOfLimit(int used, int limit) {
+    return '$used/$limit';
+  }
+
+  @override
+  String planUsageUnlimited(int used) {
+    return '$used · unlimited';
+  }
+
+  @override
+  String planReadOnlyNote(int classes, int students) {
+    return '$classes classes and $students students are read-only because they exceed the Free limit. Nothing is deleted; upgrade to Pro to unlock them right away.';
+  }
+
+  @override
+  String get planFeaturesTitle => 'Pro features';
+
+  @override
+  String get planFeatureForm02 => 'Form 02';
+
+  @override
+  String get planFeatureForm03 => 'Form 03';
+
+  @override
+  String get planFeatureRevenueExport => 'Revenue book export';
+
+  @override
+  String get planFeatureReportsExport => 'Report export';
+
+  @override
+  String get planFeatureLocked => 'Pro';
+
+  @override
+  String get planFeatureOn => 'Unlocked';
+
+  @override
+  String get planTrialButton => 'Try 14 days free';
+
+  @override
+  String get planTrialUsed =>
+      'You have used your Pro trial. Each account can try it once.';
+
+  @override
+  String planTrialStarted(int days) {
+    return 'Pro trial on · $days days left';
+  }
+
+  @override
+  String get planBuyButton => 'Buy Pro';
+
+  @override
+  String planBuyButtonPrice(String price) {
+    return 'Buy Pro · $price';
+  }
+
+  @override
+  String get planBuyPending => 'Activating Pro, this can take up to 1 minute.';
+
+  @override
+  String get planBuyUnavailable => 'In-app purchase isn\'t available yet.';
+
+  @override
+  String get planBuyFailed => 'The purchase didn\'t complete. Try again later.';
+
+  @override
+  String get planWebButton => 'Pay on the web';
+
+  @override
+  String get planWebFailed => 'Couldn\'t open the browser.';
+
+  @override
+  String get planErrTrialUsed => 'You have already used your Pro trial.';
+
+  @override
+  String get planErrBusy => 'Pro is already active.';
+
+  @override
+  String get planLimitAction => 'See Pro plan';
 }
