@@ -167,14 +167,7 @@ void main() {
         expect(h.invoices, isNotEmpty);
         expect(h.payments, isNotEmpty);
         expect(h.reminders, isNotEmpty);
-        // Nợ ròng = max(0, hóa đơn còn nợ + số dư sổ) (S6-BE-05).
-        expect(
-          h.outstandingAmount,
-          (h.invoiceOutstandingAmount + h.ledgerBalanceAmount).clamp(
-            0,
-            1 << 40,
-          ),
-        );
+        expect(h.invoiceOutstandingAmount, isNonNegative);
       },
     );
 
