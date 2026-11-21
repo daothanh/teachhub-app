@@ -1394,6 +1394,10 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   }
 
   @override
+  String get billingIssueZeroConfirmBody =>
+      'Send the 0 đ drafts. Drafts with nothing charged stay as drafts; drafts fully covered by overpayment are sent and marked as covered by the balance.';
+
+  @override
   String billingIssueOneConfirmBody(String student, String amount) {
     return 'Issue the invoice for $student, $amount. Parents are notified right away and issued invoices cannot be edited.';
   }
@@ -1434,7 +1438,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
       other: '$count invoices',
       one: '1 invoice',
     );
-    return '$_temp0 of 0 đ will not be sent.';
+    return '$_temp0 of 0 đ: not sent when nothing was charged.';
   }
 
   @override
@@ -1511,8 +1515,66 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String billingClamped(String amount) {
-    return 'The adjustment made the total negative, so it is held at 0 đ; the negative part of $amount is not carried to the next period yet.';
+    return 'The adjustment made the total negative, so it is held at 0 đ; the negative part of $amount will be deducted next period.';
   }
+
+  @override
+  String get billingCarryTitle => 'Balance from earlier periods';
+
+  @override
+  String get billingCarryDebt => 'Previous balance owed';
+
+  @override
+  String get billingCarryCredit => 'Overpayment credited';
+
+  @override
+  String get billingPrevAdjustment => 'Adjustment for earlier period';
+
+  @override
+  String get billingCarryPreviewNote =>
+      'This is calculated as of now and may change when you send it.';
+
+  @override
+  String get billingDraftPreviewNote =>
+      'Each draft total already includes any previous balance or overpayment and may change when you send it.';
+
+  @override
+  String billingIssuedTotal(int count, String amount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count invoices',
+      one: '1 invoice',
+    );
+    return '$_temp0 sent, total $amount.';
+  }
+
+  @override
+  String billingIssuedCovered(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count invoices were',
+      one: '1 invoice was',
+    );
+    return '$_temp0 covered by the balance, nothing to collect.';
+  }
+
+  @override
+  String get billingCoveredByBalance => 'Covered by balance';
+
+  @override
+  String get billingCoveredByBalanceHint =>
+      'The student\'s overpayment already covers this period, so there is nothing more to collect.';
+
+  @override
+  String billingCarriedAmount(String amount) {
+    return '$amount carried to the next period';
+  }
+
+  @override
+  String get billingCarriedHint =>
+      'This amount is now on the next period\'s invoice; collect it there.';
 
   @override
   String get billingAddAdjustment => 'Add adjustment';
@@ -1776,6 +1838,25 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String receivablesRowOwed(String amount) {
     return 'Owes $amount';
   }
+
+  @override
+  String receivablesInvoiceOutstanding(String amount) {
+    return 'Open invoices: $amount';
+  }
+
+  @override
+  String receivablesLedgerDebt(String amount) {
+    return 'Owed on the ledger: $amount';
+  }
+
+  @override
+  String receivablesLedgerCredit(String amount) {
+    return 'Overpaid: $amount';
+  }
+
+  @override
+  String get receivablesNetHint =>
+      'Net debt after overpayment credit or ledger debt; amounts already carried to the next period are not counted twice.';
 
   @override
   String receivablesRowMeta(String classes, int invoices) {

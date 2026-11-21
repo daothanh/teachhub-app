@@ -73,6 +73,7 @@ Invoice sampleInvoice({
   int clamped = 0,
   String? voidReason,
   int paid = 0,
+  int carried = 0,
 }) => Invoice(
   id: id,
   periodId: periodId,
@@ -82,10 +83,11 @@ Invoice sampleInvoice({
   studentName: 'Nguyễn Minh Anh',
   totalAmount: total,
   paidAmount: paid,
+  carriedAmount: carried,
   remainingAmount:
       status == InvoiceStatus.draft || status == InvoiceStatus.voided
       ? 0
-      : (total - paid).clamp(0, 1 << 40),
+      : (total - paid - carried).clamp(0, 1 << 40),
   dueDate: '2026-11-11',
   voidReason: voidReason,
   lines: lines ?? [sampleLine()],
@@ -279,6 +281,7 @@ class FakeBillingRepository implements BillingRepository {
       status: status,
       total: inv.totalAmount,
       paid: paid,
+      carried: inv.carriedAmount,
     );
     invoice = next;
     return PaymentResult(

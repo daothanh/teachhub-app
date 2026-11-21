@@ -109,7 +109,12 @@ void main() {
         expect(find.text('Không gửi'), findsOneWidget);
         // Chỉ bản nháp có tiền mới có nút chốt riêng.
         expect(find.text('Chốt & gửi'), findsNWidgets(2));
-        expect(find.text('1 hóa đơn 0 đ sẽ không được gửi.'), findsOneWidget);
+        expect(
+          find.text(
+            '1 hóa đơn 0 đ: nếu không có khoản phát sinh thì sẽ không được gửi.',
+          ),
+          findsOneWidget,
+        );
       },
     );
 
@@ -146,7 +151,9 @@ void main() {
       await tester.pumpAndSettle();
       expect(repo.issuedIds, [null]);
       expect(
-        find.text('Đã gửi 2 hóa đơn. 1 hóa đơn 0 đ không gửi.'),
+        find.text(
+          'Đã gửi 2 hóa đơn, tổng 2.700.000 đ. 1 hóa đơn 0 đ không gửi.',
+        ),
         findsOneWidget,
       );
     });
@@ -203,7 +210,10 @@ void main() {
         );
         await tester.pumpAndSettle();
         expect(repo.issuedIds, hasLength(2));
-        expect(find.text('Đã gửi 2 hóa đơn.'), findsOneWidget);
+        expect(
+          find.text('Đã gửi 2 hóa đơn, tổng 2.700.000 đ.'),
+          findsOneWidget,
+        );
       },
     );
 

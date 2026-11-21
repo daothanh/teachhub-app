@@ -2458,6 +2458,12 @@ abstract class MiniAppLocalizations {
   /// **'Chốt {count, plural, other{{count} hóa đơn}}, tổng {amount}. Phụ huynh nhận thông báo ngay và hóa đơn không sửa được sau khi gửi.'**
   String billingIssueAllConfirmBody(int count, String amount);
 
+  /// No description provided for @billingIssueZeroConfirmBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chốt các bản nháp 0 đ. Bản nháp không có khoản phát sinh được giữ lại; bản nháp mà tiền trả thừa trả đủ sẽ được chốt và ghi là đã trừ vào số dư.'**
+  String get billingIssueZeroConfirmBody;
+
   /// No description provided for @billingIssueOneConfirmBody.
   ///
   /// In vi, this message translates to:
@@ -2491,7 +2497,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @billingZeroDraftNote.
   ///
   /// In vi, this message translates to:
-  /// **'{count, plural, other{{count} hóa đơn}} 0 đ sẽ không được gửi.'**
+  /// **'{count, plural, other{{count} hóa đơn}} 0 đ: nếu không có khoản phát sinh thì sẽ không được gửi.'**
   String billingZeroDraftNote(int count);
 
   /// No description provided for @billingInvoicesEmpty.
@@ -2629,8 +2635,80 @@ abstract class MiniAppLocalizations {
   /// No description provided for @billingClamped.
   ///
   /// In vi, this message translates to:
-  /// **'Điều chỉnh làm tổng âm nên tổng được giữ ở 0 đ; phần âm {amount} chưa được chuyển sang kỳ sau.'**
+  /// **'Điều chỉnh làm tổng âm nên tổng được giữ ở 0 đ; phần âm {amount} sẽ được trừ vào kỳ sau.'**
   String billingClamped(String amount);
+
+  /// No description provided for @billingCarryTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số dư kỳ trước'**
+  String get billingCarryTitle;
+
+  /// No description provided for @billingCarryDebt.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nợ kỳ trước'**
+  String get billingCarryDebt;
+
+  /// No description provided for @billingCarryCredit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trừ tiền trả thừa'**
+  String get billingCarryCredit;
+
+  /// No description provided for @billingPrevAdjustment.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điều chỉnh kỳ trước'**
+  String get billingPrevAdjustment;
+
+  /// No description provided for @billingCarryPreviewNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số này tính theo hiện tại, có thể thay đổi khi chốt.'**
+  String get billingCarryPreviewNote;
+
+  /// No description provided for @billingDraftPreviewNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tổng mỗi bản nháp đã gồm nợ kỳ trước hoặc tiền trả thừa nếu có, có thể thay đổi khi chốt.'**
+  String get billingDraftPreviewNote;
+
+  /// No description provided for @billingIssuedTotal.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gửi {count, plural, other{{count} hóa đơn}}, tổng {amount}.'**
+  String billingIssuedTotal(int count, String amount);
+
+  /// No description provided for @billingIssuedCovered.
+  ///
+  /// In vi, this message translates to:
+  /// **'{count, plural, other{{count} hóa đơn}} đã trừ vào số dư, không cần thu.'**
+  String billingIssuedCovered(int count);
+
+  /// No description provided for @billingCoveredByBalance.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã trừ vào số dư'**
+  String get billingCoveredByBalance;
+
+  /// No description provided for @billingCoveredByBalanceHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiền trả thừa của học viên đã đủ trả kỳ này nên không cần thu thêm.'**
+  String get billingCoveredByBalanceHint;
+
+  /// No description provided for @billingCarriedAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã chuyển {amount} sang kỳ sau'**
+  String billingCarriedAmount(String amount);
+
+  /// No description provided for @billingCarriedHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản này đã nằm ở hóa đơn kỳ sau, hãy thu ở đó.'**
+  String get billingCarriedHint;
 
   /// No description provided for @billingAddAdjustment.
   ///
@@ -3087,6 +3165,30 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Còn nợ {amount}'**
   String receivablesRowOwed(String amount);
+
+  /// No description provided for @receivablesInvoiceOutstanding.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn còn nợ: {amount}'**
+  String receivablesInvoiceOutstanding(String amount);
+
+  /// No description provided for @receivablesLedgerDebt.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nợ ở sổ: {amount}'**
+  String receivablesLedgerDebt(String amount);
+
+  /// No description provided for @receivablesLedgerCredit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trả thừa: {amount}'**
+  String receivablesLedgerCredit(String amount);
+
+  /// No description provided for @receivablesNetHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nợ ròng đã trừ tiền trả thừa hoặc cộng nợ ở sổ, không đếm hai lần phần đã chuyển sang kỳ sau.'**
+  String get receivablesNetHint;
 
   /// No description provided for @receivablesRowMeta.
   ///

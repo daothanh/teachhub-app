@@ -102,6 +102,7 @@ class _Body extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final inv = invoice;
     final sessions = inv.sessionLines;
+    final carries = inv.carryLines;
     final others = inv.otherLines;
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -135,6 +136,17 @@ class _Body extends StatelessWidget {
           Text(l10n.billingLinesSessions, style: text.titleSmall),
           for (final l in sessions) _SessionLine(line: l),
         ],
+        if (carries.isNotEmpty) ...[
+          const SizedBox(height: AppSpacing.lg),
+          Text(l10n.billingCarryTitle, style: text.titleSmall),
+          for (final l in carries) _CarryLine(line: l),
+          // Ở bản nháp, hai loại dòng này là xem trước, server tính lại mỗi lần đọc.
+          if (inv.status == InvoiceStatus.draft)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.xs),
+              child: Text(l10n.billingCarryPreviewNote, style: text.bodySmall),
+            ),
+        ],
         if (others.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.lg),
           Text(l10n.billingLinesOther, style: text.titleSmall),
@@ -157,7 +169,7 @@ class _Body extends StatelessWidget {
           ),
         InvoicePaymentsSection(invoice: inv, payments: payments, busy: busy),
         // Bản nháp chưa có lịch nhắc; hóa đơn đã phát hành thì xem được trạng thái nhắc.
-        if (inv.status != InvoiceStatus.draft)
+        if (inv.status != InvoiceStatus.draft && !inv.isCoveredByBalance)
           // Đổi trạng thái hoặc số đã thu (ghi thu, hủy thu) thì tải lại khối nhắc nợ.
           InvoiceDunningSection(
             key: ValueKey('${inv.id}:${inv.status}:${inv.paidAmount}'),
@@ -173,9 +185,9 @@ class _Body extends StatelessWidget {
             onPressed: () => _openAdjustSheet(context),
           ),
         ],
-        // Hóa đơn đã có thanh toán còn hiệu lực thì server từ chối hủy (409):
-        // phải hủy thanh toán trước.
-        if (inv.status.isLive && inv.paidAmount == 0) ...[
+        // Hóa đơn đã có thanh toán còn hiệu lực, đã chuyển nợ hoặc mang dòng
+        // kết chuyển thì server từ chối hủy (409): không hiện nút.
+        if (inv.canVoid) ...[
           const SizedBox(height: AppSpacing.lg),
           AppButton(
             label: l10n.billingVoid,
@@ -235,6 +247,44 @@ class _SessionLine extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.sm),
           Text(formatVnd(l.amount), style: text.bodyMedium),
+        ],
+      ),
+    );
+  }
+}
+
+/// Dòng số dư kỳ trước: nhãn theo loại và dấu, không lấy mô tả của server làm nhãn.
+class _CarryLine extends StatelessWidget {
+  const _CarryLine({required this.line});
+  final InvoiceLine line;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.miniAppL10n;
+    final text = Theme.of(context).textTheme;
+    final l = line;
+    final label = l.kind == InvoiceLineKind.prevAdjustment
+        ? l10n.billingPrevAdjustment
+        : l.amount < 0
+        ? l10n.billingCarryCredit
+        : l10n.billingCarryDebt;
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.sm),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: text.bodyMedium),
+                if (l.description.isNotEmpty && l.description != label)
+                  Text(l.description, style: text.bodySmall),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Text(formatVnd(l.amount, plus: true), style: text.bodyMedium),
         ],
       ),
     );

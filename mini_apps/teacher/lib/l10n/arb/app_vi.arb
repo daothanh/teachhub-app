@@ -809,6 +809,7 @@
       }
     }
   },
+  "billingIssueZeroConfirmBody": "Chốt các bản nháp 0 đ. Bản nháp không có khoản phát sinh được giữ lại; bản nháp mà tiền trả thừa trả đủ sẽ được chốt và ghi là đã trừ vào số dư.",
   "billingIssueOneConfirmBody": "Chốt hóa đơn của {student}, {amount}. Phụ huynh nhận thông báo ngay và hóa đơn không sửa được sau khi gửi.",
   "@billingIssueOneConfirmBody": {
     "placeholders": {
@@ -838,7 +839,7 @@
     }
   },
   "billingNoPayableDrafts": "Không còn bản nháp nào có tiền để gửi.",
-  "billingZeroDraftNote": "{count, plural, other{{count} hóa đơn}} 0 đ sẽ không được gửi.",
+  "billingZeroDraftNote": "{count, plural, other{{count} hóa đơn}} 0 đ: nếu không có khoản phát sinh thì sẽ không được gửi.",
   "@billingZeroDraftNote": {
     "placeholders": {
       "count": {
@@ -892,7 +893,7 @@
     }
   },
   "billingTotal": "Tổng cộng",
-  "billingClamped": "Điều chỉnh làm tổng âm nên tổng được giữ ở 0 đ; phần âm {amount} chưa được chuyển sang kỳ sau.",
+  "billingClamped": "Điều chỉnh làm tổng âm nên tổng được giữ ở 0 đ; phần âm {amount} sẽ được trừ vào kỳ sau.",
   "@billingClamped": {
     "placeholders": {
       "amount": {
@@ -900,6 +901,42 @@
       }
     }
   },
+  "billingCarryTitle": "Số dư kỳ trước",
+  "billingCarryDebt": "Nợ kỳ trước",
+  "billingCarryCredit": "Trừ tiền trả thừa",
+  "billingPrevAdjustment": "Điều chỉnh kỳ trước",
+  "billingCarryPreviewNote": "Số này tính theo hiện tại, có thể thay đổi khi chốt.",
+  "billingDraftPreviewNote": "Tổng mỗi bản nháp đã gồm nợ kỳ trước hoặc tiền trả thừa nếu có, có thể thay đổi khi chốt.",
+  "billingIssuedTotal": "Đã gửi {count, plural, other{{count} hóa đơn}}, tổng {amount}.",
+  "@billingIssuedTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingIssuedCovered": "{count, plural, other{{count} hóa đơn}} đã trừ vào số dư, không cần thu.",
+  "@billingIssuedCovered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "billingCoveredByBalance": "Đã trừ vào số dư",
+  "billingCoveredByBalanceHint": "Tiền trả thừa của học viên đã đủ trả kỳ này nên không cần thu thêm.",
+  "billingCarriedAmount": "Đã chuyển {amount} sang kỳ sau",
+  "@billingCarriedAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "billingCarriedHint": "Khoản này đã nằm ở hóa đơn kỳ sau, hãy thu ở đó.",
   "billingAddAdjustment": "Thêm điều chỉnh",
   "billingAdjustTitle": "Điều chỉnh hóa đơn",
   "billingAdjustHint": "Dòng điều chỉnh chưa xóa được. Nhập sai thì thêm một dòng ngược dấu.",
@@ -1065,6 +1102,31 @@
       }
     }
   },
+  "receivablesInvoiceOutstanding": "Hóa đơn còn nợ: {amount}",
+  "@receivablesInvoiceOutstanding": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesLedgerDebt": "Nợ ở sổ: {amount}",
+  "@receivablesLedgerDebt": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesLedgerCredit": "Trả thừa: {amount}",
+  "@receivablesLedgerCredit": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receivablesNetHint": "Nợ ròng đã trừ tiền trả thừa hoặc cộng nợ ở sổ, không đếm hai lần phần đã chuyển sang kỳ sau.",
   "receivablesRowMeta": "{classes} · {invoices, plural, other{{invoices} hóa đơn}}",
   "@receivablesRowMeta": {
     "placeholders": {

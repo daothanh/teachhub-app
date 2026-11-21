@@ -92,6 +92,23 @@ class _Body extends StatelessWidget {
           l10n.receivablesRowOwed(formatVnd(h.outstandingAmount)),
           style: text.titleLarge,
         ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          l10n.receivablesInvoiceOutstanding(
+            formatVnd(h.invoiceOutstandingAmount),
+          ),
+          style: text.bodyMedium,
+        ),
+        if (h.ledgerBalanceAmount != 0)
+          Text(
+            h.ledgerBalanceAmount > 0
+                ? l10n.receivablesLedgerDebt(formatVnd(h.ledgerBalanceAmount))
+                : l10n.receivablesLedgerCredit(
+                    formatVnd(-h.ledgerBalanceAmount),
+                  ),
+            style: text.bodyMedium,
+          ),
+        Text(l10n.receivablesNetHint, style: text.bodySmall),
         const SizedBox(height: AppSpacing.lg),
         Text(l10n.dunningStudentTitle, style: text.titleSmall),
         DunningSwitches(history: h, toggling: toggling),
