@@ -258,6 +258,7 @@ enum ClassFieldError {
   feeAmountRequired,
   feeAmountRange,
   feeInstallments,
+  feeCourseNeedsSchedule,
 }
 
 /// Kiểm tra trước khi gọi API (US-1.1 AC1–AC2, US-2.1). Server vẫn là nguồn
@@ -306,6 +307,10 @@ Map<String, ClassFieldError> validateClass(
       e['feeAmount'] = ClassFieldError.feeAmountRequired;
     } else if (a < 1 || a > feeAmountMax) {
       e['feeAmount'] = ClassFieldError.feeAmountRange;
+    }
+    // Trọn khóa cần ngày kết thúc và lịch học (server từ chối nếu thiếu).
+    if (t == FeeType.course && (i.endDate == null || rules.isEmpty)) {
+      e['feeType'] = ClassFieldError.feeCourseNeedsSchedule;
     }
     final n = i.feeRules?.installments ?? 1;
     if (n < 1 || n > feeInstallmentsMax || (t != FeeType.course && n != 1)) {
@@ -424,7 +429,7 @@ class RosterEntry extends Equatable {
         RosterGuardian.fromJson(g as Map<String, dynamic>),
     ],
     feeOverride: switch (json['feeOverride']) {
-      final Map<String, dynamic> m => FeeOverride.fromJson(m),
+      final Map<String, dynamic> m => FeeOverride.lenient(m),
       _ => null,
     },
   );

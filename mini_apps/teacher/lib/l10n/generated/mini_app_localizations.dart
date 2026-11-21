@@ -1912,6 +1912,12 @@ abstract class MiniAppLocalizations {
   /// **'Số đợt từ 1 đến 36, chỉ dùng cho trọn khóa.'**
   String get classesErrFeeInstallments;
 
+  /// No description provided for @classesErrFeeCourseSchedule.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trọn khóa cần có ngày kết thúc và ít nhất một lịch học hằng tuần.'**
+  String get classesErrFeeCourseSchedule;
+
   /// No description provided for @feesErrRateLimited.
   ///
   /// In vi, this message translates to:

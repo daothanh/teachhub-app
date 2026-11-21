@@ -620,6 +620,7 @@
   "classesErrFeeAmountRequired": "Enter an amount.",
   "classesErrFeeAmountRange": "Amount must be between 1 and 1,000,000,000.",
   "classesErrFeeInstallments": "Installments: 1 to 36, whole course only.",
+  "classesErrFeeCourseSchedule": "A whole-course fee needs an end date and at least one weekly session.",
   "feesErrRateLimited": "You are going too fast. Wait a moment and try again.",
   "rosterFeeOverrideBadge": "Custom price",
   "rosterFeeOverrideAction": "Set custom price",

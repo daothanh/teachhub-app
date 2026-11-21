@@ -6,6 +6,7 @@ import 'package:teacher/features/classes/classes_routes.dart';
 import 'package:teacher/features/classes/data/class_models.dart';
 import 'package:teacher/features/classes/data/classes_repository.dart';
 import 'package:teacher/features/fees/data/fee_models.dart';
+import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../classes/fake_classes_repository.dart';
@@ -57,6 +58,19 @@ void main() {
     await tester.tap(inputOf('Ngày bắt đầu'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+  }
+
+  /// Trọn khóa cần ngày kết thúc và một buổi lịch học.
+  Future<void> addEndDateAndSession(WidgetTester tester) async {
+    await reveal(tester, inputOf('Ngày kết thúc (không bắt buộc)'));
+    await tester.tap(inputOf('Ngày kết thúc (không bắt buộc)'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    final add = find.widgetWithText(AppButton, 'Thêm buổi');
+    await reveal(tester, add);
+    await tester.tap(add);
     await tester.pumpAndSettle();
   }
 
@@ -129,6 +143,7 @@ void main() {
       expect(find.text('Trừ tiền buổi giáo viên hủy'), findsNothing);
       await tester.enterText(fieldOf('Tổng học phí cả khóa'), '3600000');
       await tester.enterText(fieldOf('Số đợt thu (1–36)'), '6');
+      await addEndDateAndSession(tester);
       await tapButton(tester, 'Lưu');
       final body = repo.patchBodies.last;
       expect(body['feeType'], 'course');
@@ -175,6 +190,7 @@ void main() {
     await enableFee(tester);
     await tapText(tester, 'Trọn khóa');
     await tester.enterText(fieldOf('Tổng học phí cả khóa'), '3600000');
+    await addEndDateAndSession(tester);
     repo.updateError = validationError({
       'feeType': ['Trọn khóa cần ngày kết thúc và lịch học.'],
     });
@@ -231,4 +247,23 @@ void main() {
     await tapText(tester, 'Trọn khóa');
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'S6: trọn khóa thiếu ngày kết thúc và lịch: lỗi tại ô học phí, không gọi API',
+    (tester) async {
+      await open(tester);
+      await fillClass(tester);
+      await enableFee(tester);
+      await tapText(tester, 'Trọn khóa');
+      await tester.enterText(fieldOf('Tổng học phí cả khóa'), '3600000');
+      await tapButton(tester, 'Lưu');
+      expect(
+        find.text(
+          'Trọn khóa cần có ngày kết thúc và ít nhất một lịch học hằng tuần.',
+        ),
+        findsOneWidget,
+      );
+      expect(repo.calls, isEmpty);
+    },
+  );
 }

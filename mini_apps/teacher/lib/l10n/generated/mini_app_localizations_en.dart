@@ -1065,6 +1065,10 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
       'Installments: 1 to 36, whole course only.';
 
   @override
+  String get classesErrFeeCourseSchedule =>
+      'A whole-course fee needs an end date and at least one weekly session.';
+
+  @override
   String get feesErrRateLimited =>
       'You are going too fast. Wait a moment and try again.';
 

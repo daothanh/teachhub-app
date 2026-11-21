@@ -103,10 +103,16 @@ void main() {
             grade: 9,
             location: 'x',
             startDate: base.startDate,
+            endDate: '2027-06-30',
             feeType: t,
             feeAmount: amount,
             feeRules: FeeRules(installments: installments),
           );
+      const rule = ScheduleRule(
+        weekday: 2,
+        startTime: '18:00',
+        durationMin: 90,
+      );
       expect(validateClass(base, const []), isEmpty);
       expect(
         validateClass(fee(FeeType.perSession, null), const [])['feeAmount'],
@@ -127,14 +133,13 @@ void main() {
         ClassFieldError.feeInstallments,
       );
       expect(
-        validateClass(fee(FeeType.course, 1, installments: 36), const []),
+        validateClass(fee(FeeType.course, 1, installments: 36), const [rule]),
         isEmpty,
       );
       expect(
-        validateClass(
-          fee(FeeType.course, 1, installments: 37),
-          const [],
-        )['feeRules'],
+        validateClass(fee(FeeType.course, 1, installments: 37), const [
+          rule,
+        ])['feeRules'],
         ClassFieldError.feeInstallments,
       );
     },
@@ -208,4 +213,30 @@ void main() {
     expect(bankName('970436'), 'Vietcombank');
     expect(bankName('000000'), isNull);
   });
+
+  test(
+    'S5: bản ghi giá riêng lạ không làm hỏng roster, nhãn vẫn theo feeOverride',
+    () {
+      final entry = RosterEntry.fromJson({
+        'enrollmentId': 'e1',
+        'studentId': 's1',
+        'fullName': 'An',
+        'studentStatus': 'active',
+        'joinedOn': '2026-12-14',
+        'guardians': <Object>[],
+        'feeOverride': {
+          'feeAmount': 120000,
+          'chargeExcused': 'lạ',
+          'discounts': [
+            {'kind': 'bonus', 'description': 'x', 'bonus': 1},
+            {'kind': 'percent', 'description': 'Con thứ hai', 'percent': 10},
+          ],
+        },
+      });
+      expect(entry.hasFeeOverride, isTrue);
+      expect(entry.feeOverride!.feeAmount, 120000);
+      expect(entry.feeOverride!.chargeExcused, isNull);
+      expect(entry.feeOverride!.discounts.single.description, 'Con thứ hai');
+    },
+  );
 }

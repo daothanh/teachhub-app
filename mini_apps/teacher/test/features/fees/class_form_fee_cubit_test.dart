@@ -25,6 +25,7 @@ ClassInput _withFee({
   grade: _base.grade,
   location: _base.location,
   startDate: _base.startDate,
+  endDate: '2027-06-30',
   feeType: type,
   feeAmount: amount,
   feeRules: rules,
@@ -122,7 +123,7 @@ void main() {
       repo.updateError = validationError({
         'feeType': ['Trọn khóa cần ngày kết thúc và lịch học.'],
       });
-      await cubit.save(_withFee(type: FeeType.course), const []);
+      await cubit.save(_withFee(type: FeeType.course), const [_rule]);
       expect(cubit.state.serverErrors['feeType'], isNotEmpty);
       expect(cubit.state.error, isNull);
       expect(cubit.state.saving, isFalse);
@@ -138,7 +139,7 @@ void main() {
     repo.updateError = validationError({
       'feeRules.installments': ['Chỉ trọn khóa.'],
     });
-    await cubit.save(_withFee(type: FeeType.course), const []);
+    await cubit.save(_withFee(type: FeeType.course), const [_rule]);
     expect(cubit.state.serverErrors['feeRules'], ['Chỉ trọn khóa.']);
     expect(cubit.state.error, isNull);
     await cubit.close();
@@ -154,4 +155,65 @@ void main() {
     expect(repo.calls, ['create', 'update:new:fee']);
     await cubit.close();
   });
+
+  test(
+    'S6: trọn khóa thiếu ngày kết thúc hoặc lịch: lỗi tại ô học phí, không gọi API',
+    () async {
+      final repo = FakeClassesRepository();
+      final cubit = ClassFormCubit(repo);
+      // Không có lịch.
+      await cubit.save(_withFee(type: FeeType.course), const []);
+      expect(
+        cubit.state.clientErrors['feeType'],
+        ClassFieldError.feeCourseNeedsSchedule,
+      );
+      // Có lịch nhưng không có ngày kết thúc.
+      final noEnd = ClassInput(
+        name: _base.name,
+        subject: _base.subject,
+        grade: _base.grade,
+        location: _base.location,
+        startDate: _base.startDate,
+        feeType: FeeType.course,
+        feeAmount: 3000000,
+        feeRules: const FeeRules(),
+      );
+      await cubit.save(noEnd, const [_rule]);
+      expect(
+        cubit.state.clientErrors['feeType'],
+        ClassFieldError.feeCourseNeedsSchedule,
+      );
+      expect(repo.calls, isEmpty);
+      await cubit.close();
+    },
+  );
+
+  test(
+    'S7: PATCH học phí lỗi mạng, bấm Lưu lại dùng cùng Idempotency-Key, không tạo lớp mới',
+    () async {
+      final c = sampleClass(
+        feeType: FeeType.perSession,
+        feeAmount: 150000,
+        feeRules: const FeeRules(),
+      );
+      final repo = FakeClassesRepository()..current = c;
+      final cubit = ClassFormCubit(repo, initial: c);
+      final input = _withFee(amount: 200000);
+      repo.feeUpdateError = const ApiException.network();
+      await cubit.save(input, const []);
+      expect(cubit.state.error!.kind, ApiErrorKind.network);
+      repo.feeUpdateError = null;
+      await cubit.save(input, const []);
+      expect(cubit.state.saved, isNotNull);
+      expect(repo.calls.where((x) => x == 'create'), isEmpty);
+      final feeCalls = [
+        for (var i = 0; i < repo.calls.length; i++)
+          if (repo.calls[i] == 'update:c1:fee') repo.keys[i],
+      ];
+      expect(feeCalls, hasLength(2));
+      expect(feeCalls[0], isNotNull);
+      expect(feeCalls[1], feeCalls[0]);
+      await cubit.close();
+    },
+  );
 }

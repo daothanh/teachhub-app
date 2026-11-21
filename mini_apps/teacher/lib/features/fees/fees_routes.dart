@@ -8,8 +8,8 @@ import 'pages/payout_accounts_page.dart';
 
 /// Đường dẫn màn học phí riêng và tài khoản nhận tiền.
 abstract final class FeesRoutes {
-  /// Danh sách tài khoản nhận tiền. Màn chốt kỳ mở route này khi API trả
-  /// `PAYOUT_ACCOUNT_MISSING` (US-7.3 AC5).
+  /// Danh sách tài khoản nhận tiền. Route này dành cho màn chốt kỳ (S5-FL-07):
+  /// màn đó sẽ mở khi API trả `PAYOUT_ACCOUNT_MISSING` (US-7.3 AC5).
   static const payoutAccounts = '${TeachHubRoutes.teacher}/payout-accounts';
   static const payoutNew = '$payoutAccounts/new';
   static String payoutEdit(String id) => '$payoutAccounts/$id/edit';

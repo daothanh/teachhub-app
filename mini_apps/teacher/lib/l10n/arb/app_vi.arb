@@ -620,6 +620,7 @@
   "classesErrFeeAmountRequired": "Nhập số tiền.",
   "classesErrFeeAmountRange": "Số tiền từ 1 đ đến 1.000.000.000 đ.",
   "classesErrFeeInstallments": "Số đợt từ 1 đến 36, chỉ dùng cho trọn khóa.",
+  "classesErrFeeCourseSchedule": "Trọn khóa cần có ngày kết thúc và ít nhất một lịch học hằng tuần.",
   "feesErrRateLimited": "Bạn thao tác hơi nhanh. Chờ một lúc rồi thử lại.",
   "rosterFeeOverrideBadge": "Giá riêng",
   "rosterFeeOverrideAction": "Giá riêng cho học viên",

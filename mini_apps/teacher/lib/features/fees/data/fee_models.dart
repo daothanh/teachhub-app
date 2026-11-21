@@ -125,6 +125,38 @@ class FeeOverride extends Equatable {
     ],
   );
 
+  /// Đọc khoan dung cho danh sách lớp: một trường hay khoản miễn giảm lạ
+  /// (server mới hơn app) bị bỏ, không làm hỏng cả roster.
+  factory FeeOverride.lenient(Map<String, dynamic> json) {
+    final discounts = <FeeDiscount>[];
+    final raw = json['discounts'];
+    if (raw is List) {
+      for (final d in raw) {
+        try {
+          discounts.add(FeeDiscount.fromJson(d as Map<String, dynamic>));
+        } on Object {
+          // bỏ khoản không đọc được
+        }
+      }
+    }
+    return FeeOverride(
+      feeAmount: json['feeAmount'] is int ? json['feeAmount'] as int : null,
+      chargeExcused: json['chargeExcused'] is bool
+          ? json['chargeExcused'] as bool
+          : null,
+      chargeUnexcused: json['chargeUnexcused'] is bool
+          ? json['chargeUnexcused'] as bool
+          : null,
+      deductCancelled: json['deductCancelled'] is bool
+          ? json['deductCancelled'] as bool
+          : null,
+      installments: json['installments'] is int
+          ? json['installments'] as int
+          : null,
+      discounts: discounts,
+    );
+  }
+
   final int? feeAmount;
   final bool? chargeExcused;
   final bool? chargeUnexcused;

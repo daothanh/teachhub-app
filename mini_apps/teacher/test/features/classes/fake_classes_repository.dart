@@ -87,6 +87,9 @@ class FakeClassesRepository implements ClassesRepository {
   Object? getError;
   Object? createError;
   Object? updateError;
+
+  /// Lỗi chỉ cho lệnh PATCH học phí (`withFee`).
+  Object? feeUpdateError;
   Object? archiveError;
   Object? putRulesError;
   Object? enrollError;
@@ -148,6 +151,7 @@ class FakeClassesRepository implements ClassesRepository {
     keys.add(idempotencyKey);
     lastInput = input;
     patchBodies.add(input.toPatchJson(withFee: withFee));
+    if (withFee && feeUpdateError != null) throw feeUpdateError!;
     if (updateError != null) throw updateError!;
     // Trả lại học phí của lớp đang có, trừ khi lệnh này gửi học phí mới.
     final old = current;

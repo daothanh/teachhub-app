@@ -208,6 +208,7 @@ class _BodyState extends State<_Body> {
             controller: _otp,
             label: l10n.payoutOtpField,
             required: true,
+            autofillHints: const [AutofillHints.oneTimeCode],
             keyboardType: TextInputType.number,
             maxLength: 6,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],

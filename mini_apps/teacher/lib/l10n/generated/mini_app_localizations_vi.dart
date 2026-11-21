@@ -1051,6 +1051,10 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
       'Số đợt từ 1 đến 36, chỉ dùng cho trọn khóa.';
 
   @override
+  String get classesErrFeeCourseSchedule =>
+      'Trọn khóa cần có ngày kết thúc và ít nhất một lịch học hằng tuần.';
+
+  @override
   String get feesErrRateLimited =>
       'Bạn thao tác hơi nhanh. Chờ một lúc rồi thử lại.';
 

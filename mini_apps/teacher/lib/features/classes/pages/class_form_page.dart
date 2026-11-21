@@ -184,6 +184,8 @@ class _FormBodyState extends State<_FormBody> {
       ClassFieldError.feeAmountRequired => l10n.classesErrFeeAmountRequired,
       ClassFieldError.feeAmountRange => l10n.classesErrFeeAmountRange,
       ClassFieldError.feeInstallments => l10n.classesErrFeeInstallments,
+      ClassFieldError.feeCourseNeedsSchedule =>
+        l10n.classesErrFeeCourseSchedule,
     };
   }
 
