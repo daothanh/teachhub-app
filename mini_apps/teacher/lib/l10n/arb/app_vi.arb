@@ -1535,8 +1535,6 @@
   "planBuyPending": "Đang kích hoạt Pro, có thể mất tới 1 phút.",
   "planBuyUnavailable": "Mua trong ứng dụng chưa sẵn sàng.",
   "planBuyFailed": "Không hoàn tất được giao dịch. Thử lại sau.",
-  "planWebButton": "Thanh toán trên web",
-  "planWebFailed": "Không mở được trình duyệt.",
   "planErrTrialUsed": "Bạn đã dùng thử Pro rồi.",
   "planErrBusy": "Gói Pro đang hoạt động.",
   "planLimitAction": "Xem gói Pro"

@@ -1535,8 +1535,6 @@
   "planBuyPending": "Activating Pro, this can take up to 1 minute.",
   "planBuyUnavailable": "In-app purchase isn't available yet.",
   "planBuyFailed": "The purchase didn't complete. Try again later.",
-  "planWebButton": "Pay on the web",
-  "planWebFailed": "Couldn't open the browser.",
   "planErrTrialUsed": "You have already used your Pro trial.",
   "planErrBusy": "Pro is already active.",
   "planLimitAction": "See Pro plan"

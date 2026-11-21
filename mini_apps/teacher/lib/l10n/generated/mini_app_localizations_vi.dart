@@ -2340,12 +2340,6 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get planBuyFailed => 'Không hoàn tất được giao dịch. Thử lại sau.';
 
   @override
-  String get planWebButton => 'Thanh toán trên web';
-
-  @override
-  String get planWebFailed => 'Không mở được trình duyệt.';
-
-  @override
   String get planErrTrialUsed => 'Bạn đã dùng thử Pro rồi.';
 
   @override

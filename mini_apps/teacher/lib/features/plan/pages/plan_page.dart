@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../l10n/l10n.dart';
 import '../../billing/cubit/billing_periods_cubit.dart' show BillingLoad;
@@ -12,39 +11,24 @@ import '../data/plan_models.dart';
 import '../data/plan_repository.dart';
 import '../data/purchase_service.dart';
 
-/// Trang web thanh toán Pro (chuyển khoản chỉ ở web, R6).
-final proWebUri = Uri.parse('https://app.dayhoc.app/subscription');
-
-Future<bool> _openExternal(Uri uri) =>
-    launchUrl(uri, mode: LaunchMode.externalApplication);
-
 /// T14 (US-0.7, US-0.8): gói hiện tại, hạn, mức dùng so với giới hạn Free,
-/// tính năng Pro, dùng thử 14 ngày, mua Pro qua IAP và nút mở trang web.
+/// tính năng Pro, dùng thử 14 ngày và mua Pro qua IAP.
 class PlanPage extends StatelessWidget {
-  const PlanPage({
-    super.key,
-    this.repository,
-    this.purchase,
-    this.openUrl = _openExternal,
-  });
+  const PlanPage({super.key, this.repository, this.purchase});
   final PlanRepository? repository;
   final PurchaseService? purchase;
-
-  /// Mở trang web ngoài app; `false` khi không mở được.
-  final Future<bool> Function(Uri) openUrl;
 
   @override
   Widget build(BuildContext context) => BlocProvider(
     create: (_) =>
         PlanCubit(repository ?? planRepository(), purchase ?? purchaseService())
           ..load(),
-    child: _View(openUrl: openUrl),
+    child: const _View(),
   );
 }
 
 class _View extends StatelessWidget {
-  const _View({required this.openUrl});
-  final Future<bool> Function(Uri) openUrl;
+  const _View();
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +75,7 @@ class _View extends StatelessWidget {
           ),
           BillingLoad.ready => RefreshIndicator(
             onRefresh: cubit.refresh,
-            child: _Body(state: s, openUrl: openUrl),
+            child: _Body(state: s),
           ),
         },
       ),
@@ -100,9 +84,8 @@ class _View extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({required this.state, required this.openUrl});
+  const _Body({required this.state});
   final PlanState state;
-  final Future<bool> Function(Uri) openUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -197,20 +180,6 @@ class _Body extends StatelessWidget {
                 : AppButtonVariant.primary,
             width: double.infinity,
             onPressed: state.busy ? null : cubit.purchase,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          AppButton(
-            label: l10n.planWebButton,
-            variant: AppButtonVariant.outlinePrimary,
-            width: double.infinity,
-            onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              if (!await openUrl(proWebUri)) {
-                messenger.showSnackBar(
-                  SnackBar(content: Text(l10n.planWebFailed)),
-                );
-              }
-            },
           ),
         ],
       ],

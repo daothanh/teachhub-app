@@ -2366,12 +2366,6 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get planBuyFailed => 'The purchase didn\'t complete. Try again later.';
 
   @override
-  String get planWebButton => 'Pay on the web';
-
-  @override
-  String get planWebFailed => 'Couldn\'t open the browser.';
-
-  @override
   String get planErrTrialUsed => 'You have already used your Pro trial.';
 
   @override

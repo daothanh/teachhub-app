@@ -37,8 +37,6 @@ dependencies:
   flutter_contacts: ^2.6.0
   share_plus: ^11.1.0
   qr_flutter: ^4.1.0
-  # Mở trang thanh toán Pro trên web (T14).
-  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:

@@ -14,13 +14,9 @@ import 'fake_plan.dart';
 void main() {
   late FakePlanRepository repo;
   late FakePurchaseService purchase;
-  final opened = <Uri>[];
-  var canOpen = true;
   setUp(() {
     repo = FakePlanRepository();
     purchase = FakePurchaseService();
-    opened.clear();
-    canOpen = true;
   });
 
   Future<void> open(WidgetTester tester, {double scale = 1}) async {
@@ -29,14 +25,7 @@ void main() {
       [
         GoRoute(
           path: PlanRoutes.plan,
-          builder: (_, _) => PlanPage(
-            repository: repo,
-            purchase: purchase,
-            openUrl: (u) async {
-              opened.add(u);
-              return canOpen;
-            },
-          ),
+          builder: (_, _) => PlanPage(repository: repo, purchase: purchase),
         ),
       ],
       initial: PlanRoutes.plan,
@@ -58,9 +47,9 @@ void main() {
     expect(find.text('Xuất báo cáo'), findsNothing);
     expect(find.text('Dùng thử 14 ngày'), findsOneWidget);
     expect(find.text('Mua Pro'), findsOneWidget);
-    expect(find.text('Thanh toán trên web'), findsOneWidget);
-    // App không có lựa chọn chuyển khoản.
+    // R6: không có lựa chọn chuyển khoản hay thanh toán ngoài store.
     expect(find.textContaining('huyển khoản'), findsNothing);
+    expect(find.textContaining('trên web'), findsNothing);
   });
 
   testWidgets('giá chỉ hiện khi store trả giá', (tester) async {
@@ -132,7 +121,6 @@ void main() {
     await open(tester);
     expect(find.text('Pro đang hoạt động'), findsOneWidget);
     expect(find.text('Mua Pro'), findsNothing);
-    expect(find.text('Thanh toán trên web'), findsNothing);
     expect(find.textContaining('dùng thử một lần'), findsNothing);
   });
 
@@ -142,19 +130,6 @@ void main() {
     await tester.tap(find.text('Mua Pro'));
     await tester.pumpAndSettle();
     expect(find.text('Mua trong ứng dụng chưa sẵn sàng.'), findsOneWidget);
-  });
-
-  testWidgets('Thanh toán trên web mở đúng địa chỉ; không mở được thì báo', (
-    tester,
-  ) async {
-    await open(tester);
-    await tester.tap(find.text('Thanh toán trên web'));
-    await tester.pumpAndSettle();
-    expect(opened.single.toString(), startsWith('https://app.dayhoc.app/'));
-    canOpen = false;
-    await tester.tap(find.text('Thanh toán trên web'));
-    await tester.pumpAndSettle();
-    expect(find.text('Không mở được trình duyệt.'), findsOneWidget);
   });
 
   testWidgets('ngoại tuyến khi tải: báo lỗi, Thử lại tải được', (tester) async {
@@ -172,7 +147,7 @@ void main() {
     await open(tester, scale: 1.3);
     expect(tester.takeException(), isNull);
     await tester.scrollUntilVisible(
-      find.text('Thanh toán trên web'),
+      find.text('Mua Pro'),
       200,
       scrollable: find.byType(Scrollable).first,
     );

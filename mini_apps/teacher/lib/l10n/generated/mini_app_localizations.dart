@@ -4006,18 +4006,6 @@ abstract class MiniAppLocalizations {
   /// **'Không hoàn tất được giao dịch. Thử lại sau.'**
   String get planBuyFailed;
 
-  /// No description provided for @planWebButton.
-  ///
-  /// In vi, this message translates to:
-  /// **'Thanh toán trên web'**
-  String get planWebButton;
-
-  /// No description provided for @planWebFailed.
-  ///
-  /// In vi, this message translates to:
-  /// **'Không mở được trình duyệt.'**
-  String get planWebFailed;
-
   /// No description provided for @planErrTrialUsed.
   ///
   /// In vi, this message translates to:
