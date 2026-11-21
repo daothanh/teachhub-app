@@ -58,13 +58,46 @@ Flavor `development` chạy được khi thiếu file: `bootstrap` ghi một dò
 1. Tạo app Android + iOS cho từng flavor trong project Firebase tương ứng (bảng trên), đúng applicationId/bundle id.
 2. Đặt `google-services.json` và `GoogleService-Info.plist` vào đúng đường dẫn ở trên (đã gitignore, không commit).
 3. Upload APNs key (Auth Key `.p8`) lên Firebase Cloud Messaging của từng project; bật Push Notifications cho 3 App ID.
-4. Android 13+: app chưa xin quyền `POST_NOTIFICATIONS`; thông báo hiện trên khay cần quyền này (xem ghi chú dưới).
-5. Thử trên máy thật (Android + iOS): đăng nhập → `POST /push/register`; đăng xuất → `POST /push/unregister`;
-   gửi push data-only `{notificationId, type: student_absent}` → chạm mở `/p` và tự đổi sang vai trò Phụ huynh.
+4. Android 13+: quyền `POST_NOTIFICATIONS` khai trong `AndroidManifest.xml`; hộp thoại xin quyền hiện qua banner "bật thông báo" của P02.
+5. Thử trên máy thật: xem mục "Thử push trên máy thật" bên dưới.
 
-Push gửi tới thiết bị là data-only (hợp đồng `POST /push/register`), nên hệ điều hành không tự vẽ thông báo trên khay.
-Hiện chưa có code vẽ thông báo cục bộ từ payload; việc chạm thông báo → mở màn chỉ chạy khi thông báo đã hiện (vd. server
-thêm khối `notification` hoặc app vẽ bằng `flutter_local_notifications`). Cần Owner/BE chốt hướng trước khi phát hành.
+### iOS: entitlements theo cấu hình build
+
+`aps-environment` khác nhau theo môi trường APNs nên có hai file trong `ios/Runner/`:
+
+| File | Cấu hình build | `aps-environment` |
+|---|---|---|
+| `Runner.entitlements` | `Debug-*`, `Profile-*` (cả 3 flavor) | `development` |
+| `RunnerRelease.entitlements` | `Release-*` | `production` |
+
+`Profile` ký bằng provisioning development nên dùng `development`. Cả hai giữ nguyên `applinks:dayhoc.app` và Sign in with Apple. `CODE_SIGN_ENTITLEMENTS` trỏ theo từng build configuration
+trong `project.pbxproj`. Kiểm nhanh:
+`xcodebuild -showBuildSettings -project ios/Runner.xcodeproj -target Runner -configuration Release-staging | grep ENTITLEMENTS`.
+
+### Android: kênh thông báo
+
+Lúc khởi động app tạo 3 kênh (tên theo ngôn ngữ app, vi/en): `attendance` (quan trọng cao), `billing`, `general`.
+Biểu tượng thông báo là `ic_stat_notification` (chữ D đơn sắc), màu `brand_logo`. Backend gửi `channelId` thuộc nhóm này; tin không khai kênh rơi vào `general` nhờ
+`com.google.firebase.messaging.default_notification_channel_id` trong `AndroidManifest.xml`.
+
+### Hiển thị và chạm thông báo
+
+Backend gửi FCM có khối `notification` (tiêu đề, nội dung) cùng `data {notificationId, type}`.
+
+- App nền hoặc đã tắt: hệ điều hành tự vẽ; chạm → `onMessageOpenedApp` / `getInitialMessage` → `PushNavigator`.
+- App đang mở, iOS: bật presentation options (alert, badge, sound), hệ thống tự vẽ; chạm đi cùng đường trên.
+- App đang mở, Android: `ForegroundNotifications` (`lib/core/push/`) vẽ bằng `flutter_local_notifications` đúng kênh;
+  chạm → `PushNavigator`.
+
+### Thử push trên máy thật
+
+1. Đăng nhập app (flavor có Firebase), kiểm `POST /push/register` thành công.
+2. Firebase console → Messaging → tạo thông báo thử, dán FCM token của máy; ở "Custom data" thêm `type` = `student_absent`
+   (hoặc `invoice_issued`, `billing_ready`) và `notificationId` bất kỳ.
+3. Thử ba trạng thái: app đang mở, ở nền, đã tắt hẳn. Cả ba chạm vào đều phải mở đúng màn (`student_absent` → `/p`, tự đổi sang vai trò Phụ huynh).
+4. Đăng xuất → `POST /push/unregister`; gửi lại không còn nhận.
+
+iOS cần máy thật (simulator không nhận APNs); bản Debug dùng APNs sandbox, bản Release/TestFlight dùng production.
 
 ## Đồng bộ nền (S3-FL-09)
 

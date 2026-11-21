@@ -554,4 +554,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get consentLater => 'Later';
+
+  @override
+  String get pushChannelAttendance => 'Attendance';
+
+  @override
+  String get pushChannelBilling => 'Billing';
+
+  @override
+  String get pushChannelGeneral => 'General';
 }
