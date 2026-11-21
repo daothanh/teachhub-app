@@ -1,6 +1,7 @@
 import 'package:app/core/theme/teachhub_theme.dart';
 import 'package:app/features/auth/auth_cubit.dart';
 import 'package:app/features/auth/pages/login_page.dart';
+import 'package:app/features/auth/sso/google_sso_provider.dart';
 import 'package:app/features/auth/teachhub_user.dart';
 import 'package:app/l10n/l10n.dart';
 import 'package:dio/dio.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tasco_auth/tasco_auth.dart';
 import 'package:tasco_core/tasco_core.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
@@ -49,6 +51,7 @@ class _Repo implements AuthRepository<TeachHubUser> {
 Future<List<String>> _pump(
   WidgetTester tester, {
   Map<String, Object?> loginError = const {'code': 'OTP_INVALID'},
+  SsoProvider? google,
 }) async {
   final sent = <String>[];
   final themes = await tester.runAsync(TeachHubTheme.load);
@@ -75,7 +78,7 @@ Future<List<String>> _pump(
           value: cubit,
           child: LoginPage(
             sendOtp: (email) async => sent.add(email),
-            google: _NoSso(),
+            google: google ?? _NoSso(),
             apple: const GenericSsoProvider(
               providerId: 'apple',
               onAuthenticate: _fakeSso,
@@ -131,6 +134,33 @@ void main() {
       },
     );
   }
+
+  group('Google SSO', () {
+    testWidgets('người dùng hủy → không hiện lỗi', (tester) async {
+      await _pump(
+        tester,
+        google: GenericSsoProvider(
+          providerId: 'google',
+          onAuthenticate: () async => throw const GoogleSignInException(
+            code: GoogleSignInExceptionCode.canceled,
+          ),
+        ),
+      );
+      await tester.tap(find.text('Tiếp tục với Google'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Đăng nhập không thành công'), findsNothing);
+    });
+
+    testWidgets('thiếu id_token → thông báo thân thiện', (tester) async {
+      await _pump(
+        tester,
+        google: GoogleSsoProvider(fetchIdToken: () async => null),
+      );
+      await tester.tap(find.text('Tiếp tục với Google'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Đăng nhập không thành công'), findsOneWidget);
+    });
+  });
 
   testWidgets(
     'T01 (B01): Apple, Google trước email; gửi mã tắt tới khi email hợp lệ',
