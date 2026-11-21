@@ -9,10 +9,14 @@ import '../../fees/data/fee_models.dart';
 import '../cubit/class_form_cubit.dart';
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
+import '../data/draft_keys.dart';
 import '../widgets/class_fee_section.dart';
 import '../widgets/classes_error_text.dart';
 import '../widgets/read_only_field.dart';
 import '../widgets/schedule_rules_editor.dart';
+
+/// Phần form hiện ra: onboarding tách tạo lớp (bước 1) và đặt lịch (bước 3).
+enum ClassFormPart { all, basics, schedule }
 
 /// T06b: tạo/sửa lớp kèm quy tắc lặp. Đóng với [TeachClass] đã lưu.
 ///
@@ -24,6 +28,9 @@ class ClassFormPage extends StatelessWidget {
     this.initial,
     this.repository,
     this.onSaved,
+    this.part = ClassFormPart.all,
+    this.embedded = false,
+    this.keys,
   });
   final String? classId;
   final TeachClass? initial;
@@ -31,6 +38,13 @@ class ClassFormPage extends StatelessWidget {
 
   /// Thay cho việc đóng màn khi nhúng vào luồng khác (onboarding).
   final ValueChanged<TeachClass>? onSaved;
+  final ClassFormPart part;
+
+  /// Nhúng trong màn khác: không có thanh tiêu đề riêng.
+  final bool embedded;
+
+  /// Khóa bền vững (onboarding); null = khóa trong bộ nhớ.
+  final DraftKeys? keys;
 
   @override
   Widget build(BuildContext context) => BlocProvider(
@@ -38,14 +52,17 @@ class ClassFormPage extends StatelessWidget {
       repository ?? classesRepository(),
       initial: initial,
       classId: classId,
+      keys: keys,
     )..load(),
-    child: _FormView(onSaved: onSaved),
+    child: _FormView(onSaved: onSaved, part: part, embedded: embedded),
   );
 }
 
 class _FormView extends StatelessWidget {
-  const _FormView({this.onSaved});
+  const _FormView({this.onSaved, required this.part, required this.embedded});
   final ValueChanged<TeachClass>? onSaved;
+  final ClassFormPart part;
+  final bool embedded;
 
   @override
   Widget build(BuildContext context) {
@@ -71,23 +88,27 @@ class _FormView extends StatelessWidget {
       },
       builder: (context, s) {
         final editing = s.initial != null;
+        final body = s.loading
+            ? (s.error == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : AppEmptyState(
+                      message: classesErrorText(l10n, s.error!),
+                      action: AppButton(
+                        label: l10n.classesRetry,
+                        onPressed: context.read<ClassFormCubit>().load,
+                      ),
+                    ))
+            : _FormBody(initial: s.initial, state: s, part: part);
+        // Nhúng trong màn khác: dùng Scaffold của màn đó (không lồng Scaffold
+        // con tự co theo bàn phím lần hai).
+        if (embedded) return body;
         return Scaffold(
           appBar: AppBar(
             title: Text(
               editing ? l10n.classesFormEditTitle : l10n.classesFormNewTitle,
             ),
           ),
-          body: s.loading
-              ? (s.error == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : AppEmptyState(
-                        message: classesErrorText(l10n, s.error!),
-                        action: AppButton(
-                          label: l10n.classesRetry,
-                          onPressed: context.read<ClassFormCubit>().load,
-                        ),
-                      ))
-              : _FormBody(initial: s.initial, state: s),
+          body: body,
         );
       },
     );
@@ -95,9 +116,14 @@ class _FormView extends StatelessWidget {
 }
 
 class _FormBody extends StatefulWidget {
-  const _FormBody({required this.initial, required this.state});
+  const _FormBody({
+    required this.initial,
+    required this.state,
+    required this.part,
+  });
   final TeachClass? initial;
   final ClassFormState state;
+  final ClassFormPart part;
 
   @override
   State<_FormBody> createState() => _FormBodyState();
@@ -205,6 +231,7 @@ class _FormBodyState extends State<_FormBody> {
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
     final s = widget.state;
+    final part = widget.part;
     const gap = SizedBox(height: AppSpacing.lg);
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -217,107 +244,114 @@ class _FormBodyState extends State<_FormBody> {
           ),
           gap,
         ],
-        AppInput(
-          controller: _name,
-          label: l10n.classesFieldName,
-          required: true,
-          maxLength: 120,
-          errorText: _error('name'),
-        ),
-        gap,
-        AppInput(
-          controller: _subject,
-          label: l10n.classesFieldSubject,
-          required: true,
-          maxLength: 80,
-          errorText: _error('subject'),
-        ),
-        gap,
-        AppInput(
-          controller: _grade,
-          label: l10n.classesFieldGrade,
-          required: true,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          errorText: _error('grade'),
-        ),
-        gap,
-        Text(
-          l10n.classesFieldMode,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: AppSpacing.sm,
-          runSpacing: AppSpacing.sm,
-          children: [
-            AppChoiceChip(
-              label: l10n.classesModeOffline,
-              selected: _mode == ClassMode.offline,
-              onTap: () => setState(() => _mode = ClassMode.offline),
-            ),
-            AppChoiceChip(
-              label: l10n.classesModeOnline,
-              selected: _mode == ClassMode.online,
-              onTap: () => setState(() => _mode = ClassMode.online),
-            ),
-          ],
-        ),
-        // Địa điểm chỉ có ở lớp tại chỗ (US-1.1 AC1).
-        if (_mode == ClassMode.offline) ...[
+        if (part != ClassFormPart.schedule) ...[
+          AppInput(
+            controller: _name,
+            label: l10n.classesFieldName,
+            required: true,
+            maxLength: 120,
+            errorText: _error('name'),
+          ),
           gap,
           AppInput(
-            controller: _location,
-            label: l10n.classesFieldLocation,
+            controller: _subject,
+            label: l10n.classesFieldSubject,
             required: true,
-            maxLength: 200,
-            errorText: _error('location'),
+            maxLength: 80,
+            errorText: _error('subject'),
+          ),
+          gap,
+          AppInput(
+            controller: _grade,
+            label: l10n.classesFieldGrade,
+            required: true,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            errorText: _error('grade'),
+          ),
+          gap,
+          Text(
+            l10n.classesFieldMode,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              AppChoiceChip(
+                label: l10n.classesModeOffline,
+                selected: _mode == ClassMode.offline,
+                onTap: () => setState(() => _mode = ClassMode.offline),
+              ),
+              AppChoiceChip(
+                label: l10n.classesModeOnline,
+                selected: _mode == ClassMode.online,
+                onTap: () => setState(() => _mode = ClassMode.online),
+              ),
+            ],
+          ),
+          // Địa điểm chỉ có ở lớp tại chỗ (US-1.1 AC1).
+          if (_mode == ClassMode.offline) ...[
+            gap,
+            AppInput(
+              controller: _location,
+              label: l10n.classesFieldLocation,
+              required: true,
+              maxLength: 200,
+              errorText: _error('location'),
+            ),
+          ],
+          gap,
+          AppInput(
+            controller: _capacity,
+            label: l10n.classesFieldCapacity,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            errorText: _error('capacity'),
+          ),
+          gap,
+          _DateField(
+            label: l10n.classesFieldStart,
+            value: _start,
+            required: true,
+            error: _error('startDate'),
+            onTap: () => _pickDate(start: true),
+          ),
+          gap,
+          _DateField(
+            label: l10n.classesFieldEnd,
+            value: _end,
+            error: _error('endDate'),
+            onTap: () => _pickDate(start: false),
+            onClear: _end == null ? null : () => setState(() => _end = null),
           ),
         ],
-        gap,
-        AppInput(
-          controller: _capacity,
-          label: l10n.classesFieldCapacity,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          errorText: _error('capacity'),
-        ),
-        gap,
-        _DateField(
-          label: l10n.classesFieldStart,
-          value: _start,
-          required: true,
-          error: _error('startDate'),
-          onTap: () => _pickDate(start: true),
-        ),
-        gap,
-        _DateField(
-          label: l10n.classesFieldEnd,
-          value: _end,
-          error: _error('endDate'),
-          onTap: () => _pickDate(start: false),
-          onClear: _end == null ? null : () => setState(() => _end = null),
-        ),
-        gap,
-        ScheduleRulesEditor(
-          rules: _rules,
-          error: _error('rules'),
-          onChanged: (r) => setState(() => _rules = r),
-        ),
-        gap,
-        ClassFeeSection(
-          enabled: _feeOn,
-          type: _feeType,
-          rules: _feeRules,
-          amount: _feeAmount,
-          installments: _feeInstallments,
-          onEnabled: (v) => setState(() => _feeOn = v),
-          onType: (t) => setState(() => _feeType = t),
-          onRules: (r) => setState(() => _feeRules = r),
-          typeError: _error('feeType'),
-          amountError: _error('feeAmount'),
-          rulesError: _error('feeRules'),
-        ),
+        if (part == ClassFormPart.all) gap,
+        if (part != ClassFormPart.basics) ...[
+          ScheduleRulesEditor(
+            rules: _rules,
+            error: _error('rules'),
+            onChanged: (r) => setState(() => _rules = r),
+          ),
+        ],
+        // Onboarding không hỏi học phí: cấu hình sau trong màn lớp.
+        if (part == ClassFormPart.all) ...[
+          gap,
+          ClassFeeSection(
+            enabled: _feeOn,
+            type: _feeType,
+            rules: _feeRules,
+            amount: _feeAmount,
+            installments: _feeInstallments,
+            onEnabled: (v) => setState(() => _feeOn = v),
+            onType: (t) => setState(() => _feeType = t),
+            onRules: (r) => setState(() => _feeRules = r),
+            typeError: _error('feeType'),
+            amountError: _error('feeAmount'),
+            rulesError: _error('feeRules'),
+          ),
+        ],
         gap,
         AppButton(
           label: l10n.classesSave,

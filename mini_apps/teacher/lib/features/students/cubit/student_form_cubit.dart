@@ -1,9 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:math';
 
 import 'package:teachhub_shared/teachhub_shared.dart';
 
+import '../../classes/data/draft_keys.dart';
 import '../data/student_models.dart';
 import '../data/student_repository.dart';
 
@@ -32,34 +32,35 @@ class StudentFormState extends Equatable {
 
 class StudentFormCubit extends Cubit<StudentFormState> {
   /// [studentId] có giá trị = sửa hồ sơ có sẵn (`PATCH`), không thì thêm mới.
-  StudentFormCubit(this._repo, {this.studentId})
-    : super(const StudentFormState());
+  StudentFormCubit(this._repo, {this.studentId, DraftKeys? keys})
+    : _keys = keys ?? DraftKeys(),
+      super(const StudentFormState());
 
   final StudentRepository _repo;
   final String? studentId;
+  final DraftKeys _keys;
   StudentDraft? _draft;
-  bool _confirmNew = false;
-  String? _key;
 
   Future<void> submit(StudentDraft draft, {bool confirmNew = false}) async {
     if (state.status == StudentFormStatus.submitting) return;
     // Cùng nội dung thì giữ khóa để thử lại không tạo trùng; đổi nội dung hoặc
     // xác nhận em mới thì khóa mới.
-    if (_key == null || draft != _draft || confirmNew != _confirmNew) {
-      _key = uuidV4(Random.secure());
-    }
+    final key = _keys.of(
+      'student',
+      '$studentId|$confirmNew|${draft.toJson(confirmNew: confirmNew)}',
+    );
     _draft = draft;
-    _confirmNew = confirmNew;
     emit(const StudentFormState(status: StudentFormStatus.submitting));
     try {
       final id = studentId;
       final student = id == null
           ? await _repo.create(
               draft,
-              idempotencyKey: _key!,
+              idempotencyKey: key,
               confirmNew: confirmNew,
             )
-          : await _repo.update(id, draft, idempotencyKey: _key!);
+          : await _repo.update(id, draft, idempotencyKey: key);
+      _keys.done('student');
       if (isClosed) return;
       emit(
         StudentFormState(

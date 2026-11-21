@@ -851,12 +851,6 @@ abstract class MiniAppLocalizations {
   /// **'Xong bước này'**
   String get onboardingMarkDone;
 
-  /// No description provided for @onboardingPlaceholderBody.
-  ///
-  /// In vi, this message translates to:
-  /// **'Màn này đang được hoàn thiện.'**
-  String get onboardingPlaceholderBody;
-
   /// No description provided for @onboardingComplianceBody.
   ///
   /// In vi, this message translates to:
@@ -917,17 +911,29 @@ abstract class MiniAppLocalizations {
   /// **'Chưa lưu được. Thử lại sau.'**
   String get onboardingErrorGeneric;
 
-  /// No description provided for @onboardingCreateClassPending.
+  /// No description provided for @onboardingSaved.
   ///
   /// In vi, this message translates to:
-  /// **'Màn tạo lớp sẽ được nối sau.'**
-  String get onboardingCreateClassPending;
+  /// **'Đã lưu. Chưa ghi nhận được bước này.'**
+  String get onboardingSaved;
 
-  /// No description provided for @onboardingStudentSaved.
+  /// No description provided for @onboardingStudentNotEnrolled.
   ///
   /// In vi, this message translates to:
-  /// **'Đã lưu học viên. Chưa ghi nhận được bước này.'**
-  String get onboardingStudentSaved;
+  /// **'Đã lưu học viên. Chưa thêm được vào lớp hoặc chưa ghi nhận bước này.'**
+  String get onboardingStudentNotEnrolled;
+
+  /// No description provided for @onboardingScheduleChooseClass.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có nhiều lớp. Chọn lớp cần đặt lịch.'**
+  String get onboardingScheduleChooseClass;
+
+  /// No description provided for @onboardingScheduleNoClass.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có lớp để đặt lịch. Hãy tạo lớp ở bước 1.'**
+  String get onboardingScheduleNoClass;
 
   /// No description provided for @todayTitle.
   ///

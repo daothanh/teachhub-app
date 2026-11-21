@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tasco_storage/tasco_storage.dart';
+import 'package:teacher/features/onboarding/data/onboarding_draft.dart';
 import 'package:teacher/features/onboarding/data/onboarding_models.dart';
 import 'package:teacher/features/onboarding/data/onboarding_repository.dart';
 import 'package:teacher/features/onboarding/pages/onboarding_page.dart';
@@ -23,6 +25,9 @@ void main() {
       }),
     );
     GetIt.I.registerSingleton<OnboardingRepository>(repo);
+    GetIt.I.registerSingleton<OnboardingDraftStore>(
+      OnboardingDraftStore(InMemoryKeyValueStore()),
+    );
     final router = GoRouter(
       routes: [
         GoRoute(
