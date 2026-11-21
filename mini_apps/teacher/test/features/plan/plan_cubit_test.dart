@@ -90,6 +90,40 @@ void main() {
       expect(cubit.state.usage!.isPro, isTrue);
     });
 
+    test('lỗi lạ khi dùng thử: không kẹt busy', () async {
+      await cubit.load();
+      repo.trialError = StateError('x');
+      await cubit.startTrial();
+      expect(cubit.state.busy, isFalse);
+      expect(cubit.state.actionError, isNotNull);
+    });
+
+    test(
+      'làm mới khi đang dùng thử: bỏ qua, busy giữ, kết quả cuối là Pro',
+      () async {
+        await cubit.load();
+        repo.trialGate = Completer<void>();
+        final trial = cubit.startTrial();
+        await cubit.refresh();
+        expect(cubit.state.busy, isTrue);
+        expect(repo.usageCalls, 1);
+        repo.trialGate!.complete();
+        await trial;
+        expect(cubit.state.usage!.isPro, isTrue);
+        expect(cubit.state.busy, isFalse);
+      },
+    );
+
+    test('làm mới bắt đầu trước, về sau dùng thử: không ghi đè', () async {
+      await cubit.load();
+      repo.usageGate = Completer<void>();
+      final refresh = cubit.refresh();
+      await cubit.startTrial();
+      repo.usageGate!.complete();
+      await refresh;
+      expect(cubit.state.usage!.isPro, isTrue);
+    });
+
     test('bấm đúp khi đang gửi chỉ gửi một lần', () async {
       await cubit.load();
       repo.trialGate = Completer<void>();
@@ -125,6 +159,25 @@ void main() {
       await cubit.purchase();
       expect(cubit.state.notice, isNull);
       expect(cubit.state.busy, isFalse);
+    });
+
+    test('dịch vụ mua ném lỗi: báo thất bại, không kẹt busy', () async {
+      await cubit.load();
+      purchase.error = StateError('store lỗi');
+      await cubit.purchase();
+      expect(cubit.state.notice, PlanNotice.purchaseFailed);
+      expect(cubit.state.busy, isFalse);
+      purchase.error = null;
+      await cubit.purchase();
+      expect(purchase.calls, 2);
+    });
+
+    test('mua xong, làm mới lỗi không thay thông báo đang kích hoạt', () async {
+      await cubit.load();
+      repo.usageError = const ApiException.network();
+      await cubit.purchase();
+      expect(cubit.state.notice, PlanNotice.purchasePending);
+      expect(cubit.state.actionError, isNull);
     });
 
     test('bản tạm trả unavailable và không có giá', () async {

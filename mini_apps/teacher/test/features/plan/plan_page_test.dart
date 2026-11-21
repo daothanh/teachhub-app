@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:teacher/features/plan/data/plan_models.dart';
 import 'package:teacher/features/plan/data/purchase_service.dart';
 import 'package:teacher/features/plan/pages/plan_page.dart';
@@ -141,6 +144,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Gói Miễn phí'), findsOneWidget);
   });
+
+  testWidgets('kéo làm mới khi dùng thử đang bay: nút vẫn khóa', (
+    tester,
+  ) async {
+    await open(tester);
+    repo.trialGate = Completer<void>();
+    await tester.tap(find.text('Dùng thử 14 ngày'));
+    await tester.pump();
+    await tester.drag(find.byType(ListView), const Offset(0, 300));
+    await tester.pump(const Duration(seconds: 1));
+    final btn = tester.widget<AppButton>(
+      find.widgetWithText(AppButton, 'Dùng thử 14 ngày'),
+    );
+    expect(btn.onPressed, isNull);
+    repo.trialGate!.complete();
+    await tester.pumpAndSettle();
+    expect(find.text('Đang dùng thử Pro'), findsOneWidget);
+  });
+
+  testWidgets(
+    'chữ 130%, trạng thái đầy đủ: banner, tính năng, nút mua có giá',
+    (tester) async {
+      purchase.price = '250.000 ₫';
+      repo.current = samplePlan(
+        status: SubscriptionStatus.expired,
+        trialAvailable: false,
+        readOnlyClasses: 2,
+        readOnlyStudents: 9,
+        withReportsExport: true,
+      );
+      await open(tester, scale: 1.3);
+      expect(tester.takeException(), isNull);
+      await tester.scrollUntilVisible(
+        find.text('Mua Pro · 250.000 ₫'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Xuất báo cáo'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('chữ 130%: không tràn', (tester) async {
     repo.current = samplePlan(readOnlyClasses: 2, readOnlyStudents: 9);

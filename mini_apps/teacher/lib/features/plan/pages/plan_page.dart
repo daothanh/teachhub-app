@@ -207,10 +207,13 @@ class _UsageRow extends StatelessWidget {
             children: [
               Expanded(child: Text(label)),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                limit == null
-                    ? l10n.planUsageUnlimited(used)
-                    : l10n.planUsageOfLimit(used, limit!),
+              Flexible(
+                child: Text(
+                  limit == null
+                      ? l10n.planUsageUnlimited(used)
+                      : l10n.planUsageOfLimit(used, limit!),
+                  textAlign: TextAlign.end,
+                ),
               ),
             ],
           ),

@@ -247,7 +247,9 @@ class _FormBodyState extends State<_FormBody> {
             actionLabel: s.error!.kind == ApiErrorKind.paymentRequired
                 ? l10n.planLimitAction
                 : null,
-            onAction: () => context.push(PlanRoutes.plan),
+            onAction: s.error!.kind == ApiErrorKind.paymentRequired
+                ? () => context.push(PlanRoutes.plan)
+                : null,
           ),
           gap,
         ],

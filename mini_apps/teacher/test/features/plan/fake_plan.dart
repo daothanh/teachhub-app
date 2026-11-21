@@ -17,6 +17,7 @@ PlanUsage samplePlan({
   int readOnlyClasses = 0,
   int readOnlyStudents = 0,
   bool pro = false,
+  bool withReportsExport = false,
 }) => PlanUsage(
   isPro: isPro,
   status: status,
@@ -34,6 +35,7 @@ PlanUsage samplePlan({
     'compliance.form03': pro,
     'revenue.export': pro,
     'lạ.khóa': true,
+    if (withReportsExport) 'reports.export': pro,
   },
 );
 
@@ -53,14 +55,17 @@ class FakePlanRepository implements PlanRepository {
   Object? usageError;
   Object? trialError;
   Completer<void>? trialGate;
+  Completer<void>? usageGate;
   int usageCalls = 0;
   final trialKeys = <String>[];
 
   @override
   Future<PlanUsage> usage() async {
     usageCalls++;
+    final snapshot = current;
+    await usageGate?.future;
     if (usageError != null) throw usageError!;
-    return current;
+    return snapshot;
   }
 
   @override
@@ -77,6 +82,7 @@ class FakePurchaseService implements PurchaseService {
   PurchaseOutcome outcome;
   String? price;
   int calls = 0;
+  Object? error;
 
   @override
   String? get priceLabel => price;
@@ -84,6 +90,7 @@ class FakePurchaseService implements PurchaseService {
   @override
   Future<PurchaseOutcome> purchasePro() async {
     calls++;
+    if (error != null) throw error!;
     return outcome;
   }
 }
