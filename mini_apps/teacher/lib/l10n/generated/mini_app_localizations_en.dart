@@ -2166,4 +2166,91 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get dunningDiscardKeep => 'Keep editing';
+
+  @override
+  String get reportsTitle => 'Reports';
+
+  @override
+  String get reportsMonthPrev => 'Previous month';
+
+  @override
+  String get reportsMonthNext => 'Next month';
+
+  @override
+  String get reportsBilled => 'Billed';
+
+  @override
+  String get reportsCollected => 'Collected';
+
+  @override
+  String get reportsOutstanding => 'Receivables';
+
+  @override
+  String get reportsStudents => 'Active students';
+
+  @override
+  String get reportsNoData => 'No data for this month yet';
+
+  @override
+  String get reportsNoDataBody =>
+      'No invoices issued or payments recorded this month. Receivables and student count are current figures.';
+
+  @override
+  String get reportsByClass => 'Revenue by class';
+
+  @override
+  String get reportsByClassEmpty => 'No class revenue this month.';
+
+  @override
+  String get reportsOtherClass => 'Other';
+
+  @override
+  String get reportsOtherClassHint =>
+      'Payments that cannot be assigned to a class, such as carried-over debt or manual adjustments.';
+
+  @override
+  String get reportsArchived => 'Archived';
+
+  @override
+  String reportsAttendance(String percent) {
+    return 'Attendance $percent%';
+  }
+
+  @override
+  String get reportsChartTitle => 'Collected revenue, 12 months';
+
+  @override
+  String reportsChartBar(int month, String amount) {
+    return 'Month $month: $amount';
+  }
+
+  @override
+  String reportsChartSelected(int month, int year, String amount) {
+    return '$month/$year: $amount';
+  }
+
+  @override
+  String get reportsLoadFailed => 'Could not load the report.';
+
+  @override
+  String get reportsPaymentsTitle => 'Collected payments';
+
+  @override
+  String reportsPaymentsTotal(String amount) {
+    return 'Total $amount';
+  }
+
+  @override
+  String get reportsPaymentsEmpty => 'No payments this month.';
+
+  @override
+  String get reportsPaymentsLoadFailed => 'Could not load the payments.';
+
+  @override
+  String get reportsReversal => 'Payment voided';
+
+  @override
+  String reportsEntryMeta(String date, String method, String code) {
+    return '$date · $method · $code';
+  }
 }

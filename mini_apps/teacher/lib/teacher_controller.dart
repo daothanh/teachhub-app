@@ -32,6 +32,8 @@ import 'features/onboarding/data/onboarding_repository.dart';
 import 'features/onboarding/pages/onboarding_page.dart';
 import 'features/receivables/data/receivables_repository.dart';
 import 'features/receivables/receivables_routes.dart';
+import 'features/reports/data/reports_repository.dart';
+import 'features/reports/reports_routes.dart';
 import 'features/schedule/data/schedule_repository.dart';
 import 'features/schedule/schedule_routes.dart';
 import 'features/invites/data/invite_repository.dart';
@@ -96,6 +98,7 @@ class TeacherController {
     ...feesRoutes(moduleId),
     ...billingRoutes(moduleId),
     ...receivablesRoutes(moduleId),
+    ...reportsRoutes(moduleId),
     ...studentsRoutes(moduleId),
     ...attendanceRoutes(moduleId),
     ...scheduleRoutes(moduleId),
@@ -162,6 +165,11 @@ class TeacherController {
     if (!getIt.isRegistered<ReceivablesRepository>()) {
       getIt.registerLazySingleton<ReceivablesRepository>(
         () => DioReceivablesRepository(api()),
+      );
+    }
+    if (!getIt.isRegistered<ReportsRepository>()) {
+      getIt.registerLazySingleton<ReportsRepository>(
+        () => DioReportsRepository(api()),
       );
     }
     if (!getIt.isRegistered<OnboardingRepository>()) {

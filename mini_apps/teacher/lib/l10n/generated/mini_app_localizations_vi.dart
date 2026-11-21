@@ -2139,4 +2139,92 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get dunningDiscardKeep => 'Ở lại';
+
+  @override
+  String get reportsTitle => 'Báo cáo';
+
+  @override
+  String get reportsMonthPrev => 'Tháng trước';
+
+  @override
+  String get reportsMonthNext => 'Tháng sau';
+
+  @override
+  String get reportsBilled => 'Phải thu';
+
+  @override
+  String get reportsCollected => 'Đã thu';
+
+  @override
+  String get reportsOutstanding => 'Công nợ';
+
+  @override
+  String get reportsStudents => 'Học viên đang học';
+
+  @override
+  String get reportsNoData => 'Chưa có dữ liệu tháng này';
+
+  @override
+  String get reportsNoDataBody =>
+      'Tháng này chưa có hóa đơn phát hành hay khoản thu nào. Công nợ và số học viên là số hiện tại.';
+
+  @override
+  String get reportsByClass => 'Doanh thu theo lớp';
+
+  @override
+  String get reportsByClassEmpty =>
+      'Chưa có doanh thu theo lớp trong tháng này.';
+
+  @override
+  String get reportsOtherClass => 'Khác';
+
+  @override
+  String get reportsOtherClassHint =>
+      'Khoản thu không gán được cho lớp nào, như nợ kỳ trước hay điều chỉnh tay.';
+
+  @override
+  String get reportsArchived => 'Đã lưu trữ';
+
+  @override
+  String reportsAttendance(String percent) {
+    return 'Chuyên cần $percent%';
+  }
+
+  @override
+  String get reportsChartTitle => 'Doanh thu đã thu 12 tháng';
+
+  @override
+  String reportsChartBar(int month, String amount) {
+    return 'Tháng $month: $amount';
+  }
+
+  @override
+  String reportsChartSelected(int month, int year, String amount) {
+    return '$month/$year: $amount';
+  }
+
+  @override
+  String get reportsLoadFailed => 'Không tải được báo cáo.';
+
+  @override
+  String get reportsPaymentsTitle => 'Khoản đã thu';
+
+  @override
+  String reportsPaymentsTotal(String amount) {
+    return 'Tổng $amount';
+  }
+
+  @override
+  String get reportsPaymentsEmpty => 'Tháng này chưa có khoản thu nào.';
+
+  @override
+  String get reportsPaymentsLoadFailed => 'Không tải được danh sách khoản thu.';
+
+  @override
+  String get reportsReversal => 'Hủy thanh toán';
+
+  @override
+  String reportsEntryMeta(String date, String method, String code) {
+    return '$date · $method · $code';
+  }
 }

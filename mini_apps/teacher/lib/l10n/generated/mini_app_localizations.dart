@@ -3663,6 +3663,156 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Ở lại'**
   String get dunningDiscardKeep;
+
+  /// No description provided for @reportsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Báo cáo'**
+  String get reportsTitle;
+
+  /// No description provided for @reportsMonthPrev.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng trước'**
+  String get reportsMonthPrev;
+
+  /// No description provided for @reportsMonthNext.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng sau'**
+  String get reportsMonthNext;
+
+  /// No description provided for @reportsBilled.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phải thu'**
+  String get reportsBilled;
+
+  /// No description provided for @reportsCollected.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thu'**
+  String get reportsCollected;
+
+  /// No description provided for @reportsOutstanding.
+  ///
+  /// In vi, this message translates to:
+  /// **'Công nợ'**
+  String get reportsOutstanding;
+
+  /// No description provided for @reportsStudents.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học viên đang học'**
+  String get reportsStudents;
+
+  /// No description provided for @reportsNoData.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có dữ liệu tháng này'**
+  String get reportsNoData;
+
+  /// No description provided for @reportsNoDataBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng này chưa có hóa đơn phát hành hay khoản thu nào. Công nợ và số học viên là số hiện tại.'**
+  String get reportsNoDataBody;
+
+  /// No description provided for @reportsByClass.
+  ///
+  /// In vi, this message translates to:
+  /// **'Doanh thu theo lớp'**
+  String get reportsByClass;
+
+  /// No description provided for @reportsByClassEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa có doanh thu theo lớp trong tháng này.'**
+  String get reportsByClassEmpty;
+
+  /// No description provided for @reportsOtherClass.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khác'**
+  String get reportsOtherClass;
+
+  /// No description provided for @reportsOtherClassHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản thu không gán được cho lớp nào, như nợ kỳ trước hay điều chỉnh tay.'**
+  String get reportsOtherClassHint;
+
+  /// No description provided for @reportsArchived.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã lưu trữ'**
+  String get reportsArchived;
+
+  /// No description provided for @reportsAttendance.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chuyên cần {percent}%'**
+  String reportsAttendance(String percent);
+
+  /// No description provided for @reportsChartTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Doanh thu đã thu 12 tháng'**
+  String get reportsChartTitle;
+
+  /// No description provided for @reportsChartBar.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng {month}: {amount}'**
+  String reportsChartBar(int month, String amount);
+
+  /// No description provided for @reportsChartSelected.
+  ///
+  /// In vi, this message translates to:
+  /// **'{month}/{year}: {amount}'**
+  String reportsChartSelected(int month, int year, String amount);
+
+  /// No description provided for @reportsLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được báo cáo.'**
+  String get reportsLoadFailed;
+
+  /// No description provided for @reportsPaymentsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khoản đã thu'**
+  String get reportsPaymentsTitle;
+
+  /// No description provided for @reportsPaymentsTotal.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tổng {amount}'**
+  String reportsPaymentsTotal(String amount);
+
+  /// No description provided for @reportsPaymentsEmpty.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tháng này chưa có khoản thu nào.'**
+  String get reportsPaymentsEmpty;
+
+  /// No description provided for @reportsPaymentsLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được danh sách khoản thu.'**
+  String get reportsPaymentsLoadFailed;
+
+  /// No description provided for @reportsReversal.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hủy thanh toán'**
+  String get reportsReversal;
+
+  /// No description provided for @reportsEntryMeta.
+  ///
+  /// In vi, this message translates to:
+  /// **'{date} · {method} · {code}'**
+  String reportsEntryMeta(String date, String method, String code);
 }
 
 class _MiniAppLocalizationsDelegate
