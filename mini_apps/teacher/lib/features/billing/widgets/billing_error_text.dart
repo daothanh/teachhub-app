@@ -8,5 +8,6 @@ import '../../fees/widgets/fees_error_text.dart';
 String billingErrorText(MiniAppLocalizations l10n, ApiException e) =>
     switch (e.code) {
       ApiErrorCode.invoiceImmutable => l10n.billingErrImmutable,
+      ApiErrorCode.conflictStale => l10n.billingErrStale,
       _ => feesErrorText(l10n, e),
     };

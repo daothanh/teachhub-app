@@ -113,6 +113,19 @@ class BillingPeriodCubit extends Cubit<BillingPeriodState> {
     } on ApiException catch (e) {
       if (!e.retryable) _keys.done('issue');
       if (isClosed) return;
+      if (e.code == ApiErrorCode.conflictStale) {
+        // Kết quả đã lưu quá hạn phát lại: tải lại kỳ, không tự gửi lại; lần
+        // bấm sau dùng khóa mới (đã `done` ở trên).
+        BillingPeriodDetail? fresh;
+        try {
+          fresh = await _repo.getPeriod(periodId);
+        } on ApiException {
+          // Giữ danh sách cũ; kéo để làm mới sẽ tải lại.
+        }
+        if (isClosed) return;
+        emit(state.copyWith(issuing: false, detail: fresh, error: e));
+        return;
+      }
       emit(state.copyWith(issuing: false, error: e));
       return;
     }

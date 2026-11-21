@@ -155,7 +155,17 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     } on ApiException catch (e) {
       if (!e.retryable) _keys.done('void');
       if (isClosed) return;
-      emit(state.copyWith(voidError: e));
+      Invoice? fresh;
+      if (e.code == ApiErrorCode.conflictStale) {
+        // Kết quả hủy đã lưu quá hạn phát lại: tải lại hóa đơn, lần bấm sau dùng khóa mới.
+        try {
+          fresh = await _repo.getInvoice(invoiceId);
+        } on ApiException {
+          // Giữ bản cũ; kéo làm mới/vào lại sẽ tải lại.
+        }
+        if (isClosed) return;
+      }
+      emit(state.copyWith(invoice: fresh, voidError: e));
     }
   }
 }

@@ -200,6 +200,27 @@ void main() {
       },
     );
 
+    testWidgets('409 CONFLICT_STALE khi chốt: báo đã cập nhật, không gửi lại', (
+      tester,
+    ) async {
+      repo.issueError = apiErr(ApiErrorCode.conflictStale);
+      await openPeriod(tester);
+      await tapButton(tester, 'Chốt & gửi tất cả');
+      await tester.tap(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.text('Gửi tất cả'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('đã cập nhật trạng thái mới nhất'),
+        findsOneWidget,
+      );
+      expect(repo.issuedIds, hasLength(1));
+      expect(repo.calls.last, 'getPeriod:$periodId');
+    });
+
     testWidgets('lỗi mạng khi chốt: báo lỗi và vẫn bấm lại được', (
       tester,
     ) async {
@@ -426,7 +447,11 @@ void main() {
     });
 
     for (final (name, error, text) in [
-      ('409', apiErr(ApiErrorCode.conflictStale), 'Dữ liệu vừa thay đổi'),
+      (
+        '409',
+        apiErr(ApiErrorCode.conflictStale),
+        'đã cập nhật trạng thái mới nhất',
+      ),
       ('mạng', const ApiException.network(), 'mạng'),
     ]) {
       testWidgets('hủy lỗi ($name): có SnackBar lỗi, hóa đơn giữ nguyên', (

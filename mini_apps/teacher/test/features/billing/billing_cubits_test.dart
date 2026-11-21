@@ -136,16 +136,25 @@ void main() {
       },
     );
 
-    test('lỗi không thử lại được (409) → khóa mới ở lần sau', () async {
-      repo.detail = sampleDetail();
-      final c = make();
-      await c.load();
-      repo.issueError = apiErr(ApiErrorCode.conflictStale);
-      await c.issueAll();
-      await c.issueAll();
-      expect(repo.keys[0], isNot(repo.keys[1]));
-      await c.close();
-    });
+    test(
+      '409 CONFLICT_STALE → tải lại kỳ, không tự gửi lại, khóa mới',
+      () async {
+        repo.detail = sampleDetail();
+        final c = make();
+        await c.load();
+        repo.calls.clear();
+        repo.detail = sampleDetail(invoices: [sampleSummary(id: 'i9')]);
+        repo.issueError = apiErr(ApiErrorCode.conflictStale);
+        await c.issueAll();
+        expect(c.state.error!.code, ApiErrorCode.conflictStale);
+        expect(c.state.issuing, isFalse);
+        expect(c.state.detail!.invoices.single.id, 'i9');
+        expect(repo.calls, ['issue:$periodId', 'getPeriod:$periodId']);
+        await c.issueAll();
+        expect(repo.keys[0], isNot(repo.keys[1]));
+        await c.close();
+      },
+    );
 
     test(
       'PAYOUT_ACCOUNT_MISSING: báo lỗi, không có kết quả; chốt lại được',
@@ -362,6 +371,10 @@ void main() {
       await c.voidInvoice('lý do');
       expect(c.state.voidError!.code, ApiErrorCode.conflictStale);
       expect(c.state.invoice!.status, InvoiceStatus.issued);
+      // Tải lại hóa đơn, không tự gửi lại; lần bấm sau dùng khóa mới.
+      expect(repo.calls, ['getInvoice:i1', 'void:i1:lý do', 'getInvoice:i1']);
+      await c.voidInvoice('lý do');
+      expect(repo.keys[0], isNot(repo.keys[1]));
       await c.close();
     });
 
