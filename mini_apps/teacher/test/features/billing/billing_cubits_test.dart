@@ -688,7 +688,7 @@ void main() {
     });
 
     test(
-      'thu đủ lỗi mạng rồi thử lại: không kiểm lại, gửi lại cùng khóa (server phát lại)',
+      'thu đủ lỗi mạng rồi thử lại mà hóa đơn đã paid (khoản của mình): gửi lại cùng khóa, 1 thanh toán',
       () async {
         final c = make();
         await c.load();
@@ -704,6 +704,41 @@ void main() {
         expect(sends(), 2);
         expect(repo.keys[0], repo.keys[1]);
         expect(c.state.notice, isNull);
+        expect(c.state.done, InvoiceDone.paymentRecorded);
+        await c.close();
+      },
+    );
+
+    test(
+      'thử lại sau lỗi mạng mà máy khác đã thu một phần: không gửi, báo số mới, khóa mới',
+      () async {
+        final c = make();
+        await c.load();
+        repo.payError = const ApiException.network();
+        await c.recordPayment(pay(1200000), expectedRemaining: 1200000);
+        repo.invoice = owed(200000); // khoản của mình chưa tới server
+        await c.recordPayment(pay(1200000), expectedRemaining: 1200000);
+        expect(sends(), 1);
+        expect(c.state.notice, PayNotice.remainingChanged);
+        expect(c.state.invoice!.remainingAmount, 1000000);
+        await c.recordPayment(pay(1000000), expectedRemaining: 1000000);
+        expect(sends(), 2);
+        expect(repo.keys[1], isNot(repo.keys[0]));
+        await c.close();
+      },
+    );
+
+    test(
+      'thử lại sau lỗi mạng mà tải lại lỗi: vẫn gửi lại cùng khóa',
+      () async {
+        final c = make();
+        await c.load();
+        repo.payError = const ApiException.network();
+        await c.recordPayment(pay(1200000), expectedRemaining: 1200000);
+        repo.invoiceError = const ApiException.network();
+        await c.recordPayment(pay(1200000), expectedRemaining: 1200000);
+        expect(sends(), 2);
+        expect(repo.keys[0], repo.keys[1]);
         expect(c.state.done, InvoiceDone.paymentRecorded);
         await c.close();
       },

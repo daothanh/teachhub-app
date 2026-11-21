@@ -276,36 +276,39 @@ class InvoiceCubit extends Cubit<InvoiceState> {
     final draft =
         '${input.amount}|${input.method.wire}|${input.paidOn}|'
         '${input.note.trim()}';
-    // Thử lại sau lỗi mạng: server có thể đã ghi (hóa đơn nay là `paid`), nên
-    // không kiểm lại mà gửi lại cùng khóa để server phát lại kết quả.
-    if (expectedRemaining != null && !_keys.pending('pay', draft)) {
+    // Thử lại sau lỗi mạng (khóa còn chờ): vẫn tải lại hóa đơn. Server có thể đã
+    // ghi khoản của mình (hóa đơn nay `paid`) nên bỏ qua nhánh không ghi được và
+    // gửi lại cùng khóa để server phát lại kết quả; tải lại lỗi cũng gửi lại.
+    // Hóa đơn còn nhận thu mà số còn nợ khác thì khoản của mình chưa tới server
+    // và máy khác đã thu: không gửi, bỏ khóa cũ để lần xác nhận lại dùng khóa mới.
+    if (expectedRemaining != null) {
+      final retry = _keys.pending('pay', draft);
       try {
         final (inv, pays) = await _fetch();
         if (isClosed) return;
         final notice = !inv.canRecordPayment
-            ? PayNotice.notPayable
+            ? (retry ? null : PayNotice.notPayable)
             : inv.remainingAmount != expectedRemaining
             ? PayNotice.remainingChanged
             : null;
         if (notice != null) {
+          if (retry) _keys.done('pay');
           emit(state.copyWith(invoice: inv, payments: pays, notice: notice));
           return;
         }
       } on ApiException catch (e) {
-        // Không kiểm lại được số còn nợ thì không gửi.
-        if (!isClosed) emit(state.copyWith(error: e));
-        return;
+        if (!retry) {
+          // Không kiểm lại được số còn nợ thì không gửi.
+          if (!isClosed) emit(state.copyWith(error: e));
+          return;
+        }
       }
     }
     try {
       final r = await _repo.recordPayment(
         invoiceId,
         input,
-        idempotencyKey: _keys.of(
-          'pay',
-          '${input.amount}|${input.method.wire}|${input.paidOn}|'
-              '${input.note.trim()}',
-        ),
+        idempotencyKey: _keys.of('pay', draft),
       );
       _keys.done('pay');
       if (isClosed) return;
