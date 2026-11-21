@@ -18,9 +18,10 @@ final Map<String, dynamic>? _openapi = File(_contractPath).existsSync()
     : null;
 
 class FakeTeachHubBackend implements HttpClientAdapter {
-  FakeTeachHubBackend({DateTime? now}) : now = now ?? DateTime.now();
+  FakeTeachHubBackend({required this.now});
 
-  /// Mốc "hôm nay" của kịch bản: buổi học, kỳ thu đều tính từ đây.
+  /// Giờ của server giả: kỳ thu, hạn đóng, hạn sửa điểm danh và mọi dấu thời gian
+  /// tính từ đây, cố định để kịch bản không phụ thuộc ngày/giờ chạy.
   final DateTime now;
 
   static const className = 'Toán 9A';
@@ -53,7 +54,24 @@ class FakeTeachHubBackend implements HttpClientAdapter {
   final _issueReplay = <String, Map<String, Object?>>{};
   final _syncReplay = <String, Map<String, Object?>>{};
 
-  String get sessionDate => _isoDate(now);
+  /// Ngày của buổi học. Màn "Hôm nay" của teacher lấy ngày từ đồng hồ máy
+  /// (`TodayCubit` không có chỗ tiêm), nên buổi được xếp vào đúng ngày app hỏi
+  /// ở `GET /sessions?from=`; mặc định là ngày của [now].
+  late String sessionDate = _isoDate(now);
+
+  /// Số lần `issue` thật sự chạy (phát lại theo khóa không tính) và các khóa nhận được.
+  int issueExecutions = 0;
+  final issueKeys = <String>[];
+
+  /// Áp dụng `issue` xong nhưng phản hồi mất trên đường về (lỗi mạng), một lần.
+  bool dropNextIssueResponse = false;
+
+  /// Số lần tới `issue` trả 409 `CONFLICT_STALE` mà không chạy gì (kết quả đã
+  /// lưu quá hạn phát lại).
+  int staleIssues = 0;
+
+  /// Số lần tới `GET /billing-periods/{id}` mất mạng.
+  int failPeriodGets = 0;
   String get _month => '${now.year}-${now.month.toString().padLeft(2, '0')}-01';
 
   /// Số buổi đã ghi cho học viên, để test đối chiếu.
@@ -66,6 +84,12 @@ class FakeTeachHubBackend implements HttpClientAdapter {
         note: null,
         at: now.toUtc().toIso8601String(),
       );
+
+  /// Chốt tất cả ngay trên server, như một thiết bị khác vừa làm.
+  void issueAllNow() {
+    issueExecutions++;
+    _issue(null);
+  }
 
   /// Hóa đơn đã chốt của học viên (bản server giữ), `null` nếu chưa chốt.
   Map<String, Object?>? issuedInvoiceOf(String studentId) =>
@@ -85,7 +109,7 @@ class FakeTeachHubBackend implements HttpClientAdapter {
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   Map<String, Object?> _session() {
-    final start = DateTime(now.year, now.month, now.day, 18).toUtc();
+    final start = DateTime.parse('${sessionDate}T18:00:00+07:00').toUtc();
     return {
       'id': sessionId,
       'classId': classId,
@@ -343,6 +367,7 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     final method = options.method;
+    final m0 = method;
     final path = options.path;
     requests.add('$method $path');
     final op = _operation(method, path);
@@ -357,6 +382,18 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     if (reqSchema != null && !_valid(body, reqSchema)) {
       return _error(422, 'VALIDATION_FAILED');
     }
+    if (m0 == 'GET' && path == '/sessions') {
+      sessionDate = options.queryParameters['from'] as String? ?? sessionDate;
+    }
+    if (failPeriodGets > 0 &&
+        m0 == 'GET' &&
+        path == '/billing-periods/$periodId') {
+      failPeriodGets--;
+      throw DioException.connectionError(
+        requestOptions: options,
+        reason: 'offline',
+      );
+    }
     final (status, out) = _route(
       method,
       path,
@@ -365,6 +402,13 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     );
     if (status < 300) {
       _conform(out, _responseSchema(op, status), '$method $path');
+    }
+    if (dropNextIssueResponse && path.endsWith('/issue') && status < 300) {
+      dropNextIssueResponse = false;
+      throw DioException.connectionError(
+        requestOptions: options,
+        reason: 'response lost',
+      );
     }
     return _json(status, out);
   }
@@ -435,11 +479,17 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     }
     if (m == 'GET /billing-periods/$periodId') return (200, _period());
     if (m == 'POST /billing-periods/$periodId/issue') {
+      issueKeys.add(key!);
+      if (staleIssues > 0) {
+        staleIssues--;
+        return (409, _err('CONFLICT_STALE'));
+      }
       final replay = _issueReplay[key];
       if (replay != null) return (200, replay);
       if (payout == null) return (422, _err('PAYOUT_ACCOUNT_MISSING'));
       final ids = (body! as Map)['invoiceIds'] as List?;
-      return (200, _issueReplay[key!] = _issue(ids?.cast<String>()));
+      issueExecutions++;
+      return (200, _issueReplay[key] = _issue(ids?.cast<String>()));
     }
     final inv = RegExp(
       r'^(GET|POST) /invoices/([^/]+)(/adjustments)?$',

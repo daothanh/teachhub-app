@@ -3,6 +3,8 @@
 // (`FakeTeachHubBackend`): điểm danh → bản nháp của kỳ → điều chỉnh → "Chốt & gửi"
 // → phụ huynh thấy hóa đơn kèm VietQR ở P03. Dùng chung cho `flutter test` (CI) và
 // integration test trên máy (integration_test/billing_flow_test.dart).
+import 'dart:async';
+
 import 'package:app/core/routing/app_router.dart';
 import 'package:app/features/auth/auth_cubit.dart';
 import 'package:app/features/auth/teachhub_user.dart';
@@ -17,6 +19,7 @@ import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:parent/l10n/l10n.dart' as parent_l10n;
 import 'package:parent/parent.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +34,7 @@ import 'package:teacher/data/sync/clock_skew.dart';
 import 'package:teacher/data/sync/sync_engine.dart';
 import 'package:teacher/features/attendance/data/attendance_repository.dart';
 import 'package:teacher/features/fees/fees_routes.dart';
+import 'package:teacher/l10n/l10n.dart' as teacher_l10n;
 import 'package:teacher/teacher.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
@@ -81,6 +85,10 @@ void defineBillingFlowTests() {
   late FakeTeachHubBackend backend;
   late _Memberships memberships;
   late GoRouter router;
+  late TeacherDatabase db;
+  late SyncEngine engine;
+  late teacher_l10n.MiniAppLocalizations tl;
+  late parent_l10n.MiniAppLocalizations pl;
 
   Future<void> pump(WidgetTester tester) async {
     tester.view.physicalSize = const Size(390, 1400) * 3;
@@ -88,14 +96,23 @@ void defineBillingFlowTests() {
     addTearDown(tester.view.reset);
 
     SharedPreferences.setMockInitialValues({});
-    backend = FakeTeachHubBackend();
+    // 10:00 giờ Việt Nam, giữa tháng. Chỗ còn phụ thuộc đồng hồ máy: màn "Hôm nay"
+    // (TodayCubit lấy DateTime.now, không tiêm được) nên backend giả xếp buổi học
+    // vào đúng ngày app hỏi; mọi thứ còn lại theo mốc cố định này.
+    backend = FakeTeachHubBackend(now: DateTime.utc(2026, 11, 15, 3));
+    tl = await teacher_l10n.MiniAppLocalizations.delegate.load(
+      const Locale('vi'),
+    );
+    pl = await parent_l10n.MiniAppLocalizations.delegate.load(
+      const Locale('vi'),
+    );
     final dio = backend.dio();
     await GetIt.I.reset();
     addTearDown(GetIt.I.reset);
     GetIt.I.registerSingleton<Dio>(dio, instanceName: TeachHubDiKey.api);
 
     // CSDL ngoại tuyến của teacher chạy trong bộ nhớ, đồng bộ lên backend giả.
-    final db = TeacherDatabase(NativeDatabase.memory());
+    db = TeacherDatabase(NativeDatabase.memory());
     GetIt.I.registerSingleton<TeacherDatabase>(
       db,
       instanceName: TeacherController.databaseKey,
@@ -104,8 +121,8 @@ void defineBillingFlowTests() {
       dio,
       deviceId: '20000000-0000-4000-8000-000000000001',
     );
-    final clock = ClockSkew();
-    final engine = SyncEngine(db, api.sync, clock: clock);
+    final clock = ClockSkew(now: () => backend.now);
+    engine = SyncEngine(db, api.sync, clock: clock, now: () => backend.now);
     GetIt.I.registerSingleton<AttendanceRepository>(
       DriftAttendanceRepository(
         database: () async => db,
@@ -115,15 +132,6 @@ void defineBillingFlowTests() {
         clock: clock,
       ),
     );
-    addTearDown(
-      () => tester.runAsync(() async {
-        await engine.dispose();
-        // CSDL trong bộ nhớ: đóng chờ tối đa 2 giây, không để treo cả bộ test
-        // khi drift còn truy vấn chạy dở trên đồng hồ giả của test trước.
-        await db.close().timeout(const Duration(seconds: 2), onTimeout: () {});
-      }),
-    );
-
     final auth = _Auth();
     memberships = _Memberships(await SharedPreferences.getInstance());
     final consent = ConsentCubit(Dio())..markAccepted();
@@ -178,9 +186,21 @@ void defineBillingFlowTests() {
     }
   }
 
-  /// Gỡ cây widget rồi cho timer đóng luồng truy vấn của drift chạy nốt.
+  /// Gỡ cây widget, cho timer đóng luồng truy vấn của drift chạy nốt, rồi đóng CSDL.
+  /// Mọi kịch bản phải gọi cuối thân test.
   Future<void> finish(WidgetTester tester) async {
     await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(seconds: 1));
+    // `db.close()` phải chạy trên đồng hồ giả của test và được bơm khung hình:
+    // drift chờ các future đã tạo trong vùng giả đó. Bọc trong `runAsync` hay đặt
+    // ở addTearDown thì không bao giờ xong (từng làm rò CSDL sang test sau).
+    await tester.runAsync(engine.dispose);
+    var closed = false;
+    unawaited(db.close().then((_) => closed = true));
+    for (var i = 0; i < 20 && !closed; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(closed, isTrue, reason: 'db.close() không xong sau 2 giây giả');
     await tester.pump(const Duration(seconds: 1));
   }
 
@@ -201,24 +221,27 @@ void defineBillingFlowTests() {
 
   /// Chờ điều kiện trên backend: đồng bộ nền chạy ngoài đồng hồ giả của test.
   Future<void> until(WidgetTester tester, bool Function() done) async {
-    for (var i = 0; i < 100 && !done(); i++) {
+    for (var i = 0; i < 500 && !done(); i++) {
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(milliseconds: 20)),
       );
       await tester.pump();
     }
-    expect(done(), isTrue);
+    expect(done(), isTrue, reason: 'hết 10 giây: ${backend.requests}');
   }
 
   Future<void> openPeriod(WidgetTester tester) async {
     router.go(TeachHubRoutes.teacherBilling);
     await tester.pumpAndSettle();
-    await tapText(tester, 'Tháng ${backend.now.month}/${backend.now.year}');
+    await tapText(
+      tester,
+      tl.billingPeriodMonth(backend.now.month, backend.now.year),
+    );
   }
 
   Future<void> confirmIssueAll(WidgetTester tester) async {
-    await tapText(tester, 'Chốt & gửi tất cả');
-    await tester.tap(inDialog('Gửi tất cả'));
+    await tapText(tester, tl.billingIssueAll);
+    await tester.tap(inDialog(tl.billingIssueAllConfirmAction));
     await tester.pumpAndSettle();
   }
 
@@ -231,9 +254,9 @@ void defineBillingFlowTests() {
 
     // T03 → T04: điểm danh. Minh Anh có mặt (mặc định), Bảo Châu vắng có phép.
     expect(find.text(FakeTeachHubBackend.className), findsOneWidget);
-    await tapText(tester, 'Điểm danh');
+    await tapText(tester, tl.todayTakeAttendance);
     await tapText(tester, baoChau.name);
-    await tapText(tester, 'Lưu');
+    await tapText(tester, tl.attendanceSave);
     await until(
       tester,
       () =>
@@ -247,31 +270,34 @@ void defineBillingFlowTests() {
     await openPeriod(tester);
     expect(find.text(minhAnh.name), findsOneWidget);
     expect(find.text(_vnd(fee)), findsWidgets);
-    expect(find.text('Không gửi'), findsOneWidget);
+    expect(find.text(tl.billingNoSend), findsOneWidget);
 
     // Điều chỉnh giảm 50.000 đ: tổng bản nháp lấy từ server.
     await tapText(tester, minhAnh.name);
-    await tapText(tester, 'Thêm điều chỉnh');
-    await tester.enterText(fieldOf('Số tiền'), '50000');
-    await tester.enterText(fieldOf('Mô tả'), 'Giảm học thử');
-    await tester.enterText(fieldOf('Lý do (bắt buộc)'), 'Đã thỏa thuận');
-    await tapText(tester, 'Lưu điều chỉnh');
+    await tapText(tester, tl.billingAddAdjustment);
+    await tester.enterText(fieldOf(tl.billingAdjustAmount), '50000');
+    await tester.enterText(
+      fieldOf(tl.billingAdjustDescription),
+      'Giảm học thử',
+    );
+    await tester.enterText(fieldOf(tl.billingAdjustReason), 'Đã thỏa thuận');
+    await tapText(tester, tl.billingAdjustSave);
     const total = fee - 50000;
     expect(find.text(_vnd(total)), findsWidgets);
     router.pop();
     await tester.pumpAndSettle();
-    expect(find.textContaining('2 bản nháp · ${_vnd(total)}'), findsOneWidget);
+    expect(find.text(tl.billingDraftSummary(2, _vnd(total))), findsOneWidget);
 
     // Chốt khi chưa có tài khoản nhận tiền → mở màn tài khoản, chưa phát hành.
-    await tapText(tester, 'Chốt & gửi tất cả');
+    await tapText(tester, tl.billingIssueAll);
     expect(
-      find.textContaining('Chốt 1 hóa đơn, tổng ${_vnd(total)}'),
+      find.text(tl.billingIssueAllConfirmBody(1, _vnd(total))),
       findsOneWidget,
     );
-    await tester.tap(inDialog('Gửi tất cả'));
+    await tester.tap(inDialog(tl.billingIssueAllConfirmAction));
     await tester.pumpAndSettle();
-    expect(find.text('Chưa có tài khoản nhận tiền'), findsOneWidget);
-    await tapText(tester, 'Thêm tài khoản');
+    expect(find.text(tl.billingPayoutMissingTitle), findsOneWidget);
+    await tapText(tester, tl.billingPayoutMissingAction);
     expect(router.state.uri.path, FeesRoutes.payoutAccounts);
     expect(backend.issuedInvoiceOf(minhAnh.id), isNull);
 
@@ -286,7 +312,7 @@ void defineBillingFlowTests() {
     await tester.pumpAndSettle();
     await confirmIssueAll(tester);
     expect(
-      find.text('Đã gửi 1 hóa đơn. 1 hóa đơn 0 đ không gửi.'),
+      find.text('${tl.billingIssued(1)} ${tl.billingIssuedSkippedZero(1)}'),
       findsOneWidget,
     );
     final issued = backend.issuedInvoiceOf(minhAnh.id)!;
@@ -309,7 +335,9 @@ void defineBillingFlowTests() {
     await tester.tap(find.textContaining(minhAnh.name));
     await tester.pumpAndSettle();
     expect(
-      find.text('Mã $code · ${FakeTeachHubBackend.teacherName}'),
+      find.text(
+        '${pl.invoiceCodeLabel(code)} · ${FakeTeachHubBackend.teacherName}',
+      ),
       findsOneWidget,
     );
     expect(find.text(_vnd(total)), findsWidgets);
@@ -325,7 +353,9 @@ void defineBillingFlowTests() {
                   .widget<CustomPaint>(
                     find.descendant(
                       of: find.byType(QrImageView),
-                      matching: find.byType(CustomPaint),
+                      matching: find.byWidgetPredicate(
+                        (w) => w is CustomPaint && w.painter is QrPainter,
+                      ),
                     ),
                   )
                   .painter!
@@ -367,11 +397,103 @@ void defineBillingFlowTests() {
     backend.recordAttendance(FakeTeachHubBackend.baoChau.id, 'late');
     await openPeriod(tester);
     await confirmIssueAll(tester);
-    expect(find.text('Chưa có tài khoản nhận tiền'), findsOneWidget);
-    await tapText(tester, 'Thêm tài khoản');
+    expect(find.text(tl.billingPayoutMissingTitle), findsOneWidget);
+    await tapText(tester, tl.billingPayoutMissingAction);
     expect(router.state.uri.path, FeesRoutes.payoutAccounts);
     expect(backend.issuedInvoiceOf(FakeTeachHubBackend.minhAnh.id), isNull);
     expect(backend.issuedInvoiceOf(FakeTeachHubBackend.baoChau.id), isNull);
+    await finish(tester);
+  });
+
+  /// Hai học viên cùng có mặt (mỗi người 150.000 đ) và đã có tài khoản nhận tiền.
+  void seedPayable() {
+    backend.recordAttendance(FakeTeachHubBackend.minhAnh.id, 'present');
+    backend.recordAttendance(FakeTeachHubBackend.baoChau.id, 'present');
+    backend.payout = {
+      'bankBin': '970436',
+      'bankName': 'Vietcombank',
+      'accountNo': '0123456789',
+      'accountName': 'NGUYEN VAN LAN',
+    };
+  }
+
+  /// Chờ SnackBar đang hiện tắt hẳn để thông báo kế tiếp hiện ngay.
+  Future<void> dismissSnackBar(WidgetTester tester) async {
+    await tester.pump(const Duration(seconds: 6));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('chốt lỗi mạng rồi bấm lại: cùng Idempotency-Key, server phát '
+      'lại, chỉ phát hành một lần', (tester) async {
+    await pump(tester);
+    seedPayable();
+    backend.dropNextIssueResponse = true; // server đã chốt, phản hồi mất
+    await openPeriod(tester);
+    await confirmIssueAll(tester);
+    expect(backend.issueExecutions, 1);
+    expect(find.text(tl.billingIssued(2)), findsNothing);
+
+    await dismissSnackBar(tester);
+    await confirmIssueAll(tester);
+    expect(backend.issueKeys, hasLength(2));
+    expect(backend.issueKeys[1], backend.issueKeys[0]);
+    expect(backend.issueExecutions, 1, reason: 'lần hai là phát lại');
+    expect(find.text(tl.billingIssued(2)), findsOneWidget);
+    final codes = [
+      for (final s in [
+        FakeTeachHubBackend.minhAnh,
+        FakeTeachHubBackend.baoChau,
+      ])
+        backend.issuedInvoiceOf(s.id)!['code'],
+    ];
+    expect(codes, ['TH-25K7Q9', 'TH-26M8R2'], reason: 'không cấp mã lần hai');
+    await finish(tester);
+  });
+
+  testWidgets('409 CONFLICT_STALE dù hóa đơn đã phát hành: tải lại, hiện trạng '
+      'thái đã phát hành, không tạo hóa đơn thứ hai', (tester) async {
+    await pump(tester);
+    seedPayable();
+    await openPeriod(tester);
+    backend
+      ..issueAllNow() // thiết bị khác vừa chốt
+      ..staleIssues = 1;
+    await confirmIssueAll(tester);
+    expect(find.text(tl.billingErrStale), findsOneWidget);
+    expect(find.text(tl.billingErrStaleUnverified), findsNothing);
+    expect(find.text('TH-25K7Q9'), findsOneWidget);
+    expect(find.text('TH-26M8R2'), findsOneWidget);
+    expect(find.text(tl.billingNoPayableDrafts), findsOneWidget);
+    expect(backend.issueExecutions, 1, reason: 'chỉ lần chốt của thiết bị kia');
+    await finish(tester);
+  });
+
+  testWidgets('409 CONFLICT_STALE mà tải lại cũng lỗi: báo chưa xác nhận; bấm '
+      'lại dùng khóa mới, issuedCount = 0, không báo lỗi', (tester) async {
+    await pump(tester);
+    seedPayable();
+    await openPeriod(tester);
+    backend
+      ..issueAllNow()
+      ..staleIssues = 1
+      ..failPeriodGets = 1;
+    await confirmIssueAll(tester);
+    expect(find.text(tl.billingErrStaleUnverified), findsOneWidget);
+    expect(find.text(tl.billingErrStale), findsNothing);
+
+    await dismissSnackBar(tester);
+    await confirmIssueAll(tester);
+    expect(backend.issueKeys, hasLength(2));
+    expect(backend.issueKeys[1], isNot(backend.issueKeys[0]));
+    expect(find.text(tl.billingIssuedNone), findsOneWidget);
+    expect(find.text(tl.billingErrStale), findsNothing);
+    expect(find.text(tl.billingErrStaleUnverified), findsNothing);
+    expect(
+      backend.issuedInvoiceOf(FakeTeachHubBackend.minhAnh.id)!['code'],
+      'TH-25K7Q9',
+      reason: 'không tạo hóa đơn thứ hai',
+    );
+    expect(find.text(tl.billingNoPayableDrafts), findsOneWidget);
     await finish(tester);
   });
 }
