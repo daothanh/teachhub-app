@@ -87,15 +87,21 @@ class PushNavigator {
     }
 
     // Chưa có vai trò đang mở (chưa chọn) thì không tự chọn thay người dùng.
-    if (active() != null && active()?.role != role) {
+    final current = active();
+    if (current != null) {
+      // `membershipId` của push chỉ đúng membership đó (kể cả cùng vai trò nhưng
+      // khác tenant); không có thì chọn theo vai trò của loại thông báo.
       final next =
-          byId ?? memberships().where((m) => m.role == role).firstOrNull;
-      if (next == null) {
+          byId ??
+          (current.role == role
+              ? null
+              : memberships().where((m) => m.role == role).firstOrNull);
+      if (next == null && current.role != role) {
         // Người dùng không còn vai trò đó (đã xóa): về trang chủ vai trò đang mở.
-        go(active()?.role.rootRoute ?? AppRoutes.rolePicker);
+        go(current.role.rootRoute);
         return;
       }
-      await select(next);
+      if (next != null && next.id != current.id) await select(next);
     }
     go(path);
   }
