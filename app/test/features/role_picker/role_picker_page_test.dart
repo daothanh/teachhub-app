@@ -17,6 +17,9 @@ class _Cubit extends MembershipCubit {
   _Cubit(SharedPreferences prefs)
     : super(api: Dio(), prefs: prefs, activeMembership: ActiveMembership(null));
   final added = <MembershipRole>[];
+  var resets = 0;
+  @override
+  void resetPendingAdd() => resets++;
   @override
   Future<void> addRole(MembershipRole role) async => added.add(role);
 }
@@ -74,6 +77,7 @@ void main() {
     await tester.tap(find.text('Phụ huynh'));
     await tester.pump();
     expect(find.text('Đã chọn'), findsOneWidget);
+    expect(cubit.resets, 1, reason: 'đổi lựa chọn = đổi ý, bỏ khóa dở');
 
     await tester.tap(cont());
     await tester.pump();

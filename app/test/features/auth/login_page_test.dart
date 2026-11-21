@@ -52,6 +52,7 @@ Future<List<String>> _pump(
   WidgetTester tester, {
   Map<String, Object?> loginError = const {'code': 'OTP_INVALID'},
   SsoProvider? google,
+  double textScale = 1,
 }) async {
   final sent = <String>[];
   final themes = await tester.runAsync(TeachHubTheme.load);
@@ -63,6 +64,8 @@ Future<List<String>> _pump(
   tester.view.physicalSize = const Size(390, 844) * 3;
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
+  tester.platformDispatcher.textScaleFactorTestValue = textScale;
+  addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
   await tester.pumpWidget(
     ScreenUtilPlusInit(
       designSize: const Size(393, 852),
@@ -105,6 +108,8 @@ Finder _button(String label) =>
 Future<void> _toOtp(WidgetTester tester) async {
   await tester.enterText(find.byType(TextField).first, 'co.lan@example.com');
   await tester.pump();
+  // Ở cỡ chữ lớn, nút nằm dưới màn hình: trang cuộn được nên cuộn tới nút.
+  await tester.ensureVisible(find.text('Gửi mã đăng nhập'));
   await tester.tap(find.text('Gửi mã đăng nhập'));
   await tester.pumpAndSettle();
 }
@@ -234,5 +239,43 @@ void main() {
     expect(tester.widget<AppButton>(_button('Tạm khóa')).disabled, isTrue);
     expect(find.text('•'), findsNWidgets(6));
     await _dispose(tester);
+  });
+
+  // S1-FL-02: cỡ chữ hệ thống 130% không làm vỡ bố cục (overflow ném lỗi
+  // khung hình, `takeException` bắt được).
+  group('cỡ chữ 130%', () {
+    testWidgets('T01 không vỡ, các nút vẫn thấy được', (tester) async {
+      await _pump(tester, textScale: 1.3);
+      expect(tester.takeException(), isNull);
+      expect(find.text('Tiếp tục với Apple'), findsOneWidget);
+      expect(find.text('Tiếp tục với Google'), findsOneWidget);
+      expect(find.text('Gửi mã đăng nhập'), findsOneWidget);
+    });
+
+    testWidgets('T01a không vỡ, có đếm ngược gửi lại', (tester) async {
+      await _pump(tester, textScale: 1.3);
+      await _toOtp(tester);
+      expect(tester.takeException(), isNull);
+      expect(find.text('Xác thực email'), findsOneWidget);
+      expect(find.text('Gửi lại mã sau 1:00'), findsOneWidget);
+      await _dispose(tester);
+    });
+
+    testWidgets('T01a khóa OTP không vỡ', (tester) async {
+      await _pump(
+        tester,
+        textScale: 1.3,
+        loginError: const {
+          'code': 'OTP_LOCKED',
+          'details': {'retryAfterSec': 900},
+        },
+      );
+      await _toOtp(tester);
+      await tester.enterText(find.byType(TextField).first, '111111');
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('Thử lại sau 15:00'), findsOneWidget);
+      await _dispose(tester);
+    });
   });
 }

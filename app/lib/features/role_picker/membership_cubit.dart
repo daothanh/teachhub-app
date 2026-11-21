@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:math' show Random;
 
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
@@ -71,6 +72,11 @@ class MembershipCubit extends Cubit<MembershipState> {
   final Dio _api;
   final SharedPreferences _prefs;
   final ActiveMembership _active;
+
+  /// `Idempotency-Key` của lần "thêm Giáo viên" đang dở. Giữ qua các lần thử
+  /// lại sau lỗi mạng để `POST /workspaces` không tạo hai tenant; bỏ khi thành
+  /// công, khi server từ chối hẳn, hoặc khi người dùng đổi ý.
+  String? _workspaceKey;
 
   static const _activeKey = 'active_membership_id';
 
@@ -152,26 +158,48 @@ class MembershipCubit extends Cubit<MembershipState> {
   /// Thêm vai trò (T01c): Giáo viên tạo không gian (`POST /workspaces`), Phụ
   /// huynh/Học sinh thêm vai trò rỗng (`POST /me/roles`), rồi mở vai trò đó.
   Future<void> addRole(MembershipRole role) async {
+    // Bấm lặp khi đang gửi: một request thôi.
+    if (state.statusCreate == LoadingStatus.loading) return;
     emit(state.copyWith(statusCreate: LoadingStatus.loading));
+    var posted = false;
     try {
       if (role == MembershipRole.tenantOwner) {
-        await _api.post<void>('/workspaces', data: const <String, dynamic>{});
+        final key = _workspaceKey ??= uuidV4(Random.secure());
+        await _api.post<void>(
+          '/workspaces',
+          data: const <String, dynamic>{},
+          options: Options(headers: {'Idempotency-Key': key}),
+        );
       } else {
         await _api.post<void>('/me/roles', data: {'role': role.wire});
       }
+      posted = true;
       await load(silent: true);
       final created = state.memberships
           .where((m) => m.role == role)
           .firstOrNull;
-      if (created != null) await select(created);
+      // `load` nuốt lỗi: chưa thấy vai trò mới thì coi như chưa xong, giữ khóa.
+      if (created == null) throw StateError('vai trò mới chưa tải được');
+      await select(created);
+      _workspaceKey = null;
       emit(state.copyWith(statusCreate: LoadingStatus.success));
     } catch (e) {
+      // POST bị từ chối chắc chắn (409, 422…) thì lần sau là lệnh mới. Lỗi mạng, hoặc lỗi
+      // sau khi POST đã thành công (tải lại vai trò), giữ khóa: bấm lại được server phát
+      // lại kết quả cũ, không tạo tenant thứ hai.
+      if (!posted && ApiException.fromDio(e)?.retryable != true) {
+        _workspaceKey = null;
+      }
       emit(state.copyWith(statusCreate: LoadingStatus.failure, error: e));
     }
   }
 
+  /// Người dùng đổi ý (chọn vai trò khác): lần thêm Giáo viên sau là lệnh mới.
+  void resetPendingAdd() => _workspaceKey = null;
+
   /// Đăng xuất: quên vai trò của phiên này.
   Future<void> clear() async {
+    _workspaceKey = null;
     await _prefs.remove(_activeKey);
     await _prefs.remove(_cacheKey);
     emit(const MembershipState());

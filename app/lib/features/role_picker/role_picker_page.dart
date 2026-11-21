@@ -118,7 +118,14 @@ class _RolePickerPageState extends State<RolePickerPage> {
                         : owned.contains(role)
                         ? l10n.roleOwned
                         : null,
-                    onTap: busy ? null : () => setState(() => _selected = role),
+                    onTap: busy
+                        ? null
+                        : () {
+                            if (_selected != role) {
+                              context.read<MembershipCubit>().resetPendingAdd();
+                            }
+                            setState(() => _selected = role);
+                          },
                   ),
                 ],
                 SizedBox(height: tokens.spacingContent),
