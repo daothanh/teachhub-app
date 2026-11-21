@@ -239,6 +239,12 @@ void defineBillingFlowTests() {
     );
   }
 
+  /// Chờ SnackBar đang hiện tắt hẳn để thông báo kế tiếp hiện ngay.
+  Future<void> dismissSnackBar(WidgetTester tester) async {
+    await tester.pump(const Duration(seconds: 6));
+    await tester.pumpAndSettle();
+  }
+
   Future<void> confirmIssueAll(WidgetTester tester) async {
     await tapText(tester, tl.billingIssueAll);
     await tester.tap(inDialog(tl.billingIssueAllConfirmAction));
@@ -310,6 +316,9 @@ void defineBillingFlowTests() {
     };
     router.pop();
     await tester.pumpAndSettle();
+    // SnackBar "chưa có tài khoản" còn hiện thì thông báo chốt xếp hàng sau nó;
+    // đồng hồ thật (máy ảo) không tự trôi như đồng hồ giả.
+    await dismissSnackBar(tester);
     await confirmIssueAll(tester);
     expect(
       find.text(
@@ -418,12 +427,6 @@ void defineBillingFlowTests() {
       'accountNo': '0123456789',
       'accountName': 'NGUYEN VAN LAN',
     };
-  }
-
-  /// Chờ SnackBar đang hiện tắt hẳn để thông báo kế tiếp hiện ngay.
-  Future<void> dismissSnackBar(WidgetTester tester) async {
-    await tester.pump(const Duration(seconds: 6));
-    await tester.pumpAndSettle();
   }
 
   testWidgets('chốt lỗi mạng rồi bấm lại: cùng Idempotency-Key, server phát '
