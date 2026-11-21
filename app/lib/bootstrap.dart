@@ -29,6 +29,7 @@ import 'core/config/app_env.dart';
 import 'core/deep_link/deep_link_handler.dart';
 import 'core/deep_link/teachhub_deep_link_resolver.dart';
 import 'core/module_health_report.dart';
+import 'core/push/foreground_notifications.dart';
 import 'core/push/push_navigator.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/teachhub_theme.dart';
@@ -307,6 +308,17 @@ Future<void> bootstrap({required Env env}) async {
     // Sống cùng app nên không hủy; giữ tham chiếu để rõ chủ sở hữu.
     pushTapSub = FirebaseMessaging.onMessageOpenedApp.listen(
       (m) => unawaited(push.handle(m.data)),
+    );
+    // Foreground: iOS hệ thống vẽ, Android vẽ bằng local notification đúng kênh.
+    unawaited(
+      ForegroundNotifications(
+        onTap: push.handle,
+        locale: () =>
+            GetIt.I<LocaleController>().locale ??
+            WidgetsBinding.instance.platformDispatcher.locale,
+      ).start().catchError((Object e, StackTrace st) {
+        log('Foreground push failed: $e', name: 'push', stackTrace: st);
+      }),
     );
     unawaited(
       FirebaseMessaging.instance

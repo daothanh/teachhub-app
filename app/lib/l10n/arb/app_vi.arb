@@ -265,5 +265,8 @@
   "deleteAccountErrActiveClasses": "Còn lớp đang hoạt động. Hãy lưu trữ hết các lớp trước khi xóa tài khoản.",
   "deleteAccountErrStale": "Dữ liệu vừa thay đổi. Mở lại màn này rồi thử lại.",
   "deleteAccountErrGeneric": "Chưa xóa được tài khoản. Thử lại sau.",
-  "consentLater": "Để sau"
+  "consentLater": "Để sau",
+  "pushChannelAttendance": "Điểm danh",
+  "pushChannelBilling": "Học phí",
+  "pushChannelGeneral": "Thông báo chung"
 }

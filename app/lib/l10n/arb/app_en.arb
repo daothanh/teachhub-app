@@ -223,5 +223,8 @@
   "deleteAccountErrActiveClasses": "You still have active classes. Archive all classes before deleting your account.",
   "deleteAccountErrStale": "Data just changed. Reopen this screen and try again.",
   "deleteAccountErrGeneric": "Could not delete the account. Try again later.",
-  "consentLater": "Later"
+  "consentLater": "Later",
+  "pushChannelAttendance": "Attendance",
+  "pushChannelBilling": "Billing",
+  "pushChannelGeneral": "General"
 }

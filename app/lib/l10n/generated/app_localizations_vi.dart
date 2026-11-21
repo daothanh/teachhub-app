@@ -554,4 +554,13 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get consentLater => 'Để sau';
+
+  @override
+  String get pushChannelAttendance => 'Điểm danh';
+
+  @override
+  String get pushChannelBilling => 'Học phí';
+
+  @override
+  String get pushChannelGeneral => 'Thông báo chung';
 }

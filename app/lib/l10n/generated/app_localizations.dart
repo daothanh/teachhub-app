@@ -1069,6 +1069,24 @@ abstract class AppLocalizations {
   /// In vi, this message translates to:
   /// **'Để sau'**
   String get consentLater;
+
+  /// No description provided for @pushChannelAttendance.
+  ///
+  /// In vi, this message translates to:
+  /// **'Điểm danh'**
+  String get pushChannelAttendance;
+
+  /// No description provided for @pushChannelBilling.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học phí'**
+  String get pushChannelBilling;
+
+  /// No description provided for @pushChannelGeneral.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thông báo chung'**
+  String get pushChannelGeneral;
 }
 
 class _AppLocalizationsDelegate
