@@ -42,6 +42,7 @@ class PushNavigator {
     'student_absent': MembershipRole.parent,
     'student_absent_correction': MembershipRole.parent,
     'invoice_issued': MembershipRole.parent,
+    'payment_recorded': MembershipRole.parent,
     'billing_ready': MembershipRole.tenantOwner,
   };
 
@@ -49,6 +50,7 @@ class PushNavigator {
   /// (push data-only chỉ có `notificationId` và `type`, không có id hóa đơn hay id kỳ).
   static const _routeByType = {
     'invoice_issued': TeachHubRoutes.parentInvoices,
+    'payment_recorded': TeachHubRoutes.parentInvoices,
     'billing_ready': TeachHubRoutes.teacherBilling,
   };
 

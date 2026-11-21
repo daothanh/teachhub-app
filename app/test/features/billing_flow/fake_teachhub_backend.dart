@@ -1,4 +1,4 @@
-// S5-FL-08: backend giả có trạng thái, dùng chung cho giáo viên và phụ huynh.
+// S5-FL-08, S6-FL-01/02: backend giả có trạng thái, dùng chung cho giáo viên và phụ huynh.
 // Cắm vào `Dio.httpClientAdapter`, không mạng thật. Mô phỏng phần liên quan tới
 // luồng học phí của hợp đồng Sprint 5: điểm danh → bản nháp của kỳ → điều chỉnh →
 // chốt & gửi → `/family/invoices`. Phản hồi (và thân request) được đối chiếu với
@@ -53,6 +53,35 @@ class FakeTeachHubBackend implements HttpClientAdapter {
   final _issued = <String, Map<String, Object?>>{};
   final _issueReplay = <String, Map<String, Object?>>{};
   final _syncReplay = <String, Map<String, Object?>>{};
+
+  /// Thanh toán theo hóa đơn, cũ trước (phản hồi đảo lại: mới trước).
+  final _payments = <String, List<Map<String, Object?>>>{};
+  final _payReplay = <String, (int, Map<String, Object?>)>{};
+  int _paymentSeq = 0;
+
+  /// Số lần `POST …/payments` thật sự chạy (phát lại theo khóa không tính) và
+  /// các khóa nhận được.
+  int payExecutions = 0;
+  final payKeys = <String>[];
+
+  /// Ghi thanh toán xong nhưng phản hồi mất trên đường về (lỗi mạng), một lần.
+  bool dropNextPayResponse = false;
+
+  /// Ghi thanh toán ngay trên server, như một thiết bị khác vừa làm.
+  void recordPaymentNow(
+    String studentId,
+    int amount, {
+    String method = 'cash',
+  }) => _recordPayment(_invoiceId(studentId), {
+    'amount': amount,
+    'method': method,
+  }, 'seed-${_payReplay.length}');
+
+  /// Thanh toán còn hiệu lực của hóa đơn.
+  List<Map<String, Object?>> activePaymentsOf(String invoiceId) => [
+    for (final p in _payments[invoiceId] ?? const <Map<String, Object?>>[])
+      if (p['voidedAt'] == null) p,
+  ];
 
   /// Ngày của buổi học. Màn "Hôm nay" của teacher lấy ngày từ đồng hồ máy
   /// (`TodayCubit` không có chỗ tiêm), nên buổi được xếp vào đúng ngày app hỏi
@@ -174,6 +203,8 @@ class FakeTeachHubBackend implements HttpClientAdapter {
       'studentId': s.id,
       'studentName': s.name,
       'totalAmount': sum < 0 ? 0 : sum,
+      'paidAmount': 0,
+      'remainingAmount': 0,
       'dueDate': _dueDate(),
       'issuedAt': null,
       'payout': null,
@@ -231,7 +262,10 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     final drafts = all.where((i) => i['status'] == 'draft').toList();
     int sum(Iterable<Map<String, Object?>> l) =>
         l.fold(0, (t, i) => t + (i['totalAmount']! as int));
-    final issued = all.where((i) => i['status'] == 'issued').toList();
+    // Đã phát hành = mọi trạng thái sau bản nháp (đã thu một phần/đủ vẫn tính).
+    final issued = all
+        .where((i) => i['status'] != 'draft' && i['status'] != 'void')
+        .toList();
     final pending = drafts.where((i) => (i['totalAmount']! as int) > 0);
     return {
       'id': periodId,
@@ -285,6 +319,8 @@ class FakeTeachHubBackend implements HttpClientAdapter {
         'transferNote': note,
         'qrPayload': 'VIETQR|${p['bankBin']}|${p['accountNo']}|$total|$note',
         'status': 'issued',
+        'paidAmount': 0,
+        'remainingAmount': total,
         'issuedAt': now.toUtc().toIso8601String(),
         'payout': p,
       };
@@ -326,6 +362,8 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     'teacherName': teacherName,
     'periodMonth': i['periodMonth'],
     'totalAmount': i['totalAmount'],
+    'paidAmount': i['paidAmount'],
+    'remainingAmount': i['remainingAmount'],
     'dueDate': i['dueDate'],
     'issuedAt': i['issuedAt'],
   };
@@ -341,11 +379,112 @@ class FakeTeachHubBackend implements HttpClientAdapter {
           'amount': l['amount'],
         },
     ],
+    'payments': [
+      // Biên nhận cho phụ huynh: không người ghi, ghi chú, lý do hủy.
+      for (final p in (_payments[i['id']] ?? []).reversed)
+        {
+          for (final k in [
+            'id',
+            'amount',
+            'method',
+            'paidOn',
+            'recordedAt',
+            'voidedAt',
+          ])
+            k: p[k],
+        },
+    ],
     'transferNote': i['transferNote'],
     'qrPayload': i['qrPayload'],
     'payout': i['payout'],
     'voidedAt': i['voidedAt'],
   };
+
+  /// Tính lại trạng thái và số liệu hóa đơn từ thanh toán còn hiệu lực.
+  void _recalc(String invoiceId) {
+    final inv = _issued[invoiceId]!;
+    final total = inv['totalAmount']! as int;
+    final paid = activePaymentsOf(
+      invoiceId,
+    ).fold<int>(0, (t, p) => t + (p['amount']! as int));
+    _issued[invoiceId] = {
+      ...inv,
+      'status': paid == 0
+          ? 'issued'
+          : paid >= total
+          ? 'paid'
+          : 'partially_paid',
+      'paidAmount': paid,
+      'remainingAmount': paid >= total ? 0 : total - paid,
+    };
+  }
+
+  Map<String, Object?> _paymentResult(Map<String, Object?> payment) {
+    final inv = _issued[payment['invoiceId']]!;
+    final paid = inv['paidAmount']! as int;
+    final total = inv['totalAmount']! as int;
+    return {
+      'payment': payment,
+      'status': inv['status'],
+      'paidAmount': paid,
+      'remainingAmount': inv['remainingAmount'],
+      'overpaidAmount': paid > total ? paid - total : 0,
+      'dunningCancelled': inv['status'] == 'paid',
+    };
+  }
+
+  (int, Object) _recordPayment(String invoiceId, Map body, String key) {
+    final replay = _payReplay[key];
+    if (replay != null) return (replay.$1, replay.$2);
+    final status = _issued[invoiceId]!['status'];
+    if (status == 'paid') return (409, _err('INVOICE_NOT_PAYABLE'));
+    // "Hôm nay" của app lấy từ đồng hồ máy (cubit hóa đơn không tiêm được giờ),
+    // nên ngày thu hợp lệ so với ngày thật chứ không so với [now] cố định.
+    final today = _isoDate(DateTime.now());
+    final paidOn = body['paidOn'] as String? ?? today;
+    if (paidOn.compareTo(today) > 0) return (422, _err('VALIDATION_FAILED'));
+    payExecutions++;
+    final actor = {'id': uid(900), 'name': teacherName};
+    final payment = <String, Object?>{
+      'id': uid(500 + ++_paymentSeq),
+      'invoiceId': invoiceId,
+      'amount': body['amount'],
+      'method': body['method'],
+      'paidOn': paidOn,
+      'note': body['note'],
+      'recordedAt': now.toUtc().toIso8601String(),
+      'recordedBy': actor,
+      'voidedAt': null,
+      'voidedBy': null,
+      'voidReason': null,
+    };
+    (_payments[invoiceId] ??= []).add(payment);
+    _recalc(invoiceId);
+    final out = (201, _paymentResult(payment));
+    return _payReplay[key] = (out.$1, out.$2);
+  }
+
+  (int, Object) _voidPayment(String paymentId, Map body, String key) {
+    final replay = _payReplay[key];
+    if (replay != null) return (replay.$1, replay.$2);
+    for (final MapEntry(key: invoiceId, value: list) in _payments.entries) {
+      final i = list.indexWhere((p) => p['id'] == paymentId);
+      if (i < 0) continue;
+      // Hủy lại thanh toán đã hủy: 200 bản hiện tại, giữ lý do và người hủy đầu.
+      if (list[i]['voidedAt'] == null) {
+        list[i] = {
+          ...list[i],
+          'voidedAt': now.toUtc().toIso8601String(),
+          'voidedBy': {'id': uid(900), 'name': teacherName},
+          'voidReason': body['reason'],
+        };
+        _recalc(invoiceId);
+      }
+      final out = (200, _paymentResult(list[i]));
+      return _payReplay[key] = (out.$1, out.$2);
+    }
+    return (404, _err('NOT_FOUND'));
+  }
 
   // ---- HTTP ---------------------------------------------------------------
 
@@ -402,6 +541,16 @@ class FakeTeachHubBackend implements HttpClientAdapter {
     );
     if (status < 300) {
       _conform(out, _responseSchema(op, status), '$method $path');
+    }
+    if (dropNextPayResponse &&
+        method == 'POST' &&
+        path.endsWith('/payments') &&
+        status < 300) {
+      dropNextPayResponse = false;
+      throw DioException.connectionError(
+        requestOptions: options,
+        reason: 'response lost',
+      );
     }
     if (dropNextIssueResponse && path.endsWith('/issue') && status < 300) {
       dropNextIssueResponse = false;
@@ -490,6 +639,28 @@ class FakeTeachHubBackend implements HttpClientAdapter {
       final ids = (body! as Map)['invoiceIds'] as List?;
       issueExecutions++;
       return (200, _issueReplay[key] = _issue(ids?.cast<String>()));
+    }
+    final pay = RegExp(
+      r'^(GET|POST) /invoices/([^/]+)/payments$',
+    ).firstMatch(m);
+    if (pay != null) {
+      final id = pay.group(2)!;
+      final exists = _students.any((s) => _invoiceId(s.id) == id);
+      if (!exists) return (404, _err('NOT_FOUND'));
+      final issued = _issued.containsKey(id);
+      if (pay.group(1) == 'GET') {
+        return issued
+            ? (200, {'items': (_payments[id] ?? []).reversed.toList()})
+            : (404, _err('NOT_FOUND'));
+      }
+      payKeys.add(key!);
+      // Bản nháp chưa phát hành không ghi thanh toán được.
+      if (!issued) return (409, _err('INVOICE_NOT_PAYABLE'));
+      return _recordPayment(id, body! as Map, key);
+    }
+    final voidPay = RegExp(r'^POST /payments/([^/]+)/void$').firstMatch(m);
+    if (voidPay != null) {
+      return _voidPayment(voidPay.group(1)!, body! as Map, key!);
     }
     final inv = RegExp(
       r'^(GET|POST) /invoices/([^/]+)(/adjustments)?$',

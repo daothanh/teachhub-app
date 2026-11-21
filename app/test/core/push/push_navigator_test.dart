@@ -25,9 +25,13 @@ class _Harness {
   final routes = <String>[];
 
   late final nav = PushNavigator(
-    resolve: (uri) => uri.scheme == 'teachhub' && uri.host == 'p'
-        ? DeepLinkTarget(path: '/p${uri.path}')
-        : null,
+    resolve: (uri) => uri.scheme != 'teachhub'
+        ? null
+        : switch (uri.host) {
+            'p' => DeepLinkTarget(path: '/p${uri.path}'),
+            'invoices' => DeepLinkTarget(path: '/p/invoices${uri.path}'),
+            _ => null,
+          },
     isAuthenticated: () => authenticated,
     memberships: () => memberships,
     active: () => active,
@@ -92,6 +96,24 @@ void main() {
       expect(h.routes, ['/t/billing']);
     },
   );
+
+  test('payment_recorded (chỉ có notificationId và type): chuyển sang phụ '
+      'huynh, mở danh sách hóa đơn', () async {
+    final h = _Harness();
+    await h.nav.handle({'notificationId': 'n1', 'type': 'payment_recorded'});
+    expect(h.selected, ['m-p']);
+    expect(h.routes, ['/p/invoices']);
+  });
+
+  test('payment_recorded có deepLink hóa đơn: mở đúng hóa đơn đó', () async {
+    final h = _Harness(active: parent);
+    await h.nav.handle({
+      'notificationId': 'n1',
+      'type': 'payment_recorded',
+      'deepLink': 'teachhub://invoices/019c0a10-0001-7b30-8c01-000000000001',
+    });
+    expect(h.routes, ['/p/invoices/019c0a10-0001-7b30-8c01-000000000001']);
+  });
 
   test(
     'invoice_issued có membershipId của con khác: chọn đúng membership',

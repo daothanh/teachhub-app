@@ -496,4 +496,177 @@ void defineBillingFlowTests() {
     expect(find.text(tl.billingNoPayableDrafts), findsOneWidget);
     await finish(tester);
   });
+
+  /// Chốt cả kỳ trên server rồi mở hóa đơn của Minh Anh phía giáo viên.
+  Future<void> openIssuedInvoice(WidgetTester tester) async {
+    backend.issueAllNow();
+    await openPeriod(tester);
+    await tapText(tester, FakeTeachHubBackend.minhAnh.name);
+  }
+
+  final minhAnhInvoiceId = FakeTeachHubBackend.invoiceIdOf(
+    FakeTeachHubBackend.minhAnh.id,
+  );
+
+  /// Phụ huynh mở hóa đơn của Minh Anh ở P03.
+  Future<void> parentOpensInvoice(WidgetTester tester) async {
+    memberships.set(_state(_parent));
+    router.go(TeachHubRoutes.parentInvoices);
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining(FakeTeachHubBackend.minhAnh.name));
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> scrollTo(WidgetTester tester, Finder f) => tester
+      .scrollUntilVisible(f, 300, scrollable: find.byType(Scrollable).first);
+
+  testWidgets('thu tiền: chốt → thu một phần → phụ huynh thấy "một phần" và '
+      'biên nhận → thu nốt → "đã thu đủ"', (tester) async {
+    await pump(tester);
+    seedPayable();
+    final minhAnh = FakeTeachHubBackend.minhAnh;
+    const fee = FakeTeachHubBackend.feePerSession;
+    await openPeriod(tester);
+    await confirmIssueAll(tester);
+    await dismissSnackBar(tester);
+
+    // Danh sách của kỳ: hóa đơn đã phát hành có lối vào "Thu tiền".
+    expect(find.text(tl.billingPayRecord), findsNWidgets(2));
+    await tapText(tester, tl.billingPayRecord);
+    expect(find.text(minhAnh.name), findsOneWidget);
+    expect(find.text(tl.billingPayFull), findsOneWidget);
+
+    // Thu một phần 50.000 đ bằng tiền mặt.
+    await tapText(tester, tl.billingPayPartial);
+    await tester.enterText(fieldOf(tl.billingPayAmount), '50000');
+    await tester.tap(find.text(tl.billingPayMethodCash));
+    await tester.pumpAndSettle();
+    await tapText(tester, tl.billingPayConfirm);
+    expect(find.text(tl.billingPaymentRecorded), findsOneWidget);
+    final first = backend.activePaymentsOf(minhAnhInvoiceId).single;
+    expect([first['amount'], first['method']], [50000, 'cash']);
+    expect(backend.issuedInvoiceOf(minhAnh.id)!['status'], 'partially_paid');
+    expect(find.text(tl.billingStatusPartial), findsOneWidget);
+    expect(find.text(_vnd(fee - 50000)), findsOneWidget);
+    expect(find.textContaining('Cô Lan'), findsOneWidget);
+    await dismissSnackBar(tester);
+
+    // Phụ huynh: "đã trả một phần", còn nợ, biên nhận; vẫn có QR để trả nốt.
+    await parentOpensInvoice(tester);
+    expect(find.text(pl.invoiceStatusPartial), findsOneWidget);
+    expect(find.text(pl.invoiceRemainingAmount), findsOneWidget);
+    expect(find.text(_vnd(fee - 50000)), findsOneWidget);
+    await scrollTo(tester, find.text(pl.invoiceReceiptsTitle));
+    expect(find.textContaining('${pl.invoiceMethodCash} ·'), findsOneWidget);
+    await scrollTo(tester, find.byType(QrImageView));
+    expect(find.byType(QrImageView), findsOneWidget);
+
+    // Giáo viên thu nốt bằng "Đã thu đủ": số tiền = còn nợ.
+    memberships.set(_state(_teacher));
+    await openPeriod(tester);
+    await tapText(tester, minhAnh.name);
+    await tapText(tester, tl.billingPayFull);
+    expect(find.text(_vnd(fee - 50000)), findsWidgets);
+    await tapText(tester, tl.billingPayConfirm);
+    final payments = backend.activePaymentsOf(minhAnhInvoiceId);
+    expect(payments.map((p) => p['amount']), [50000, fee - 50000]);
+    expect(backend.issuedInvoiceOf(minhAnh.id)!['status'], 'paid');
+    expect(find.text(tl.billingStatusPaid), findsOneWidget);
+    expect(find.text(tl.billingPayFull), findsNothing);
+    expect(find.text(tl.billingPayPartial), findsNothing);
+    await dismissSnackBar(tester);
+
+    // Phụ huynh: đã thu đủ, hai biên nhận, không còn kêu gọi chuyển khoản.
+    await parentOpensInvoice(tester);
+    expect(find.text(pl.invoiceStatusPaid), findsWidgets);
+    expect(find.text(pl.invoicePaidNotice), findsOneWidget);
+    expect(find.textContaining('${pl.invoiceMethodCash} ·'), findsOneWidget);
+    expect(find.textContaining('${pl.invoiceMethodBank} ·'), findsOneWidget);
+    expect(find.byType(QrImageView), findsNothing);
+    expect(
+      find.text(
+        backend.issuedInvoiceOf(minhAnh.id)!['transferNote']! as String,
+      ),
+      findsNothing,
+    );
+    expect(find.text('0123456789'), findsNothing);
+    await finish(tester);
+  });
+
+  testWidgets('thu tiền lỗi mạng rồi bấm lại: cùng Idempotency-Key, chỉ một '
+      'thanh toán', (tester) async {
+    await pump(tester);
+    seedPayable();
+    backend.dropNextPayResponse = true; // server đã ghi, phản hồi mất
+    await openIssuedInvoice(tester);
+    await tapText(tester, tl.billingPayFull);
+    await tapText(tester, tl.billingPayConfirm);
+    expect(backend.payExecutions, 1);
+    expect(find.text(tl.billingPaymentRecorded), findsNothing);
+
+    await tapText(tester, tl.billingPayConfirm);
+    expect(backend.payKeys, hasLength(2));
+    expect(backend.payKeys[1], backend.payKeys[0]);
+    expect(backend.payExecutions, 1, reason: 'lần hai là phát lại');
+    expect(backend.activePaymentsOf(minhAnhInvoiceId), hasLength(1));
+    expect(find.text(tl.billingPaymentRecorded), findsOneWidget);
+    expect(find.text(tl.billingStatusPaid), findsOneWidget);
+    await finish(tester);
+  });
+
+  testWidgets('hủy thanh toán: giáo viên ghi lý do, phụ huynh thấy biên nhận '
+      '"đã hủy" và hóa đơn lại chưa thanh toán', (tester) async {
+    await pump(tester);
+    seedPayable();
+    backend.issueAllNow();
+    backend.recordPaymentNow(FakeTeachHubBackend.minhAnh.id, 50000);
+    await openPeriod(tester);
+    await tapText(tester, FakeTeachHubBackend.minhAnh.name);
+    expect(find.text(tl.billingStatusPartial), findsOneWidget);
+    await tapText(tester, tl.billingPaymentVoidAction);
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(EditableText),
+      ),
+      'Ghi nhầm',
+    );
+    await tester.tap(inDialog(tl.billingPaymentVoidAction));
+    await tester.pumpAndSettle();
+    expect(backend.activePaymentsOf(minhAnhInvoiceId), isEmpty);
+    expect(
+      backend.issuedInvoiceOf(FakeTeachHubBackend.minhAnh.id)!['status'],
+      'issued',
+    );
+    expect(find.text(tl.billingPaymentVoidedLabel), findsOneWidget);
+    expect(find.textContaining('Ghi nhầm'), findsOneWidget);
+    await dismissSnackBar(tester);
+
+    await parentOpensInvoice(tester);
+    expect(find.text(pl.invoiceReceiptVoided), findsOneWidget);
+    expect(find.text(pl.invoiceStatusIssued), findsOneWidget);
+    expect(find.text(pl.invoicePaidAmount), findsNothing);
+    expect(find.byType(QrImageView), findsOneWidget);
+    await finish(tester);
+  });
+
+  testWidgets('chữ 130%: chi tiết hóa đơn, form thu (giáo viên) và P03 có biên '
+      'nhận (phụ huynh) không vỡ', (tester) async {
+    tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    await pump(tester);
+    seedPayable();
+    backend.issueAllNow();
+    backend.recordPaymentNow(FakeTeachHubBackend.minhAnh.id, 50000);
+    await openPeriod(tester);
+    await tapText(tester, FakeTeachHubBackend.minhAnh.name);
+    await tapText(tester, tl.billingPayPartial);
+    expect(tester.takeException(), isNull);
+    router.pop();
+    await tester.pumpAndSettle();
+    await parentOpensInvoice(tester);
+    expect(find.text(pl.invoiceReceiptsTitle), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await finish(tester);
+  });
 }
