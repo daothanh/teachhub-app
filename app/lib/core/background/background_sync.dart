@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart' show kReleaseMode, visibleForTesting;
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tasco_core/tasco_core.dart';
@@ -140,12 +140,10 @@ Future<bool> runBackgroundTask({
 }
 
 /// Phần thuần Dart của callback nền: dựng Dio rồi chạy một lượt. Thiếu cấu
-/// hình hoặc (bản release) thiếu pin thì không gửi gì. [requirePins] lấy từ hằng
-/// build-time, không đọc từ `inputData` (dữ liệu tác vụ không được tắt pin).
+/// hình thì không gửi gì.
 @visibleForTesting
 Future<BackgroundSyncOutcome> syncOutboxFromInput(
   Map<String, dynamic> input, {
-  bool requirePins = kReleaseMode,
   required KeyValueStore keys,
   required Future<String?> Function() accessToken,
   required Future<String?> Function() userId,
@@ -162,23 +160,15 @@ Future<BackgroundSyncOutcome> syncOutboxFromInput(
 }) async {
   final apiUrl = input[_apiUrlKey] as String?;
   if (apiUrl == null || apiUrl.isEmpty) return BackgroundSyncOutcome.done;
-  final Dio dio;
-  try {
-    dio = buildBackgroundDio(
-      apiUrl: apiUrl,
-      pins: {
-        for (final p in (input[_pinsKey] as String? ?? '').split(','))
-          if (p.trim().isNotEmpty) p.trim(),
-      },
-      requirePins: requirePins,
-      accessToken: accessToken,
-      clientInfo: await clientInfo(),
-    );
-  } on StateError catch (e) {
-    log('Đồng bộ nền không chạy: ${e.message}', name: 'background');
-    return BackgroundSyncOutcome
-        .done; // fail-closed: không gửi qua TLS không pin
-  }
+  final dio = buildBackgroundDio(
+    apiUrl: apiUrl,
+    pins: {
+      for (final p in (input[_pinsKey] as String? ?? '').split(','))
+        if (p.trim().isNotEmpty) p.trim(),
+    },
+    accessToken: accessToken,
+    clientInfo: await clientInfo(),
+  );
   return (runner ?? _defaultRunner)(
     dio: dio,
     keys: keys,
@@ -202,19 +192,15 @@ Future<BackgroundSyncOutcome> _defaultRunner({
 /// Client API cho isolate nền: cùng header như client của shell và Bearer là
 /// access token hiện có. KHÔNG làm mới token (làm mới ở isolate thứ hai sẽ
 /// đua với app, phát `sessionExpired`/xóa token): 401 chỉ là một lỗi, lượt này
-/// bỏ và hệ điều hành thử lại sau khi app mở. Ngoài development bắt buộc có
-/// pin chứng chỉ; thiếu thì ném [StateError].
+/// bỏ và hệ điều hành thử lại sau khi app mở. Pin giống client của shell: có
+/// [pins] thì pin, rỗng thì TLS thường (MVP chưa bật pin, Tech Spec §bảo mật).
 @visibleForTesting
 Dio buildBackgroundDio({
   required String apiUrl,
   required Set<String> pins,
-  required bool requirePins,
   required Future<String?> Function() accessToken,
   required String clientInfo,
 }) {
-  if (requirePins && pins.isEmpty) {
-    throw StateError('thiếu certificate pin cho API');
-  }
   final dio = Dio(NetworkDefaults.baseOptions(baseUrl: apiUrl));
   if (pins.isNotEmpty) {
     dio.httpClientAdapter = CertificatePinning.adapter(allowedSha256: pins);
