@@ -176,5 +176,38 @@
       }
     }
   },
-  "invoiceCopyAmount": "Copy amount"
+  "invoiceCopyAmount": "Copy amount",
+  "invoiceClaimButton": "I have transferred",
+  "invoicePendingNotice": "You reported the transfer. The teacher will check the receipt and confirm; the invoice updates when there is a result.",
+  "invoiceClaimTitle": "Report a transfer",
+  "invoiceClaimHint": "Pick the receipt or a screenshot of the transaction (JPEG, PNG or HEIC, up to 10 MB). The image is sent only to the teacher and is not saved to your photo library.",
+  "invoiceClaimPick": "Choose receipt image",
+  "invoiceClaimChange": "Choose another image",
+  "invoiceClaimImageLabel": "Selected receipt image",
+  "invoiceClaimAmount": "Amount transferred (VND)",
+  "invoiceClaimNote": "Note for the teacher (optional)",
+  "invoiceClaimSubmit": "Send report",
+  "invoiceClaimRetry": "Try again",
+  "invoiceClaimUploading": "Uploading image… {percent}%",
+  "@invoiceClaimUploading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "invoiceClaimVerifying": "Checking image…",
+  "invoiceClaimSending": "Sending report…",
+  "invoiceClaimDone": "Transfer reported. The teacher will confirm.",
+  "invoiceClaimErrType": "The image must be JPEG, PNG or HEIC. Choose another image.",
+  "invoiceClaimErrLarge": "The image is larger than 10 MB. Choose a smaller one.",
+  "invoiceClaimErrAmount": "Enter the amount transferred, greater than 0.",
+  "invoiceClaimErrNote": "The note is at most 300 characters.",
+  "invoiceClaimErrOffline": "No network connection. The image is kept; tap Try again when you are online.",
+  "invoiceClaimErrExpired": "The upload session expired. Tap Try again to upload again.",
+  "invoiceClaimErrPending": "This invoice already has a report awaiting the teacher's confirmation.",
+  "invoiceClaimErrNotPayable": "This invoice no longer needs a transfer.",
+  "invoiceClaimErrNotFound": "Invoice not found.",
+  "invoiceClaimErrRate": "You are going too fast. Wait a moment and try again.",
+  "invoiceClaimErrFailed": "Could not send yet. Tap Try again; the image will not be uploaded twice."
 }
