@@ -16,6 +16,7 @@ class FamilyState extends Equatable {
     this.weekLoading = false,
     this.weekFailed = false,
     this.notificationsOff = false,
+    this.refreshFailed = false,
   });
 
   final FamilyStatus status;
@@ -27,6 +28,9 @@ class FamilyState extends Equatable {
   final bool weekLoading;
   final bool weekFailed;
   final bool notificationsOff;
+
+  /// Làm mới (đã có dữ liệu) bị lỗi: page báo SnackBar một lần, giữ màn cũ.
+  final bool refreshFailed;
 
   FamilyStudent? get selected =>
       students.where((s) => s.id == selectedId).firstOrNull;
@@ -41,6 +45,7 @@ class FamilyState extends Equatable {
     bool? weekLoading,
     bool? weekFailed,
     bool? notificationsOff,
+    bool refreshFailed = false,
   }) => FamilyState(
     status: status ?? this.status,
     students: students ?? this.students,
@@ -49,6 +54,7 @@ class FamilyState extends Equatable {
     weekLoading: weekLoading ?? this.weekLoading,
     weekFailed: weekFailed ?? this.weekFailed,
     notificationsOff: notificationsOff ?? this.notificationsOff,
+    refreshFailed: refreshFailed,
   );
 
   @override
@@ -60,6 +66,7 @@ class FamilyState extends Equatable {
     weekLoading,
     weekFailed,
     notificationsOff,
+    refreshFailed,
   ];
 }
 
@@ -75,7 +82,8 @@ class FamilyCubit extends Cubit<FamilyState> {
   Future<void> load() async {
     // Làm mới khi đã có dữ liệu thì giữ nguyên màn, không nháy vòng tải.
     final first = state.status != FamilyStatus.ready;
-    if (first) emit(state.copyWith(status: FamilyStatus.loading));
+    // copyWith luôn xóa refreshFailed: lỗi làm mới lặp lại vẫn báo lại.
+    emit(state.copyWith(status: first ? FamilyStatus.loading : null));
     try {
       final students = await _repo.students();
       if (isClosed) return;
@@ -93,9 +101,12 @@ class FamilyCubit extends Cubit<FamilyState> {
       );
       await Future.wait([_loadWeek(), refreshNotifications()]);
     } catch (_) {
-      if (!isClosed && first) {
-        emit(state.copyWith(status: FamilyStatus.failure));
-      }
+      if (isClosed) return;
+      emit(
+        first
+            ? state.copyWith(status: FamilyStatus.failure)
+            : state.copyWith(refreshFailed: true),
+      );
     }
   }
 

@@ -55,4 +55,35 @@ void main() {
       expect(repo.weekCalls, ['a']);
     },
   );
+
+  test(
+    'làm mới lỗi khi đã có dữ liệu: giữ màn, báo refreshFailed mỗi lần',
+    () async {
+      final repo = _Repo();
+      final c = FamilyCubit(repo);
+      addTearDown(c.close);
+      await c.load();
+
+      final seen = <bool>[];
+      final sub = c.stream.listen((s) => seen.add(s.refreshFailed));
+      addTearDown(sub.cancel);
+      repo.fail = true;
+      await c.load();
+      await c.load();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(c.state.status, FamilyStatus.ready);
+      expect(c.state.students, hasLength(1));
+      // Lần lỗi thứ hai vẫn phát lại tín hiệu (xóa rồi đặt lại).
+      expect(seen, [true, false, true]);
+    },
+  );
+
+  test('tải đầu lỗi: failure, không báo refreshFailed', () async {
+    final c = FamilyCubit(_Repo()..fail = true);
+    addTearDown(c.close);
+    await c.load();
+    expect(c.state.status, FamilyStatus.failure);
+    expect(c.state.refreshFailed, isFalse);
+  });
 }

@@ -242,4 +242,18 @@ void main() {
     await tester.pumpAndSettle();
     expect(invoices.listCalls, 2);
   });
+
+  testWidgets('làm mới lỗi: giữ màn cũ và báo SnackBar', (tester) async {
+    final repo = _FakeRepo([_child('a', 'Minh Anh')]);
+    await _pump(tester, repo);
+
+    repo.failStudents = true;
+    await tester.fling(find.byType(ListView), const Offset(0, 400), 1000);
+    await tester.pumpAndSettle();
+    expect(
+      find.text("Couldn't refresh. Pull down to try again."),
+      findsOneWidget,
+    );
+    expect(find.text('Minh Anh'), findsOneWidget);
+  });
 }
