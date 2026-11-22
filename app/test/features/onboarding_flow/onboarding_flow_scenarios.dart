@@ -85,7 +85,7 @@ void defineOnboardingFlowTests() {
     WidgetTester tester, {
     String route = '${TeachHubRoutes.teacher}/onboarding',
   }) async {
-    tester.view.physicalSize = const Size(390, 1400) * 3;
+    tester.view.physicalSize = const Size(402, 874) * 3;
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
@@ -229,6 +229,8 @@ void defineOnboardingFlowTests() {
     await tester.enterText(fieldOf(tl.classesFieldSubject), 'Toán');
     await tester.enterText(fieldOf(tl.classesFieldGrade), '9');
     await tester.enterText(fieldOf(tl.classesFieldLocation), 'Nhà riêng');
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     await reveal(tester, inputOf(tl.classesFieldStart));
     await tester.tap(inputOf(tl.classesFieldStart));
     await tester.pumpAndSettle();
@@ -242,6 +244,9 @@ void defineOnboardingFlowTests() {
 
   Future<void> addStudent(WidgetTester tester) async {
     await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
+    // Ô đang focus tự cuộn về con trỏ, kéo nút ở cuối form ra khỏi màn (máy thật).
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     await tapButton(tester, tl.onboardingAddStudent);
     // Ghi danh lỗi thì chưa có học sinh trong danh sách, chưa có "Tiếp tục".
     if (find.text(tl.onboardingStudentsContinue(1)).evaluate().isNotEmpty) {
