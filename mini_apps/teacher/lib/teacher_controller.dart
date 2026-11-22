@@ -114,7 +114,10 @@ class TeacherController {
       return;
     }
     GetIt.I.registerLazySingletonAsync<TeacherDatabase>(
-      () => TeacherDatabase.openEncrypted(SecureStore()),
+      () => TeacherDatabase.openEncrypted(
+        SecureStore(),
+        directory: documentsDirectory,
+      ),
       instanceName: databaseKey,
       dispose: (db) => db.close(),
     );
