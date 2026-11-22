@@ -111,7 +111,10 @@ class ClassesListCubit extends Cubit<ClassesListState> {
         ),
       );
     } on ApiException {
-      // Giữ danh sách cũ.
+      // Giữ danh sách cũ. loadMore đang bay đã bị bỏ (gen đổi) nên tự gỡ cờ
+      // của nó, không thì kẹt "đang tải thêm" mãi.
+      if (isClosed || gen != _gen || !state.loadingMore) return;
+      emit(state.copyWith(loadingMore: false));
     }
   }
 

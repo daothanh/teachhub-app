@@ -67,6 +67,29 @@ void main() {
     await cubit.close();
   });
 
+  test('refresh lỗi khi loadMore đang bay: không kẹt loadingMore', () async {
+    final repo = FakeClassesRepository()
+      ..active = [sampleClass()]
+      ..listTotal = 40;
+    final cubit = ClassesListCubit(repo);
+    await cubit.load();
+    repo.listGate = Completer<void>();
+    final more = cubit.loadMore();
+    final gate = repo.listGate!;
+    repo
+      ..listGate = null
+      ..listError = const ApiException.network();
+    await cubit.refresh();
+    repo.listError = null;
+    gate.complete();
+    await more;
+
+    expect(cubit.state.loadingMore, isFalse);
+    await cubit.loadMore();
+    expect(cubit.state.items, hasLength(2));
+    await cubit.close();
+  });
+
   test('refresh giữ danh sách cũ khi lỗi và thay khi thành công', () async {
     final repo = FakeClassesRepository()..active = [sampleClass()];
     final cubit = ClassesListCubit(repo);

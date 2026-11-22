@@ -67,6 +67,9 @@ class ReportPaymentsCubit extends Cubit<ReportPaymentsState> {
   final String month;
   int _seq = 0;
 
+  /// Đang tải trang 1: không cho `loadMore` chạy chen vào.
+  bool _firstInFlight = false;
+
   Future<void> load() => _first(const ReportPaymentsState(), keep: false);
 
   Future<void> refresh() async {
@@ -77,6 +80,7 @@ class ReportPaymentsCubit extends Cubit<ReportPaymentsState> {
   Future<void> _first(ReportPaymentsState next, {required bool keep}) async {
     if (isClosed) return;
     final seq = ++_seq;
+    _firstInFlight = true;
     if (!keep) {
       emit(next);
     } else {
@@ -89,10 +93,12 @@ class ReportPaymentsCubit extends Cubit<ReportPaymentsState> {
         pageSize: reportPaymentsPageSize,
       );
       if (isClosed || seq != _seq) return;
+      _firstInFlight = false;
       emit(_ready(p, p.items));
     } on Object catch (raw) {
       final e = asApiException(raw);
       if (isClosed || seq != _seq) return;
+      _firstInFlight = false;
       emit(
         keep
             ? _copy(state, refreshError: e)
@@ -103,7 +109,12 @@ class ReportPaymentsCubit extends Cubit<ReportPaymentsState> {
 
   Future<void> loadMore() async {
     final s = state;
-    if (s.load != BillingLoad.ready || s.loadingMore || !s.hasMore) return;
+    if (s.load != BillingLoad.ready ||
+        s.loadingMore ||
+        !s.hasMore ||
+        _firstInFlight) {
+      return;
+    }
     final seq = _seq;
     emit(_copy(s, loadingMore: true));
     try {
