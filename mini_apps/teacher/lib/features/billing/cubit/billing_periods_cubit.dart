@@ -27,6 +27,9 @@ class BillingPeriodsCubit extends Cubit<BillingPeriodsState> {
   BillingPeriodsCubit(this._repo) : super(const BillingPeriodsState());
   final BillingRepository _repo;
 
+  /// Phản hồi của lần gọi cũ bị bỏ.
+  int _seq = 0;
+
   /// Lần đầu và "Thử lại": hiện vòng tải.
   Future<void> load() async {
     if (isClosed) return;
@@ -42,12 +45,13 @@ class BillingPeriodsCubit extends Cubit<BillingPeriodsState> {
   }
 
   Future<void> _fetch() async {
+    final seq = ++_seq;
     try {
       final items = await _repo.listPeriods();
-      if (isClosed) return;
+      if (isClosed || seq != _seq) return;
       emit(BillingPeriodsState(load: BillingLoad.ready, periods: items));
     } on ApiException catch (e) {
-      if (isClosed) return;
+      if (isClosed || seq != _seq) return;
       // Làm mới lỗi thì giữ danh sách đang có; chỉ lần tải đầu mới báo lỗi cả màn.
       if (state.load == BillingLoad.ready) return;
       emit(BillingPeriodsState(load: BillingLoad.failure, error: e));

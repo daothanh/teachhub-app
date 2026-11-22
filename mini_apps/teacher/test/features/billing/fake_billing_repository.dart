@@ -154,6 +154,9 @@ class FakeBillingRepository implements BillingRepository {
   /// Giữ `getInvoice` đang chạy tới khi test hoàn tất cổng này.
   Completer<void>? invoiceGate;
 
+  /// Giữ `getPeriod` đang chạy tới khi test hoàn tất cổng này.
+  Completer<void>? periodGate;
+
   /// Giữ lệnh chốt đang chạy tới khi test hoàn tất cổng này.
   Completer<void>? issueGate;
 
@@ -170,8 +173,10 @@ class FakeBillingRepository implements BillingRepository {
   @override
   Future<BillingPeriodDetail> getPeriod(String id) async {
     calls.add('getPeriod:$id');
+    final d = detail; // dữ liệu lúc gọi, kể cả khi phản hồi về muộn
+    await periodGate?.future;
     if (periodError != null) throw periodError!;
-    return detail!;
+    return d!;
   }
 
   @override

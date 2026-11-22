@@ -224,6 +224,23 @@ void main() {
       await c.close();
     });
 
+    test('GET làm mới cũ về sau khi chốt: bỏ, giữ dữ liệu sau chốt', () async {
+      repo.detail = sampleDetail();
+      final c = make();
+      await c.load();
+      final gate = repo.periodGate = Completer<void>();
+      final refreshing = c.refresh(); // mang bản trước khi chốt
+      repo.periodGate = null;
+      final after = repo.detail = sampleDetail(invoices: []);
+      await c.issueAll();
+      await pumpEventQueue();
+      expect(c.state.detail, same(after));
+      gate.complete();
+      await refreshing;
+      expect(c.state.detail, same(after));
+      await c.close();
+    });
+
     test('refresh lỗi giữ danh sách, báo lỗi; không hiện vòng tải', () async {
       repo.detail = sampleDetail();
       final c = make();

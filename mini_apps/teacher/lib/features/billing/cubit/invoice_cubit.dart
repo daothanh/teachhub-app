@@ -117,6 +117,9 @@ class InvoiceCubit extends Cubit<InvoiceState> {
   final DraftKeys _keys;
   final DateTime Function() _now;
 
+  /// Phản hồi của lần [load] cũ bị bỏ.
+  int _seq = 0;
+
   /// Hôm nay `YYYY-MM-DD` (ngày thu mặc định và cận trên của ngày thu).
   String get today {
     final d = _now();
@@ -126,13 +129,14 @@ class InvoiceCubit extends Cubit<InvoiceState> {
 
   Future<void> load() async {
     if (isClosed) return;
+    final seq = ++_seq;
     emit(const InvoiceState());
     try {
       final (inv, pays) = await _fetch();
-      if (isClosed) return;
+      if (isClosed || seq != _seq) return;
       emit(InvoiceState(load: BillingLoad.ready, invoice: inv, payments: pays));
     } on ApiException catch (e) {
-      if (isClosed) return;
+      if (isClosed || seq != _seq) return;
       emit(InvoiceState(load: BillingLoad.failure, error: e));
     }
   }
