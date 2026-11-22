@@ -7,6 +7,10 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 class _Repo implements InvoiceRepository {
   bool fail = false;
 
+  /// Con trỏ lỗi: trang nào cũng báo còn trang sau.
+  bool endless = false;
+  int calls = 0;
+
   @override
   Future<InvoicePage> list({
     String? cursor,
@@ -14,8 +18,9 @@ class _Repo implements InvoiceRepository {
     String? studentId,
     int limit = 20,
   }) async {
+    calls++;
     if (fail) throw const ApiException.network();
-    return const InvoicePage(items: [], nextCursor: null);
+    return InvoicePage(items: const [], nextCursor: endless ? 'c$calls' : null);
   }
 
   @override
@@ -51,5 +56,14 @@ void main() {
     await c.load();
     expect(c.state.failed, isTrue);
     expect(c.state.loaded, isFalse);
+  });
+
+  test('con trỏ server lặp mãi: dừng ở trần số trang và báo lỗi', () async {
+    final repo = _Repo()..endless = true;
+    final c = TuitionCubit(repo, 'a');
+    addTearDown(c.close);
+    await c.load();
+    expect(repo.calls, maxTuitionPages);
+    expect(c.state.failed, isTrue);
   });
 }

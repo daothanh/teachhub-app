@@ -110,11 +110,6 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   }
 
   @override
-  String invoiceTuitionUnpaidMore(int count) {
-    return '$count+ invoices not settled';
-  }
-
-  @override
   String get invoiceTuitionNone => 'No invoices to pay.';
 
   @override

@@ -421,12 +421,20 @@ void main() {
       expect(find.text('Paid · Due $_due'), findsOneWidget);
     });
 
-    testWidgets('card học phí còn trang sau: hiện "N+", không hiện tổng', (
+    testWidgets('card học phí cộng nợ ở mọi trang, không chỉ trang đầu', (
       tester,
     ) async {
-      final repo = _FakeInvoices()..pages.add(_page([_json()], 'c2'));
+      final repo = _FakeInvoices()
+        ..pages.addAll([
+          _page([_json()], 'c2'),
+          _page([_json(id: 'i2', total: 500000)]),
+        ]);
       await _pump(tester, repo, _FakeSaver());
-      expect(find.text('1+ invoices not settled'), findsOneWidget);
+      expect(
+        find.text('2 invoices not settled, 2,000,000 đ outstanding'),
+        findsOneWidget,
+      );
+      expect(repo.listCalls.map((c) => c.cursor), contains('c2'));
     });
 
     testWidgets('card học phí tải lỗi: báo lỗi kèm thử lại, không ẩn', (

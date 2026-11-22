@@ -109,11 +109,6 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   }
 
   @override
-  String invoiceTuitionUnpaidMore(int count) {
-    return '$count+ hóa đơn chưa đóng xong';
-  }
-
-  @override
   String get invoiceTuitionNone => 'Không có hóa đơn nào cần đóng.';
 
   @override

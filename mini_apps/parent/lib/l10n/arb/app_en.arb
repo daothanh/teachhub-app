@@ -76,14 +76,6 @@
       }
     }
   },
-  "invoiceTuitionUnpaidMore": "{count}+ invoices not settled",
-  "@invoiceTuitionUnpaidMore": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "invoiceTuitionNone": "No invoices to pay.",
   "invoiceTuitionFailed": "Couldn't load tuition.",
   "invoiceTuitionOpen": "View invoices",
