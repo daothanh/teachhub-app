@@ -350,6 +350,8 @@ Future<void> bootstrap({required Env env}) async {
     router: router,
     resolve: resolver.resolve,
     isAuthenticated: () => authCubit.isAuthenticated,
+    rolesLoaded: () =>
+        membershipCubit.state.statusLoad == LoadingStatus.success,
   );
   await deepLinks.handleInitialLink();
   deepLinks.startListening();
