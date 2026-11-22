@@ -884,6 +884,7 @@
   "billingReasonUnexcused": "unexcused absence",
   "billingReasonCancelled": "session cancelled",
   "billingReasonMakeup": "makeup session",
+  "billingReasonNotMarked": "not marked when the period closed",
   "billingReasonOther": "per the class rules",
   "billingAdjustmentReasonLine": "Reason: {reason}",
   "@billingAdjustmentReasonLine": {
@@ -1537,5 +1538,67 @@
   "planBuyFailed": "The purchase didn't complete. Try again later.",
   "planErrTrialUsed": "You have already used your Pro trial.",
   "planErrBusy": "Pro is already active.",
-  "planLimitAction": "See Pro plan"
+  "planLimitAction": "See Pro plan",
+  "claimsTitle": "Transfers reported by parents",
+  "claimsLoadFailed": "Could not load the reported transfers.",
+  "claimLine": "{name} · {when}",
+  "@claimLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "claimAmount": "Parent reported: {amount}",
+  "@claimAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "claimNote": "Note: {note}",
+  "@claimNote": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "claimRejectedReason": "Rejected because: {reason}",
+  "@claimRejectedReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "claimStatusPending": "Awaiting confirmation",
+  "claimStatusConfirmed": "Confirmed",
+  "claimStatusRejected": "Rejected",
+  "claimViewReceipt": "View receipt",
+  "claimConfirm": "Confirm",
+  "claimReject": "Reject",
+  "claimCancel": "Close",
+  "claimConfirmTitle": "Confirm money received",
+  "claimConfirmHint": "The parent reported {amount}. You can edit the amount actually received; a bank transfer payment is recorded on the invoice.",
+  "@claimConfirmHint": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "claimConfirmAmount": "Amount received",
+  "claimRejectTitle": "Reject this report",
+  "claimRejectHint": "The reason is sent to the parent with the notification. The invoice returns to its previous status.",
+  "claimRejectReason": "Reason",
+  "claimConfirmedDone": "Confirmed and recorded.",
+  "claimRejectedDone": "Report rejected.",
+  "claimReceiptTitle": "Receipt",
+  "claimReceiptClose": "Close",
+  "claimReceiptFailed": "Could not open the receipt."
 }

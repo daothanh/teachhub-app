@@ -6,7 +6,6 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
-import '../data/draft_keys.dart';
 
 class StudentPickerState extends Equatable {
   const StudentPickerState({

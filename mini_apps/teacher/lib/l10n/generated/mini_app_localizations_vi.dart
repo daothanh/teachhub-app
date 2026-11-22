@@ -1488,6 +1488,9 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get billingReasonMakeup => 'buổi dạy bù';
 
   @override
+  String get billingReasonNotMarked => 'chưa điểm danh lúc chốt kỳ';
+
+  @override
   String get billingReasonOther => 'theo quy tắc của lớp';
 
   @override
@@ -2347,4 +2350,87 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get planLimitAction => 'Xem gói Pro';
+
+  @override
+  String get claimsTitle => 'Phụ huynh báo đã chuyển khoản';
+
+  @override
+  String get claimsLoadFailed => 'Không tải được các lần báo chuyển khoản.';
+
+  @override
+  String claimLine(String name, String when) {
+    return '$name · $when';
+  }
+
+  @override
+  String claimAmount(String amount) {
+    return 'Phụ huynh khai: $amount';
+  }
+
+  @override
+  String claimNote(String note) {
+    return 'Ghi chú: $note';
+  }
+
+  @override
+  String claimRejectedReason(String reason) {
+    return 'Lý do từ chối: $reason';
+  }
+
+  @override
+  String get claimStatusPending => 'Chờ xác nhận';
+
+  @override
+  String get claimStatusConfirmed => 'Đã xác nhận';
+
+  @override
+  String get claimStatusRejected => 'Đã từ chối';
+
+  @override
+  String get claimViewReceipt => 'Xem biên lai';
+
+  @override
+  String get claimConfirm => 'Xác nhận';
+
+  @override
+  String get claimReject => 'Từ chối';
+
+  @override
+  String get claimCancel => 'Đóng';
+
+  @override
+  String get claimConfirmTitle => 'Xác nhận đã nhận tiền';
+
+  @override
+  String claimConfirmHint(String amount) {
+    return 'Phụ huynh khai $amount. Bạn có thể sửa số tiền thực nhận; hệ thống ghi một khoản thu chuyển khoản vào hóa đơn.';
+  }
+
+  @override
+  String get claimConfirmAmount => 'Số tiền thực nhận';
+
+  @override
+  String get claimRejectTitle => 'Từ chối lần báo';
+
+  @override
+  String get claimRejectHint =>
+      'Lý do được gửi kèm thông báo cho phụ huynh. Hóa đơn quay về trạng thái trước đó.';
+
+  @override
+  String get claimRejectReason => 'Lý do';
+
+  @override
+  String get claimConfirmedDone => 'Đã xác nhận và ghi thu.';
+
+  @override
+  String get claimRejectedDone => 'Đã từ chối lần báo.';
+
+  @override
+  String get claimReceiptTitle => 'Biên lai';
+
+  @override
+  String get claimReceiptClose => 'Đóng';
+
+  @override
+  String get claimReceiptFailed => 'Không mở được biên lai.';
 }

@@ -2620,6 +2620,12 @@ abstract class MiniAppLocalizations {
   /// **'buổi dạy bù'**
   String get billingReasonMakeup;
 
+  /// No description provided for @billingReasonNotMarked.
+  ///
+  /// In vi, this message translates to:
+  /// **'chưa điểm danh lúc chốt kỳ'**
+  String get billingReasonNotMarked;
+
   /// No description provided for @billingReasonOther.
   ///
   /// In vi, this message translates to:
@@ -4023,6 +4029,150 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Xem gói Pro'**
   String get planLimitAction;
+
+  /// No description provided for @claimsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phụ huynh báo đã chuyển khoản'**
+  String get claimsTitle;
+
+  /// No description provided for @claimsLoadFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được các lần báo chuyển khoản.'**
+  String get claimsLoadFailed;
+
+  /// No description provided for @claimLine.
+  ///
+  /// In vi, this message translates to:
+  /// **'{name} · {when}'**
+  String claimLine(String name, String when);
+
+  /// No description provided for @claimAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phụ huynh khai: {amount}'**
+  String claimAmount(String amount);
+
+  /// No description provided for @claimNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi chú: {note}'**
+  String claimNote(String note);
+
+  /// No description provided for @claimRejectedReason.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do từ chối: {reason}'**
+  String claimRejectedReason(String reason);
+
+  /// No description provided for @claimStatusPending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chờ xác nhận'**
+  String get claimStatusPending;
+
+  /// No description provided for @claimStatusConfirmed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã xác nhận'**
+  String get claimStatusConfirmed;
+
+  /// No description provided for @claimStatusRejected.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã từ chối'**
+  String get claimStatusRejected;
+
+  /// No description provided for @claimViewReceipt.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xem biên lai'**
+  String get claimViewReceipt;
+
+  /// No description provided for @claimConfirm.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác nhận'**
+  String get claimConfirm;
+
+  /// No description provided for @claimReject.
+  ///
+  /// In vi, this message translates to:
+  /// **'Từ chối'**
+  String get claimReject;
+
+  /// No description provided for @claimCancel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đóng'**
+  String get claimCancel;
+
+  /// No description provided for @claimConfirmTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xác nhận đã nhận tiền'**
+  String get claimConfirmTitle;
+
+  /// No description provided for @claimConfirmHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phụ huynh khai {amount}. Bạn có thể sửa số tiền thực nhận; hệ thống ghi một khoản thu chuyển khoản vào hóa đơn.'**
+  String claimConfirmHint(String amount);
+
+  /// No description provided for @claimConfirmAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tiền thực nhận'**
+  String get claimConfirmAmount;
+
+  /// No description provided for @claimRejectTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Từ chối lần báo'**
+  String get claimRejectTitle;
+
+  /// No description provided for @claimRejectHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do được gửi kèm thông báo cho phụ huynh. Hóa đơn quay về trạng thái trước đó.'**
+  String get claimRejectHint;
+
+  /// No description provided for @claimRejectReason.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lý do'**
+  String get claimRejectReason;
+
+  /// No description provided for @claimConfirmedDone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã xác nhận và ghi thu.'**
+  String get claimConfirmedDone;
+
+  /// No description provided for @claimRejectedDone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã từ chối lần báo.'**
+  String get claimRejectedDone;
+
+  /// No description provided for @claimReceiptTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Biên lai'**
+  String get claimReceiptTitle;
+
+  /// No description provided for @claimReceiptClose.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đóng'**
+  String get claimReceiptClose;
+
+  /// No description provided for @claimReceiptFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không mở được biên lai.'**
+  String get claimReceiptFailed;
 }
 
 class _MiniAppLocalizationsDelegate

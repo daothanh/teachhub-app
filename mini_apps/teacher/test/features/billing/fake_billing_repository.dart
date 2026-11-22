@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:teacher/features/billing/data/billing_models.dart';
 import 'package:teacher/features/billing/data/billing_repository.dart';
+import 'package:teacher/features/billing/data/claim_models.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 const periodId = '019c0a00-0001-7b30-8c01-000000000001';
@@ -147,6 +148,15 @@ class FakeBillingRepository implements BillingRepository {
 
   /// Thanh toán của hóa đơn (mới trước); server giả tự tính lại số liệu.
   List<Payment> payments = [];
+
+  /// Lần báo chuyển khoản của hóa đơn (mới trước); `resolveClaim` tự cập nhật.
+  List<PaymentClaim> claims = [];
+  final resolutions = <ClaimResolution>[];
+  Object? claimsError;
+  Object? resolveError;
+
+  /// Giữ lệnh xử lý lần báo đang chạy tới khi test hoàn tất cổng này.
+  Completer<void>? resolveGate;
 
   /// Giữ lệnh ghi thanh toán đang chạy tới khi test hoàn tất cổng này.
   Completer<void>? payGate;
@@ -342,7 +352,84 @@ class FakeBillingRepository implements BillingRepository {
     payments = [for (final p in payments) p.replacing(voided)];
     return _result(voided);
   }
+
+  @override
+  Future<List<PaymentClaim>> listClaims(String invoiceId) async {
+    calls.add('listClaims:$invoiceId');
+    if (claimsError != null) {
+      final e = claimsError!;
+      claimsError = null;
+      throw e;
+    }
+    return claims;
+  }
+
+  @override
+  Future<ClaimResolveResult> resolveClaim(
+    String claimId,
+    ClaimResolution resolution, {
+    required String idempotencyKey,
+  }) async {
+    calls.add('resolveClaim:$claimId');
+    keys.add(idempotencyKey);
+    resolutions.add(resolution);
+    await resolveGate?.future;
+    if (resolveError != null) {
+      final e = resolveError!;
+      resolveError = null;
+      throw e;
+    }
+    final old = claims.firstWhere((c) => c.id == claimId);
+    final payment = resolution.isConfirm
+        ? samplePayment(id: 'pc-$claimId', amount: resolution.amount!)
+        : null;
+    final resolved = sampleClaim(
+      id: old.id,
+      status: resolution.isConfirm
+          ? ClaimStatus.confirmed
+          : ClaimStatus.rejected,
+      amount: old.amount,
+      rejectReason: resolution.reason,
+      paymentId: payment?.id,
+    );
+    claims = [for (final c in claims) c.id == claimId ? resolved : c];
+    if (payment != null) payments = [payment, ...payments];
+    return ClaimResolveResult(
+      claim: resolved,
+      result: payment == null ? null : _result(payment),
+    );
+  }
+
+  @override
+  Future<String> receiptUrl(String fileId) async {
+    calls.add('receiptUrl:$fileId');
+    return 'https://files.example.invalid/$fileId';
+  }
 }
+
+PaymentClaim sampleClaim({
+  String id = 'c1',
+  ClaimStatus status = ClaimStatus.pending,
+  int amount = 1200000,
+  String? note,
+  String? rejectReason,
+  String? paymentId,
+}) => PaymentClaim(
+  id: id,
+  invoiceId: 'i1',
+  status: status,
+  amount: amount,
+  note: note,
+  receiptFileId: 'f-$id',
+  claimedByName: 'Nguyễn Văn Hải',
+  createdAt: '2026-11-05T09:12:00+07:00',
+  resolvedAt: status == ClaimStatus.pending
+      ? null
+      : '2026-11-06T08:00:00+07:00',
+  resolvedByName: status == ClaimStatus.pending ? null : 'Cô Lan',
+  rejectReason: rejectReason,
+  paymentId: paymentId,
+);
 
 ApiException fieldErr(Map<String, List<String>> errors) => ApiException(
   code: ApiErrorCode.validationFailed,

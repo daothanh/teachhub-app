@@ -884,6 +884,7 @@
   "billingReasonUnexcused": "vắng không phép",
   "billingReasonCancelled": "buổi bị hủy",
   "billingReasonMakeup": "buổi dạy bù",
+  "billingReasonNotMarked": "chưa điểm danh lúc chốt kỳ",
   "billingReasonOther": "theo quy tắc của lớp",
   "billingAdjustmentReasonLine": "Lý do: {reason}",
   "@billingAdjustmentReasonLine": {
@@ -1537,5 +1538,67 @@
   "planBuyFailed": "Không hoàn tất được giao dịch. Thử lại sau.",
   "planErrTrialUsed": "Bạn đã dùng thử Pro rồi.",
   "planErrBusy": "Gói Pro đang hoạt động.",
-  "planLimitAction": "Xem gói Pro"
+  "planLimitAction": "Xem gói Pro",
+  "claimsTitle": "Phụ huynh báo đã chuyển khoản",
+  "claimsLoadFailed": "Không tải được các lần báo chuyển khoản.",
+  "claimLine": "{name} · {when}",
+  "@claimLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "claimAmount": "Phụ huynh khai: {amount}",
+  "@claimAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "claimNote": "Ghi chú: {note}",
+  "@claimNote": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "claimRejectedReason": "Lý do từ chối: {reason}",
+  "@claimRejectedReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "claimStatusPending": "Chờ xác nhận",
+  "claimStatusConfirmed": "Đã xác nhận",
+  "claimStatusRejected": "Đã từ chối",
+  "claimViewReceipt": "Xem biên lai",
+  "claimConfirm": "Xác nhận",
+  "claimReject": "Từ chối",
+  "claimCancel": "Đóng",
+  "claimConfirmTitle": "Xác nhận đã nhận tiền",
+  "claimConfirmHint": "Phụ huynh khai {amount}. Bạn có thể sửa số tiền thực nhận; hệ thống ghi một khoản thu chuyển khoản vào hóa đơn.",
+  "@claimConfirmHint": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "claimConfirmAmount": "Số tiền thực nhận",
+  "claimRejectTitle": "Từ chối lần báo",
+  "claimRejectHint": "Lý do được gửi kèm thông báo cho phụ huynh. Hóa đơn quay về trạng thái trước đó.",
+  "claimRejectReason": "Lý do",
+  "claimConfirmedDone": "Đã xác nhận và ghi thu.",
+  "claimRejectedDone": "Đã từ chối lần báo.",
+  "claimReceiptTitle": "Biên lai",
+  "claimReceiptClose": "Đóng",
+  "claimReceiptFailed": "Không mở được biên lai."
 }

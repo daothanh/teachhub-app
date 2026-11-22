@@ -4,7 +4,6 @@ import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../data/class_models.dart';
 import '../data/classes_repository.dart';
-import '../data/draft_keys.dart';
 import 'classes_list_cubit.dart' show ClassesLoad;
 
 class ClassDetailState extends Equatable {

@@ -11,6 +11,7 @@ import '../cubit/invoice_cubit.dart';
 import '../data/billing_models.dart';
 import '../data/billing_repository.dart';
 import '../widgets/billing_error_text.dart';
+import '../widgets/invoice_claims_section.dart';
 import '../widgets/invoice_payments.dart';
 import '../widgets/invoice_status_label.dart';
 import '../widgets/void_reason_dialog.dart';
@@ -168,6 +169,12 @@ class _Body extends StatelessWidget {
             ),
           ),
         InvoicePaymentsSection(invoice: inv, payments: payments, busy: busy),
+        // Phụ huynh báo đã chuyển khoản (US-7.7); bản nháp chưa có lần báo (404).
+        if (inv.status != InvoiceStatus.draft)
+          InvoiceClaimsSection(
+            key: ValueKey('claims:${inv.id}'),
+            invoiceId: inv.id,
+          ),
         // Bản nháp chưa có lịch nhắc; hóa đơn đã phát hành thì xem được trạng thái nhắc.
         if (inv.status != InvoiceStatus.draft && !inv.isCoveredByBalance)
           // Đổi trạng thái hoặc số đã thu (ghi thu, hủy thu) thì tải lại khối nhắc nợ.
@@ -208,6 +215,7 @@ String _reasonText(MiniAppLocalizations l10n, NotChargedReason? r) =>
       NotChargedReason.unexcused => l10n.billingReasonUnexcused,
       NotChargedReason.cancelled => l10n.billingReasonCancelled,
       NotChargedReason.makeup => l10n.billingReasonMakeup,
+      NotChargedReason.notMarked => l10n.billingReasonNotMarked,
       _ => l10n.billingReasonOther,
     };
 

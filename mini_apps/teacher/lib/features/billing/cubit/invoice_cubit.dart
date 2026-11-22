@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
-import '../../classes/data/draft_keys.dart';
 import '../data/billing_models.dart';
 import '../data/billing_repository.dart';
 import 'billing_periods_cubit.dart';
@@ -115,6 +114,9 @@ class InvoiceCubit extends Cubit<InvoiceState> {
   final BillingRepository _repo;
   final String invoiceId;
   final DraftKeys _keys;
+
+  /// Kho dữ liệu của trang, để các khối con (báo chuyển khoản) dùng chung.
+  BillingRepository get repository => _repo;
   final DateTime Function() _now;
 
   /// Hôm nay `YYYY-MM-DD` (ngày thu mặc định và cận trên của ngày thu).
@@ -144,6 +146,20 @@ class InvoiceCubit extends Cubit<InvoiceState> {
         ? const <Payment>[]
         : await _repo.listPayments(invoiceId);
     return (inv, pays);
+  }
+
+  /// Tải lại lặng lẽ (không spinner, không đụng cờ bận): sau khi xác nhận hoặc
+  /// từ chối một lần báo chuyển khoản hóa đơn có thể đã đổi trạng thái và số đã thu.
+  Future<void> refresh() async {
+    if (isClosed || state.invoice == null) return;
+    try {
+      final (inv, pays) = await _fetch();
+      if (!isClosed) {
+        emit(state.copyWith(invoice: inv, payments: pays, busy: state.busy));
+      }
+    } on ApiException {
+      // Kéo làm mới/vào lại sẽ tải lại.
+    }
   }
 
   /// Xóa lỗi cũ khi mở lại form điều chỉnh hoặc thanh toán.

@@ -220,6 +220,9 @@ enum NotChargedReason {
   unexcused,
   cancelled,
   makeup,
+
+  /// `not_marked`: buổi chưa điểm danh lúc chốt kỳ, 0 đ (hợp đồng Sprint 8).
+  notMarked,
   other;
 
   static NotChargedReason? fromWire(String? v) => switch (v) {
@@ -228,6 +231,7 @@ enum NotChargedReason {
     'unexcused_not_charged' => unexcused,
     'cancelled' => cancelled,
     'makeup' => makeup,
+    'not_marked' => notMarked,
     _ => other,
   };
 }

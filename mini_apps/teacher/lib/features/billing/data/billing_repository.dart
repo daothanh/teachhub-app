@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:teachhub_shared/teachhub_shared.dart';
 
 import 'billing_models.dart';
+import 'claim_models.dart';
 
 /// API kỳ thu và hóa đơn của giáo viên (US-7.2, US-7.3). Mọi lỗi ra ngoài là
 /// [ApiException]; test thay bằng bản giả của lớp này.
@@ -57,6 +58,21 @@ abstract class BillingRepository {
     required String reason,
     required String idempotencyKey,
   });
+
+  /// `GET /invoices/{id}/payment-claims` (US-7.7): mới nhất trước. Bản nháp trả 404.
+  Future<List<PaymentClaim>> listClaims(String invoiceId);
+
+  /// `POST /payment-claims/{id}/resolve`: xác nhận (sinh thanh toán
+  /// `bank_transfer`) hoặc từ chối có lý do. 409 `CONFLICT_STALE` khi lần báo
+  /// không còn chờ.
+  Future<ClaimResolveResult> resolveClaim(
+    String claimId,
+    ClaimResolution resolution, {
+    required String idempotencyKey,
+  });
+
+  /// `GET /files/{id}/download-url`: URL xem biên lai, sống 10 phút. Không giữ lâu.
+  Future<String> receiptUrl(String fileId);
 }
 
 BillingRepository billingRepository() =>
@@ -191,6 +207,39 @@ class DioBillingRepository implements BillingRepository {
       options: _key(idempotencyKey),
     );
     return PaymentResult.fromJson(r.data!);
+  });
+
+  @override
+  Future<List<PaymentClaim>> listClaims(String invoiceId) => _call(() async {
+    final r = await _dio.get<Map<String, dynamic>>(
+      '/invoices/$invoiceId/payment-claims',
+    );
+    return [
+      for (final e in r.data!['items'] as List)
+        PaymentClaim.fromJson(e as Map<String, dynamic>),
+    ];
+  });
+
+  @override
+  Future<ClaimResolveResult> resolveClaim(
+    String claimId,
+    ClaimResolution resolution, {
+    required String idempotencyKey,
+  }) => _call(() async {
+    final r = await _dio.post<Map<String, dynamic>>(
+      '/payment-claims/$claimId/resolve',
+      data: resolution.toJson(),
+      options: _key(idempotencyKey),
+    );
+    return ClaimResolveResult.fromJson(r.data!);
+  });
+
+  @override
+  Future<String> receiptUrl(String fileId) => _call(() async {
+    final r = await _dio.get<Map<String, dynamic>>(
+      '/files/$fileId/download-url',
+    );
+    return r.data!['url'] as String;
   });
 }
 
