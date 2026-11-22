@@ -131,6 +131,28 @@ void main() {
       expect(cubit.state.rows.single.savedId, 's-new');
     });
 
+    test('dòng lỗi 4xx: lưu lại cùng nội dung dùng khóa mới', () async {
+      final repo = FakeStudentRepository([
+        ApiException.fromResponse(422, {
+          'code': 'VALIDATION_FAILED',
+          'message': 'x',
+        }),
+        const Student(id: 's-a', fullName: 'Minh Anh'),
+      ]);
+      final cubit = ContactImportCubit(
+        FakeContactsService(contacts: _contacts),
+        repo,
+      );
+      await cubit.start();
+      cubit.toggle('a');
+      cubit.confirmSelection();
+      await cubit.saveAll();
+      expect(cubit.state.rows.single.status, RowStatus.failed);
+      await cubit.saveAll();
+      expect(repo.calls[1].key, isNot(repo.calls[0].key));
+      expect(cubit.state.rows.single.status, RowStatus.saved);
+    });
+
     test('repository ném lỗi lạ: dòng failed, saving được reset', () async {
       final repo = FakeStudentRepository([StateError('boom')]);
       final cubit = ContactImportCubit(
