@@ -221,7 +221,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get classesErrRulesDuplicate =>
-      'Two sessions share the same day and start time.';
+      'Two sessions on the same day overlap.';
 
   @override
   String get classesErrRulesOverflow => 'A session cannot run past 24:00.';
@@ -444,20 +444,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get onboardingStepSetSchedule => 'Set the schedule';
 
   @override
-  String get onboardingStepPayoutAccount => 'Payout account';
-
-  @override
-  String get onboardingStepComplianceChecklist => 'Compliance checklist';
-
-  @override
   String get onboardingSkip => 'Later';
-
-  @override
-  String get onboardingMarkDone => 'Done with this step';
-
-  @override
-  String get onboardingComplianceBody =>
-      'See what to do to teach within the rules. Coming soon.';
 
   @override
   String get onboardingDoneTitle => 'You are all set';
@@ -2459,4 +2446,10 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get claimReceiptFailed => 'Could not open the receipt.';
+
+  @override
+  String get contactsPickPhone => 'Pick a number from contacts';
+
+  @override
+  String get contactsPhoneDenied => 'You can still type the number.';
 }

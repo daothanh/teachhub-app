@@ -115,4 +115,14 @@ class FakeContactsService implements ContactsService {
 
   @override
   Future<void> openSettings() async => settingsOpened++;
+
+  /// Số của liên hệ "được chọn" ở bộ chọn hệ điều hành; `null` = hủy.
+  List<String>? picked;
+  int picks = 0;
+
+  @override
+  Future<List<String>?> pickPhones() async {
+    picks++;
+    return picked;
+  }
 }

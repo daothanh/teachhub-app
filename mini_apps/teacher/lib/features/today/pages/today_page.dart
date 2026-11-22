@@ -198,8 +198,6 @@ String _stepTitle(MiniAppLocalizations l10n, OnboardingStep s) => switch (s) {
   OnboardingStep.createClass => l10n.onboardingStepCreateClass,
   OnboardingStep.addStudents => l10n.onboardingStepAddStudents,
   OnboardingStep.setSchedule => l10n.onboardingStepSetSchedule,
-  OnboardingStep.payoutAccount => l10n.onboardingStepPayoutAccount,
-  OnboardingStep.complianceChecklist => l10n.onboardingStepComplianceChecklist,
 };
 
 /// Nhắc các bước onboarding đã bỏ qua (US-0.2 AC2); bấm một bước thì mở đúng bước.

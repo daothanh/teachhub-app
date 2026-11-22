@@ -26,7 +26,7 @@ class OnboardingState extends Equatable {
   List<Object?> get props => [load, onboarding, saving, error];
 }
 
-/// Tiến độ 5 bước (US-0.2). Server là nguồn sự thật: mở lại app thì [load]
+/// Tiến độ 3 bước (US-0.2). Server là nguồn sự thật: mở lại app thì [load]
 /// trả `currentStep` là bước dở.
 class OnboardingCubit extends Cubit<OnboardingState> {
   OnboardingCubit(this._repo) : super(const OnboardingState());

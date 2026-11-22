@@ -62,7 +62,7 @@
   "classesErrGrade": "Khối từ 1 đến 12.",
   "classesErrCapacity": "Sĩ số từ 1 đến 500.",
   "classesErrEndBeforeStart": "Ngày kết thúc không được trước ngày bắt đầu.",
-  "classesErrRulesDuplicate": "Có hai buổi cùng thứ và giờ bắt đầu.",
+  "classesErrRulesDuplicate": "Có hai buổi cùng thứ bị chồng giờ.",
   "classesErrRulesOverflow": "Buổi học không được kéo qua 24:00.",
   "classesErrRulesTooMany": "Tối đa 14 buổi mỗi tuần.",
   "classesRulesTitle": "Lịch lặp hằng tuần",
@@ -230,11 +230,7 @@
   "onboardingStepCreateClass": "Tạo lớp đầu tiên",
   "onboardingStepAddStudents": "Thêm học viên",
   "onboardingStepSetSchedule": "Đặt lịch học",
-  "onboardingStepPayoutAccount": "Tài khoản nhận tiền",
-  "onboardingStepComplianceChecklist": "Việc cần làm theo quy định",
   "onboardingSkip": "Để sau",
-  "onboardingMarkDone": "Xong bước này",
-  "onboardingComplianceBody": "Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.",
   "onboardingDoneTitle": "Bạn đã xong phần làm quen",
   "onboardingDoneBody": "Vào xem lớp và học viên của bạn.",
   "onboardingFinish": "Vào DayHoc",
@@ -1600,5 +1596,7 @@
   "claimRejectedDone": "Đã từ chối lần báo.",
   "claimReceiptTitle": "Biên lai",
   "claimReceiptClose": "Đóng",
-  "claimReceiptFailed": "Không mở được biên lai."
+  "claimReceiptFailed": "Không mở được biên lai.",
+  "contactsPickPhone": "Chọn số từ danh bạ",
+  "contactsPhoneDenied": "Bạn vẫn có thể gõ số tay."
 }

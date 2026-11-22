@@ -62,7 +62,7 @@
   "classesErrGrade": "Grade must be 1 to 12.",
   "classesErrCapacity": "Capacity must be 1 to 500.",
   "classesErrEndBeforeStart": "The end date cannot be before the start date.",
-  "classesErrRulesDuplicate": "Two sessions share the same day and start time.",
+  "classesErrRulesDuplicate": "Two sessions on the same day overlap.",
   "classesErrRulesOverflow": "A session cannot run past 24:00.",
   "classesErrRulesTooMany": "At most 14 sessions per week.",
   "classesRulesTitle": "Weekly schedule",
@@ -230,11 +230,7 @@
   "onboardingStepCreateClass": "Create your first class",
   "onboardingStepAddStudents": "Add students",
   "onboardingStepSetSchedule": "Set the schedule",
-  "onboardingStepPayoutAccount": "Payout account",
-  "onboardingStepComplianceChecklist": "Compliance checklist",
   "onboardingSkip": "Later",
-  "onboardingMarkDone": "Done with this step",
-  "onboardingComplianceBody": "See what to do to teach within the rules. Coming soon.",
   "onboardingDoneTitle": "You are all set",
   "onboardingDoneBody": "Go see your classes and students.",
   "onboardingFinish": "Open DayHoc",
@@ -1600,5 +1596,7 @@
   "claimRejectedDone": "Report rejected.",
   "claimReceiptTitle": "Receipt",
   "claimReceiptClose": "Close",
-  "claimReceiptFailed": "Could not open the receipt."
+  "claimReceiptFailed": "Could not open the receipt.",
+  "contactsPickPhone": "Pick a number from contacts",
+  "contactsPhoneDenied": "You can still type the number."
 }

@@ -476,7 +476,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @classesErrRulesDuplicate.
   ///
   /// In vi, this message translates to:
-  /// **'Có hai buổi cùng thứ và giờ bắt đầu.'**
+  /// **'Có hai buổi cùng thứ bị chồng giờ.'**
   String get classesErrRulesDuplicate;
 
   /// No description provided for @classesErrRulesOverflow.
@@ -827,35 +827,11 @@ abstract class MiniAppLocalizations {
   /// **'Đặt lịch học'**
   String get onboardingStepSetSchedule;
 
-  /// No description provided for @onboardingStepPayoutAccount.
-  ///
-  /// In vi, this message translates to:
-  /// **'Tài khoản nhận tiền'**
-  String get onboardingStepPayoutAccount;
-
-  /// No description provided for @onboardingStepComplianceChecklist.
-  ///
-  /// In vi, this message translates to:
-  /// **'Việc cần làm theo quy định'**
-  String get onboardingStepComplianceChecklist;
-
   /// No description provided for @onboardingSkip.
   ///
   /// In vi, this message translates to:
   /// **'Để sau'**
   String get onboardingSkip;
-
-  /// No description provided for @onboardingMarkDone.
-  ///
-  /// In vi, this message translates to:
-  /// **'Xong bước này'**
-  String get onboardingMarkDone;
-
-  /// No description provided for @onboardingComplianceBody.
-  ///
-  /// In vi, this message translates to:
-  /// **'Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.'**
-  String get onboardingComplianceBody;
 
   /// No description provided for @onboardingDoneTitle.
   ///
@@ -4173,6 +4149,18 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Không mở được biên lai.'**
   String get claimReceiptFailed;
+
+  /// No description provided for @contactsPickPhone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn số từ danh bạ'**
+  String get contactsPickPhone;
+
+  /// No description provided for @contactsPhoneDenied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn vẫn có thể gõ số tay.'**
+  String get contactsPhoneDenied;
 }
 
 class _MiniAppLocalizationsDelegate

@@ -47,7 +47,7 @@ void main() {
 
   testWidgets('mở lần đầu: bước 1, không có "Để sau"', (tester) async {
     await _open(tester, FakeOnboardingRepository(onboardingOf({})));
-    expect(find.text('Bước 1/5'), findsOneWidget);
+    expect(find.text('Bước 1/3'), findsOneWidget);
     expect(find.text('Tạo lớp đầu tiên'), findsOneWidget);
     expect(find.text('Để sau'), findsNothing);
   });
@@ -59,69 +59,37 @@ void main() {
         onboardingOf({OnboardingStep.createClass: _done}),
       ),
     );
-    expect(find.text('Bước 2/5'), findsOneWidget);
+    expect(find.text('Bước 2/3'), findsOneWidget);
     expect(find.textContaining('Họ và tên'), findsOneWidget);
     expect(find.text('Để sau'), findsOneWidget);
   });
 
-  testWidgets('mở lại giữa chừng: vào đúng bước dở (bước 4)', (tester) async {
+  testWidgets('mở lại giữa chừng: vào đúng bước dở (bước 3)', (tester) async {
     await _open(
       tester,
       FakeOnboardingRepository(
         onboardingOf({
           OnboardingStep.createClass: _done,
-          OnboardingStep.addStudents: _done,
-          OnboardingStep.setSchedule: OnboardingStatus.skipped,
+          OnboardingStep.addStudents: OnboardingStatus.skipped,
         }),
       ),
     );
-    expect(find.text('Bước 4/5'), findsOneWidget);
-    expect(find.text('Tài khoản nhận tiền'), findsOneWidget);
+    expect(find.text('Bước 3/3'), findsOneWidget);
+    expect(find.text('Đặt lịch học'), findsOneWidget);
   });
 
-  testWidgets(
-    'bước 4: danh sách tài khoản thật; có tài khoản thì Tiếp tục ghi done',
-    (tester) async {
-      final fees = FakeFeeRepository()..accounts = [sampleAccount()];
-      final repo = await _open(
-        tester,
-        FakeOnboardingRepository(
-          onboardingOf({
-            OnboardingStep.createClass: _done,
-            OnboardingStep.addStudents: _done,
-            OnboardingStep.setSchedule: OnboardingStatus.skipped,
-          }),
-        ),
-        fees: fees,
-      );
-      expect(find.text('Vietcombank · ******6789'), findsOneWidget);
-      expect(find.text('Tính năng sắp có.'), findsNothing);
-      await tester.tap(find.text('Tiếp tục'));
-      await tester.pumpAndSettle();
-      expect(repo.patches.first, (
-        OnboardingStep.payoutAccount,
-        OnboardingStatus.done,
-      ));
-    },
-  );
-
-  testWidgets(
-    'bước 4 chưa có tài khoản: chỉ có nút Thêm tài khoản, không có Tiếp tục',
-    (tester) async {
-      await _open(
-        tester,
-        FakeOnboardingRepository(
-          onboardingOf({
-            OnboardingStep.createClass: _done,
-            OnboardingStep.addStudents: _done,
-            OnboardingStep.setSchedule: OnboardingStatus.skipped,
-          }),
-        ),
-      );
-      expect(find.text('Thêm tài khoản'), findsOneWidget);
-      expect(find.text('Tiếp tục'), findsNothing);
-    },
-  );
+  testWidgets('bước 2 chỉ nhập tay: không có "Thêm từ danh bạ" hàng loạt', (
+    tester,
+  ) async {
+    await _open(
+      tester,
+      FakeOnboardingRepository(
+        onboardingOf({OnboardingStep.createClass: _done}),
+      ),
+    );
+    expect(find.text('Thêm từ danh bạ'), findsNothing);
+    expect(find.byTooltip('Chọn số từ danh bạ'), findsOneWidget);
+  });
 
   testWidgets('"Để sau" ở bước 2 gửi skipped và chuyển bước 3', (tester) async {
     final repo = await _open(
@@ -136,7 +104,7 @@ void main() {
     expect(repo.patches, [
       (OnboardingStep.addStudents, OnboardingStatus.skipped),
     ]);
-    expect(find.text('Bước 3/5'), findsOneWidget);
+    expect(find.text('Bước 3/3'), findsOneWidget);
   });
 
   testWidgets('lưu học viên ở bước 2 đánh dấu bước xong', (tester) async {
@@ -151,10 +119,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repo.patches, [(OnboardingStep.addStudents, _done)]);
-    expect(find.text('Bước 3/5'), findsOneWidget);
+    expect(find.text('Bước 3/3'), findsOneWidget);
   });
 
-  testWidgets('xong hết 5 bước: màn hoàn tất', (tester) async {
+  testWidgets('xong hết 3 bước: màn hoàn tất', (tester) async {
     await _open(
       tester,
       FakeOnboardingRepository(
@@ -179,7 +147,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Bước này chưa lưu được. Kiểm tra lại.'), findsOneWidget);
-    expect(find.text('Bước 2/5'), findsOneWidget);
+    expect(find.text('Bước 2/3'), findsOneWidget);
   });
 
   testWidgets('409 đang xử lý: thông báo thử lại', (tester) async {
@@ -220,7 +188,7 @@ void main() {
         }),
       ),
     );
-    expect(find.text('Bước 3/5'), findsOneWidget);
+    expect(find.text('Bước 3/3'), findsOneWidget);
     expect(find.text('Xong bước này'), findsNothing);
     expect(find.text('Để sau'), findsOneWidget);
   });
@@ -241,7 +209,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Đã lưu. Chưa ghi nhận được bước này.'), findsOneWidget);
-      expect(find.text('Bước 2/5'), findsOneWidget);
+      expect(find.text('Bước 2/3'), findsOneWidget);
 
       repo.patchError = null;
       await tester.tap(find.text('Thử lại'));
@@ -252,7 +220,7 @@ void main() {
         (OnboardingStep.addStudents, _done),
         (OnboardingStep.addStudents, _done),
       ]);
-      expect(find.text('Bước 3/5'), findsOneWidget);
+      expect(find.text('Bước 3/3'), findsOneWidget);
     },
   );
 }

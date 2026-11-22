@@ -218,7 +218,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
       'Ngày kết thúc không được trước ngày bắt đầu.';
 
   @override
-  String get classesErrRulesDuplicate => 'Có hai buổi cùng thứ và giờ bắt đầu.';
+  String get classesErrRulesDuplicate => 'Có hai buổi cùng thứ bị chồng giờ.';
 
   @override
   String get classesErrRulesOverflow => 'Buổi học không được kéo qua 24:00.';
@@ -438,20 +438,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get onboardingStepSetSchedule => 'Đặt lịch học';
 
   @override
-  String get onboardingStepPayoutAccount => 'Tài khoản nhận tiền';
-
-  @override
-  String get onboardingStepComplianceChecklist => 'Việc cần làm theo quy định';
-
-  @override
   String get onboardingSkip => 'Để sau';
-
-  @override
-  String get onboardingMarkDone => 'Xong bước này';
-
-  @override
-  String get onboardingComplianceBody =>
-      'Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.';
 
   @override
   String get onboardingDoneTitle => 'Bạn đã xong phần làm quen';
@@ -2433,4 +2420,10 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get claimReceiptFailed => 'Không mở được biên lai.';
+
+  @override
+  String get contactsPickPhone => 'Chọn số từ danh bạ';
+
+  @override
+  String get contactsPhoneDenied => 'Bạn vẫn có thể gõ số tay.';
 }

@@ -9,14 +9,13 @@ import '../../../l10n/l10n.dart';
 import '../../classes/data/class_models.dart';
 import '../../classes/data/classes_repository.dart';
 import '../../classes/pages/class_form_page.dart';
-import '../../fees/pages/payout_accounts_page.dart';
 import '../../students/pages/student_form_page.dart';
 import '../cubit/onboarding_cubit.dart';
 import '../data/onboarding_draft.dart';
 import '../data/onboarding_models.dart';
 import '../data/onboarding_repository.dart';
 
-/// [T02] Khung onboarding 5 bước. Route `/t/onboarding`.
+/// [T02] Khung onboarding 3 bước. Route `/t/onboarding`.
 class OnboardingPage extends StatelessWidget {
   const OnboardingPage({super.key, this.initialStep});
 
@@ -30,34 +29,10 @@ class OnboardingPage extends StatelessWidget {
   );
 }
 
-/// Màn giữ chỗ của bước 5 (checklist tuân thủ, chưa có màn thật).
-///
-/// shortcut: không có nút hoàn thành (không ghi `done` khi chưa làm gì); thay
-/// bằng màn thật khi có, truyền [onDone] để gọi khi người dùng xong.
-class OnboardingPlaceholderStep extends StatelessWidget {
-  const OnboardingPlaceholderStep({super.key, required this.body, this.onDone});
-
-  final String body;
-  final VoidCallback? onDone;
-
-  @override
-  Widget build(BuildContext context) => AppEmptyState(
-    message: body,
-    action: onDone == null
-        ? null
-        : AppButton(
-            label: context.miniAppL10n.onboardingMarkDone,
-            onPressed: onDone,
-          ),
-  );
-}
-
 String _stepTitle(MiniAppLocalizations l10n, OnboardingStep s) => switch (s) {
   OnboardingStep.createClass => l10n.onboardingStepCreateClass,
   OnboardingStep.addStudents => l10n.onboardingStepAddStudents,
   OnboardingStep.setSchedule => l10n.onboardingStepSetSchedule,
-  OnboardingStep.payoutAccount => l10n.onboardingStepPayoutAccount,
-  OnboardingStep.complianceChecklist => l10n.onboardingStepComplianceChecklist,
 };
 
 class OnboardingView extends StatelessWidget {
@@ -196,13 +171,6 @@ class _StepBody extends StatelessWidget {
             ),
             OnboardingStep.setSchedule => _ScheduleStep(
               onSaved: () => _complete(cubit, step),
-            ),
-            OnboardingStep.payoutAccount => PayoutAccountsPage(
-              embedded: true,
-              onContinue: () => cubit.complete(step),
-            ),
-            OnboardingStep.complianceChecklist => OnboardingPlaceholderStep(
-              body: l10n.onboardingComplianceBody,
             ),
           },
         ),
@@ -433,6 +401,7 @@ class _AddStudentsBodyState extends State<_AddStudentsBody> {
                     : const Center(child: CircularProgressIndicator()))
               : StudentFormScope(
                   keys: _studentKeys,
+                  quickAdd: true,
                   onSaved: (id) async {
                     await _store().update((d) => d.copyWith(studentId: id));
                     if (!mounted) return;
