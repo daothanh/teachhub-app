@@ -221,6 +221,25 @@ void main() {
     await _dispose(tester);
   });
 
+  testWidgets('Đổi email rồi gửi lại: đếm ngược cũ không ghi đè cái mới', (
+    tester,
+  ) async {
+    await _pump(tester);
+    await _toOtp(tester);
+    await tester.pump(const Duration(seconds: 10));
+    expect(find.text('Gửi lại mã sau 0:50'), findsOneWidget);
+    await tester.tap(find.text('Đổi email'));
+    await tester.pumpAndSettle();
+    await _toOtp(tester);
+    // Dò mỗi nửa giây: timer cũ (còn ~0:4x) mà còn chạy sẽ ghi đè lên số mới.
+    for (var i = 0; i < 6; i++) {
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.textContaining('Gửi lại mã sau 0:4'), findsNothing);
+      expect(find.textContaining('Gửi lại mã sau'), findsOneWidget);
+    }
+    await _dispose(tester);
+  });
+
   testWidgets('T01a (B24): OTP_LOCKED → banner, đếm ngược, nút Tạm khóa', (
     tester,
   ) async {
