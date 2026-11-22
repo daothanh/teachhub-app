@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math';
 
@@ -132,9 +133,13 @@ class TeacherDatabase extends _$TeacherDatabase {
   );
 
   /// Mở `teacher.sqlite` với khóa 256-bit lấy từ [keyStore] (Keychain/
-  /// Keystore), sinh khóa ở lần mở đầu.
-  static Future<TeacherDatabase> openEncrypted(KeyValueStore keyStore) async =>
-      openWithKey(await databaseKey(keyStore));
+  /// Keystore), sinh khóa ở lần mở đầu. [directory] là thư mục drift_flutter
+  /// lưu file (xem [openingDatabaseKey]).
+  static Future<TeacherDatabase> openEncrypted(
+    KeyValueStore keyStore, {
+    required Future<Directory> Function() directory,
+  }) async =>
+      openWithKey(await openingDatabaseKey(keyStore, await directory()));
 
   /// Mở với khóa đã có. Isolate nền dùng đường này (khóa đọc bằng
   /// [readDatabaseKey]) để không bao giờ sinh khóa mới.
@@ -195,6 +200,24 @@ Future<void> deleteTeacherDatabase(
 Future<String?> readDatabaseKey(KeyValueStore store) async {
   final stored = await store.read(_keyName);
   return stored != null && stored.length == 64 ? stored : null;
+}
+
+/// Khóa để mở CSDL ở app chính. Mất khóa mà file cũ còn (Android khôi phục
+/// backup hay chuyển máy không mang theo Keystore, Keystore bị reset) thì file
+/// đó không giải mã được nữa: xóa rồi tạo mới, thay vì mở bằng khóa mới và lỗi
+/// mãi, khóa cả mini-app. Outbox trong file cũ vốn không đọc được nên không mất
+/// thêm gì; cache tải lại từ server.
+Future<String> openingDatabaseKey(KeyValueStore store, Directory dir) async {
+  final stored = await readDatabaseKey(store);
+  if (stored != null) return stored;
+  if (File('${dir.path}/$teacherDatabaseFile').existsSync()) {
+    developer.log(
+      'Teacher DB còn file nhưng mất khóa, tạo lại CSDL',
+      name: 'teacher',
+    );
+  }
+  await deleteTeacherDatabase(store, dir);
+  return databaseKey(store);
 }
 
 /// Khóa CSDL dạng hex 64 ký tự; sinh bằng CSPRNG và lưu ở lần đầu.

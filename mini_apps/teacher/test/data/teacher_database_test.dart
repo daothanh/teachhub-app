@@ -65,6 +65,27 @@ void main() {
     );
   });
 
+  test('mất khóa mà file cũ còn: xóa file, sinh khóa mới', () async {
+    final store = InMemoryKeyValueStore();
+    final file = File('${dir.path}/$teacherDatabaseFile')
+      ..writeAsStringSync('mã hóa bằng khóa đã mất');
+    File('${dir.path}/$teacherDatabaseFile-wal').writeAsStringSync('x');
+    final key = await openingDatabaseKey(store, dir);
+    expect(key, matches(RegExp(r'^[0-9a-f]{64}$')));
+    expect(file.existsSync(), isFalse);
+    expect(File('${dir.path}/$teacherDatabaseFile-wal').existsSync(), isFalse);
+    expect(await readDatabaseKey(store), key);
+  });
+
+  test('còn khóa: giữ nguyên file và khóa', () async {
+    final store = InMemoryKeyValueStore();
+    final key = await databaseKey(store);
+    final file = File('${dir.path}/$teacherDatabaseFile')
+      ..writeAsStringSync('dữ liệu');
+    expect(await openingDatabaseKey(store, dir), key);
+    expect(file.existsSync(), isTrue);
+  });
+
   test('the key is created once and reused', () async {
     final store = InMemoryKeyValueStore();
     final first = await databaseKey(store);
