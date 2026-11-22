@@ -85,7 +85,7 @@ void defineOnboardingFlowTests() {
     WidgetTester tester, {
     String route = '${TeachHubRoutes.teacher}/onboarding',
   }) async {
-    tester.view.physicalSize = const Size(390, 1400) * 3;
+    tester.view.physicalSize = const Size(402, 874) * 3;
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.reset);
 
@@ -229,6 +229,8 @@ void defineOnboardingFlowTests() {
     await tester.enterText(fieldOf(tl.classesFieldSubject), 'Toán');
     await tester.enterText(fieldOf(tl.classesFieldGrade), '9');
     await tester.enterText(fieldOf(tl.classesFieldLocation), 'Nhà riêng');
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     await reveal(tester, inputOf(tl.classesFieldStart));
     await tester.tap(inputOf(tl.classesFieldStart));
     await tester.pumpAndSettle();
@@ -237,18 +239,23 @@ void defineOnboardingFlowTests() {
     await tapButton(tester, tl.classesSave);
   }
 
+  Future<void> continueStudents(WidgetTester tester) =>
+      tapButton(tester, tl.onboardingStudentsContinue(1));
+
   Future<void> addStudent(WidgetTester tester) async {
     await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
-    await tapButton(tester, tl.studentsSave);
-  }
-
-  Future<void> skip(WidgetTester tester) async {
-    await tester.tap(find.widgetWithText(AppButton, tl.onboardingSkip));
+    // Ô đang focus tự cuộn về con trỏ, kéo nút ở cuối form ra khỏi màn (máy thật).
+    FocusManager.instance.primaryFocus?.unfocus();
     await tester.pumpAndSettle();
+    await tapButton(tester, tl.onboardingAddStudent);
+    // Ghi danh lỗi thì chưa có học sinh trong danh sách, chưa có "Tiếp tục".
+    if (find.text(tl.onboardingStudentsContinue(1)).evaluate().isNotEmpty) {
+      await continueStudents(tester);
+    }
   }
 
   void expectStep(int n) =>
-      expect(find.text(tl.onboardingProgress(n, 5)), findsOneWidget);
+      expect(find.text(tl.onboardingProgress(n, 3)), findsOneWidget);
 
   /// Lưu quy tắc mặc định (thứ Hai 18:00, 90 phút) của bước 3.
   Future<void> addRuleAndSave(WidgetTester tester) async {
@@ -256,8 +263,8 @@ void defineOnboardingFlowTests() {
     await tapButton(tester, tl.classesSave);
   }
 
-  testWidgets('luồng B: onboarding → tạo lớp → thêm học viên → đặt lịch → '
-      'bỏ qua bước 4, 5 → Hôm nay có buổi học và thẻ nhắc', (tester) async {
+  testWidgets('luồng B: onboarding 3 bước → tạo lớp → thêm học viên → đặt '
+      'lịch → Hôm nay có buổi học', (tester) async {
     await setUpBackend(tester);
     await openApp(tester);
 
@@ -284,27 +291,20 @@ void defineOnboardingFlowTests() {
     expect(backend.steps['set_schedule'], 'done');
     expect(backend.classCreates, 1, reason: 'đặt lịch sửa lớp, không tạo lớp');
 
-    // Bước 4 và 5 bỏ qua được.
-    expectStep(4);
-    await skip(tester);
-    await tester.pumpAndSettle();
-    expectStep(5);
-    await skip(tester);
-    await tester.pumpAndSettle();
-    expect(backend.steps['payout_account'], 'skipped');
-    expect(backend.steps['compliance_checklist'], 'skipped');
+    // Server còn bước 4–5 nhưng app dừng ở bước 3 (22/11/2026), không ghi gì thêm.
+    expect(backend.steps['payout_account'], isNot('skipped'));
+    expect(backend.steps['compliance_checklist'], isNot('skipped'));
 
-    // Xong: vào Hôm nay thấy buổi vừa đặt và thẻ nhắc hai bước đã bỏ qua.
-    expect(find.text(tl.onboardingDoneTitle), findsOneWidget);
-    await tester.tap(find.widgetWithText(AppButton, tl.onboardingFinish));
-    await tester.pumpAndSettle();
+    // Xong bước 3: vào thẳng Hôm nay, gợi ý mời phụ huynh của lớp vừa tạo.
     expect(router.state.uri.path, TeachHubRoutes.teacher);
+    expect(find.text(tl.todayInviteTitle), findsOneWidget);
+    await tester.tap(find.text(tl.todayInviteLater));
+    await tester.pumpAndSettle();
 
-    // Hôm nay được làm mới ngay: buổi vừa đặt và thẻ nhắc hai bước đã bỏ qua.
+    // Hôm nay được làm mới ngay: buổi vừa đặt, không còn thẻ nhắc (không bỏ qua bước nào).
     expect(find.text('Toán 9A'), findsOneWidget);
     expect(find.text(tl.todayTakeAttendance), findsOneWidget);
-    expect(find.text(tl.todayOnboardingTitle), findsOneWidget);
-    expect(find.text(tl.onboardingStepPayoutAccount), findsOneWidget);
+    expect(find.text(tl.todayOnboardingTitle), findsNothing);
 
     // Màn điểm danh của buổi đó thấy học viên đã thêm ở bước 2.
     await tester.tap(find.text(tl.todayTakeAttendance));
@@ -340,7 +340,7 @@ void defineOnboardingFlowTests() {
     // Lớp tạo ở bước 1 vẫn là lớp được đặt lịch.
     await addRuleAndSave(tester);
     expect(backend.rules, hasLength(1));
-    expectStep(4);
+    expect(find.text(tl.todayInviteTitle), findsOneWidget);
 
     await finish(tester);
   });
@@ -381,6 +381,7 @@ void defineOnboardingFlowTests() {
     expect(backend.enrolled, isEmpty);
     expect(backend.steps['add_students'], 'pending');
     await tapButton(tester, tl.onboardingRetry);
+    await continueStudents(tester);
 
     expectStep(3);
     expect(backend.studentCreates, 1);
@@ -424,6 +425,7 @@ void defineOnboardingFlowTests() {
 
     expect(backend.studentCreates, 1, reason: 'không tạo học viên thứ hai');
     expect(backend.enrolled, [FakeOnboardingBackend.studentId]);
+    await continueStudents(tester);
     expect(backend.steps['add_students'], 'done');
     expectStep(3);
 

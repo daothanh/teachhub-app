@@ -1,12 +1,14 @@
 import 'package:equatable/equatable.dart';
 
 /// Khóa bước theo thứ tự của hợp đồng (`Onboarding.steps[].step`).
+///
+/// Onboarding còn 3 bước (22/11/2026). Server vẫn trả `payout_account` và
+/// `compliance_checklist`: [fromWire] coi là bước lạ nên app bỏ qua, xong
+/// bước 3 thì [Onboarding.currentStep] là `null`.
 enum OnboardingStep {
   createClass('create_class'),
   addStudents('add_students'),
-  setSchedule('set_schedule'),
-  payoutAccount('payout_account'),
-  complianceChecklist('compliance_checklist');
+  setSchedule('set_schedule');
 
   const OnboardingStep(this.wire);
   final String wire;

@@ -2,20 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 
-/// Theme TeachHub = preset Tasco (`AppTheme.v1`/`v1Dark`)
+/// Theme DayHoc = preset Tasco (`AppTheme.v1`/`v1Dark`)
 /// + token ghi đè `assets/tokens/teachhub.tokens.json` (màu, bo góc, khoảng cách)
-/// + thang chữ Inter của Figma DS (`TeachHub/*`).
+/// + thang chữ Be Vietnam Pro của Figma DS v2 (`DayHoc/*`).
 ///
-/// Nguồn token: Figma kOMrSBbbMkgGSBTNnFV72z, mode "Brand". Mini-app kế thừa
-/// theme này qua host shell, không tự dựng theme.
+/// Nguồn token: Figma kOMrSBbbMkgGSBTNnFV72z, mode "Light"/"Dark". Mini-app kế
+/// thừa theme này qua host shell, không tự dựng theme.
 abstract final class TeachHubTheme {
   static const tokensAsset = 'assets/tokens/teachhub.tokens.json';
-  static const fontFamily = 'Inter';
+  static const fontFamily = 'Be Vietnam Pro';
 
-  /// `bg/disabled`, `text/disabled` (DS · Color). DS chưa có mode Dark nên
-  /// dark giữ màu disabled của preset.
-  static const _disabledBg = Color(0xFFE5E5E5);
-  static const _disabledFg = Color(0xFF8A8A8A);
+  /// `bg/disabled`, `text/disabled` (DS · Color Light/Dark).
+  static const _disabledBg = Color(0xFFE4E4DE);
+  static const _disabledFg = Color(0xFF8C8C84);
+  static const _disabledBgDark = Color(0xFF2A2A27);
+  static const _disabledFgDark = Color(0xFF6B6B64);
+
+  /// `action/secondary/border` — viền nút phụ (nút trung tính, chữ đen).
+  static const _secondaryBorder = Color(0xFFD3D3CB);
+  static const _secondaryBorderDark = Color(0xFF4A4A45);
 
   static Future<({ThemeData light, ThemeData dark})> load([
     AssetBundle? bundle,
@@ -43,29 +48,37 @@ abstract final class TeachHubTheme {
           sm: TascoButtonSizeTheme(height: 40, textStyle: buttonSmall),
         ),
         variants: TascoButtonVariants(
-          primary: light
-              ? const TascoButtonVariantTheme(
-                  disabledBackgroundColor: _disabledBg,
-                  disabledForegroundColor: _disabledFg,
-                )
-              : null,
-          // Lime trên nền trắng chỉ 1.2:1 → nút viền dùng `action/secondary` (lime/800).
+          primary: TascoButtonVariantTheme(
+            disabledBackgroundColor: light ? _disabledBg : _disabledBgDark,
+            disabledForegroundColor: light ? _disabledFg : _disabledFgDark,
+          ),
+          // DS v2: nút phụ trung tính (viền stone, chữ đen); lime chỉ cho hành động chính.
           outlinePrimary: TascoButtonVariantTheme(
-            foregroundColor: scheme.secondary,
-            borderColor: scheme.secondary,
+            foregroundColor: scheme.onSurface,
+            borderColor: light ? _secondaryBorder : _secondaryBorderDark,
           ),
         ),
       ),
     );
 
-    // withTokens dựng lại component theme (app bar, input, nút…) theo chữ Inter.
+    // withTokens dựng lại component theme (app bar, input, nút…) theo chữ DS.
     final base = AppTheme.withTokens(themed.copyWith(textTheme: text), tokens);
+    // Preset viền ô nhập bằng `outlineVariant` (border/default, chỉ ~1.3:1);
+    // DS v2 dùng `border/control` (= `outline`, ≥ 3:1, WCAG 1.4.11).
+    final controlBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(tokens.fieldRadius),
+      borderSide: BorderSide(color: scheme.outline),
+    );
     return base.copyWith(
+      inputDecorationTheme: base.inputDecorationTheme.copyWith(
+        border: controlBorder,
+        enabledBorder: controlBorder,
+      ),
       extensions: [
         ...base.extensions.values,
         const TeachHubColors(warningBorder: Color(0xFFF59E0B)),
       ],
-      disabledColor: light ? _disabledFg : null,
+      disabledColor: light ? _disabledFg : _disabledFgDark,
       // Mặc định Material lấy `primary` (lime) cho chữ nút và vạch tiến trình — không đủ tương phản.
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
@@ -79,35 +92,35 @@ abstract final class TeachHubTheme {
     );
   }
 
-  /// Text style `TeachHub/*` của Figma → slot `TextTheme`.
+  /// Text style `DayHoc/*` của Figma DS v2 → slot `TextTheme`.
   ///
-  /// | Figma            | Cỡ/dòng/độ đậm | Slot                            |
-  /// |------------------|----------------|---------------------------------|
-  /// | Display          | 24/32/700      | `headlineLarge`                 |
-  /// | H1               | 20/28/700      | `headlineMedium`, `headlineSmall` |
-  /// | H2 (app bar)     | 17/24/700      | `titleLarge`, `titleMedium`     |
-  /// | H3               | 15/22/700      | `titleSmall`                    |
-  /// | Body             | 14/20/400      | `bodyLarge`, `bodyMedium`       |
-  /// | Caption          | 12/16/400      | `bodySmall`                     |
-  /// | Button           | 15/20/600      | `labelLarge`                    |
-  /// | Label            | 12/16/600      | `labelMedium`                   |
-  /// | Nav              | 11/14/400      | `labelSmall`                    |
+  /// | Figma            | Cỡ/dòng/độ đậm/giãn chữ | Slot                              |
+  /// |------------------|-------------------------|-----------------------------------|
+  /// | Display          | 24/32/600/−2%           | `headlineLarge`                   |
+  /// | H1               | 20/28/600/−1,5%         | `headlineMedium`, `headlineSmall` |
+  /// | H2 (app bar)     | 17/24/600/−1%           | `titleLarge`, `titleMedium`       |
+  /// | H3               | 15/22/600/−0,5%         | `titleSmall`                      |
+  /// | Body             | 14/20/400               | `bodyLarge`, `bodyMedium`         |
+  /// | Caption          | 12/16/400               | `bodySmall`                       |
+  /// | Button           | 15/20/600               | `labelLarge`                      |
+  /// | Label            | 12/16/500               | `labelMedium`                     |
+  /// | Nav              | 11/14/500               | `labelSmall`                      |
   static TextTheme textTheme(Color color) => TextTheme(
-    headlineLarge: _style(24, 32, FontWeight.w700, color),
-    headlineMedium: _style(20, 28, FontWeight.w700, color),
-    headlineSmall: _style(20, 28, FontWeight.w700, color),
-    titleLarge: _style(17, 24, FontWeight.w700, color),
-    titleMedium: _style(17, 24, FontWeight.w700, color),
-    titleSmall: _style(15, 22, FontWeight.w700, color),
+    headlineLarge: _style(24, 32, FontWeight.w600, color, -2),
+    headlineMedium: _style(20, 28, FontWeight.w600, color, -1.5),
+    headlineSmall: _style(20, 28, FontWeight.w600, color, -1.5),
+    titleLarge: _style(17, 24, FontWeight.w600, color, -1),
+    titleMedium: _style(17, 24, FontWeight.w600, color, -1),
+    titleSmall: _style(15, 22, FontWeight.w600, color, -0.5),
     bodyLarge: _style(14, 20, FontWeight.w400, color),
     bodyMedium: _style(14, 20, FontWeight.w400, color),
     bodySmall: _style(12, 16, FontWeight.w400, color),
     labelLarge: _style(15, 20, FontWeight.w600, color),
-    labelMedium: _style(12, 16, FontWeight.w600, color),
-    labelSmall: _style(11, 14, FontWeight.w400, color),
+    labelMedium: _style(12, 16, FontWeight.w500, color),
+    labelSmall: _style(11, 14, FontWeight.w500, color),
   );
 
-  /// `TeachHub/Button S` — 13/18/600.
+  /// `DayHoc/Button S` — 13/18/600.
   static const buttonSmall = TextStyle(
     fontFamily: fontFamily,
     fontSize: 13,
@@ -120,14 +133,15 @@ abstract final class TeachHubTheme {
     double size,
     double lineHeight,
     FontWeight weight,
-    Color color,
-  ) => TextStyle(
+    Color color, [
+    double trackingPercent = 0,
+  ]) => TextStyle(
     fontFamily: fontFamily,
     fontSize: size,
     height: lineHeight / size,
     fontWeight: weight,
-    // Figma letterSpacing 0; không để Typography của Material chèn giá trị mặc định.
-    letterSpacing: 0,
+    // Figma giãn chữ theo % cỡ chữ; luôn đặt để Material không chèn giá trị mặc định.
+    letterSpacing: size * trackingPercent / 100,
     color: color,
   );
 }

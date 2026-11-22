@@ -258,7 +258,7 @@ void main() {
     }
     await save(tester);
 
-    expect(find.text('Có hai buổi cùng thứ và giờ bắt đầu.'), findsOneWidget);
+    expect(find.text('Có hai buổi cùng thứ bị chồng giờ.'), findsOneWidget);
     expect(repo.calls, isEmpty);
   });
 
@@ -301,7 +301,7 @@ void main() {
       await tester.pumpAndSettle();
     }
     await save(tester); // hiện đủ lỗi ở trường và lỗi quy tắc trùng
-    expect(find.text('Có hai buổi cùng thứ và giờ bắt đầu.'), findsOneWidget);
+    expect(find.text('Có hai buổi cùng thứ bị chồng giờ.'), findsOneWidget);
     expect(tester.takeException(), isNull);
     // Mỗi nút Xóa có nhãn riêng theo số buổi.
     expect(find.bySemanticsLabel('Xóa buổi 1'), findsOneWidget);

@@ -294,8 +294,7 @@ Map<String, ClassFieldError> validateClass(
     e['rules'] = ClassFieldError.rulesTooMany;
   } else if (rules.any((r) => r.durationMin < 15 || r.durationMin > 480)) {
     e['rules'] = ClassFieldError.rulesDuration;
-  } else if ({for (final r in rules) '${r.weekday}|${r.startTime}'}.length !=
-      rules.length) {
+  } else if (_hasOverlap(rules)) {
     e['rules'] = ClassFieldError.rulesDuplicate;
   } else if (rules.any((r) => minutesOf(r.startTime) + r.durationMin > 1440)) {
     e['rules'] = ClassFieldError.rulesOverflow;
@@ -318,6 +317,21 @@ Map<String, ClassFieldError> validateClass(
     }
   }
   return e;
+}
+
+/// Hai buổi cùng thứ chồng giờ (US-0.2 AC6); cùng thứ mà không chồng thì hợp lệ.
+bool _hasOverlap(List<ScheduleRule> rules) {
+  for (var i = 0; i < rules.length; i++) {
+    for (var j = i + 1; j < rules.length; j++) {
+      final a = rules[i], b = rules[j];
+      if (a.weekday != b.weekday) continue;
+      final aStart = minutesOf(a.startTime), bStart = minutesOf(b.startTime);
+      if (aStart < bStart + b.durationMin && bStart < aStart + a.durationMin) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 int minutesOf(String hhmm) {

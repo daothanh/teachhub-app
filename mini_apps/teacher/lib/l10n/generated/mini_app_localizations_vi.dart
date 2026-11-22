@@ -218,7 +218,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
       'Ngày kết thúc không được trước ngày bắt đầu.';
 
   @override
-  String get classesErrRulesDuplicate => 'Có hai buổi cùng thứ và giờ bắt đầu.';
+  String get classesErrRulesDuplicate => 'Có hai buổi cùng thứ bị chồng giờ.';
 
   @override
   String get classesErrRulesOverflow => 'Buổi học không được kéo qua 24:00.';
@@ -438,20 +438,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get onboardingStepSetSchedule => 'Đặt lịch học';
 
   @override
-  String get onboardingStepPayoutAccount => 'Tài khoản nhận tiền';
-
-  @override
-  String get onboardingStepComplianceChecklist => 'Việc cần làm theo quy định';
-
-  @override
   String get onboardingSkip => 'Để sau';
-
-  @override
-  String get onboardingMarkDone => 'Xong bước này';
-
-  @override
-  String get onboardingComplianceBody =>
-      'Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.';
 
   @override
   String get onboardingDoneTitle => 'Bạn đã xong phần làm quen';
@@ -486,7 +473,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get onboardingStudentNotEnrolled =>
-      'Đã lưu học viên. Chưa thêm được vào lớp hoặc chưa ghi nhận bước này.';
+      'Đã lưu học viên. Chưa thêm được vào lớp.';
 
   @override
   String get onboardingScheduleChooseClass =>
@@ -2433,4 +2420,34 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get claimReceiptFailed => 'Không mở được biên lai.';
+
+  @override
+  String get contactsPickPhone => 'Chọn số từ danh bạ';
+
+  @override
+  String get contactsPhoneDenied => 'Bạn vẫn có thể gõ số tay.';
+
+  @override
+  String get onboardingAddStudent => '+ Thêm học sinh';
+
+  @override
+  String get onboardingStudentsAdded => 'Đã thêm';
+
+  @override
+  String onboardingStudentsContinue(int n) {
+    return 'Tiếp tục ($n học sinh)';
+  }
+
+  @override
+  String get todayInviteTitle => 'Mời phụ huynh theo dõi lớp';
+
+  @override
+  String get todayInviteBody =>
+      'Phụ huynh theo dõi lớp sẽ nhận được thông báo điểm danh, điểm kiểm tra, học phí.';
+
+  @override
+  String get todayInviteSend => 'Gửi link qua Zalo';
+
+  @override
+  String get todayInviteLater => 'Để sau';
 }

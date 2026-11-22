@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:teacher/features/students/data/contacts_service.dart';
 import 'package:teacher/features/students/data/student_models.dart';
 import 'package:teacher/features/students/data/student_repository.dart';
 import 'package:teacher/features/students/pages/student_form_page.dart';
@@ -286,5 +287,75 @@ void main() {
     await _save(tester);
     expect(find.text('Có phải cùng một em?'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  group('bước 2 onboarding (quickAdd): chỉ nhập tay, chọn SĐT từ danh bạ', () {
+    Future<FakeContactsService> openQuick(
+      WidgetTester tester, {
+      ContactsAccess access = ContactsAccess.granted,
+      List<String>? picked,
+    }) async {
+      final contacts = FakeContactsService(access: access)..picked = picked;
+      GetIt.I.registerSingleton<ContactsService>(contacts);
+      GetIt.I.registerSingleton<StudentRepository>(FakeStudentRepository([]));
+      await pumpApp(
+        tester,
+        Scaffold(body: StudentFormScope(onSaved: (_) {}, quickAdd: true)),
+      );
+      return contacts;
+    }
+
+    Finder phoneField() => find.widgetWithText(TextField, '0912345678');
+
+    testWidgets(
+      'không có "Thêm từ danh bạ"; chọn liên hệ thì điền số đã chuẩn hóa',
+      (tester) async {
+        final contacts = await openQuick(tester, picked: ['+84 912 345 678']);
+        expect(find.text('Thêm từ danh bạ'), findsNothing);
+        await tester.tap(find.byTooltip('Chọn số từ danh bạ'));
+        await tester.pumpAndSettle();
+        expect(contacts.requests, 1);
+        expect(contacts.picks, 1);
+        expect(phoneField(), findsOneWidget);
+      },
+    );
+
+    testWidgets('liên hệ nhiều số: chọn 1 số trong danh sách', (tester) async {
+      await openQuick(tester, picked: ['0912345678', '0987654321']);
+      await tester.tap(find.byTooltip('Chọn số từ danh bạ'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('0912345678'));
+      await tester.pumpAndSettle();
+      expect(phoneField(), findsOneWidget);
+    });
+
+    testWidgets('từ chối quyền: báo vẫn gõ tay được, không mở bộ chọn', (
+      tester,
+    ) async {
+      final contacts = await openQuick(tester, access: ContactsAccess.denied);
+      await tester.tap(find.byTooltip('Chọn số từ danh bạ'));
+      await tester.pumpAndSettle();
+      expect(find.text('Bạn vẫn có thể gõ số tay.'), findsOneWidget);
+      expect(contacts.picks, 0);
+    });
+
+    testWidgets('hàng phụ huynh để trống không chặn lưu và không được gửi', (
+      tester,
+    ) async {
+      final saved = <String>[];
+      final repo = FakeStudentRepository([_saved]);
+      GetIt.I.registerSingleton<StudentRepository>(repo);
+      await pumpApp(
+        tester,
+        Scaffold(body: StudentFormScope(onSaved: saved.add, quickAdd: true)),
+      );
+      await _fillName(tester);
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -1500));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('+ Thêm học sinh'));
+      await tester.pumpAndSettle();
+      expect(saved, ['s-new']);
+      expect(repo.calls.single.draft.guardians, isEmpty);
+    });
   });
 }

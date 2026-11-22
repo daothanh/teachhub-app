@@ -13,6 +13,7 @@ class StudentFormState extends Equatable {
     this.status = StudentFormStatus.idle,
     this.candidates = const [],
     this.savedId,
+    this.savedName,
     this.error,
   });
 
@@ -23,10 +24,13 @@ class StudentFormState extends Equatable {
 
   /// Học viên vừa tạo, hoặc hồ sơ có sẵn người dùng chọn.
   final String? savedId;
+
+  /// Họ tên của [savedId] (để hiện danh sách đã thêm ở onboarding).
+  final String? savedName;
   final ApiException? error;
 
   @override
-  List<Object?> get props => [status, candidates, savedId, error];
+  List<Object?> get props => [status, candidates, savedId, savedName, error];
 }
 
 class StudentFormCubit extends Cubit<StudentFormState> {
@@ -65,6 +69,7 @@ class StudentFormCubit extends Cubit<StudentFormState> {
         StudentFormState(
           status: StudentFormStatus.success,
           savedId: student.id,
+          savedName: student.fullName,
         ),
       );
     } on StudentDuplicateException catch (e) {
@@ -91,7 +96,11 @@ class StudentFormCubit extends Cubit<StudentFormState> {
 
   /// "Đúng là em này": dùng hồ sơ có sẵn, không tạo mới.
   void pickExisting(StudentCandidate candidate) => emit(
-    StudentFormState(status: StudentFormStatus.success, savedId: candidate.id),
+    StudentFormState(
+      status: StudentFormStatus.success,
+      savedId: candidate.id,
+      savedName: candidate.fullName,
+    ),
   );
 
   /// Đóng hộp thoại, giữ nguyên form.

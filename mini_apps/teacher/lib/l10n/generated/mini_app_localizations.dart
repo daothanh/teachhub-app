@@ -476,7 +476,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @classesErrRulesDuplicate.
   ///
   /// In vi, this message translates to:
-  /// **'Có hai buổi cùng thứ và giờ bắt đầu.'**
+  /// **'Có hai buổi cùng thứ bị chồng giờ.'**
   String get classesErrRulesDuplicate;
 
   /// No description provided for @classesErrRulesOverflow.
@@ -827,35 +827,11 @@ abstract class MiniAppLocalizations {
   /// **'Đặt lịch học'**
   String get onboardingStepSetSchedule;
 
-  /// No description provided for @onboardingStepPayoutAccount.
-  ///
-  /// In vi, this message translates to:
-  /// **'Tài khoản nhận tiền'**
-  String get onboardingStepPayoutAccount;
-
-  /// No description provided for @onboardingStepComplianceChecklist.
-  ///
-  /// In vi, this message translates to:
-  /// **'Việc cần làm theo quy định'**
-  String get onboardingStepComplianceChecklist;
-
   /// No description provided for @onboardingSkip.
   ///
   /// In vi, this message translates to:
   /// **'Để sau'**
   String get onboardingSkip;
-
-  /// No description provided for @onboardingMarkDone.
-  ///
-  /// In vi, this message translates to:
-  /// **'Xong bước này'**
-  String get onboardingMarkDone;
-
-  /// No description provided for @onboardingComplianceBody.
-  ///
-  /// In vi, this message translates to:
-  /// **'Xem các việc cần làm để dạy đúng quy định. Tính năng sắp có.'**
-  String get onboardingComplianceBody;
 
   /// No description provided for @onboardingDoneTitle.
   ///
@@ -920,7 +896,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @onboardingStudentNotEnrolled.
   ///
   /// In vi, this message translates to:
-  /// **'Đã lưu học viên. Chưa thêm được vào lớp hoặc chưa ghi nhận bước này.'**
+  /// **'Đã lưu học viên. Chưa thêm được vào lớp.'**
   String get onboardingStudentNotEnrolled;
 
   /// No description provided for @onboardingScheduleChooseClass.
@@ -4173,6 +4149,60 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Không mở được biên lai.'**
   String get claimReceiptFailed;
+
+  /// No description provided for @contactsPickPhone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn số từ danh bạ'**
+  String get contactsPickPhone;
+
+  /// No description provided for @contactsPhoneDenied.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn vẫn có thể gõ số tay.'**
+  String get contactsPhoneDenied;
+
+  /// No description provided for @onboardingAddStudent.
+  ///
+  /// In vi, this message translates to:
+  /// **'+ Thêm học sinh'**
+  String get onboardingAddStudent;
+
+  /// No description provided for @onboardingStudentsAdded.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thêm'**
+  String get onboardingStudentsAdded;
+
+  /// No description provided for @onboardingStudentsContinue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục ({n} học sinh)'**
+  String onboardingStudentsContinue(int n);
+
+  /// No description provided for @todayInviteTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mời phụ huynh theo dõi lớp'**
+  String get todayInviteTitle;
+
+  /// No description provided for @todayInviteBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phụ huynh theo dõi lớp sẽ nhận được thông báo điểm danh, điểm kiểm tra, học phí.'**
+  String get todayInviteBody;
+
+  /// No description provided for @todayInviteSend.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi link qua Zalo'**
+  String get todayInviteSend;
+
+  /// No description provided for @todayInviteLater.
+  ///
+  /// In vi, this message translates to:
+  /// **'Để sau'**
+  String get todayInviteLater;
 }
 
 class _MiniAppLocalizationsDelegate

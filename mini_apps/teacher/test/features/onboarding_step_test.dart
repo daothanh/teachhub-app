@@ -48,8 +48,8 @@ void main() {
     await tester.tap(find.text('mở'));
     await tester.pumpAndSettle();
 
-    // Bước dở là "payoutAccount" (đầu tiên còn pending) nhưng màn mở bước 3.
-    expect(find.text('Bước 3/5'), findsOneWidget);
+    // Đã xử lý hết 3 bước (không còn bước dở) nhưng màn mở bước 3.
+    expect(find.text('Bước 3/3'), findsOneWidget);
     expect(find.text('Đặt lịch học'), findsOneWidget);
 
     await tester.tap(find.text('Để sau'));

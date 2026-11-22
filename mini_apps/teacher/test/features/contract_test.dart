@@ -72,11 +72,12 @@ void main() {
     expect(const StudentDraft(fullName: 'A').toJson(), {'fullName': 'A'});
   });
 
-  test('Onboarding: enum bước và trạng thái khớp hợp đồng', () {
+  test('Onboarding: bước của app nằm trong hợp đồng, trạng thái khớp', () {
     final onboarding = _schemas['Onboarding'] as Map;
     final item = (_props(onboarding)['steps'] as Map)['items'] as Map;
+    // App chỉ hiện 3 bước đầu (22/11/2026); server có thể còn bước 4–5.
     expect(
-      _props(item)['step']['enum'],
+      (_props(item)['step']['enum'] as List).take(OnboardingStep.values.length),
       OnboardingStep.values.map((s) => s.wire),
     );
     expect(
@@ -122,5 +123,20 @@ void main() {
     expect(parsed.steps.length, 3);
     expect(parsed.steps[OnboardingStep.setSchedule], OnboardingStatus.pending);
     expect(parsed.currentStep, OnboardingStep.addStudents);
+  });
+
+  test('server còn trả bước 4–5: xong 3 bước là xong onboarding', () {
+    final parsed = Onboarding.fromJson({
+      'steps': [
+        {'step': 'create_class', 'status': 'done'},
+        {'step': 'add_students', 'status': 'skipped'},
+        {'step': 'set_schedule', 'status': 'done'},
+        {'step': 'payout_account', 'status': 'pending'},
+        {'step': 'compliance_checklist', 'status': 'pending'},
+      ],
+      'currentStep': 'payout_account',
+    });
+    expect(parsed.currentStep, isNull);
+    expect(parsed.handled, 3);
   });
 }

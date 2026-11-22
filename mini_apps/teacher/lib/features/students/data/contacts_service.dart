@@ -31,6 +31,10 @@ abstract class ContactsService {
   Future<ContactsAccess> requestAccess();
   Future<List<PickableContact>> load();
   Future<void> openSettings();
+
+  /// Bộ chọn liên hệ của hệ điều hành: các số của liên hệ được chọn, `null`
+  /// khi người dùng hủy. Gọi sau [requestAccess] (Android cần quyền để đọc số).
+  Future<List<String>?> pickPhones();
 }
 
 class DeviceContactsService implements ContactsService {
@@ -67,6 +71,14 @@ class DeviceContactsService implements ContactsService {
 
   @override
   Future<void> openSettings() => fc.FlutterContacts.permissions.openSettings();
+
+  @override
+  Future<List<String>?> pickPhones() async {
+    final c = await fc.FlutterContacts.native.showPicker(
+      properties: {fc.ContactProperty.phone},
+    );
+    return c?.phones.map((p) => p.number).toList();
+  }
 }
 
 /// SĐT trong danh bạ → dạng nhập ở form: bỏ dấu cách/chấm/gạch/ngoặc, `+84…`,

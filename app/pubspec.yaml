@@ -134,16 +134,16 @@ flutter:
     # Hình minh họa T01 lấy nguyên từ Figma (88:11172).
     - assets/images/login/
 
-  # Inter 4.1 (rsms/inter, SIL OFL 1.1 — assets/fonts/inter/OFL.txt), font của Figma DS.
+  # Be Vietnam Pro (bettergui/BeVietnamPro, SIL OFL 1.1 — assets/fonts/be_vietnam_pro/OFL.txt), font của DayHoc DS v2.
   fonts:
-    - family: Inter
+    - family: Be Vietnam Pro
       fonts:
-        - asset: assets/fonts/inter/Inter-Regular.ttf
-        - asset: assets/fonts/inter/Inter-Medium.ttf
+        - asset: assets/fonts/be_vietnam_pro/BeVietnamPro-Regular.ttf
+        - asset: assets/fonts/be_vietnam_pro/BeVietnamPro-Medium.ttf
           weight: 500
-        - asset: assets/fonts/inter/Inter-SemiBold.ttf
+        - asset: assets/fonts/be_vietnam_pro/BeVietnamPro-SemiBold.ttf
           weight: 600
-        - asset: assets/fonts/inter/Inter-Bold.ttf
+        - asset: assets/fonts/be_vietnam_pro/BeVietnamPro-Bold.ttf
           weight: 700
 
 # Bản SQLite có mã hóa (SQLite3MultipleCiphers) cho CSDL ngoại tuyến của

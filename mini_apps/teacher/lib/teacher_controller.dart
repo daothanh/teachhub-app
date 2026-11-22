@@ -76,7 +76,14 @@ class TeacherController {
       path: routePrefix,
       name: '$moduleId.home',
       // `extra` đổi (rời onboarding) thì dựng lại trang để tải buổi và thẻ nhắc mới.
-      builder: (context, state) => TodayPage(key: ValueKey(state.extra)),
+      builder: (context, state) => TodayPage(
+        key: ValueKey(state.extra),
+        // Rời onboarding sau bước cuối: `(thời điểm, id lớp)` → gợi ý mời phụ huynh.
+        inviteClassId: switch (state.extra) {
+          (DateTime _, String id) => id,
+          _ => null,
+        },
+      ),
       routes: [
         GoRoute(
           path: 'onboarding',

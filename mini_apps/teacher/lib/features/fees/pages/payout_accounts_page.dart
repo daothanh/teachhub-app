@@ -17,7 +17,7 @@ String payoutBankLabel(MiniAppLocalizations l10n, String bin) =>
 
 /// Danh sách tài khoản nhận tiền (US-7.3 AC5): chỉ hiện số đã che.
 ///
-/// [embedded]: nằm trong onboarding bước 4 (không có Scaffold); có tài khoản
+/// [embedded]: nhúng không có Scaffold (từng là onboarding bước 4, tạm bỏ 22/11/2026); có tài khoản
 /// thì hiện nút "Tiếp tục" gọi [onContinue].
 class PayoutAccountsPage extends StatelessWidget {
   const PayoutAccountsPage({

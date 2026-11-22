@@ -104,7 +104,15 @@ Future<void> _addRule(WidgetTester tester) async {
 
 Future<void> _saveStudent(WidgetTester tester) async {
   await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
-  await tester.tap(find.text('Lưu học viên'));
+  final save = find.text('+ Thêm học sinh');
+  await _reveal(tester, save);
+  await tester.tap(save);
+  await tester.pumpAndSettle();
+}
+
+/// Bấm "Tiếp tục (n học sinh)" để ghi bước 2 xong.
+Future<void> _continueStudents(WidgetTester tester, [int n = 1]) async {
+  await tester.tap(find.text('Tiếp tục ($n học sinh)'));
   await tester.pumpAndSettle();
 }
 
@@ -133,7 +141,7 @@ void main() {
         final classes = FakeClassesRepository();
         await _open(tester, onboarding, classes);
 
-        expect(find.text('Bước 1/5'), findsOneWidget);
+        expect(find.text('Bước 1/3'), findsOneWidget);
         expect(find.text('Để sau'), findsNothing);
         expect(find.text('Thêm buổi'), findsNothing); // lịch để bước 3
         expect(find.text('Thu học phí'), findsNothing); // học phí cấu hình sau
@@ -143,7 +151,7 @@ void main() {
 
         expect(classes.calls, ['create']);
         expect(onboarding.patches, [(OnboardingStep.createClass, _done)]);
-        expect(find.text('Bước 2/5'), findsOneWidget);
+        expect(find.text('Bước 2/3'), findsOneWidget);
       },
     );
 
@@ -179,7 +187,7 @@ void main() {
 
       expect(classes.calls, ['create']);
       expect(onboarding.patches.last, (OnboardingStep.createClass, _done));
-      expect(find.text('Bước 2/5'), findsOneWidget);
+      expect(find.text('Bước 2/3'), findsOneWidget);
     });
 
     testWidgets('kill app sau khi tạo lớp, chưa ghi done: mở lại không tạo lớp '
@@ -201,7 +209,7 @@ void main() {
 
       expect(classes.calls, ['create'], reason: 'không tạo lớp thứ hai');
       expect(onboarding.patches.last, (OnboardingStep.createClass, _done));
-      expect(find.text('Bước 2/5'), findsOneWidget);
+      expect(find.text('Bước 2/3'), findsOneWidget);
     });
 
     testWidgets(
@@ -224,7 +232,7 @@ void main() {
 
         expect(classes.keys, hasLength(2));
         expect(classes.keys[0], classes.keys[1]);
-        expect(find.text('Bước 2/5'), findsOneWidget);
+        expect(find.text('Bước 2/3'), findsOneWidget);
       },
     );
 
@@ -263,8 +271,11 @@ void main() {
 
       expect(classes.calls.first, 'enroll:c1:s1');
       expect(classes.calls, isNot(contains('list:active:1')));
+      expect(onboarding.patches, isEmpty, reason: 'còn thêm được em khác');
+      expect(find.text('Minh Anh'), findsOneWidget);
+      await _continueStudents(tester);
       expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
-      expect(find.text('Bước 3/5'), findsOneWidget);
+      expect(find.text('Bước 3/3'), findsOneWidget);
     });
 
     testWidgets('chưa có lớp (bỏ qua bước 1): chỉ tạo học viên, không ghi danh '
@@ -273,6 +284,7 @@ void main() {
       final classes = FakeClassesRepository()..active = [sampleClass()];
       await _open(tester, onboarding, classes);
       await _saveStudent(tester);
+      await _continueStudents(tester);
 
       expect(classes.calls.where((c) => c.startsWith('enroll')), isEmpty);
       expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
@@ -280,7 +292,7 @@ void main() {
         find.text('Chưa thêm được vào lớp', findRichText: true),
         findsNothing,
       );
-      expect(find.text('Bước 3/5'), findsOneWidget);
+      expect(find.text('Bước 3/3'), findsOneWidget);
     });
 
     testWidgets(
@@ -302,22 +314,23 @@ void main() {
         await _saveStudent(tester);
 
         expect(onboarding.patches, isEmpty);
-        expect(find.text('Bước 2/5'), findsOneWidget);
+        expect(find.text('Bước 2/3'), findsOneWidget);
         classes.enrollError = null;
         _retry(tester);
         await tester.pumpAndSettle();
+        await _continueStudents(tester);
 
         expect(students.calls, hasLength(1));
         expect(classes.calls.where((c) => c == 'enroll:c1:s1'), hasLength(2));
         expect(classes.keys[0], classes.keys[1]);
         expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
-        expect(find.text('Bước 3/5'), findsOneWidget);
+        expect(find.text('Bước 3/3'), findsOneWidget);
       },
     );
 
     testWidgets(
-      'lỗi cũ của bước trước không hiện "chưa ghi danh" ở lần ghi bước '
-      'khác',
+      'ghi bước lỗi khi bấm Tiếp tục: báo chưa ghi nhận bước (không phải '
+      '"chưa ghi danh"), Thử lại thì sang bước 3',
       (tester) async {
         final onboarding = FakeOnboardingRepository(
           atStep2,
@@ -325,13 +338,18 @@ void main() {
         );
         await _open(tester, onboarding, FakeClassesRepository(), classId: 'c1');
         await _saveStudent(tester);
-        expect(find.textContaining('Chưa thêm được vào lớp'), findsOneWidget);
+        await _continueStudents(tester);
+        expect(
+          find.text('Đã lưu. Chưa ghi nhận được bước này.'),
+          findsOneWidget,
+        );
+        expect(find.textContaining('Chưa thêm được vào lớp'), findsNothing);
 
         onboarding.patchError = null;
         _retry(tester);
         await tester.pumpAndSettle();
         expect(find.textContaining('Chưa thêm được vào lớp'), findsNothing);
-        expect(find.text('Bước 3/5'), findsOneWidget);
+        expect(find.text('Bước 3/3'), findsOneWidget);
       },
     );
 
@@ -371,10 +389,11 @@ void main() {
         hasLength(1),
         reason: 'không tạo học viên thứ hai',
       );
+      await _continueStudents(tester);
       expect(classes.calls.where((c) => c == 'enroll:c1:s1'), hasLength(2));
       expect(classes.keys[0], classes.keys[1]);
       expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
-      expect(find.text('Bước 3/5'), findsOneWidget);
+      expect(find.text('Bước 3/3'), findsOneWidget);
     });
 
     testWidgets(
@@ -412,6 +431,44 @@ void main() {
       },
     );
 
+    testWidgets('thêm 2 học sinh: danh sách và "Tiếp tục (2 học sinh)"; kill '
+        'app vẫn còn danh sách', (tester) async {
+      final kv = InMemoryKeyValueStore();
+      final onboarding = FakeOnboardingRepository(atStep2);
+      final classes = FakeClassesRepository();
+      final students = FakeStudentRepository([
+        const Student(id: 's1', fullName: 'Minh Anh'),
+        const Student(id: 's2', fullName: 'Bảo Ngọc'),
+      ]);
+      await _open(
+        tester,
+        onboarding,
+        classes,
+        students: students,
+        kv: kv,
+        classId: 'c1',
+      );
+      await _saveStudent(tester);
+      await _saveStudent(tester);
+      expect(find.text('Minh Anh'), findsOneWidget);
+      expect(find.text('Bảo Ngọc'), findsOneWidget);
+      expect(classes.calls, containsAll(['enroll:c1:s1', 'enroll:c1:s2']));
+
+      await _kill(tester);
+      await _open(
+        tester,
+        onboarding,
+        classes,
+        students: students,
+        kv: kv,
+        classId: 'c1',
+      );
+      expect(find.text('Bảo Ngọc'), findsOneWidget);
+      await _continueStudents(tester, 2);
+      expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
+      expect(find.text('Bước 3/3'), findsOneWidget);
+    });
+
     testWidgets('chữ 130%, bàn phím mở: nút Thử lại vẫn hiện', (tester) async {
       await _open(
         tester,
@@ -432,21 +489,21 @@ void main() {
       await _fillClass(tester);
       await _save(tester);
 
-      expect(find.text('Bước 2/5'), findsOneWidget);
+      expect(find.text('Bước 2/3'), findsOneWidget);
       expect(find.byType(SnackBar), findsNothing);
     });
   });
 
   group('bước 3: form quy tắc lặp có sẵn', () {
-    testWidgets('lưu quy tắc cho lớp đã lưu (get theo id), ghi done, sang '
-        'bước 4', (tester) async {
+    testWidgets('lưu quy tắc cho lớp đã lưu (get theo id), ghi done, xong '
+        'onboarding', (tester) async {
       final onboarding = FakeOnboardingRepository(atStep3);
       final classes = FakeClassesRepository()
         ..active = [sampleClass(id: 'other')]
         ..current = sampleClass();
       await _open(tester, onboarding, classes, classId: 'c1');
 
-      expect(find.text('Bước 3/5'), findsOneWidget);
+      expect(find.text('Bước 3/3'), findsOneWidget);
       expect(find.text('Để sau'), findsOneWidget);
       expect(classes.calls.first, 'get:c1');
       expect(classes.calls, isNot(contains('list:active:1')));
@@ -456,7 +513,7 @@ void main() {
       expect(classes.lastRules, hasLength(1));
       expect(classes.calls, contains('putRules:c1'));
       expect(onboarding.patches, [(OnboardingStep.setSchedule, _done)]);
-      expect(find.text('Bước 4/5'), findsOneWidget);
+      expect(find.text('Bạn đã xong phần làm quen'), findsOneWidget);
     });
 
     testWidgets('kill app ở bước 3, mở lại: đúng bước 3, quy tắc còn', (
@@ -478,7 +535,7 @@ void main() {
       await _kill(tester);
       await _open(tester, onboarding, classes, kv: kv, classId: 'c1');
 
-      expect(find.text('Bước 3/5'), findsOneWidget);
+      expect(find.text('Bước 3/3'), findsOneWidget);
       expect(find.text('Buổi 1'), findsOneWidget);
       expect(find.text('18:00'), findsOneWidget);
     });
@@ -528,7 +585,7 @@ void main() {
       await _addRule(tester);
       await _addRule(tester);
       await _save(tester);
-      expect(find.text('Có hai buổi cùng thứ và giờ bắt đầu.'), findsOneWidget);
+      expect(find.text('Có hai buổi cùng thứ bị chồng giờ.'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   });
