@@ -143,6 +143,12 @@ abstract class MiniAppLocalizations {
   /// **'Thử lại'**
   String get parentRetry;
 
+  /// No description provided for @parentRefreshFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không làm mới được. Kéo xuống để thử lại.'**
+  String get parentRefreshFailed;
+
   /// No description provided for @parentPickChild.
   ///
   /// In vi, this message translates to:
@@ -280,6 +286,12 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Không có hóa đơn nào cần đóng.'**
   String get invoiceTuitionNone;
+
+  /// No description provided for @invoiceTuitionFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tải được học phí.'**
+  String get invoiceTuitionFailed;
 
   /// No description provided for @invoiceTuitionOpen.
   ///

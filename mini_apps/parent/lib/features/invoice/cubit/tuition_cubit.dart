@@ -10,10 +10,14 @@ class TuitionState extends Equatable {
     this.count = 0,
     this.total = 0,
     this.hasMore = false,
+    this.failed = false,
   });
 
-  /// `false` khi đang tải hoặc lỗi: card ẩn, không chặn phần còn lại của P02.
+  /// `false` khi đang tải hoặc lỗi; đang tải thì card ẩn, không chặn P02.
   final bool loaded;
+
+  /// Tải lỗi: card báo lỗi kèm nút thử lại, không ẩn (ẩn dễ hiểu nhầm là hết nợ).
+  final bool failed;
   final int count;
   final int total;
 
@@ -21,7 +25,7 @@ class TuitionState extends Equatable {
   final bool hasMore;
 
   @override
-  List<Object?> get props => [loaded, count, total, hasMore];
+  List<Object?> get props => [loaded, count, total, hasMore, failed];
 }
 
 class TuitionCubit extends Cubit<TuitionState> {
@@ -51,7 +55,8 @@ class TuitionCubit extends Cubit<TuitionState> {
         ),
       );
     } catch (_) {
-      // Card học phí là phần phụ: lỗi thì ẩn.
+      // Số cũ có thể đã sai (vừa đóng tiền): báo lỗi thay vì giữ số cũ.
+      if (!isClosed) emit(const TuitionState(failed: true));
     }
   }
 }

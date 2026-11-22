@@ -8,7 +8,8 @@ import '../cubit/tuition_cubit.dart';
 import 'invoice_format.dart';
 
 /// Card học phí ở P02: số hóa đơn chưa thanh toán và tổng, bấm mở P03 (US-7.3).
-/// Đặt dưới `BlocProvider<TuitionCubit>`; chưa tải xong hoặc lỗi thì ẩn.
+/// Đặt dưới `BlocProvider<TuitionCubit>`; chưa tải xong thì ẩn, lỗi thì báo
+/// kèm nút thử lại.
 class TuitionCard extends StatelessWidget {
   const TuitionCard({super.key});
 
@@ -18,6 +19,35 @@ class TuitionCard extends StatelessWidget {
     final theme = Theme.of(context);
     return BlocBuilder<TuitionCubit, TuitionState>(
       builder: (context, s) {
+        if (s.failed) {
+          return Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.invoiceTuitionTitle,
+                    style: theme.textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.invoiceTuitionFailed,
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  Align(
+                    alignment: AlignmentDirectional.centerEnd,
+                    child: TextButton(
+                      onPressed: context.read<TuitionCubit>().load,
+                      child: Text(l10n.parentRetry),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
         if (!s.loaded) return const SizedBox.shrink();
         final text = s.count == 0 && !s.hasMore
             ? l10n.invoiceTuitionNone

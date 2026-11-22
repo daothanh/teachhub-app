@@ -429,6 +429,25 @@ void main() {
       expect(find.text('1+ invoices not settled'), findsOneWidget);
     });
 
+    testWidgets('card học phí tải lỗi: báo lỗi kèm thử lại, không ẩn', (
+      tester,
+    ) async {
+      final repo = _FakeInvoices()
+        ..pages.add(_page([_json()]))
+        ..listError = const ApiException.network();
+      await _pump(tester, repo, _FakeSaver());
+      expect(find.text("Couldn't load tuition."), findsOneWidget);
+
+      repo.listError = null;
+      await tester.tap(find.text('Try again'));
+      await tester.pumpAndSettle();
+      expect(find.text("Couldn't load tuition."), findsNothing);
+      expect(
+        find.text('1 invoices not settled, 1,500,000 đ outstanding'),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('quay về từ P03: card học phí tải lại số nợ', (tester) async {
       final repo = _FakeInvoices()..pages.add(_page([_json()]));
       await _pump(tester, repo, _FakeSaver());

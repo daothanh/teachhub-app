@@ -7,6 +7,7 @@
   "parentAddInvite": "Thêm lời mời",
   "parentLoadFailed": "Không tải được thông tin của con. Vui lòng thử lại.",
   "parentRetry": "Thử lại",
+  "parentRefreshFailed": "Không làm mới được. Kéo xuống để thử lại.",
   "parentPickChild": "Chọn con",
   "parentChildClasses": "Lớp: {classes}",
   "@parentChildClasses": {
@@ -84,6 +85,7 @@
     }
   },
   "invoiceTuitionNone": "Không có hóa đơn nào cần đóng.",
+  "invoiceTuitionFailed": "Không tải được học phí.",
   "invoiceTuitionOpen": "Xem hóa đơn",
   "invoiceListTitle": "Hóa đơn",
   "invoiceFilterAll": "Tất cả",

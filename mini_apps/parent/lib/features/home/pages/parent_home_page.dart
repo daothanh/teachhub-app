@@ -33,7 +33,11 @@ class ParentHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
-    return BlocBuilder<FamilyCubit, FamilyState>(
+    return BlocConsumer<FamilyCubit, FamilyState>(
+      listenWhen: (a, b) => !a.refreshFailed && b.refreshFailed,
+      listener: (context, _) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.parentRefreshFailed))),
       builder: (context, state) {
         final hasChildren = state.students.isNotEmpty;
         return Scaffold(
