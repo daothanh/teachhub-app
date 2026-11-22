@@ -62,16 +62,21 @@ class BillingPeriodCubit extends Cubit<BillingPeriodState> {
   final String periodId;
   final DraftKeys _keys;
 
+  /// Phản hồi GET của lần gọi cũ bị bỏ: làm mới về muộn không ghi đè dữ liệu
+  /// sau khi chốt.
+  int _seq = 0;
+
   /// Lần đầu và "Thử lại": hiện vòng tải.
   Future<void> load() async {
     if (isClosed) return;
+    final seq = ++_seq;
     emit(const BillingPeriodState());
     try {
       final d = await _repo.getPeriod(periodId);
-      if (isClosed) return;
+      if (isClosed || seq != _seq) return;
       emit(BillingPeriodState(load: BillingLoad.ready, detail: d));
     } on ApiException catch (e) {
-      if (isClosed) return;
+      if (isClosed || seq != _seq) return;
       emit(BillingPeriodState(load: BillingLoad.failure, error: e));
     }
   }
@@ -81,12 +86,13 @@ class BillingPeriodCubit extends Cubit<BillingPeriodState> {
   Future<void> refresh() async {
     if (isClosed) return;
     if (state.load != BillingLoad.ready) return load();
+    final seq = ++_seq;
     try {
       final d = await _repo.getPeriod(periodId);
-      if (isClosed) return;
+      if (isClosed || seq != _seq) return;
       emit(state.copyWith(detail: d));
     } on ApiException catch (e) {
-      if (isClosed) return;
+      if (isClosed || seq != _seq) return;
       emit(state.copyWith(error: e));
     }
   }
@@ -107,6 +113,8 @@ class BillingPeriodCubit extends Cubit<BillingPeriodState> {
   Future<void> _issue(List<String>? ids) async {
     if (state.issuing || state.load != BillingLoad.ready) return;
     emit(state.copyWith(issuing: true));
+    // GET làm mới đang bay mang dữ liệu trước khi chốt: bỏ.
+    var seq = ++_seq;
     // Cùng tập hóa đơn thì cùng khóa: thử lại sau lỗi mạng không phát hành hai lần.
     final draft = ids == null ? '*' : (ids.toList()..sort()).join(',');
     final IssueResult result;
@@ -133,7 +141,8 @@ class BillingPeriodCubit extends Cubit<BillingPeriodState> {
         emit(
           state.copyWith(
             issuing: false,
-            detail: fresh,
+            // Có lần làm mới mới hơn thì để nó thay dữ liệu.
+            detail: seq == _seq ? fresh : null,
             error: e,
             staleUnverified: fresh == null,
           ),
@@ -146,9 +155,10 @@ class BillingPeriodCubit extends Cubit<BillingPeriodState> {
     if (isClosed) return;
     // Lệnh đã thành công: tải lại lỗi thì giữ danh sách cũ, không báo như chốt lỗi.
     emit(state.copyWith(issuing: false, result: result));
+    seq = ++_seq;
     try {
       final d = await _repo.getPeriod(periodId);
-      if (isClosed) return;
+      if (isClosed || seq != _seq) return;
       emit(state.copyWith(detail: d));
     } on ApiException {
       // Kéo để làm mới sẽ tải lại.

@@ -126,6 +126,39 @@ void main() {
     expect(active.value, isNull);
   });
 
+  test('đăng xuất khi /me/memberships đang chạy: bỏ phản hồi cũ', () async {
+    final gate = Completer<void>();
+    final c = MembershipCubit(
+      api: Dio()
+        ..interceptors.add(
+          InterceptorsWrapper(
+            onRequest: (o, h) async {
+              await gate.future;
+              h.resolve(
+                Response(
+                  requestOptions: o,
+                  statusCode: 200,
+                  data: {
+                    'items': [_m('m1', 'tenant_owner')],
+                  },
+                ),
+              );
+            },
+          ),
+        ),
+      prefs: prefs,
+      activeMembership: active,
+    );
+    final loading = c.load();
+    await c.clear();
+    gate.complete();
+    await loading;
+    expect(c.state.statusLoad, LoadingStatus.initial);
+    expect(c.state.memberships, isEmpty);
+    expect(active.value, isNull);
+    expect(prefs.getString('memberships_cache'), isNull);
+  });
+
   group('mở app khi mất mạng (#34)', () {
     final online = _FakeApi({
       'GET /me/memberships': () => {

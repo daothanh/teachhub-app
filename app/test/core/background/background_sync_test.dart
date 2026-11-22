@@ -123,14 +123,12 @@ void main() {
   });
 
   group('buildBackgroundDio', () {
-    Dio build({Set<String> pins = const {'aa'}, bool requirePins = true}) =>
-        buildBackgroundDio(
-          apiUrl: 'https://api.test/v1',
-          pins: pins,
-          requirePins: requirePins,
-          accessToken: () async => 'tok',
-          clientInfo: 'teachhub-app/1 (test)',
-        );
+    Dio build({Set<String> pins = const {'aa'}}) => buildBackgroundDio(
+      apiUrl: 'https://api.test/v1',
+      pins: pins,
+      accessToken: () async => 'tok',
+      clientInfo: 'teachhub-app/1 (test)',
+    );
 
     test('có adapter pin khi có pin', () {
       expect(build().httpClientAdapter, isNot(isA<_Capture>()));
@@ -140,16 +138,14 @@ void main() {
       );
     });
 
-    test('staging/production thiếu pin: fail-closed', () {
-      expect(() => build(pins: {}), throwsStateError);
-      // development được phép không pin
-      expect(build(pins: {}, requirePins: false), isA<Dio>());
+    test('không có pin: vẫn dựng client như shell (MVP chưa bật pin)', () {
+      expect(build(pins: {}), isA<Dio>());
     });
 
     test('gửi Bearer; 401 không gọi refresh, không đụng token', () async {
       final tokens = TokenStore(InMemoryKeyValueStore());
       await tokens.saveTokens(accessToken: 'tok', refreshToken: 'refresh');
-      final dio = build(requirePins: false, pins: {});
+      final dio = build(pins: {});
       final adapter = _Capture()..status = 401;
       dio.httpClientAdapter = adapter;
       await expectLater(dio.get<void>('/x'), throwsA(isA<DioException>()));
@@ -168,10 +164,8 @@ void main() {
     Future<BackgroundSyncOutcome> sync(
       Map<String, dynamic> input, {
       required List<String> calls,
-      bool requirePins = true,
     }) => syncOutboxFromInput(
       input,
-      requirePins: requirePins,
       keys: InMemoryKeyValueStore(),
       accessToken: () async => 'tok',
       userId: () async => 'u',
@@ -195,24 +189,20 @@ void main() {
       expect(calls, isEmpty);
     });
 
-    test('production thiếu pin: không chạy (fail-closed)', () async {
-      final calls = <String>[];
-      await sync(
-        backgroundInput(apiUrl: 'https://api.test/v1', pins: {}),
-        calls: calls,
-        requirePins: true,
-      );
-      expect(calls, isEmpty);
-    });
-
-    test('inputData không tắt được yêu cầu pin', () async {
-      final calls = <String>[];
-      await sync({
-        ...backgroundInput(apiUrl: 'https://api.test/v1', pins: {}),
-        'requirePins': false,
-      }, calls: calls);
-      expect(calls, isEmpty);
-    });
+    test(
+      'không có pin: vẫn đẩy outbox (trước đây bản release bỏ lượt)',
+      () async {
+        final calls = <String>[];
+        expect(
+          await sync(
+            backgroundInput(apiUrl: 'https://api.test/v1', pins: {}),
+            calls: calls,
+          ),
+          BackgroundSyncOutcome.done,
+        );
+        expect(calls, ['run:https://api.test/v1']);
+      },
+    );
 
     test('đủ cấu hình: chạy runner với base URL từ inputData', () async {
       final calls = <String>[];

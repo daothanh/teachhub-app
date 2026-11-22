@@ -76,6 +76,8 @@ class StudentFormCubit extends Cubit<StudentFormState> {
         ),
       );
     } on ApiException catch (e) {
+      // Lỗi chắc chắn không ghi (4xx): lần lưu sau dùng khóa mới.
+      if (!e.retryable) _keys.done('student');
       if (isClosed) return;
       emit(StudentFormState(status: StudentFormStatus.failure, error: e));
     }

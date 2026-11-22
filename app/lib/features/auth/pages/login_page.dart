@@ -101,6 +101,7 @@ class _LoginPageState extends State<LoginPage> {
         _sentTo = email;
         _codeInvalid = false;
       });
+      _resendTimer?.cancel();
       _resendTimer = _countdown(_resendAfter, (s) => _resendIn = s);
     } catch (e) {
       if (mounted) _showError(_errorMessage(context.l10n, e));
@@ -128,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _changeEmail() {
     _lockTimer?.cancel();
+    _resendTimer?.cancel();
     setState(() {
       _sentTo = null;
       _codeInvalid = false;

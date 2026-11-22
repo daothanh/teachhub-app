@@ -26,7 +26,10 @@ void main() {
       final store = SecureStore();
       await deleteTeacherDatabase(store, dir); // bắt đầu sạch
 
-      final db = await TeacherDatabase.openEncrypted(store);
+      final db = await TeacherDatabase.openEncrypted(
+        store,
+        directory: getApplicationDocumentsDirectory,
+      );
       await db.into(db.outboxMutations).insert(_row(_marker));
 
       // 1 lần làm nóng + 10 lần đo. Một lần lưu điểm danh = 20 học sinh.
@@ -89,7 +92,10 @@ void main() {
         final dir = await getApplicationDocumentsDirectory();
         final store = SecureStore();
 
-        final db = await TeacherDatabase.openEncrypted(store);
+        final db = await TeacherDatabase.openEncrypted(
+          store,
+          directory: getApplicationDocumentsDirectory,
+        );
         final rows = await db.select(db.outboxMutations).get();
         expect(rows.map((r) => r.clientMutationId), contains(_marker));
         expect(

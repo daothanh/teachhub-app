@@ -32,6 +32,10 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get parentRetry => 'Try again';
 
   @override
+  String get parentRefreshFailed =>
+      'Couldn\'t refresh. Pull down to try again.';
+
+  @override
   String get parentPickChild => 'Choose child';
 
   @override
@@ -106,12 +110,10 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   }
 
   @override
-  String invoiceTuitionUnpaidMore(int count) {
-    return '$count+ invoices not settled';
-  }
+  String get invoiceTuitionNone => 'No invoices to pay.';
 
   @override
-  String get invoiceTuitionNone => 'No invoices to pay.';
+  String get invoiceTuitionFailed => 'Couldn\'t load tuition.';
 
   @override
   String get invoiceTuitionOpen => 'View invoices';

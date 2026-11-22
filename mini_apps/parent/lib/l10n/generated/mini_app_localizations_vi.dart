@@ -32,6 +32,9 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get parentRetry => 'Thử lại';
 
   @override
+  String get parentRefreshFailed => 'Không làm mới được. Kéo xuống để thử lại.';
+
+  @override
   String get parentPickChild => 'Chọn con';
 
   @override
@@ -106,12 +109,10 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   }
 
   @override
-  String invoiceTuitionUnpaidMore(int count) {
-    return '$count+ hóa đơn chưa đóng xong';
-  }
+  String get invoiceTuitionNone => 'Không có hóa đơn nào cần đóng.';
 
   @override
-  String get invoiceTuitionNone => 'Không có hóa đơn nào cần đóng.';
+  String get invoiceTuitionFailed => 'Không tải được học phí.';
 
   @override
   String get invoiceTuitionOpen => 'Xem hóa đơn';

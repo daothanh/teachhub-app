@@ -44,6 +44,7 @@ typedef HistoryPageDto = ({List<HistoryItemDto> items, String? nextCursor});
 /// `GET /sessions/{id}/attendance`.
 typedef AttendanceDto = ({
   String sessionId,
+  String sessionDate,
   String sessionStatus,
   bool canEdit,
   DateTime editableUntil,
@@ -87,6 +88,7 @@ class TeacherApi {
     final m = _map(res.data);
     return (
       sessionId: m['sessionId'] as String,
+      sessionDate: m['sessionDate'] as String,
       sessionStatus: m['sessionStatus'] as String,
       canEdit: m['canEdit'] as bool,
       editableUntil: DateTime.parse(m['editableUntil'] as String),
@@ -132,7 +134,9 @@ class TeacherApi {
       results: {
         for (final r in (body['results'] as List).cast<Map>())
           r['clientMutationId'] as String: MutationResult(
-            SyncResult.values.byName(r['result'] as String),
+            // Giá trị lạ (server thêm loại mới) coi là bị từ chối: ném lỗi thì
+            // lô bị gửi lại mãi và chặn cả hàng đợi.
+            SyncResult.values.asNameMap()[r['result']] ?? SyncResult.rejected,
             errorCode: r['errorCode'] as String?,
             current: switch (r['current']) {
               final Map c => AttendanceCurrent(

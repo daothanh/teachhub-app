@@ -7,6 +7,7 @@
   "parentAddInvite": "Add invitation",
   "parentLoadFailed": "Could not load your child's information. Please try again.",
   "parentRetry": "Try again",
+  "parentRefreshFailed": "Couldn't refresh. Pull down to try again.",
   "parentPickChild": "Choose child",
   "parentChildClasses": "Classes: {classes}",
   "@parentChildClasses": {
@@ -75,15 +76,8 @@
       }
     }
   },
-  "invoiceTuitionUnpaidMore": "{count}+ invoices not settled",
-  "@invoiceTuitionUnpaidMore": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "invoiceTuitionNone": "No invoices to pay.",
+  "invoiceTuitionFailed": "Couldn't load tuition.",
   "invoiceTuitionOpen": "View invoices",
   "invoiceListTitle": "Invoices",
   "invoiceFilterAll": "All",

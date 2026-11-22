@@ -111,7 +111,10 @@ void main() {
       store,
       await getApplicationDocumentsDirectory(),
     );
-    final db = await TeacherDatabase.openEncrypted(store);
+    final db = await TeacherDatabase.openEncrypted(
+      store,
+      directory: getApplicationDocumentsDirectory,
+    );
 
     // Lấy một cổng trống rồi đóng lại: chưa có server = "mất mạng".
     final probe = await ServerSocket.bind(InternetAddress.loopbackIPv4, 0);
