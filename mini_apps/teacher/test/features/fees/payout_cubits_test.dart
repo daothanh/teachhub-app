@@ -298,6 +298,29 @@ void main() {
       expect(repo.calls, ['otp', 'otp']);
       expect(c.state.step, PayoutStep.code);
     });
+
+    test('đang gửi lại mã: vẫn hiện dòng đã gửi mã', () async {
+      await c.submit(_input);
+      final busy = c.stream.firstWhere((s) => s.busy);
+      await c.sendCode();
+      expect((await busy).codeSent, isTrue);
+    });
+
+    test('gửi lại mã lỗi: giữ lỗi tại ô mã', () async {
+      await c.submit(_input);
+      repo.createError = validation({
+        'otpCode': ['Mã gồm 6 số.'],
+      });
+      await c.confirm('12');
+      final busy = c.stream.firstWhere((s) => s.busy);
+      repo.otpError = apiErr(ApiErrorCode.rateLimited);
+      await c.sendCode();
+      expect((await busy).serverErrors['otpCode'], isNotNull);
+      expect(c.state.step, PayoutStep.code);
+      expect(c.state.serverErrors['otpCode'], isNotNull);
+      expect(c.state.error!.code, ApiErrorCode.rateLimited);
+      expect(c.state.busy, isFalse);
+    });
   });
 
   group('PayoutAccountFormCubit: sửa', () {

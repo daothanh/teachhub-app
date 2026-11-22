@@ -94,14 +94,19 @@ class PayoutAccountFormCubit extends Cubit<PayoutFormState> {
   /// Gửi (hoặc gửi lại) mã tới email của tài khoản đang đăng nhập.
   Future<void> sendCode() async {
     if (state.busy || _pending == null) return;
-    emit(PayoutFormState(step: state.step, busy: true));
+    // Gửi lại mã ở bước nhập mã: giữ lỗi theo trường và dòng "đã gửi mã".
+    emit(
+      state.step == PayoutStep.code
+          ? state.copyWith(busy: true)
+          : const PayoutFormState(busy: true),
+    );
     try {
       await _repo.sendPayoutOtp();
       if (isClosed) return;
       emit(const PayoutFormState(step: PayoutStep.code, codeSent: true));
     } on ApiException catch (e) {
       if (isClosed) return;
-      emit(PayoutFormState(step: state.step, error: e));
+      emit(state.copyWith(busy: false, error: e));
     }
   }
 
