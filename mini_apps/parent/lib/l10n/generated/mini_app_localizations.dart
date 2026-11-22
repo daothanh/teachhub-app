@@ -275,12 +275,6 @@ abstract class MiniAppLocalizations {
   /// **'{count} hóa đơn chưa đóng xong, còn nợ {total}'**
   String invoiceTuitionUnpaid(int count, String total);
 
-  /// No description provided for @invoiceTuitionUnpaidMore.
-  ///
-  /// In vi, this message translates to:
-  /// **'{count}+ hóa đơn chưa đóng xong'**
-  String invoiceTuitionUnpaidMore(int count);
-
   /// No description provided for @invoiceTuitionNone.
   ///
   /// In vi, this message translates to:

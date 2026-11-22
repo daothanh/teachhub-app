@@ -76,14 +76,6 @@
       }
     }
   },
-  "invoiceTuitionUnpaidMore": "{count}+ hóa đơn chưa đóng xong",
-  "@invoiceTuitionUnpaidMore": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "invoiceTuitionNone": "Không có hóa đơn nào cần đóng.",
   "invoiceTuitionFailed": "Không tải được học phí.",
   "invoiceTuitionOpen": "Xem hóa đơn",
