@@ -221,6 +221,17 @@ void main() {
     },
   );
 
+  testWidgets('lỗi 4xx: lưu lại cùng nội dung dùng khóa mới', (tester) async {
+    final repo = await _open(tester, [
+      _api(422, 'VALIDATION_FAILED'),
+      _saved,
+    ], []);
+    await _fillName(tester);
+    await _save(tester);
+    await _save(tester);
+    expect(repo.calls[1].key, isNot(repo.calls[0].key));
+  });
+
   testWidgets('confirmNew dùng khóa mới', (tester) async {
     final repo = await _open(tester, [
       const StudentDuplicateException([_candidate]),

@@ -321,6 +321,8 @@ class ContactImportCubit extends Cubit<ContactImportState> {
             r.copyWith(status: RowStatus.duplicate, candidates: e.candidates),
       );
     } on ApiException catch (e) {
+      // Lỗi chắc chắn không ghi (4xx): lần lưu sau dùng khóa mới.
+      if (!e.retryable) _keys.remove(id);
       _update(id, (r) => r.copyWith(status: RowStatus.failed, error: e));
     } catch (_) {
       // Lỗi lạ: dòng này thất bại, không treo cả lượt lưu.
