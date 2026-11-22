@@ -15,7 +15,8 @@ import '../core/network/consent_required_interceptor.dart';
 import '../features/auth/teachhub_user.dart';
 import '../features/consent/consent_cubit.dart';
 
-/// HTTP inspector; `null` ở production.
+/// HTTP inspector; chỉ có ở development — staging dùng dữ liệu thật, không
+/// để lộ Authorization/OTP/token qua màn inspector.
 Alice? alice;
 
 /// Hai client theo spec §3.5:
@@ -25,7 +26,7 @@ Alice? alice;
 ///   Bearer, không pin (chứng chỉ R2 không phải của API).
 Future<void> apiModule(GetIt getIt) async {
   final appEnv = getIt<AppEnv>();
-  alice = appEnv.isProduction ? null : Alice();
+  alice = appEnv.isDevelopment ? Alice() : null;
 
   // Pin cho API (theo flavor). Retry client dùng chung adapter này, nếu không
   // request gửi lại — vẫn mang Bearer — sẽ đi trên TLS không pin.
