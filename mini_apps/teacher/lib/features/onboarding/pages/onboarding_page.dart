@@ -66,8 +66,19 @@ class OnboardingView extends StatelessWidget {
           // Sang bước khác: bỏ SnackBar "đã lưu" khỏi đè nút "Để sau"/"Thử lại".
           listenWhen: (a, b) =>
               a.onboarding?.currentStep != b.onboarding?.currentStep,
-          listener: (context, _) =>
-              ScaffoldMessenger.of(context).clearSnackBars(),
+          listener: (context, s) async {
+            ScaffoldMessenger.of(context).clearSnackBars();
+            // Xong bước cuối trong luồng: vào thẳng Hôm nay kèm lớp vừa tạo để
+            // gợi ý mời phụ huynh (Figma T02-3 "Hoàn tất" → T03 + sheet).
+            final router = GoRouter.maybeOf(context);
+            if (initialStep != null ||
+                s.onboarding?.currentStep != null ||
+                router == null) {
+              return; // không có router (test): giữ màn hoàn tất
+            }
+            final classId = (await _store().read()).classId;
+            router.go(TeachHubRoutes.teacher, extra: (DateTime.now(), classId));
+          },
           child: BlocListener<OnboardingCubit, OnboardingState>(
             // Mở một bước riêng: lưu hoặc bỏ qua xong thì quay lại màn trước.
             listenWhen: (a, b) =>
@@ -313,9 +324,11 @@ class _CreateClassBodyState extends State<_CreateClassBody> {
   }
 }
 
-/// Bước 2: tạo học viên rồi ghi danh vào lớp của bước 1. Chưa có lớp (bỏ qua
-/// bước 1) thì chỉ tạo học viên. `studentId` và các khóa lưu bền vững tới khi
-/// bước `done`: kill app giữa chừng thì ghi danh tiếp, không tạo học viên mới.
+/// Bước 2: thêm từng học viên (nhập tay) rồi ghi danh vào lớp của bước 1;
+/// chưa có lớp (bỏ qua bước 1) thì chỉ tạo học viên. Thêm được nhiều em, bấm
+/// "Tiếp tục (n học sinh)" mới ghi bước `done`. Học viên đang dở (`studentId`)
+/// và danh sách đã thêm lưu bền vững: kill app giữa chừng thì ghi danh tiếp,
+/// không tạo học viên mới, danh sách vẫn còn.
 class _AddStudentsStep extends StatelessWidget {
   const _AddStudentsStep({required this.onSaved});
 
@@ -341,10 +354,19 @@ class _AddStudentsBodyState extends State<_AddStudentsBody> {
   late final _studentKeys = _store().keys(widget.draft, 'student');
   late final _enrollKeys = _store().keys(widget.draft, 'enroll');
   late String? _studentId = widget.draft.studentId;
+  late String? _studentName = widget.draft.studentName;
+  late final List<String> _added = [...widget.draft.added];
+  String? _pendingName;
   bool _running = false;
 
-  /// Lỗi của lần chạy hiện tại (đã xóa lỗi cũ trước khi chạy).
+  /// Đổi để dựng form mới (trống) sau mỗi học viên đã thêm.
+  int _form = 0;
+
+  /// Lỗi ghi danh của học viên đang dở.
   bool _failed = false;
+
+  /// Lỗi ghi bước khi bấm "Tiếp tục".
+  bool _continueFailed = false;
 
   @override
   void initState() {
@@ -373,10 +395,11 @@ class _AddStudentsBodyState extends State<_AddStudentsBody> {
         );
         _enrollKeys.done('enroll');
       }
-      ok = await widget.onSaved();
-      if (ok) {
-        await _store().update((d) => d.copyWith(clearStudent: true));
-      }
+      ok = true;
+      _added.add(_studentName ?? '');
+      await _store().update(
+        (d) => d.copyWith(clearStudent: true, added: [..._added]),
+      );
     } on ApiException catch (e) {
       if (!e.retryable) _enrollKeys.done('enroll');
     } finally {
@@ -384,28 +407,75 @@ class _AddStudentsBodyState extends State<_AddStudentsBody> {
         setState(() {
           _running = false;
           _failed = !ok;
+          if (ok) {
+            _studentId = null;
+            _studentName = null;
+            _form++;
+          }
         });
       }
+    }
+  }
+
+  Future<void> _continue() async {
+    setState(() => _continueFailed = false);
+    final ok = await widget.onSaved();
+    if (ok) {
+      await _store().update((d) => d.copyWith(added: const []));
+    } else if (mounted) {
+      setState(() => _continueFailed = true);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
+    final busy = _studentId != null;
     return Column(
       children: [
+        if (_added.isNotEmpty)
+          Flexible(
+            flex: 0,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.onboardingStudentsAdded,
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
+                  for (final name in _added)
+                    ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.check_circle_outline),
+                      title: Text(name),
+                    ),
+                ],
+              ),
+            ),
+          ),
         Expanded(
-          child: _studentId != null
+          child: busy
               ? (_failed
                     ? const SizedBox.shrink()
                     : const Center(child: CircularProgressIndicator()))
               : StudentFormScope(
+                  key: ValueKey(_form),
                   keys: _studentKeys,
                   quickAdd: true,
+                  onSavedName: (name) => _pendingName = name,
                   onSaved: (id) async {
-                    await _store().update((d) => d.copyWith(studentId: id));
+                    final name = _pendingName;
+                    await _store().update(
+                      (d) => d.copyWith(studentId: id, studentName: name),
+                    );
                     if (!mounted) return;
-                    setState(() => _studentId = id);
+                    setState(() {
+                      _studentId = id;
+                      _studentName = name;
+                    });
                     await _run();
                   },
                 ),
@@ -416,6 +486,17 @@ class _AddStudentsBodyState extends State<_AddStudentsBody> {
                 ? l10n.onboardingSaved
                 : l10n.onboardingStudentNotEnrolled,
             onRetry: _run,
+          ),
+        if (_continueFailed)
+          _Notice(message: l10n.onboardingSaved, onRetry: _continue),
+        if (_added.isNotEmpty && !busy && !_continueFailed)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: AppButton(
+              label: l10n.onboardingStudentsContinue(_added.length),
+              width: double.infinity,
+              onPressed: _continue,
+            ),
           ),
       ],
     );

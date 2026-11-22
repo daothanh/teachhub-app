@@ -896,7 +896,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @onboardingStudentNotEnrolled.
   ///
   /// In vi, this message translates to:
-  /// **'Đã lưu học viên. Chưa thêm được vào lớp hoặc chưa ghi nhận bước này.'**
+  /// **'Đã lưu học viên. Chưa thêm được vào lớp.'**
   String get onboardingStudentNotEnrolled;
 
   /// No description provided for @onboardingScheduleChooseClass.
@@ -4161,6 +4161,48 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Bạn vẫn có thể gõ số tay.'**
   String get contactsPhoneDenied;
+
+  /// No description provided for @onboardingAddStudent.
+  ///
+  /// In vi, this message translates to:
+  /// **'+ Thêm học sinh'**
+  String get onboardingAddStudent;
+
+  /// No description provided for @onboardingStudentsAdded.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã thêm'**
+  String get onboardingStudentsAdded;
+
+  /// No description provided for @onboardingStudentsContinue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục ({n} học sinh)'**
+  String onboardingStudentsContinue(int n);
+
+  /// No description provided for @todayInviteTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mời phụ huynh theo dõi lớp'**
+  String get todayInviteTitle;
+
+  /// No description provided for @todayInviteBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phụ huynh theo dõi lớp sẽ nhận được thông báo điểm danh, điểm kiểm tra, học phí.'**
+  String get todayInviteBody;
+
+  /// No description provided for @todayInviteSend.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi link qua Zalo'**
+  String get todayInviteSend;
+
+  /// No description provided for @todayInviteLater.
+  ///
+  /// In vi, this message translates to:
+  /// **'Để sau'**
+  String get todayInviteLater;
 }
 
 class _MiniAppLocalizationsDelegate

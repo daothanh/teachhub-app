@@ -42,6 +42,17 @@ Future<FakeOnboardingRepository> _open(
   return repo;
 }
 
+/// "+ Thêm học sinh" rồi "Tiếp tục (1 học sinh)" ở bước 2.
+Future<void> _addStudent(WidgetTester tester) async {
+  final add = find.text('+ Thêm học sinh');
+  await tester.ensureVisible(add);
+  await tester.pumpAndSettle();
+  await tester.tap(add);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Tiếp tục (1 học sinh)'));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   tearDown(GetIt.I.reset);
 
@@ -115,8 +126,7 @@ void main() {
       ),
     );
     await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
-    await tester.tap(find.text('Lưu học viên'));
-    await tester.pumpAndSettle();
+    await _addStudent(tester);
 
     expect(repo.patches, [(OnboardingStep.addStudents, _done)]);
     expect(find.text('Bước 3/3'), findsOneWidget);
@@ -205,8 +215,7 @@ void main() {
       ]);
       await _open(tester, repo, students: students);
       await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
-      await tester.tap(find.text('Lưu học viên'));
-      await tester.pumpAndSettle();
+      await _addStudent(tester);
 
       expect(find.text('Đã lưu. Chưa ghi nhận được bước này.'), findsOneWidget);
       expect(find.text('Bước 2/3'), findsOneWidget);

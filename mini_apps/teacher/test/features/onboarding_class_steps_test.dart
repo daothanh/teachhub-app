@@ -104,9 +104,15 @@ Future<void> _addRule(WidgetTester tester) async {
 
 Future<void> _saveStudent(WidgetTester tester) async {
   await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
-  final save = find.text('Lưu học viên');
+  final save = find.text('+ Thêm học sinh');
   await _reveal(tester, save);
   await tester.tap(save);
+  await tester.pumpAndSettle();
+}
+
+/// Bấm "Tiếp tục (n học sinh)" để ghi bước 2 xong.
+Future<void> _continueStudents(WidgetTester tester, [int n = 1]) async {
+  await tester.tap(find.text('Tiếp tục ($n học sinh)'));
   await tester.pumpAndSettle();
 }
 
@@ -265,6 +271,9 @@ void main() {
 
       expect(classes.calls.first, 'enroll:c1:s1');
       expect(classes.calls, isNot(contains('list:active:1')));
+      expect(onboarding.patches, isEmpty, reason: 'còn thêm được em khác');
+      expect(find.text('Minh Anh'), findsOneWidget);
+      await _continueStudents(tester);
       expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
       expect(find.text('Bước 3/3'), findsOneWidget);
     });
@@ -275,6 +284,7 @@ void main() {
       final classes = FakeClassesRepository()..active = [sampleClass()];
       await _open(tester, onboarding, classes);
       await _saveStudent(tester);
+      await _continueStudents(tester);
 
       expect(classes.calls.where((c) => c.startsWith('enroll')), isEmpty);
       expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
@@ -308,6 +318,7 @@ void main() {
         classes.enrollError = null;
         _retry(tester);
         await tester.pumpAndSettle();
+        await _continueStudents(tester);
 
         expect(students.calls, hasLength(1));
         expect(classes.calls.where((c) => c == 'enroll:c1:s1'), hasLength(2));
@@ -318,8 +329,8 @@ void main() {
     );
 
     testWidgets(
-      'lỗi cũ của bước trước không hiện "chưa ghi danh" ở lần ghi bước '
-      'khác',
+      'ghi bước lỗi khi bấm Tiếp tục: báo chưa ghi nhận bước (không phải '
+      '"chưa ghi danh"), Thử lại thì sang bước 3',
       (tester) async {
         final onboarding = FakeOnboardingRepository(
           atStep2,
@@ -327,7 +338,12 @@ void main() {
         );
         await _open(tester, onboarding, FakeClassesRepository(), classId: 'c1');
         await _saveStudent(tester);
-        expect(find.textContaining('Chưa thêm được vào lớp'), findsOneWidget);
+        await _continueStudents(tester);
+        expect(
+          find.text('Đã lưu. Chưa ghi nhận được bước này.'),
+          findsOneWidget,
+        );
+        expect(find.textContaining('Chưa thêm được vào lớp'), findsNothing);
 
         onboarding.patchError = null;
         _retry(tester);
@@ -373,6 +389,7 @@ void main() {
         hasLength(1),
         reason: 'không tạo học viên thứ hai',
       );
+      await _continueStudents(tester);
       expect(classes.calls.where((c) => c == 'enroll:c1:s1'), hasLength(2));
       expect(classes.keys[0], classes.keys[1]);
       expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
@@ -413,6 +430,44 @@ void main() {
         expect(students.calls[0].key, students.calls[1].key);
       },
     );
+
+    testWidgets('thêm 2 học sinh: danh sách và "Tiếp tục (2 học sinh)"; kill '
+        'app vẫn còn danh sách', (tester) async {
+      final kv = InMemoryKeyValueStore();
+      final onboarding = FakeOnboardingRepository(atStep2);
+      final classes = FakeClassesRepository();
+      final students = FakeStudentRepository([
+        const Student(id: 's1', fullName: 'Minh Anh'),
+        const Student(id: 's2', fullName: 'Bảo Ngọc'),
+      ]);
+      await _open(
+        tester,
+        onboarding,
+        classes,
+        students: students,
+        kv: kv,
+        classId: 'c1',
+      );
+      await _saveStudent(tester);
+      await _saveStudent(tester);
+      expect(find.text('Minh Anh'), findsOneWidget);
+      expect(find.text('Bảo Ngọc'), findsOneWidget);
+      expect(classes.calls, containsAll(['enroll:c1:s1', 'enroll:c1:s2']));
+
+      await _kill(tester);
+      await _open(
+        tester,
+        onboarding,
+        classes,
+        students: students,
+        kv: kv,
+        classId: 'c1',
+      );
+      expect(find.text('Bảo Ngọc'), findsOneWidget);
+      await _continueStudents(tester, 2);
+      expect(onboarding.patches, [(OnboardingStep.addStudents, _done)]);
+      expect(find.text('Bước 3/3'), findsOneWidget);
+    });
 
     testWidgets('chữ 130%, bàn phím mở: nút Thử lại vẫn hiện', (tester) async {
       await _open(

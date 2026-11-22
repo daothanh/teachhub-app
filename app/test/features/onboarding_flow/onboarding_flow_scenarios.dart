@@ -237,9 +237,16 @@ void defineOnboardingFlowTests() {
     await tapButton(tester, tl.classesSave);
   }
 
+  Future<void> continueStudents(WidgetTester tester) =>
+      tapButton(tester, tl.onboardingStudentsContinue(1));
+
   Future<void> addStudent(WidgetTester tester) async {
     await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
-    await tapButton(tester, tl.studentsSave);
+    await tapButton(tester, tl.onboardingAddStudent);
+    // Ghi danh lỗi thì chưa có học sinh trong danh sách, chưa có "Tiếp tục".
+    if (find.text(tl.onboardingStudentsContinue(1)).evaluate().isNotEmpty) {
+      await continueStudents(tester);
+    }
   }
 
   void expectStep(int n) =>
@@ -283,11 +290,11 @@ void defineOnboardingFlowTests() {
     expect(backend.steps['payout_account'], isNot('skipped'));
     expect(backend.steps['compliance_checklist'], isNot('skipped'));
 
-    // Xong: vào Hôm nay thấy buổi vừa đặt.
-    expect(find.text(tl.onboardingDoneTitle), findsOneWidget);
-    await tester.tap(find.widgetWithText(AppButton, tl.onboardingFinish));
-    await tester.pumpAndSettle();
+    // Xong bước 3: vào thẳng Hôm nay, gợi ý mời phụ huynh của lớp vừa tạo.
     expect(router.state.uri.path, TeachHubRoutes.teacher);
+    expect(find.text(tl.todayInviteTitle), findsOneWidget);
+    await tester.tap(find.text(tl.todayInviteLater));
+    await tester.pumpAndSettle();
 
     // Hôm nay được làm mới ngay: buổi vừa đặt, không còn thẻ nhắc (không bỏ qua bước nào).
     expect(find.text('Toán 9A'), findsOneWidget);
@@ -328,7 +335,7 @@ void defineOnboardingFlowTests() {
     // Lớp tạo ở bước 1 vẫn là lớp được đặt lịch.
     await addRuleAndSave(tester);
     expect(backend.rules, hasLength(1));
-    expect(find.text(tl.onboardingDoneTitle), findsOneWidget);
+    expect(find.text(tl.todayInviteTitle), findsOneWidget);
 
     await finish(tester);
   });
@@ -369,6 +376,7 @@ void defineOnboardingFlowTests() {
     expect(backend.enrolled, isEmpty);
     expect(backend.steps['add_students'], 'pending');
     await tapButton(tester, tl.onboardingRetry);
+    await continueStudents(tester);
 
     expectStep(3);
     expect(backend.studentCreates, 1);
@@ -412,6 +420,7 @@ void defineOnboardingFlowTests() {
 
     expect(backend.studentCreates, 1, reason: 'không tạo học viên thứ hai');
     expect(backend.enrolled, [FakeOnboardingBackend.studentId]);
+    await continueStudents(tester);
     expect(backend.steps['add_students'], 'done');
     expectStep(3);
 

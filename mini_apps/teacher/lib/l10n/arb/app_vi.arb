@@ -248,7 +248,7 @@
     }
   },
   "onboardingSaved": "Đã lưu. Chưa ghi nhận được bước này.",
-  "onboardingStudentNotEnrolled": "Đã lưu học viên. Chưa thêm được vào lớp hoặc chưa ghi nhận bước này.",
+  "onboardingStudentNotEnrolled": "Đã lưu học viên. Chưa thêm được vào lớp.",
   "onboardingScheduleChooseClass": "Bạn có nhiều lớp. Chọn lớp cần đặt lịch.",
   "onboardingScheduleNoClass": "Chưa có lớp để đặt lịch. Hãy tạo lớp ở bước 1.",
   "todayTitle": "Hôm nay",
@@ -1598,5 +1598,19 @@
   "claimReceiptClose": "Đóng",
   "claimReceiptFailed": "Không mở được biên lai.",
   "contactsPickPhone": "Chọn số từ danh bạ",
-  "contactsPhoneDenied": "Bạn vẫn có thể gõ số tay."
+  "contactsPhoneDenied": "Bạn vẫn có thể gõ số tay.",
+  "onboardingAddStudent": "+ Thêm học sinh",
+  "onboardingStudentsAdded": "Đã thêm",
+  "onboardingStudentsContinue": "Tiếp tục ({n} học sinh)",
+  "@onboardingStudentsContinue": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "todayInviteTitle": "Mời phụ huynh theo dõi lớp",
+  "todayInviteBody": "Phụ huynh theo dõi lớp sẽ nhận được thông báo điểm danh, điểm kiểm tra, học phí.",
+  "todayInviteSend": "Gửi link qua Zalo",
+  "todayInviteLater": "Để sau"
 }

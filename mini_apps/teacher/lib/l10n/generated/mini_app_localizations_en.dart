@@ -479,7 +479,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get onboardingStudentNotEnrolled =>
-      'Student saved. Could not add to the class or record this step yet.';
+      'Student saved. Could not add them to the class.';
 
   @override
   String get onboardingScheduleChooseClass =>
@@ -2452,4 +2452,28 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get contactsPhoneDenied => 'You can still type the number.';
+
+  @override
+  String get onboardingAddStudent => '+ Add student';
+
+  @override
+  String get onboardingStudentsAdded => 'Added';
+
+  @override
+  String onboardingStudentsContinue(int n) {
+    return 'Continue ($n students)';
+  }
+
+  @override
+  String get todayInviteTitle => 'Invite parents to follow the class';
+
+  @override
+  String get todayInviteBody =>
+      'Parents who follow the class get notified about attendance, test scores and fees.';
+
+  @override
+  String get todayInviteSend => 'Send link via Zalo';
+
+  @override
+  String get todayInviteLater => 'Later';
 }

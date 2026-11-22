@@ -26,7 +26,11 @@ class TodayPage extends StatelessWidget {
     this.online,
     this.repository,
     this.onboardingRepository,
+    this.inviteClassId,
   });
+
+  /// Vừa xong onboarding: mở sheet gợi ý mời phụ huynh của lớp này một lần.
+  final String? inviteClassId;
 
   /// Trạng thái mạng; mặc định [onlineChanges].
   final Stream<bool>? online;
@@ -42,13 +46,14 @@ class TodayPage extends StatelessWidget {
               ? GetIt.I<OnboardingRepository>()
               : null),
     )..start(),
-    child: _TodayView(online: online),
+    child: _TodayView(online: online, inviteClassId: inviteClassId),
   );
 }
 
 class _TodayView extends StatefulWidget {
-  const _TodayView({this.online});
+  const _TodayView({this.online, this.inviteClassId});
   final Stream<bool>? online;
+  final String? inviteClassId;
 
   @override
   State<_TodayView> createState() => _TodayViewState();
@@ -57,6 +62,56 @@ class _TodayView extends StatefulWidget {
 class _TodayViewState extends State<_TodayView> {
   late final Stream<bool> _online = (widget.online ?? onlineChanges())
       .distinct();
+
+  @override
+  void initState() {
+    super.initState();
+    final classId = widget.inviteClassId;
+    if (classId != null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _suggestInvite(classId),
+      );
+    }
+  }
+
+  /// Sheet "Mời phụ huynh theo dõi lớp" sau onboarding (Figma T02-3 → T03).
+  Future<void> _suggestInvite(String classId) async {
+    if (!mounted) return;
+    final l10n = context.miniAppL10n;
+    final send = await showModalBottomSheet<bool>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) => SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                l10n.todayInviteTitle,
+                style: Theme.of(ctx).textTheme.titleLarge,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(l10n.todayInviteBody),
+              const SizedBox(height: AppSpacing.md),
+              AppButton(
+                label: l10n.todayInviteSend,
+                width: double.infinity,
+                onPressed: () => Navigator.pop(ctx, true),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: Text(l10n.todayInviteLater),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (send == true && mounted) {
+      await context.push(ClassesRoutes.inviteAll(classId));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

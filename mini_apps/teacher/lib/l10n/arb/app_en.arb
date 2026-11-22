@@ -248,7 +248,7 @@
     }
   },
   "onboardingSaved": "Saved. This step could not be recorded yet.",
-  "onboardingStudentNotEnrolled": "Student saved. Could not add to the class or record this step yet.",
+  "onboardingStudentNotEnrolled": "Student saved. Could not add them to the class.",
   "onboardingScheduleChooseClass": "You have several classes. Choose the one to schedule.",
   "onboardingScheduleNoClass": "There is no class to schedule yet. Create one in step 1.",
   "todayTitle": "Today",
@@ -1598,5 +1598,12 @@
   "claimReceiptClose": "Close",
   "claimReceiptFailed": "Could not open the receipt.",
   "contactsPickPhone": "Pick a number from contacts",
-  "contactsPhoneDenied": "You can still type the number."
+  "contactsPhoneDenied": "You can still type the number.",
+  "onboardingAddStudent": "+ Add student",
+  "onboardingStudentsAdded": "Added",
+  "onboardingStudentsContinue": "Continue ({n} students)",
+  "todayInviteTitle": "Invite parents to follow the class",
+  "todayInviteBody": "Parents who follow the class get notified about attendance, test scores and fees.",
+  "todayInviteSend": "Send link via Zalo",
+  "todayInviteLater": "Later"
 }

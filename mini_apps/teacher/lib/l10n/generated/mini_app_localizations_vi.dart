@@ -473,7 +473,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get onboardingStudentNotEnrolled =>
-      'Đã lưu học viên. Chưa thêm được vào lớp hoặc chưa ghi nhận bước này.';
+      'Đã lưu học viên. Chưa thêm được vào lớp.';
 
   @override
   String get onboardingScheduleChooseClass =>
@@ -2426,4 +2426,28 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get contactsPhoneDenied => 'Bạn vẫn có thể gõ số tay.';
+
+  @override
+  String get onboardingAddStudent => '+ Thêm học sinh';
+
+  @override
+  String get onboardingStudentsAdded => 'Đã thêm';
+
+  @override
+  String onboardingStudentsContinue(int n) {
+    return 'Tiếp tục ($n học sinh)';
+  }
+
+  @override
+  String get todayInviteTitle => 'Mời phụ huynh theo dõi lớp';
+
+  @override
+  String get todayInviteBody =>
+      'Phụ huynh theo dõi lớp sẽ nhận được thông báo điểm danh, điểm kiểm tra, học phí.';
+
+  @override
+  String get todayInviteSend => 'Gửi link qua Zalo';
+
+  @override
+  String get todayInviteLater => 'Để sau';
 }

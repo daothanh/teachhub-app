@@ -350,7 +350,10 @@ void main() {
         Scaffold(body: StudentFormScope(onSaved: saved.add, quickAdd: true)),
       );
       await _fillName(tester);
-      await _save(tester);
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -1500));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('+ Thêm học sinh'));
+      await tester.pumpAndSettle();
       expect(saved, ['s-new']);
       expect(repo.calls.single.draft.guardians, isEmpty);
     });
