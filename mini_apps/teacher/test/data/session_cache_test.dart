@@ -152,6 +152,19 @@ void main() {
   );
 
   test(
+    'refreshAttendance cho buổi chưa có trong cache: tải buổi của ngày đó',
+    () async {
+      server.sessions = [session(s1, '2026-11-18')];
+      server.attendance[s1] = roster(s1, [item(a, 'An')]);
+      await cache.refreshAttendance(s1);
+
+      final s = await db.select(db.cachedSessions).getSingle();
+      expect((s.id, s.className, s.canEdit), (s1, 'Toán 6A', true));
+      expect((await cache.watchRoster(s1).first).single.fullName, 'An');
+    },
+  );
+
+  test(
     'làm mới không ghi đè điểm danh còn chờ đồng bộ; học viên rời lớp bị bỏ',
     () async {
       server.sessions = [session(s1, '2026-11-18')];

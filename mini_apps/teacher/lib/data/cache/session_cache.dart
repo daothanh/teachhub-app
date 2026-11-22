@@ -82,12 +82,18 @@ class SessionCache {
   }
 
   /// `GET /sessions/{id}/attendance`: làm mới danh sách học viên và quyền sửa
-  /// của buổi. Gọi [refreshSessions] trước để buổi có trong cache (không có thì
-  /// chỉ lưu danh sách học viên, chưa có `canEdit`).
+  /// của buổi. Buổi chưa có trong cache (ngoài khoảng ngày đã tải) thì tải các
+  /// buổi của ngày đó trước, để màn điểm danh có dòng buổi mà đọc.
   Future<void> refreshAttendance(String sessionId) async {
     final sentAt = _now();
     final data = await _api.attendance(sessionId);
     _clock?.observe(data.serverTime, sentAt: sentAt, receivedAt: _now());
+    final cached = await (_db.select(
+      _db.cachedSessions,
+    )..where((r) => r.id.equals(sessionId))).getSingleOrNull();
+    if (cached == null) {
+      await refreshSessions(data.sessionDate, data.sessionDate);
+    }
 
     final a = _db.cachedAttendances;
     await _db.transaction(() async {
