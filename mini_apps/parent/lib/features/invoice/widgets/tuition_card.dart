@@ -28,7 +28,12 @@ class TuitionCard extends StatelessWidget {
           margin: EdgeInsets.zero,
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
-            onTap: () => context.push(TeachHubRoutes.parentInvoices),
+            onTap: () async {
+              final cubit = context.read<TuitionCubit>();
+              await context.push(TeachHubRoutes.parentInvoices);
+              // Quay về từ P03 (có thể vừa đóng tiền): tải lại số nợ.
+              cubit.load();
+            },
             child: Semantics(
               button: true,
               container: true,
