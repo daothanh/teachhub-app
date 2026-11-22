@@ -130,6 +130,7 @@ Future<void> bootstrap({required Env env}) async {
     }
   });
   String? claimedUser;
+  Future<void>? claiming;
   var wasAuthenticated = false;
   authCubit.stream.listen((state) async {
     final before = wasAuthenticated;
@@ -150,18 +151,31 @@ Future<void> bootstrap({required Env env}) async {
           );
         }
         claimedUser = userId;
-        try {
-          await TeacherController.instance.claimDatabaseFor(userId);
-          // Lịch nền có thể đã bị hủy khi hết phiên: còn dòng thì hẹn lại ngay.
-          unawaited(TeacherController.instance.rescheduleBackgroundIfPending());
-        } catch (e, st) {
-          log(
-            'Teacher DB claim failed',
-            name: 'bootstrap',
-            error: e,
-            stackTrace: st,
-          );
-        }
+        // Nối sau lần claim trước (không chạy song song); lỗi chỉ log nên
+        // chuỗi không bao giờ lỗi, không chặn đăng nhập vĩnh viễn.
+        claiming = (claiming ?? Future<void>.value()).then((_) async {
+          try {
+            await TeacherController.instance.claimDatabaseFor(userId);
+            // Lịch nền có thể đã bị hủy khi hết phiên: còn dòng thì hẹn lại ngay.
+            unawaited(
+              TeacherController.instance.rescheduleBackgroundIfPending(),
+            );
+          } catch (e, st) {
+            log(
+              'Teacher DB claim failed',
+              name: 'bootstrap',
+              error: e,
+              stackTrace: st,
+            );
+          }
+        });
+      }
+      // Mọi emission (kể cả lần sau cùng user) chờ claim xong mới tải vai trò.
+      final claim = claiming;
+      if (claim != null) {
+        await claim;
+        // Trong lúc chờ đã đăng xuất hoặc đổi người: emission mới lo phần tải.
+        if (claim != claiming || !authCubit.state.isAuthenticated) return;
       }
       if (membershipCubit.state.statusLoad == LoadingStatus.initial) {
         membershipCubit.load();
