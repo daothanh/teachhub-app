@@ -2,10 +2,12 @@
 # từ pub.vtii.vn), analyze, format, test. Build APK + phân phối bản dev chờ Firebase.
 name: ci
 
+# Chỉ chạy trên PR (main chỉ nhận squash từ PR đã xanh); bỏ qua PR chỉ đổi tài liệu — tiết kiệm phút Actions.
 on:
   pull_request:
-  push:
-    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
   workflow_dispatch:
 
 permissions:
