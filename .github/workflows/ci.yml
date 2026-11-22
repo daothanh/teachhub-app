@@ -1,10 +1,11 @@
-# CI mobile (S0-FL-01, phần đầu S0-FL-05): mỗi gói một job — pub get (gói tasco_*
-# từ pub.vtii.vn), analyze, format, test. Build APK + phân phối bản dev chờ Firebase.
+# CI mobile (S0-FL-01, phần đầu S0-FL-05): MỘT job chạy lần lượt mọi gói — pub get (gói tasco_*
+# từ pub.vtii.vn), analyze, format, test. Một job để cài Flutter một lần (tiết kiệm phút Actions). Build APK + phân phối bản dev chờ Firebase.
 name: ci
 
 # Chỉ chạy trên PR (main chỉ nhận squash từ PR đã xanh); bỏ qua PR chỉ đổi tài liệu — tiết kiệm phút Actions.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
       - '**/*.md'
       - 'docs/**'
@@ -19,21 +20,10 @@ concurrency:
 
 jobs:
   check:
-    name: ${{ matrix.package }}
+    # PR nháp không chạy; bấm "Ready for review" thì chạy.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - app
-          - mini_apps/teacher
-          - mini_apps/parent
-          - mini_apps/student
-          - packages/teachhub_shared
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
@@ -50,10 +40,25 @@ jobs:
           if [ -n "$PUB_VTII_TOKEN" ]; then
             dart pub token add https://pub.vtii.vn --env-var PUB_VTII_TOKEN
           fi
-      - run: flutter pub get
-      - run: dart format --output=none --set-exit-if-changed .
-      - run: flutter analyze
-      - run: flutter test
+      # Chạy hết các gói rồi mới báo đỏ, để một lần chạy thấy mọi gói lỗi.
+      - name: pub get, format, analyze, test từng gói
+        run: |
+          failed=()
+          for pkg in packages/teachhub_shared mini_apps/teacher mini_apps/parent mini_apps/student app; do
+            echo "::group::$pkg"
+            if ( cd "$pkg" && flutter pub get && dart format --output=none --set-exit-if-changed . \
+                 && flutter analyze && flutter test ); then
+              echo "::endgroup::"
+            else
+              echo "::endgroup::"
+              echo "::error title=$pkg::pub get / format / analyze / test lỗi"
+              failed+=("$pkg")
+            fi
+          done
+          if [ "${#failed[@]}" -gt 0 ]; then
+            echo "Gói lỗi: ${failed[*]}"
+            exit 1
+          fi
       - name: Mini-app không import lẫn nhau (S0-FL-03)
-        if: matrix.package == 'app'
+        working-directory: app
         run: dart tool/check_miniapp_imports.dart
