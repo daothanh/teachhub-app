@@ -429,6 +429,23 @@ void main() {
       expect(find.text('1+ invoices not settled'), findsOneWidget);
     });
 
+    testWidgets('quay về từ P03: card học phí tải lại số nợ', (tester) async {
+      final repo = _FakeInvoices()..pages.add(_page([_json()]));
+      await _pump(tester, repo, _FakeSaver());
+      expect(
+        find.text('1 invoices not settled, 1,500,000 đ outstanding'),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.text('Tuition'));
+      await tester.pumpAndSettle();
+      // Phụ huynh đóng xong trong lúc ở P03.
+      repo.pages[0] = _page([_json(status: 'paid', paid: 1500000)]);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.text('No invoices to pay.'), findsOneWidget);
+    });
+
     testWidgets('danh sách: bấm hóa đơn mở chi tiết với QR và tài khoản', (
       tester,
     ) async {

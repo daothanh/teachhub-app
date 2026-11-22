@@ -63,13 +63,18 @@ class _FakeRepo implements FamilyRepository {
 }
 
 class _NoInvoices implements InvoiceRepository {
+  int listCalls = 0;
+
   @override
   Future<InvoicePage> list({
     String? cursor,
     InvoiceStatus? status,
     String? studentId,
     int limit = 20,
-  }) async => const InvoicePage(items: [], nextCursor: null);
+  }) async {
+    listCalls++;
+    return const InvoicePage(items: [], nextCursor: null);
+  }
 
   @override
   Future<InvoiceDetail> detail(String id) => throw UnimplementedError();
@@ -88,10 +93,11 @@ Future<void> _pump(
   _FakeRepo repo, {
   NotificationPermissionGate? gate,
   double textScale = 1,
+  InvoiceRepository? invoices,
 }) async {
   final c = ParentController.instance
     ..familyRepository = repo
-    ..invoiceRepository = _NoInvoices()
+    ..invoiceRepository = invoices ?? _NoInvoices()
     ..notifications = gate
     ..noInviteBuilder = (context, onLinked) => const Text('p05-embedded');
   addTearDown(() {
@@ -221,5 +227,19 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Present · 3'), findsOneWidget);
     expect(repo.weekCalls.length, 2);
+  });
+
+  testWidgets('kéo để làm mới tải lại cả card học phí', (tester) async {
+    final invoices = _NoInvoices();
+    await _pump(
+      tester,
+      _FakeRepo([_child('a', 'Minh Anh')]),
+      invoices: invoices,
+    );
+    expect(invoices.listCalls, 1);
+
+    await tester.fling(find.byType(ListView), const Offset(0, 400), 1000);
+    await tester.pumpAndSettle();
+    expect(invoices.listCalls, 2);
   });
 }
