@@ -598,6 +598,162 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Sao chép số tiền'**
   String get invoiceCopyAmount;
+
+  /// No description provided for @invoiceClaimButton.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tôi đã chuyển khoản'**
+  String get invoiceClaimButton;
+
+  /// No description provided for @invoicePendingNotice.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn đã báo chuyển khoản. Giáo viên sẽ kiểm tra biên lai rồi xác nhận; hóa đơn cập nhật khi có kết quả.'**
+  String get invoicePendingNotice;
+
+  /// No description provided for @invoiceClaimTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Báo đã chuyển khoản'**
+  String get invoiceClaimTitle;
+
+  /// No description provided for @invoiceClaimHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ảnh biên lai hoặc ảnh chụp màn hình giao dịch (JPEG, PNG hoặc HEIC, tối đa 10 MB). Ảnh chỉ gửi cho giáo viên, không lưu vào thư viện ảnh.'**
+  String get invoiceClaimHint;
+
+  /// No description provided for @invoiceClaimPick.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ảnh biên lai'**
+  String get invoiceClaimPick;
+
+  /// No description provided for @invoiceClaimChange.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn ảnh khác'**
+  String get invoiceClaimChange;
+
+  /// No description provided for @invoiceClaimImageLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ảnh biên lai đã chọn'**
+  String get invoiceClaimImageLabel;
+
+  /// No description provided for @invoiceClaimAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số tiền đã chuyển (đ)'**
+  String get invoiceClaimAmount;
+
+  /// No description provided for @invoiceClaimNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi chú cho giáo viên (không bắt buộc)'**
+  String get invoiceClaimNote;
+
+  /// No description provided for @invoiceClaimSubmit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Gửi báo chuyển khoản'**
+  String get invoiceClaimSubmit;
+
+  /// No description provided for @invoiceClaimRetry.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thử lại'**
+  String get invoiceClaimRetry;
+
+  /// No description provided for @invoiceClaimUploading.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang tải ảnh… {percent}%'**
+  String invoiceClaimUploading(int percent);
+
+  /// No description provided for @invoiceClaimVerifying.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang kiểm tra ảnh…'**
+  String get invoiceClaimVerifying;
+
+  /// No description provided for @invoiceClaimSending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang gửi báo…'**
+  String get invoiceClaimSending;
+
+  /// No description provided for @invoiceClaimDone.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đã gửi báo chuyển khoản. Giáo viên sẽ xác nhận.'**
+  String get invoiceClaimDone;
+
+  /// No description provided for @invoiceClaimErrType.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ảnh phải là JPEG, PNG hoặc HEIC. Hãy chọn ảnh khác.'**
+  String get invoiceClaimErrType;
+
+  /// No description provided for @invoiceClaimErrLarge.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ảnh lớn hơn 10 MB. Hãy chọn ảnh nhỏ hơn.'**
+  String get invoiceClaimErrLarge;
+
+  /// No description provided for @invoiceClaimErrAmount.
+  ///
+  /// In vi, this message translates to:
+  /// **'Nhập số tiền đã chuyển, lớn hơn 0.'**
+  String get invoiceClaimErrAmount;
+
+  /// No description provided for @invoiceClaimErrNote.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ghi chú tối đa 300 ký tự.'**
+  String get invoiceClaimErrNote;
+
+  /// No description provided for @invoiceClaimErrOffline.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không có kết nối mạng. Ảnh vẫn được giữ, bấm Thử lại khi có mạng.'**
+  String get invoiceClaimErrOffline;
+
+  /// No description provided for @invoiceClaimErrExpired.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phiên tải ảnh đã hết hạn. Bấm Thử lại để tải lại.'**
+  String get invoiceClaimErrExpired;
+
+  /// No description provided for @invoiceClaimErrPending.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn này đã có một lần báo đang chờ giáo viên xác nhận.'**
+  String get invoiceClaimErrPending;
+
+  /// No description provided for @invoiceClaimErrNotPayable.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hóa đơn này không còn cần chuyển khoản.'**
+  String get invoiceClaimErrNotPayable;
+
+  /// No description provided for @invoiceClaimErrNotFound.
+  ///
+  /// In vi, this message translates to:
+  /// **'Không tìm thấy hóa đơn.'**
+  String get invoiceClaimErrNotFound;
+
+  /// No description provided for @invoiceClaimErrRate.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn thao tác quá nhanh. Hãy đợi một lát rồi thử lại.'**
+  String get invoiceClaimErrRate;
+
+  /// No description provided for @invoiceClaimErrFailed.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chưa gửi được. Bấm Thử lại, ảnh sẽ không bị tải trùng.'**
+  String get invoiceClaimErrFailed;
 }
 
 class _MiniAppLocalizationsDelegate

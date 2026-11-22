@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:teachhub_shared/teachhub_shared.dart';
+import 'api/uuid.dart';
 
 /// Giữ MỘT khóa cho mỗi lệnh ghi chừng nào draft chưa đổi: bấm thử lại sau lỗi
 /// mạng/timeout dùng lại khóa cũ (server phát lại kết quả thay vì làm hai lần);

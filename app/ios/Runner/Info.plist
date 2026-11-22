@@ -74,6 +74,8 @@
 	<array>
 		<string>zalo</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TeachHub chỉ đọc ảnh bạn chọn làm biên lai khi báo đã chuyển khoản, rồi gửi cho giáo viên. TeachHub không xem các ảnh khác trong thư viện.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>TeachHub lưu ảnh mã QR hóa đơn vào thư viện ảnh khi bạn bấm Lưu ảnh QR. Thư viện ảnh không được dùng cho việc nào khác.</string>
 	<key>NSFaceIDUsageDescription</key>

@@ -1507,6 +1507,9 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get billingReasonMakeup => 'makeup session';
 
   @override
+  String get billingReasonNotMarked => 'not marked when the period closed';
+
+  @override
   String get billingReasonOther => 'per the class rules';
 
   @override
@@ -2373,4 +2376,87 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get planLimitAction => 'See Pro plan';
+
+  @override
+  String get claimsTitle => 'Transfers reported by parents';
+
+  @override
+  String get claimsLoadFailed => 'Could not load the reported transfers.';
+
+  @override
+  String claimLine(String name, String when) {
+    return '$name · $when';
+  }
+
+  @override
+  String claimAmount(String amount) {
+    return 'Parent reported: $amount';
+  }
+
+  @override
+  String claimNote(String note) {
+    return 'Note: $note';
+  }
+
+  @override
+  String claimRejectedReason(String reason) {
+    return 'Rejected because: $reason';
+  }
+
+  @override
+  String get claimStatusPending => 'Awaiting confirmation';
+
+  @override
+  String get claimStatusConfirmed => 'Confirmed';
+
+  @override
+  String get claimStatusRejected => 'Rejected';
+
+  @override
+  String get claimViewReceipt => 'View receipt';
+
+  @override
+  String get claimConfirm => 'Confirm';
+
+  @override
+  String get claimReject => 'Reject';
+
+  @override
+  String get claimCancel => 'Close';
+
+  @override
+  String get claimConfirmTitle => 'Confirm money received';
+
+  @override
+  String claimConfirmHint(String amount) {
+    return 'The parent reported $amount. You can edit the amount actually received; a bank transfer payment is recorded on the invoice.';
+  }
+
+  @override
+  String get claimConfirmAmount => 'Amount received';
+
+  @override
+  String get claimRejectTitle => 'Reject this report';
+
+  @override
+  String get claimRejectHint =>
+      'The reason is sent to the parent with the notification. The invoice returns to its previous status.';
+
+  @override
+  String get claimRejectReason => 'Reason';
+
+  @override
+  String get claimConfirmedDone => 'Confirmed and recorded.';
+
+  @override
+  String get claimRejectedDone => 'Report rejected.';
+
+  @override
+  String get claimReceiptTitle => 'Receipt';
+
+  @override
+  String get claimReceiptClose => 'Close';
+
+  @override
+  String get claimReceiptFailed => 'Could not open the receipt.';
 }

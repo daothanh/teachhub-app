@@ -289,4 +289,95 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get invoiceCopyAmount => 'Copy amount';
+
+  @override
+  String get invoiceClaimButton => 'I have transferred';
+
+  @override
+  String get invoicePendingNotice =>
+      'You reported the transfer. The teacher will check the receipt and confirm; the invoice updates when there is a result.';
+
+  @override
+  String get invoiceClaimTitle => 'Report a transfer';
+
+  @override
+  String get invoiceClaimHint =>
+      'Pick the receipt or a screenshot of the transaction (JPEG, PNG or HEIC, up to 10 MB). The image is sent only to the teacher and is not saved to your photo library.';
+
+  @override
+  String get invoiceClaimPick => 'Choose receipt image';
+
+  @override
+  String get invoiceClaimChange => 'Choose another image';
+
+  @override
+  String get invoiceClaimImageLabel => 'Selected receipt image';
+
+  @override
+  String get invoiceClaimAmount => 'Amount transferred (VND)';
+
+  @override
+  String get invoiceClaimNote => 'Note for the teacher (optional)';
+
+  @override
+  String get invoiceClaimSubmit => 'Send report';
+
+  @override
+  String get invoiceClaimRetry => 'Try again';
+
+  @override
+  String invoiceClaimUploading(int percent) {
+    return 'Uploading image… $percent%';
+  }
+
+  @override
+  String get invoiceClaimVerifying => 'Checking image…';
+
+  @override
+  String get invoiceClaimSending => 'Sending report…';
+
+  @override
+  String get invoiceClaimDone => 'Transfer reported. The teacher will confirm.';
+
+  @override
+  String get invoiceClaimErrType =>
+      'The image must be JPEG, PNG or HEIC. Choose another image.';
+
+  @override
+  String get invoiceClaimErrLarge =>
+      'The image is larger than 10 MB. Choose a smaller one.';
+
+  @override
+  String get invoiceClaimErrAmount =>
+      'Enter the amount transferred, greater than 0.';
+
+  @override
+  String get invoiceClaimErrNote => 'The note is at most 300 characters.';
+
+  @override
+  String get invoiceClaimErrOffline =>
+      'No network connection. The image is kept; tap Try again when you are online.';
+
+  @override
+  String get invoiceClaimErrExpired =>
+      'The upload session expired. Tap Try again to upload again.';
+
+  @override
+  String get invoiceClaimErrPending =>
+      'This invoice already has a report awaiting the teacher\'s confirmation.';
+
+  @override
+  String get invoiceClaimErrNotPayable =>
+      'This invoice no longer needs a transfer.';
+
+  @override
+  String get invoiceClaimErrNotFound => 'Invoice not found.';
+
+  @override
+  String get invoiceClaimErrRate =>
+      'You are going too fast. Wait a moment and try again.';
+
+  @override
+  String get invoiceClaimErrFailed =>
+      'Could not send yet. Tap Try again; the image will not be uploaded twice.';
 }

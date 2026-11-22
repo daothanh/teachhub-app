@@ -11,8 +11,11 @@ import 'features/family/data/family_repository.dart';
 import 'features/home/pages/parent_home_page.dart';
 import 'features/invoice/cubit/invoice_detail_cubit.dart';
 import 'features/invoice/cubit/invoice_list_cubit.dart';
+import 'features/invoice/cubit/receipt_claim_cubit.dart';
 import 'features/invoice/data/invoice_repository.dart';
 import 'features/invoice/data/qr_image_saver.dart';
+import 'features/invoice/data/receipt_picker.dart';
+import 'features/invoice/data/receipt_repository.dart';
 import 'features/invoice/pages/invoice_detail_page.dart';
 import 'features/invoice/pages/invoice_list_page.dart';
 import 'l10n/l10n.dart';
@@ -44,6 +47,12 @@ class ParentController {
 
   @visibleForTesting
   QrImageSaver? qrImageSaver;
+
+  @visibleForTesting
+  ReceiptRepository? receiptRepository;
+
+  @visibleForTesting
+  ReceiptPicker? receiptPicker;
 
   InvoiceRepository _invoices() =>
       invoiceRepository ??
@@ -82,12 +91,30 @@ class ParentController {
             GoRoute(
               path: ':id',
               name: '$moduleId.invoice',
-              builder: (context, state) => BlocProvider(
-                create: (_) => InvoiceDetailCubit(
-                  _invoices(),
-                  qrImageSaver ?? const GalQrImageSaver(),
-                  state.pathParameters['id']!,
-                )..load(),
+              builder: (context, state) => MultiBlocProvider(
+                providers: [
+                  BlocProvider(
+                    create: (_) => InvoiceDetailCubit(
+                      _invoices(),
+                      qrImageSaver ?? const GalQrImageSaver(),
+                      state.pathParameters['id']!,
+                    )..load(),
+                  ),
+                  // Giữ qua các lần mở sheet: URL và khóa Idempotency còn dùng lại khi thử lại.
+                  BlocProvider(
+                    create: (_) => ReceiptClaimCubit(
+                      receiptRepository ??
+                          DioReceiptRepository(
+                            GetIt.I<Dio>(instanceName: TeachHubDiKey.api),
+                            GetIt.I<Dio>(
+                              instanceName: TeachHubDiKey.objectStorage,
+                            ),
+                          ),
+                      receiptPicker ?? const ImagePickerReceiptPicker(),
+                      state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
                 child: const InvoiceDetailPage(),
               ),
             ),

@@ -285,4 +285,94 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get invoiceCopyAmount => 'Sao chép số tiền';
+
+  @override
+  String get invoiceClaimButton => 'Tôi đã chuyển khoản';
+
+  @override
+  String get invoicePendingNotice =>
+      'Bạn đã báo chuyển khoản. Giáo viên sẽ kiểm tra biên lai rồi xác nhận; hóa đơn cập nhật khi có kết quả.';
+
+  @override
+  String get invoiceClaimTitle => 'Báo đã chuyển khoản';
+
+  @override
+  String get invoiceClaimHint =>
+      'Chọn ảnh biên lai hoặc ảnh chụp màn hình giao dịch (JPEG, PNG hoặc HEIC, tối đa 10 MB). Ảnh chỉ gửi cho giáo viên, không lưu vào thư viện ảnh.';
+
+  @override
+  String get invoiceClaimPick => 'Chọn ảnh biên lai';
+
+  @override
+  String get invoiceClaimChange => 'Chọn ảnh khác';
+
+  @override
+  String get invoiceClaimImageLabel => 'Ảnh biên lai đã chọn';
+
+  @override
+  String get invoiceClaimAmount => 'Số tiền đã chuyển (đ)';
+
+  @override
+  String get invoiceClaimNote => 'Ghi chú cho giáo viên (không bắt buộc)';
+
+  @override
+  String get invoiceClaimSubmit => 'Gửi báo chuyển khoản';
+
+  @override
+  String get invoiceClaimRetry => 'Thử lại';
+
+  @override
+  String invoiceClaimUploading(int percent) {
+    return 'Đang tải ảnh… $percent%';
+  }
+
+  @override
+  String get invoiceClaimVerifying => 'Đang kiểm tra ảnh…';
+
+  @override
+  String get invoiceClaimSending => 'Đang gửi báo…';
+
+  @override
+  String get invoiceClaimDone =>
+      'Đã gửi báo chuyển khoản. Giáo viên sẽ xác nhận.';
+
+  @override
+  String get invoiceClaimErrType =>
+      'Ảnh phải là JPEG, PNG hoặc HEIC. Hãy chọn ảnh khác.';
+
+  @override
+  String get invoiceClaimErrLarge => 'Ảnh lớn hơn 10 MB. Hãy chọn ảnh nhỏ hơn.';
+
+  @override
+  String get invoiceClaimErrAmount => 'Nhập số tiền đã chuyển, lớn hơn 0.';
+
+  @override
+  String get invoiceClaimErrNote => 'Ghi chú tối đa 300 ký tự.';
+
+  @override
+  String get invoiceClaimErrOffline =>
+      'Không có kết nối mạng. Ảnh vẫn được giữ, bấm Thử lại khi có mạng.';
+
+  @override
+  String get invoiceClaimErrExpired =>
+      'Phiên tải ảnh đã hết hạn. Bấm Thử lại để tải lại.';
+
+  @override
+  String get invoiceClaimErrPending =>
+      'Hóa đơn này đã có một lần báo đang chờ giáo viên xác nhận.';
+
+  @override
+  String get invoiceClaimErrNotPayable =>
+      'Hóa đơn này không còn cần chuyển khoản.';
+
+  @override
+  String get invoiceClaimErrNotFound => 'Không tìm thấy hóa đơn.';
+
+  @override
+  String get invoiceClaimErrRate =>
+      'Bạn thao tác quá nhanh. Hãy đợi một lát rồi thử lại.';
+
+  @override
+  String get invoiceClaimErrFailed =>
+      'Chưa gửi được. Bấm Thử lại, ảnh sẽ không bị tải trùng.';
 }

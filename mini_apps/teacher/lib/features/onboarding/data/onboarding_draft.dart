@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:tasco_storage/tasco_storage.dart';
+import 'package:teachhub_shared/teachhub_shared.dart';
 
 import '../../../data/local_db/teacher_local_data.dart';
-import '../../classes/data/draft_keys.dart';
 
 /// Việc onboarding đã làm trên server mà bước chưa được ghi `done`, lưu bền
 /// vững để kill app giữa chừng không tạo trùng (lớp ở bước 1, học viên ở bước 2).

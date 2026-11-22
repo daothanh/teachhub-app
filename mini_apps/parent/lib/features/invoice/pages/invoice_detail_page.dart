@@ -6,8 +6,10 @@ import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 
 import '../../../l10n/l10n.dart';
 import '../cubit/invoice_detail_cubit.dart';
+import '../cubit/receipt_claim_cubit.dart';
 import '../data/invoice_models.dart';
 import '../widgets/invoice_format.dart';
+import '../widgets/receipt_claim_sheet.dart';
 
 /// P03: chi tiết hóa đơn, VietQR, tài khoản nhận (US-7.3 AC1 đến AC3).
 class InvoiceDetailPage extends StatelessWidget {
@@ -176,6 +178,15 @@ class _Detail extends StatelessWidget {
               child: Text(l10n.invoiceCarriedNotice),
             ),
           )
+        else if (s.status == InvoiceStatus.pendingConfirmation)
+          // Đã báo chuyển khoản (US-7.7): chờ giáo viên, không báo thêm lần nữa.
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(l10n.invoicePendingNotice),
+            ),
+          )
         else if (qr != null || payout != null)
           _Pay(invoice: invoice),
       ],
@@ -339,9 +350,42 @@ class _Pay extends StatelessWidget {
             icon: const Icon(Icons.copy),
             label: Text(l10n.invoiceCopyAccount),
           ),
+        if (invoice.summary.status.isUnpaid &&
+            invoice.summary.remainingAmount > 0) ...[
+          const SizedBox(height: 16),
+          AppButton(
+            label: l10n.invoiceClaimButton,
+            width: double.infinity,
+            onPressed: () =>
+                _openClaim(context, invoice.summary.remainingAmount),
+          ),
+        ],
       ],
     );
   }
+}
+
+/// Mở sheet báo chuyển khoản; xong (hoặc hóa đơn đã đổi) thì tải lại chi tiết.
+Future<void> _openClaim(BuildContext context, int remaining) async {
+  final claim = context.read<ReceiptClaimCubit>();
+  final detail = context.read<InvoiceDetailCubit>();
+  final messenger = ScaffoldMessenger.of(context);
+  final done = context.miniAppL10n.invoiceClaimDone;
+  final changed = await showModalBottomSheet<bool>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    enableDrag: false,
+    builder: (_) => BlocProvider.value(
+      value: claim,
+      child: ReceiptClaimSheet(remaining: remaining),
+    ),
+  );
+  if (changed != true) return;
+  if (claim.state.done) {
+    messenger.showSnackBar(SnackBar(content: Text(done)));
+  }
+  await detail.load();
 }
 
 class _Info extends StatelessWidget {
