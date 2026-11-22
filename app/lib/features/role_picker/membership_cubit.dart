@@ -78,6 +78,10 @@ class MembershipCubit extends Cubit<MembershipState> {
   /// công, khi server từ chối hẳn, hoặc khi người dùng đổi ý.
   String? _workspaceKey;
 
+  /// Tăng mỗi lần `load()`/`clear()`: phản hồi về muộn của lần tải cũ (vd. đã
+  /// đăng xuất) bị bỏ, không ghi vai trò/cache của người trước cho người sau.
+  int _gen = 0;
+
   static const _activeKey = 'active_membership_id';
 
   /// Phản hồi `GET /me/memberships` gần nhất, để mở app khi mất mạng vẫn vào
@@ -96,13 +100,16 @@ class MembershipCubit extends Cubit<MembershipState> {
   /// Vai trò mở lại: lần chọn trên máy này, rồi lần dùng gần nhất trên
   /// server, rồi vai trò duy nhất nếu chỉ có một.
   Future<void> load({bool silent = false}) async {
+    final gen = ++_gen;
     if (!silent) emit(state.copyWith(statusLoad: LoadingStatus.loading));
     try {
       final res = await _api.get<Map<String, dynamic>>('/me/memberships');
+      if (gen != _gen) return;
       final body = res.data ?? const {};
       _apply(body);
       await _prefs.setString(_cacheKey, jsonEncode(body));
     } on DioException catch (e) {
+      if (gen != _gen) return;
       // Chỉ lỗi mạng (không có phản hồi) mới dùng bản cũ; 401/403/5xx thì báo
       // lỗi như trước để không mở vai trò đã bị thu hồi.
       final cached = e.response == null ? _prefs.getString(_cacheKey) : null;
@@ -112,6 +119,7 @@ class MembershipCubit extends Cubit<MembershipState> {
         emit(state.copyWith(statusLoad: LoadingStatus.failure, error: e));
       }
     } catch (e) {
+      if (gen != _gen) return;
       emit(state.copyWith(statusLoad: LoadingStatus.failure, error: e));
     }
   }
@@ -199,6 +207,7 @@ class MembershipCubit extends Cubit<MembershipState> {
 
   /// Đăng xuất: quên vai trò của phiên này.
   Future<void> clear() async {
+    _gen++;
     _workspaceKey = null;
     await _prefs.remove(_activeKey);
     await _prefs.remove(_cacheKey);
