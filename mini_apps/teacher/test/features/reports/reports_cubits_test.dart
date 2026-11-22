@@ -242,6 +242,22 @@ void main() {
       expect(c.state.items, hasLength(25));
     });
 
+    test('loadMore khi đang làm mới trang 1: bỏ qua, không mất trang', () async {
+      repo.entries = many(50);
+      final c = ReportPaymentsCubit(repo, month: '2026-11');
+      await c.load();
+      await c.loadMore();
+      expect(c.state.page, 2);
+      final refreshing = c.refresh();
+      await c.loadMore(); // trang 1 đang bay: không được tải trang 3
+      await refreshing;
+      expect(repo.paymentCalls.map((e) => e.page), [1, 2, 1]);
+      await c.loadMore();
+      expect(c.state.items.map((e) => e.id), [
+        for (var i = 0; i < 40; i++) 'e$i',
+      ]);
+    });
+
     test('làm mới lỗi lặp lại: refreshError được xóa rồi đặt lại', () async {
       final c = ReportPaymentsCubit(repo, month: '2026-11');
       await c.load();
