@@ -113,7 +113,7 @@ class AttendanceSession extends Equatable {
       AttendanceSession(
         sessionId: j['sessionId'] as String,
         className: j['className'] as String,
-        startsAt: DateTime.parse(j['startsAt'] as String),
+        startsAt: DateTime.parse(j['startsAt'] as String).toLocal(),
         cancelled: j['sessionStatus'] == 'cancelled',
         isMakeup: j['isMakeup'] as bool,
         mark: AttendanceMark.fromWire(j['attendanceStatus']),
@@ -122,7 +122,9 @@ class AttendanceSession extends Equatable {
   final String sessionId;
   final String className;
 
-  /// Giờ bắt đầu theo múi giờ trong phản hồi (không đổi sang giờ máy).
+  /// Giờ bắt đầu theo giờ máy. Server gửi UTC (`...Z`), parse thẳng sẽ hiện
+  /// lệch 7 tiếng. shortcut: phản hồi chưa có múi giờ tenant nên dùng giờ máy
+  /// (phụ huynh ở VN thì đúng); thêm offset vào FamilyAttendanceWeek khi cần.
   final DateTime startsAt;
   final bool cancelled;
   final bool isMakeup;
