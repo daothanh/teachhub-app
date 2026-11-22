@@ -35,6 +35,7 @@ class FamilyState extends Equatable {
     FamilyStatus? status,
     List<FamilyStudent>? students,
     String? selectedId,
+    bool clearSelected = false,
     AttendanceWeek? week,
     bool clearWeek = false,
     bool? weekLoading,
@@ -43,7 +44,7 @@ class FamilyState extends Equatable {
   }) => FamilyState(
     status: status ?? this.status,
     students: students ?? this.students,
-    selectedId: selectedId ?? this.selectedId,
+    selectedId: clearSelected ? null : (selectedId ?? this.selectedId),
     week: clearWeek ? null : (week ?? this.week),
     weekLoading: weekLoading ?? this.weekLoading,
     weekFailed: weekFailed ?? this.weekFailed,
@@ -85,6 +86,8 @@ class FamilyCubit extends Cubit<FamilyState> {
           status: FamilyStatus.ready,
           students: students,
           selectedId: selected,
+          // Hết con (bị gỡ liên kết): bỏ id cũ để _loadWeek không gọi lại.
+          clearSelected: selected == null,
           clearWeek: selected != state.selectedId,
         ),
       );
