@@ -870,6 +870,22 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('danh sách: hóa đơn đã báo chuyển khoản hiện Chờ xác nhận', (
+      tester,
+    ) async {
+      final repo = _FakeInvoices()
+        ..pages.add(_page([_json(status: 'pending_confirmation')]));
+      await _pump(
+        tester,
+        repo,
+        _FakeSaver(),
+        location: TeachHubRoutes.parentInvoices,
+        textScale: 1.3,
+      );
+      expect(find.text('Awaiting confirmation · Due $_due'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('card học phí P02 tính theo còn nợ, không cộng nợ đã chuyển', (
       tester,
     ) async {
