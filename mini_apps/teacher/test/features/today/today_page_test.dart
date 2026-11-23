@@ -241,14 +241,33 @@ void main() {
     );
   });
 
-  testWidgets('AC-3: không bước nào bị bỏ qua → không có thẻ', (tester) async {
+  testWidgets('US-0.2 AC1/AC3: còn bước dở (giáo viên mới) → vào onboarding', (
+    tester,
+  ) async {
     final onboarding = FakeOnboardingRepository(onboardingOf({}));
     await pumpRouter(
       tester,
       routerFor(FakeAttendanceRepository(), onboarding: onboarding),
     );
-    expect(find.text('Bước làm quen bạn đã để sau'), findsNothing);
+    expect(find.text('onboarding-page'), findsOneWidget);
   });
+
+  testWidgets(
+    'xong cả 3 bước, không bỏ qua bước nào → ở Hôm nay, không có thẻ',
+    (tester) async {
+      final onboarding = FakeOnboardingRepository(
+        onboardingOf({
+          for (final s in OnboardingStep.values) s: OnboardingStatus.done,
+        }),
+      );
+      await pumpRouter(
+        tester,
+        routerFor(FakeAttendanceRepository(), onboarding: onboarding),
+      );
+      expect(find.text('onboarding-page'), findsNothing);
+      expect(find.text('Bước làm quen bạn đã để sau'), findsNothing);
+    },
+  );
 
   testWidgets(
     'AC-3: không tải được onboarding (ngoại tuyến) → không có thẻ, không lỗi',
