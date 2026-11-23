@@ -61,7 +61,6 @@ Future<void> apiModule(GetIt getIt) async {
           consentRequired: ConsentRequiredInterceptor(
             (v) => getIt<ConsentCubit>().markRequired(v),
           ),
-          loadingManager: getIt<LoadingManager>(),
           authInterceptor: getIt<AuthInterceptor>(),
           retryInterceptor: RetryInterceptor(
             retryClient: RetryInterceptor.buildRetryClient(
@@ -83,20 +82,18 @@ Future<void> apiModule(GetIt getIt) async {
 /// Chuỗi interceptor của client API, theo thứ tự chạy.
 ///
 /// Header đứng đầu để `Idempotency-Key`/`x-request-id` có trong
-/// `RequestOptions` trước khi Auth/Retry gửi lại. [ErrorInterceptor] (overlay
-/// loading) đứng trước Auth và Retry vì hai interceptor này kết thúc chuỗi
-/// bằng `resolve` — đứng sau chúng thì overlay không bao giờ được ẩn.
+/// `RequestOptions` trước khi Auth/Retry gửi lại. Không gắn `ErrorInterceptor`
+/// của Tasco: overlay loading toàn cục (màu Tasco) chồng lên trạng thái tải
+/// riêng của từng màn DayHoc thành hai vòng tải (Owner báo 23/11/2026).
 @visibleForTesting
 List<Interceptor> apiInterceptors({
   required TeachHubHeadersInterceptor headers,
   required ConsentRequiredInterceptor consentRequired,
-  required LoadingManager loadingManager,
   required AuthInterceptor authInterceptor,
   required RetryInterceptor retryInterceptor,
 }) => [
   headers,
   consentRequired,
-  ErrorInterceptor(loadingManager: loadingManager),
   authInterceptor,
   retryInterceptor,
   TeachHubLoggingInterceptor(),
