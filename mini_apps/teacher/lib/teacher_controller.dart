@@ -41,6 +41,7 @@ import 'features/schedule/data/schedule_repository.dart';
 import 'features/schedule/schedule_routes.dart';
 import 'features/invites/data/invite_repository.dart';
 import 'features/invites/data/invite_sharer.dart';
+import 'features/students/data/contacts_service.dart';
 import 'features/students/data/student_repository.dart';
 import 'features/students/students_routes.dart';
 import 'features/students/pages/student_form_page.dart';
@@ -147,6 +148,10 @@ class TeacherController {
       getIt.registerLazySingleton<StudentRepository>(
         () => DioStudentRepository(api()),
       );
+    }
+    // Danh bạ máy: bước 2 onboarding (chọn SĐT) và "Thêm từ danh bạ" (T06a).
+    if (!getIt.isRegistered<ContactsService>()) {
+      getIt.registerLazySingleton<ContactsService>(DeviceContactsService.new);
     }
     if (!getIt.isRegistered<InviteRepository>()) {
       getIt.registerLazySingleton<InviteRepository>(

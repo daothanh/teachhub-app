@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:teacher/data/local_db/teacher_database.dart';
+import 'package:teacher/features/students/data/contacts_service.dart';
 import 'package:teacher/teacher.dart';
 
 void main() {
@@ -14,6 +15,8 @@ void main() {
       ),
       isTrue,
     );
+    // Nút danh bạ ở bước 2 onboarding cần dịch vụ này (lỗi bắt được trên máy thật).
+    expect(GetIt.I.isRegistered<ContactsService>(), isTrue);
     await c.dispose();
     expect(
       GetIt.I.isRegistered<TeacherDatabase>(

@@ -18,6 +18,7 @@ class TodayState extends Equatable {
     this.offline = false,
     this.error,
     this.skippedSteps = const [],
+    this.onboardingPending = false,
   });
 
   /// Cache đã đọc xong lần đầu.
@@ -34,6 +35,10 @@ class TodayState extends Equatable {
   /// Bước onboarding đã bỏ qua (US-0.2 AC2), theo thứ tự bước.
   final List<OnboardingStep> skippedSteps;
 
+  /// Còn bước onboarding chưa xử lý (mở app lần đầu, hoặc thoát giữa chừng):
+  /// màn Hôm nay chuyển sang onboarding (US-0.2 AC1, AC3).
+  final bool onboardingPending;
+
   @override
   List<Object?> get props => [
     loaded,
@@ -42,6 +47,7 @@ class TodayState extends Equatable {
     offline,
     error,
     skippedSteps,
+    onboardingPending,
   ];
 }
 
@@ -129,6 +135,7 @@ class TodayCubit extends Cubit<TodayState> {
             for (final e in data.steps.entries)
               if (e.value == OnboardingStatus.skipped) e.key,
           ],
+          onboardingPending: data.currentStep != null,
         ),
       );
     } on ApiException {
@@ -144,6 +151,7 @@ class TodayCubit extends Cubit<TodayState> {
     ApiException? error,
     bool clearError = false,
     List<OnboardingStep>? skippedSteps,
+    bool? onboardingPending,
   }) => TodayState(
     loaded: loaded ?? state.loaded,
     sessions: sessions ?? state.sessions,
@@ -151,6 +159,7 @@ class TodayCubit extends Cubit<TodayState> {
     offline: offline ?? state.offline,
     error: clearError ? null : error ?? state.error,
     skippedSteps: skippedSteps ?? state.skippedSteps,
+    onboardingPending: onboardingPending ?? state.onboardingPending,
   );
 
   @override

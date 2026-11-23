@@ -114,46 +114,52 @@ class _TodayViewState extends State<_TodayView> {
     final l10n = context.miniAppL10n;
     final cubit = context.read<TodayCubit>();
     final chip = RoleSwitcherScope.chipOf(context);
-    return Scaffold(
-      appBar: AppBar(
-        // Chip vai trò của shell (C20, mở T00); chạy riêng mini-app thì hiện tên
-        // không gian và nút đổi vai trò.
-        title: chip ?? Text(l10n.spaceTitle),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: l10n.todaySettings,
-            onPressed: () => context.push(TeachHubRoutes.settings),
-          ),
-          if (chip == null)
-            TextButton(
-              onPressed: () => context.go(TeachHubRoutes.rolePicker),
-              child: Text(l10n.switchRole),
+    return BlocListener<TodayCubit, TodayState>(
+      // Giáo viên mới hoặc thoát giữa chừng: vào onboarding, tiếp đúng bước dở.
+      listenWhen: (a, b) => !a.onboardingPending && b.onboardingPending,
+      listener: (context, _) =>
+          context.go('${TeachHubRoutes.teacher}/onboarding'),
+      child: Scaffold(
+        appBar: AppBar(
+          // Chip vai trò của shell (C20, mở T00); chạy riêng mini-app thì hiện tên
+          // không gian và nút đổi vai trò.
+          title: chip ?? Text(l10n.spaceTitle),
+          centerTitle: false,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              tooltip: l10n.todaySettings,
+              onPressed: () => context.push(TeachHubRoutes.settings),
             ),
-        ],
-      ),
-      body: Column(
-        children: [
-          StreamBuilder<bool>(
-            stream: _online,
-            builder: (context, snap) =>
-                snap.data == false ||
-                    context.select((TodayCubit c) => c.state.offline)
-                ? AppBanner(
-                    tone: AppStatusTone.warning,
-                    description: l10n.offlineBanner,
-                    fullWidth: true,
-                  )
-                : const SizedBox.shrink(),
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: cubit.refresh,
-              child: const _TodayList(),
+            if (chip == null)
+              TextButton(
+                onPressed: () => context.go(TeachHubRoutes.rolePicker),
+                child: Text(l10n.switchRole),
+              ),
+          ],
+        ),
+        body: Column(
+          children: [
+            StreamBuilder<bool>(
+              stream: _online,
+              builder: (context, snap) =>
+                  snap.data == false ||
+                      context.select((TodayCubit c) => c.state.offline)
+                  ? AppBanner(
+                      tone: AppStatusTone.warning,
+                      description: l10n.offlineBanner,
+                      fullWidth: true,
+                    )
+                  : const SizedBox.shrink(),
             ),
-          ),
-        ],
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: cubit.refresh,
+                child: const _TodayList(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
