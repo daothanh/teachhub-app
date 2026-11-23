@@ -13,6 +13,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   go_router: ^14.8.1
+  flutter_svg: ^2.0.10
   tasco_ui_kit:
     hosted: https://pub.vtii.vn
     version: ^5.2.7
@@ -49,6 +50,9 @@ dev_dependencies:
 flutter:
   generate: true
   uses-material-design: true
+  # Icon Bottom Nav: bộ Solar (480 Design, CC BY 4.0), xuất từ Figma DS.
+  assets:
+    - assets/icons/solar/
 
 # SQLite3MultipleCiphers thay SQLite gốc để mã hóa CSDL cục bộ (ADR-0001).
 # Phải khai cả ở app host vì hook đọc pubspec gốc của lần build.

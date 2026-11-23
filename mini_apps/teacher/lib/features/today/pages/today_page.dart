@@ -10,13 +10,9 @@ import '../../../l10n/l10n.dart';
 import '../../attendance/attendance_routes.dart';
 import '../../attendance/data/attendance_models.dart';
 import '../../attendance/data/attendance_repository.dart';
-import '../../billing/billing_routes.dart';
 import '../../classes/classes_routes.dart';
 import '../../onboarding/data/onboarding_models.dart';
 import '../../onboarding/data/onboarding_repository.dart';
-import '../../plan/plan_routes.dart';
-import '../../receivables/receivables_routes.dart';
-import '../../schedule/schedule_routes.dart';
 import '../cubit/today_cubit.dart';
 
 /// T03 "Hôm nay": màn chính của giáo viên (route `/t`).
@@ -209,41 +205,6 @@ class _TodayList extends StatelessWidget {
           )
         else
           for (final session in s.sessions) _SessionCard(session: session),
-        const SizedBox(height: AppSpacing.md),
-        AppButton(
-          label: l10n.todayScheduleEntry,
-          variant: AppButtonVariant.outlinePrimary,
-          width: double.infinity,
-          onPressed: () => context.push(ScheduleRoutes.schedule),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        AppButton(
-          label: l10n.todayClassesEntry,
-          variant: AppButtonVariant.outlinePrimary,
-          width: double.infinity,
-          onPressed: () => context.push(ClassesRoutes.list),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        AppButton(
-          label: l10n.todayBillingEntry,
-          variant: AppButtonVariant.outlinePrimary,
-          width: double.infinity,
-          onPressed: () => context.push(BillingRoutes.periods),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        AppButton(
-          label: l10n.receivablesTitle,
-          variant: AppButtonVariant.outlinePrimary,
-          width: double.infinity,
-          onPressed: () => context.push(ReceivablesRoutes.list),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        AppButton(
-          label: l10n.todayPlanEntry,
-          variant: AppButtonVariant.outlinePrimary,
-          width: double.infinity,
-          onPressed: () => context.push(PlanRoutes.plan),
-        ),
       ],
     );
   }
