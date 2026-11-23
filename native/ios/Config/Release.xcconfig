@@ -1,0 +1,4 @@
+// Release (production).
+PRODUCT_BUNDLE_IDENTIFIER = vn.dayhoc.app
+API_URL = https:/$()/api.dayhoc.app/v1
+INFOPLIST_FILE = Config/Info.plist
