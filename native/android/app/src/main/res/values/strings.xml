@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chuỗi hiển thị tiếng Việt, chép từ app Flutter (app/lib/l10n/arb/app_vi.arb). -->
+<resources>
+    <string name="app_name">DayHoc</string>
+    <string name="retry">Thử lại</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="error_network">Không có mạng. Thử lại sau.</string>
+
+    <!-- [T01] Đăng nhập -->
+    <string name="login_slogan">Kết nối thầy, trò và gia đình.</string>
+    <string name="login_tagline">Quản lý lớp dạy thêm thật đơn giản.</string>
+    <string name="login_email">Email</string>
+    <string name="login_email_hint">ten@email.com</string>
+    <string name="login_email_helper">Chúng tôi gửi mã 6 số, không cần mật khẩu.</string>
+    <string name="login_email_invalid">Email chưa đúng định dạng, ví dụ: ten@gmail.com</string>
+    <string name="login_send_otp">Gửi mã đăng nhập</string>
+    <string name="login_sending">Đang gửi mã…</string>
+    <string name="login_resend">Gửi lại mã</string>
+    <string name="login_change_email">Đổi email</string>
+    <string name="login_rate_limited">Bạn thao tác quá nhanh, vui lòng thử lại sau.</string>
+    <string name="login_failed">Đăng nhập không thành công. Vui lòng thử lại.</string>
+    <string name="login_unavailable">Hệ thống đang bận, vui lòng thử lại sau ít phút.</string>
+
+    <!-- [T01a] Nhập mã OTP -->
+    <string name="otp_title">Xác thực email</string>
+    <string name="otp_heading">Nhập mã xác thực</string>
+    <string name="otp_sent_to">Mã 6 số đã gửi tới %1$s</string>
+    <string name="otp_code_label">Mã xác thực 6 số</string>
+    <string name="otp_confirm">Xác nhận</string>
+    <string name="otp_verifying">Đang xác thực…</string>
+    <string name="otp_resend_in">Gửi lại mã sau %1$s</string>
+    <string name="otp_invalid">Mã chưa đúng.</string>
+    <string name="otp_invalid_attempts">Mã chưa đúng. Còn %1$d lần thử.</string>
+    <string name="otp_locked_title">Nhập sai 5 lần</string>
+    <string name="otp_locked_body">Xác thực tạm khóa 15 phút để bảo vệ tài khoản.</string>
+    <string name="otp_retry_in">Thử lại sau %1$s</string>
+    <string name="otp_locked">Tạm khóa</string>
+
+    <!-- Màn tạm, thay ở NA-04 -->
+    <string name="splash_load_failed">Không tải được vai trò của bạn.</string>
+    <string name="home_greeting">Xin chào %1$s</string>
+    <string name="home_role">Vai trò: %1$s</string>
+    <string name="role_pick_placeholder">Chọn vai trò (đang làm)</string>
+    <string name="placeholder_note">Màn tạm (placeholder NA-04): sẽ thay bằng màn chọn vai trò và không gian vai trò.</string>
+</resources>

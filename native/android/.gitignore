@@ -1,0 +1,11 @@
+build/
+.gradle/
+.kotlin/
+.idea/
+local.properties
+*.iml
+captures/
+# Owner giữ keystore ký bản phát hành, không commit.
+*.jks
+*.keystore
+key.properties

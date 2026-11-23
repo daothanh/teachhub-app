@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Theme cửa sổ trước khi Compose vẽ; màu giao diện nằm ở TeachHubTheme. -->
+    <style name="Theme.DayHoc" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
