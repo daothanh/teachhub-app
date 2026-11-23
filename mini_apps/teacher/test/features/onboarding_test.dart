@@ -56,11 +56,17 @@ Future<void> _addStudent(WidgetTester tester) async {
 void main() {
   tearDown(GetIt.I.reset);
 
-  testWidgets('mở lần đầu: bước 1, không có "Để sau"', (tester) async {
+  testWidgets('mở lần đầu: bước 1, "Bỏ qua" không bấm được', (tester) async {
     await _open(tester, FakeOnboardingRepository(onboardingOf({})));
     expect(find.text('Bước 1/3'), findsOneWidget);
     expect(find.text('Tạo lớp đầu tiên'), findsOneWidget);
-    expect(find.text('Để sau'), findsNothing);
+    expect(find.text('Thiết lập lớp học'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextButton>(find.widgetWithText(TextButton, 'Bỏ qua'))
+          .onPressed,
+      isNull,
+    );
   });
 
   testWidgets('bước 1 đã xong: bước 2 nhúng form học viên', (tester) async {
@@ -71,8 +77,8 @@ void main() {
       ),
     );
     expect(find.text('Bước 2/3'), findsOneWidget);
-    expect(find.textContaining('Họ và tên'), findsOneWidget);
-    expect(find.text('Để sau'), findsOneWidget);
+    expect(find.textContaining('Họ tên học sinh'), findsOneWidget);
+    expect(find.text('Bỏ qua'), findsOneWidget);
   });
 
   testWidgets('mở lại giữa chừng: vào đúng bước dở (bước 3)', (tester) async {
@@ -86,7 +92,7 @@ void main() {
       ),
     );
     expect(find.text('Bước 3/3'), findsOneWidget);
-    expect(find.text('Đặt lịch học'), findsOneWidget);
+    expect(find.text('Lịch học hằng tuần'), findsOneWidget);
   });
 
   testWidgets('bước 2 chỉ nhập tay: không có "Thêm từ danh bạ" hàng loạt', (
@@ -102,14 +108,14 @@ void main() {
     expect(find.byTooltip('Chọn số từ danh bạ'), findsOneWidget);
   });
 
-  testWidgets('"Để sau" ở bước 2 gửi skipped và chuyển bước 3', (tester) async {
+  testWidgets('"Bỏ qua" ở bước 2 gửi skipped và chuyển bước 3', (tester) async {
     final repo = await _open(
       tester,
       FakeOnboardingRepository(
         onboardingOf({OnboardingStep.createClass: _done}),
       ),
     );
-    await tester.tap(find.text('Để sau'));
+    await tester.tap(find.text('Bỏ qua'));
     await tester.pumpAndSettle();
 
     expect(repo.patches, [
@@ -153,7 +159,7 @@ void main() {
       patchError: ApiException.fromResponse(422, {'code': 'VALIDATION_FAILED'}),
     );
     await _open(tester, repo);
-    await tester.tap(find.text('Để sau'));
+    await tester.tap(find.text('Bỏ qua'));
     await tester.pumpAndSettle();
 
     expect(find.text('Bước này chưa lưu được. Kiểm tra lại.'), findsOneWidget);
@@ -168,7 +174,7 @@ void main() {
       }),
     );
     await _open(tester, repo);
-    await tester.tap(find.text('Để sau'));
+    await tester.tap(find.text('Bỏ qua'));
     await tester.pumpAndSettle();
     expect(
       find.text('Yêu cầu đang xử lý. Thử lại sau giây lát.'),
@@ -186,9 +192,7 @@ void main() {
     expect(find.text('Thử lại'), findsOneWidget);
   });
 
-  testWidgets('bước 3-5 placeholder chỉ có "Để sau", không có nút xong', (
-    tester,
-  ) async {
+  testWidgets('bước 3: có tiêu đề bước và "Bỏ qua"', (tester) async {
     await _open(
       tester,
       FakeOnboardingRepository(
@@ -199,8 +203,8 @@ void main() {
       ),
     );
     expect(find.text('Bước 3/3'), findsOneWidget);
-    expect(find.text('Xong bước này'), findsNothing);
-    expect(find.text('Để sau'), findsOneWidget);
+    expect(find.text('Lịch học hằng tuần'), findsOneWidget);
+    expect(find.text('Bỏ qua'), findsOneWidget);
   });
 
   testWidgets(

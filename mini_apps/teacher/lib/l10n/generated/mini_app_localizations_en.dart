@@ -427,7 +427,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
       'Could not save the student. Try again later.';
 
   @override
-  String get onboardingTitle => 'Get started with DayHoc';
+  String get onboardingTitle => 'Class setup';
 
   @override
   String onboardingProgress(int n, int total) {
@@ -444,7 +444,7 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   String get onboardingStepSetSchedule => 'Set the schedule';
 
   @override
-  String get onboardingSkip => 'Later';
+  String get onboardingSkip => 'Skip';
 
   @override
   String get onboardingDoneTitle => 'You are all set';
@@ -2495,4 +2495,140 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
   @override
   String get moreIconCredit =>
       'Navigation icons: Solar by 480 Design (CC BY 4.0).';
+
+  @override
+  String get onboardingExit => 'Exit setup';
+
+  @override
+  String get onboardingExitTitle => 'Exit setup?';
+
+  @override
+  String get onboardingExitBody => 'You can continue from this step later.';
+
+  @override
+  String get onboardingExitStay => 'Stay';
+
+  @override
+  String get onboardingExitLeave => 'Exit';
+
+  @override
+  String get onboardingContinue => 'Continue';
+
+  @override
+  String get onboardingSaving => 'Saving…';
+
+  @override
+  String get onboardingClassCaption =>
+      'Just the class name and how you charge; edit the rest later.';
+
+  @override
+  String get onboardingClassNameHint => 'E.g. Math 9 evenings Mon-Wed-Fri';
+
+  @override
+  String get onboardingSubjectHint => 'Choose subject';
+
+  @override
+  String get onboardingGradeLabel => 'Grade';
+
+  @override
+  String get onboardingGradeHint => 'Choose grade';
+
+  @override
+  String get onboardingSubjects =>
+      'Toán|Ngữ văn|Tiếng Anh|Vật lý|Hóa học|Sinh học|Năng khiếu|Khác';
+
+  @override
+  String get onboardingFeeSection => 'How you charge';
+
+  @override
+  String get onboardingFeeAmountPerSession => 'Fee per session';
+
+  @override
+  String get onboardingFeeAmountMonthly => 'Fee per month';
+
+  @override
+  String get onboardingFeeAmountCourse => 'Fee for the whole course';
+
+  @override
+  String get onboardingFeeCaption =>
+      'Absences are charged by default. Change this in class settings.';
+
+  @override
+  String get onboardingEndDateLabel => 'Course end date';
+
+  @override
+  String get onboardingStudentsTitle => 'Add students';
+
+  @override
+  String get onboardingStudentsCaption =>
+      'Add at least 1 student to take attendance and send invoices.';
+
+  @override
+  String get onboardingStudentNameLabel => 'Student name';
+
+  @override
+  String get onboardingStudentNameHint => 'E.g. Nguyen Van Nam';
+
+  @override
+  String get onboardingGuardianPhoneLabel => 'Parent phone';
+
+  @override
+  String onboardingAddedCount(int n) {
+    return 'ADDED ($n)';
+  }
+
+  @override
+  String onboardingAddedPhone(String phone) {
+    return 'Parent: $phone';
+  }
+
+  @override
+  String onboardingGuardianDefaultName(String name) {
+    return 'Parent of $name';
+  }
+
+  @override
+  String get onboardingScheduleTitle => 'Weekly schedule';
+
+  @override
+  String get onboardingScheduleCaption =>
+      'Each day can have its own time. Sessions for the next 8 weeks are created automatically, skipping holidays.';
+
+  @override
+  String get onboardingRulesLabel => 'Sessions per week';
+
+  @override
+  String get onboardingRuleWeekday => 'Day';
+
+  @override
+  String get onboardingRuleStart => 'Start time';
+
+  @override
+  String get onboardingRuleDuration => 'Duration';
+
+  @override
+  String onboardingRuleDurationValue(int n) {
+    return '$n min';
+  }
+
+  @override
+  String get onboardingRuleAdd => 'Add';
+
+  @override
+  String onboardingRuleRemove(int n) {
+    return 'Remove session $n';
+  }
+
+  @override
+  String onboardingRuleOverlap(String day, String time) {
+    return 'Overlaps the $day $time session';
+  }
+
+  @override
+  String onboardingFirstSession(String when) {
+    return 'First session: $when';
+  }
+
+  @override
+  String get onboardingFinishSetup => 'Finish';
 }

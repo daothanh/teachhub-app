@@ -50,9 +50,9 @@ void main() {
 
     // Đã xử lý hết 3 bước (không còn bước dở) nhưng màn mở bước 3.
     expect(find.text('Bước 3/3'), findsOneWidget);
-    expect(find.text('Đặt lịch học'), findsOneWidget);
+    expect(find.text('Bỏ qua'), findsOneWidget);
 
-    await tester.tap(find.text('Để sau'));
+    await tester.tap(find.text('Bỏ qua'));
     await tester.pumpAndSettle();
     expect(repo.patches, [
       (OnboardingStep.setSchedule, OnboardingStatus.skipped),

@@ -33,11 +33,18 @@ class StudentFormScope extends StatelessWidget {
     this.initial,
     this.keys,
     this.quickAdd = false,
-    this.onSavedName,
+    this.onSavedInfo,
+    this.header = const [],
+    this.footer = const [],
   });
 
-  /// Gọi ngay trước [onSaved] với họ tên học viên vừa lưu.
-  final ValueChanged<String>? onSavedName;
+  /// Gọi ngay trước [onSaved] với họ tên học viên và SĐT phụ huynh vừa lưu.
+  final void Function(String name, String? phone)? onSavedInfo;
+
+  /// [quickAdd]: phần đầu (tiêu đề bước) và phần cuối (danh sách đã thêm) cuộn
+  /// cùng form.
+  final List<Widget> header;
+  final List<Widget> footer;
 
   /// Khóa bền vững (onboarding); null = khóa trong bộ nhớ.
   final DraftKeys? keys;
@@ -61,7 +68,9 @@ class StudentFormScope extends StatelessWidget {
       onSaved: onSaved,
       initial: initial,
       quickAdd: quickAdd,
-      onSavedName: onSavedName,
+      onSavedInfo: onSavedInfo,
+      header: header,
+      footer: footer,
     ),
   );
 }
@@ -107,13 +116,17 @@ class StudentFormView extends StatefulWidget {
     required this.onSaved,
     this.initial,
     this.quickAdd = false,
-    this.onSavedName,
+    this.onSavedInfo,
+    this.header = const [],
+    this.footer = const [],
   });
 
   final ValueChanged<String> onSaved;
-  final ValueChanged<String>? onSavedName;
+  final void Function(String name, String? phone)? onSavedInfo;
   final Student? initial;
   final bool quickAdd;
+  final List<Widget> header;
+  final List<Widget> footer;
 
   @override
   State<StudentFormView> createState() => _StudentFormViewState();
@@ -186,7 +199,12 @@ class _StudentFormViewState extends State<StudentFormView> {
           id: g.id,
           email: g.email,
           relation: g.relation,
-          fullName: g.name.text.trim(),
+          // Bước 2 onboarding (Figma B08) chỉ hỏi SĐT: tên phụ huynh mặc định.
+          fullName: widget.quickAdd && g.name.text.trim().isEmpty
+              ? context.miniAppL10n.onboardingGuardianDefaultName(
+                  _name.text.trim(),
+                )
+              : g.name.text.trim(),
           phone: _trimmed(g.phone),
         ),
     ],
@@ -316,6 +334,90 @@ class _StudentFormViewState extends State<StudentFormView> {
     );
   }
 
+  /// Ô SĐT phụ huynh + nút danh bạ viền cao bằng ô (Figma B08); nhãn vẽ chung ở trên.
+  Widget _phoneRow(
+    MiniAppLocalizations l10n,
+    _GuardianControllers g, {
+    required bool locked,
+    required String label,
+  }) => AppFieldDecorator(
+    label: label,
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: AppTextFormField(
+            controller: g.phone,
+            enabled: !locked,
+            semanticLabel: label,
+            hint: '09xx xxx xxx',
+            keyboardType: TextInputType.phone,
+            validator: (v) {
+              final t = (v ?? '').trim();
+              return t.isEmpty || _phoneRe.hasMatch(t)
+                  ? null
+                  : l10n.studentsGuardianPhoneInvalid;
+            },
+          ),
+        ),
+        const SizedBox(width: 8),
+        IconButton.outlined(
+          tooltip: l10n.contactsPickPhone,
+          icon: const Icon(Icons.contacts_outlined),
+          style: IconButton.styleFrom(
+            fixedSize: const Size.square(48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(context.tasco.fieldRadius),
+            ),
+            side: BorderSide(color: Theme.of(context).colorScheme.outline),
+          ),
+          onPressed: locked ? null : () => _pickPhone(g),
+        ),
+      ],
+    ),
+  );
+
+  /// Bước 2 onboarding (Figma B08): chỉ họ tên học sinh và SĐT phụ huynh.
+  Widget _quickForm(
+    MiniAppLocalizations l10n, {
+    required bool busy,
+    required bool locked,
+  }) => Form(
+    key: _formKey,
+    child: ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        ...widget.header,
+        AppTextFormField(
+          controller: _name,
+          label: l10n.onboardingStudentNameLabel,
+          hint: l10n.onboardingStudentNameHint,
+          required: true,
+          enabled: !locked,
+          maxLength: 120,
+          validator: (v) =>
+              (v ?? '').trim().isEmpty ? l10n.studentsFullNameRequired : null,
+        ),
+        const SizedBox(height: 12),
+        _phoneRow(
+          l10n,
+          _guardians.first,
+          locked: locked,
+          label: l10n.onboardingGuardianPhoneLabel,
+        ),
+        const SizedBox(height: 12),
+        AppButton(
+          label: busy ? l10n.studentsSaving : l10n.onboardingAddStudent,
+          variant: AppButtonVariant.outlinePrimary,
+          width: double.infinity,
+          onPressed: busy || locked ? null : _submit,
+          disabled: busy || locked,
+        ),
+        ...widget.footer,
+      ],
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.miniAppL10n;
@@ -325,9 +427,10 @@ class _StudentFormViewState extends State<StudentFormView> {
           case StudentFormStatus.duplicate:
             _showDuplicate(state.candidates);
           case StudentFormStatus.success:
-            if (state.savedName case final name?) {
-              widget.onSavedName?.call(name);
-            }
+            widget.onSavedInfo?.call(
+              state.savedName ?? _name.text.trim(),
+              _guardians.isEmpty ? null : _trimmed(_guardians.first.phone),
+            );
             widget.onSaved(state.savedId!);
           case StudentFormStatus.failure:
             ScaffoldMessenger.of(context).showSnackBar(
@@ -350,12 +453,15 @@ class _StudentFormViewState extends State<StudentFormView> {
         final busy = state.status == StudentFormStatus.submitting;
         // Đã lưu thì khóa form: bấm lại sẽ tạo học viên thứ hai.
         final locked = state.status == StudentFormStatus.success;
+        if (widget.quickAdd) {
+          return _quickForm(l10n, busy: busy, locked: locked);
+        }
         return Form(
           key: _formKey,
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              if (!_editing && !widget.quickAdd) ...[
+              if (!_editing) ...[
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton.icon(
@@ -436,46 +542,11 @@ class _StudentFormViewState extends State<StudentFormView> {
                   onChanged: (r) => setState(() => g.relation = r),
                 ),
                 const SizedBox(height: 12),
-                // Ô SĐT + nút danh bạ viền cao bằng ô (Figma B08); nhãn vẽ chung ở trên.
-                AppFieldDecorator(
+                _phoneRow(
+                  l10n,
+                  g,
+                  locked: locked,
                   label: l10n.studentsGuardianPhone,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: AppTextFormField(
-                          controller: g.phone,
-                          enabled: !locked,
-                          semanticLabel: l10n.studentsGuardianPhone,
-                          hint: '09xx xxx xxx',
-                          keyboardType: TextInputType.phone,
-                          validator: (v) {
-                            final t = (v ?? '').trim();
-                            return t.isEmpty || _phoneRe.hasMatch(t)
-                                ? null
-                                : l10n.studentsGuardianPhoneInvalid;
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton.outlined(
-                        tooltip: l10n.contactsPickPhone,
-                        icon: const Icon(Icons.contacts_outlined),
-                        style: IconButton.styleFrom(
-                          fixedSize: const Size.square(48),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              context.tasco.fieldRadius,
-                            ),
-                          ),
-                          side: BorderSide(
-                            color: Theme.of(context).colorScheme.outline,
-                          ),
-                        ),
-                        onPressed: locked ? null : () => _pickPhone(g),
-                      ),
-                    ],
-                  ),
                 ),
               ],
               if (_guardians.length < _maxGuardians && !locked)
@@ -489,15 +560,7 @@ class _StudentFormViewState extends State<StudentFormView> {
                 ),
               const SizedBox(height: 16),
               AppButton(
-                label: busy
-                    ? l10n.studentsSaving
-                    : widget.quickAdd
-                    ? l10n.onboardingAddStudent
-                    : l10n.studentsSave,
-                // Bước 2 onboarding: nút chính là "Tiếp tục (n)", nút thêm là nút phụ.
-                variant: widget.quickAdd
-                    ? AppButtonVariant.outlinePrimary
-                    : AppButtonVariant.primary,
+                label: busy ? l10n.studentsSaving : l10n.studentsSave,
                 onPressed: busy || locked ? null : _submit,
                 disabled: busy || locked,
               ),

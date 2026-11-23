@@ -215,7 +215,7 @@
   "studentsErrorValidation": "Thông tin chưa hợp lệ. Kiểm tra lại các ô.",
   "studentsErrorNetwork": "Không có mạng. Thử lại sau.",
   "studentsErrorGeneric": "Chưa lưu được học viên. Thử lại sau.",
-  "onboardingTitle": "Làm quen DayHoc",
+  "onboardingTitle": "Thiết lập lớp học",
   "onboardingProgress": "Bước {n}/{total}",
   "@onboardingProgress": {
     "placeholders": {
@@ -230,7 +230,7 @@
   "onboardingStepCreateClass": "Tạo lớp đầu tiên",
   "onboardingStepAddStudents": "Thêm học viên",
   "onboardingStepSetSchedule": "Đặt lịch học",
-  "onboardingSkip": "Để sau",
+  "onboardingSkip": "Bỏ qua",
   "onboardingDoneTitle": "Bạn đã xong phần làm quen",
   "onboardingDoneBody": "Vào xem lớp và học viên của bạn.",
   "onboardingFinish": "Vào DayHoc",
@@ -1618,5 +1618,96 @@
   "navClasses": "Lớp",
   "navFees": "Học phí",
   "navMore": "Thêm",
-  "moreIconCredit": "Icon thanh điều hướng: bộ Solar của 480 Design (CC BY 4.0)."
+  "moreIconCredit": "Icon thanh điều hướng: bộ Solar của 480 Design (CC BY 4.0).",
+  "onboardingExit": "Thoát thiết lập",
+  "onboardingExitTitle": "Thoát thiết lập?",
+  "onboardingExitBody": "Bạn có thể tiếp tục từ bước này lần sau.",
+  "onboardingExitStay": "Ở lại",
+  "onboardingExitLeave": "Thoát",
+  "onboardingContinue": "Tiếp tục",
+  "onboardingSaving": "Đang lưu…",
+  "onboardingClassCaption": "Chỉ cần tên lớp và cách thu học phí, các mục khác sửa sau.",
+  "onboardingClassNameHint": "VD: Toán 9 tối T2-4-6",
+  "onboardingSubjectHint": "Chọn môn",
+  "onboardingGradeLabel": "Khối",
+  "onboardingGradeHint": "Chọn khối",
+  "onboardingSubjects": "Toán|Ngữ văn|Tiếng Anh|Vật lý|Hóa học|Sinh học|Năng khiếu|Khác",
+  "onboardingFeeSection": "Cách thu học phí",
+  "onboardingFeeAmountPerSession": "Mức phí mỗi buổi",
+  "onboardingFeeAmountMonthly": "Mức phí mỗi tháng",
+  "onboardingFeeAmountCourse": "Mức phí trọn khóa",
+  "onboardingFeeCaption": "Mặc định tính tiền cả buổi vắng. Đổi quy tắc trong Cài đặt lớp.",
+  "onboardingEndDateLabel": "Ngày kết thúc khóa",
+  "onboardingStudentsTitle": "Thêm học sinh",
+  "onboardingStudentsCaption": "Thêm ít nhất 1 học sinh để điểm danh và gửi hóa đơn.",
+  "onboardingStudentNameLabel": "Họ tên học sinh",
+  "onboardingStudentNameHint": "VD: Nguyễn Văn Nam",
+  "onboardingGuardianPhoneLabel": "Số điện thoại phụ huynh",
+  "onboardingAddedCount": "ĐÃ THÊM ({n})",
+  "onboardingAddedPhone": "PH: {phone}",
+  "onboardingGuardianDefaultName": "Phụ huynh của {name}",
+  "onboardingScheduleTitle": "Lịch học hằng tuần",
+  "onboardingScheduleCaption": "Mỗi ngày học có thể khác giờ. Hệ thống tự tạo các buổi 8 tuần tới, bỏ qua ngày lễ.",
+  "onboardingRulesLabel": "Buổi học trong tuần",
+  "onboardingRuleWeekday": "Thứ",
+  "onboardingRuleStart": "Giờ bắt đầu",
+  "onboardingRuleDuration": "Thời lượng",
+  "onboardingRuleDurationValue": "{n} phút",
+  "onboardingRuleAdd": "Thêm",
+  "onboardingRuleRemove": "Xóa buổi {n}",
+  "onboardingRuleOverlap": "Trùng giờ với buổi {day} {time}",
+  "onboardingFirstSession": "Buổi đầu tiên: {when}",
+  "onboardingFinishSetup": "Hoàn tất",
+  "@onboardingAddedCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@onboardingAddedPhone": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "@onboardingGuardianDefaultName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@onboardingRuleDurationValue": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@onboardingRuleRemove": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "@onboardingRuleOverlap": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "@onboardingFirstSession": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  }
 }
