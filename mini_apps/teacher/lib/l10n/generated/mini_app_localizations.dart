@@ -800,7 +800,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @onboardingTitle.
   ///
   /// In vi, this message translates to:
-  /// **'Làm quen DayHoc'**
+  /// **'Thiết lập lớp học'**
   String get onboardingTitle;
 
   /// No description provided for @onboardingProgress.
@@ -830,7 +830,7 @@ abstract class MiniAppLocalizations {
   /// No description provided for @onboardingSkip.
   ///
   /// In vi, this message translates to:
-  /// **'Để sau'**
+  /// **'Bỏ qua'**
   String get onboardingSkip;
 
   /// No description provided for @onboardingDoneTitle.
@@ -4239,6 +4239,240 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Icon thanh điều hướng: bộ Solar của 480 Design (CC BY 4.0).'**
   String get moreIconCredit;
+
+  /// No description provided for @onboardingExit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thoát thiết lập'**
+  String get onboardingExit;
+
+  /// No description provided for @onboardingExitTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thoát thiết lập?'**
+  String get onboardingExitTitle;
+
+  /// No description provided for @onboardingExitBody.
+  ///
+  /// In vi, this message translates to:
+  /// **'Bạn có thể tiếp tục từ bước này lần sau.'**
+  String get onboardingExitBody;
+
+  /// No description provided for @onboardingExitStay.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ở lại'**
+  String get onboardingExitStay;
+
+  /// No description provided for @onboardingExitLeave.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thoát'**
+  String get onboardingExitLeave;
+
+  /// No description provided for @onboardingContinue.
+  ///
+  /// In vi, this message translates to:
+  /// **'Tiếp tục'**
+  String get onboardingContinue;
+
+  /// No description provided for @onboardingSaving.
+  ///
+  /// In vi, this message translates to:
+  /// **'Đang lưu…'**
+  String get onboardingSaving;
+
+  /// No description provided for @onboardingClassCaption.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chỉ cần tên lớp và cách thu học phí, các mục khác sửa sau.'**
+  String get onboardingClassCaption;
+
+  /// No description provided for @onboardingClassNameHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'VD: Toán 9 tối T2-4-6'**
+  String get onboardingClassNameHint;
+
+  /// No description provided for @onboardingSubjectHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn môn'**
+  String get onboardingSubjectHint;
+
+  /// No description provided for @onboardingGradeLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Khối'**
+  String get onboardingGradeLabel;
+
+  /// No description provided for @onboardingGradeHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'Chọn khối'**
+  String get onboardingGradeHint;
+
+  /// No description provided for @onboardingSubjects.
+  ///
+  /// In vi, this message translates to:
+  /// **'Toán|Ngữ văn|Tiếng Anh|Vật lý|Hóa học|Sinh học|Năng khiếu|Khác'**
+  String get onboardingSubjects;
+
+  /// No description provided for @onboardingFeeSection.
+  ///
+  /// In vi, this message translates to:
+  /// **'Cách thu học phí'**
+  String get onboardingFeeSection;
+
+  /// No description provided for @onboardingFeeAmountPerSession.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mức phí mỗi buổi'**
+  String get onboardingFeeAmountPerSession;
+
+  /// No description provided for @onboardingFeeAmountMonthly.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mức phí mỗi tháng'**
+  String get onboardingFeeAmountMonthly;
+
+  /// No description provided for @onboardingFeeAmountCourse.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mức phí trọn khóa'**
+  String get onboardingFeeAmountCourse;
+
+  /// No description provided for @onboardingFeeCaption.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mặc định tính tiền cả buổi vắng. Đổi quy tắc trong Cài đặt lớp.'**
+  String get onboardingFeeCaption;
+
+  /// No description provided for @onboardingEndDateLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Ngày kết thúc khóa'**
+  String get onboardingEndDateLabel;
+
+  /// No description provided for @onboardingStudentsTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm học sinh'**
+  String get onboardingStudentsTitle;
+
+  /// No description provided for @onboardingStudentsCaption.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm ít nhất 1 học sinh để điểm danh và gửi hóa đơn.'**
+  String get onboardingStudentsCaption;
+
+  /// No description provided for @onboardingStudentNameLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Họ tên học sinh'**
+  String get onboardingStudentNameLabel;
+
+  /// No description provided for @onboardingStudentNameHint.
+  ///
+  /// In vi, this message translates to:
+  /// **'VD: Nguyễn Văn Nam'**
+  String get onboardingStudentNameHint;
+
+  /// No description provided for @onboardingGuardianPhoneLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Số điện thoại phụ huynh'**
+  String get onboardingGuardianPhoneLabel;
+
+  /// No description provided for @onboardingAddedCount.
+  ///
+  /// In vi, this message translates to:
+  /// **'ĐÃ THÊM ({n})'**
+  String onboardingAddedCount(int n);
+
+  /// No description provided for @onboardingAddedPhone.
+  ///
+  /// In vi, this message translates to:
+  /// **'PH: {phone}'**
+  String onboardingAddedPhone(String phone);
+
+  /// No description provided for @onboardingGuardianDefaultName.
+  ///
+  /// In vi, this message translates to:
+  /// **'Phụ huynh của {name}'**
+  String onboardingGuardianDefaultName(String name);
+
+  /// No description provided for @onboardingScheduleTitle.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch học hằng tuần'**
+  String get onboardingScheduleTitle;
+
+  /// No description provided for @onboardingScheduleCaption.
+  ///
+  /// In vi, this message translates to:
+  /// **'Mỗi ngày học có thể khác giờ. Hệ thống tự tạo các buổi 8 tuần tới, bỏ qua ngày lễ.'**
+  String get onboardingScheduleCaption;
+
+  /// No description provided for @onboardingRulesLabel.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi học trong tuần'**
+  String get onboardingRulesLabel;
+
+  /// No description provided for @onboardingRuleWeekday.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thứ'**
+  String get onboardingRuleWeekday;
+
+  /// No description provided for @onboardingRuleStart.
+  ///
+  /// In vi, this message translates to:
+  /// **'Giờ bắt đầu'**
+  String get onboardingRuleStart;
+
+  /// No description provided for @onboardingRuleDuration.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thời lượng'**
+  String get onboardingRuleDuration;
+
+  /// No description provided for @onboardingRuleDurationValue.
+  ///
+  /// In vi, this message translates to:
+  /// **'{n} phút'**
+  String onboardingRuleDurationValue(int n);
+
+  /// No description provided for @onboardingRuleAdd.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm'**
+  String get onboardingRuleAdd;
+
+  /// No description provided for @onboardingRuleRemove.
+  ///
+  /// In vi, this message translates to:
+  /// **'Xóa buổi {n}'**
+  String onboardingRuleRemove(int n);
+
+  /// No description provided for @onboardingRuleOverlap.
+  ///
+  /// In vi, this message translates to:
+  /// **'Trùng giờ với buổi {day} {time}'**
+  String onboardingRuleOverlap(String day, String time);
+
+  /// No description provided for @onboardingFirstSession.
+  ///
+  /// In vi, this message translates to:
+  /// **'Buổi đầu tiên: {when}'**
+  String onboardingFirstSession(String when);
+
+  /// No description provided for @onboardingFinishSetup.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hoàn tất'**
+  String get onboardingFinishSetup;
 }
 
 class _MiniAppLocalizationsDelegate

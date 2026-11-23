@@ -421,7 +421,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get studentsErrorGeneric => 'Chưa lưu được học viên. Thử lại sau.';
 
   @override
-  String get onboardingTitle => 'Làm quen DayHoc';
+  String get onboardingTitle => 'Thiết lập lớp học';
 
   @override
   String onboardingProgress(int n, int total) {
@@ -438,7 +438,7 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   String get onboardingStepSetSchedule => 'Đặt lịch học';
 
   @override
-  String get onboardingSkip => 'Để sau';
+  String get onboardingSkip => 'Bỏ qua';
 
   @override
   String get onboardingDoneTitle => 'Bạn đã xong phần làm quen';
@@ -2469,4 +2469,140 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
   @override
   String get moreIconCredit =>
       'Icon thanh điều hướng: bộ Solar của 480 Design (CC BY 4.0).';
+
+  @override
+  String get onboardingExit => 'Thoát thiết lập';
+
+  @override
+  String get onboardingExitTitle => 'Thoát thiết lập?';
+
+  @override
+  String get onboardingExitBody => 'Bạn có thể tiếp tục từ bước này lần sau.';
+
+  @override
+  String get onboardingExitStay => 'Ở lại';
+
+  @override
+  String get onboardingExitLeave => 'Thoát';
+
+  @override
+  String get onboardingContinue => 'Tiếp tục';
+
+  @override
+  String get onboardingSaving => 'Đang lưu…';
+
+  @override
+  String get onboardingClassCaption =>
+      'Chỉ cần tên lớp và cách thu học phí, các mục khác sửa sau.';
+
+  @override
+  String get onboardingClassNameHint => 'VD: Toán 9 tối T2-4-6';
+
+  @override
+  String get onboardingSubjectHint => 'Chọn môn';
+
+  @override
+  String get onboardingGradeLabel => 'Khối';
+
+  @override
+  String get onboardingGradeHint => 'Chọn khối';
+
+  @override
+  String get onboardingSubjects =>
+      'Toán|Ngữ văn|Tiếng Anh|Vật lý|Hóa học|Sinh học|Năng khiếu|Khác';
+
+  @override
+  String get onboardingFeeSection => 'Cách thu học phí';
+
+  @override
+  String get onboardingFeeAmountPerSession => 'Mức phí mỗi buổi';
+
+  @override
+  String get onboardingFeeAmountMonthly => 'Mức phí mỗi tháng';
+
+  @override
+  String get onboardingFeeAmountCourse => 'Mức phí trọn khóa';
+
+  @override
+  String get onboardingFeeCaption =>
+      'Mặc định tính tiền cả buổi vắng. Đổi quy tắc trong Cài đặt lớp.';
+
+  @override
+  String get onboardingEndDateLabel => 'Ngày kết thúc khóa';
+
+  @override
+  String get onboardingStudentsTitle => 'Thêm học sinh';
+
+  @override
+  String get onboardingStudentsCaption =>
+      'Thêm ít nhất 1 học sinh để điểm danh và gửi hóa đơn.';
+
+  @override
+  String get onboardingStudentNameLabel => 'Họ tên học sinh';
+
+  @override
+  String get onboardingStudentNameHint => 'VD: Nguyễn Văn Nam';
+
+  @override
+  String get onboardingGuardianPhoneLabel => 'Số điện thoại phụ huynh';
+
+  @override
+  String onboardingAddedCount(int n) {
+    return 'ĐÃ THÊM ($n)';
+  }
+
+  @override
+  String onboardingAddedPhone(String phone) {
+    return 'PH: $phone';
+  }
+
+  @override
+  String onboardingGuardianDefaultName(String name) {
+    return 'Phụ huynh của $name';
+  }
+
+  @override
+  String get onboardingScheduleTitle => 'Lịch học hằng tuần';
+
+  @override
+  String get onboardingScheduleCaption =>
+      'Mỗi ngày học có thể khác giờ. Hệ thống tự tạo các buổi 8 tuần tới, bỏ qua ngày lễ.';
+
+  @override
+  String get onboardingRulesLabel => 'Buổi học trong tuần';
+
+  @override
+  String get onboardingRuleWeekday => 'Thứ';
+
+  @override
+  String get onboardingRuleStart => 'Giờ bắt đầu';
+
+  @override
+  String get onboardingRuleDuration => 'Thời lượng';
+
+  @override
+  String onboardingRuleDurationValue(int n) {
+    return '$n phút';
+  }
+
+  @override
+  String get onboardingRuleAdd => 'Thêm';
+
+  @override
+  String onboardingRuleRemove(int n) {
+    return 'Xóa buổi $n';
+  }
+
+  @override
+  String onboardingRuleOverlap(String day, String time) {
+    return 'Trùng giờ với buổi $day $time';
+  }
+
+  @override
+  String onboardingFirstSession(String when) {
+    return 'Buổi đầu tiên: $when';
+  }
+
+  @override
+  String get onboardingFinishSetup => 'Hoàn tất';
 }

@@ -224,19 +224,36 @@ void defineOnboardingFlowTests() {
     await tester.pumpAndSettle();
   }
 
+  /// Bước 1 (Figma B07): tên lớp, chọn môn và khối, mức phí theo buổi.
   Future<void> createClass(WidgetTester tester) async {
     await tester.enterText(fieldOf(tl.classesFieldName), 'Toán 9A');
-    await tester.enterText(fieldOf(tl.classesFieldSubject), 'Toán');
-    await tester.enterText(fieldOf(tl.classesFieldGrade), '9');
-    await tester.enterText(fieldOf(tl.classesFieldLocation), 'Nhà riêng');
     FocusManager.instance.primaryFocus?.unfocus();
     await tester.pumpAndSettle();
-    await reveal(tester, inputOf(tl.classesFieldStart));
-    await tester.tap(inputOf(tl.classesFieldStart));
+    for (final (label, value) in [
+      (tl.classesFieldSubject, 'Toán'),
+      (tl.onboardingGradeLabel, '9'),
+    ]) {
+      await tester.tap(fieldOf(label));
+      await tester.pumpAndSettle();
+      // Danh sách khối dài hơn sheet: cuộn tới lựa chọn trước khi bấm.
+      await tester.scrollUntilVisible(
+        find.text(value),
+        100,
+        scrollable: find.descendant(
+          of: find.byType(BottomSheet),
+          matching: find.byType(Scrollable),
+        ),
+      );
+      await tester.ensureVisible(find.text(value).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(value).last);
+      await tester.pumpAndSettle();
+    }
+    await reveal(tester, inputOf(tl.onboardingFeeAmountPerSession));
+    await tester.enterText(fieldOf(tl.onboardingFeeAmountPerSession), '200000');
+    FocusManager.instance.primaryFocus?.unfocus();
     await tester.pumpAndSettle();
-    await tester.tap(find.text('OK'));
-    await tester.pumpAndSettle();
-    await tapButton(tester, tl.classesSave);
+    await tapButton(tester, tl.onboardingContinue);
   }
 
   Future<void> continueStudents(WidgetTester tester) =>
@@ -257,10 +274,9 @@ void defineOnboardingFlowTests() {
   void expectStep(int n) =>
       expect(find.text(tl.onboardingProgress(n, 3)), findsOneWidget);
 
-  /// Lưu quy tắc mặc định (thứ Hai 18:00, 90 phút) của bước 3.
+  /// Lưu hàng mặc định của bước 3 (thứ Hai 17:30, 90 phút — Figma B09).
   Future<void> addRuleAndSave(WidgetTester tester) async {
-    await tapButton(tester, tl.classesRuleAdd);
-    await tapButton(tester, tl.classesSave);
+    await tapButton(tester, tl.onboardingFinishSetup);
   }
 
   testWidgets('luồng B: onboarding 3 bước → tạo lớp → thêm học viên → đặt '
@@ -270,8 +286,16 @@ void defineOnboardingFlowTests() {
 
     // Bước 1: tạo lớp qua form lớp, không có lịch (để bước 3).
     expectStep(1);
-    expect(find.text(tl.onboardingSkip), findsNothing);
-    expect(find.text(tl.classesRuleAdd), findsNothing);
+    // Bước 1 bắt buộc: "Bỏ qua" có nhưng không bấm được; chưa có lịch.
+    expect(
+      tester
+          .widget<TextButton>(
+            find.widgetWithText(TextButton, tl.onboardingSkip),
+          )
+          .onPressed,
+      isNull,
+    );
+    expect(find.text('+ ${tl.onboardingRuleAdd}'), findsNothing);
     await createClass(tester);
     expect(backend.savedClass!['name'], 'Toán 9A');
     expect(backend.steps['create_class'], 'done');
@@ -287,7 +311,7 @@ void defineOnboardingFlowTests() {
     expectStep(3);
     await addRuleAndSave(tester);
     expect(backend.rules.single['weekday'], 1);
-    expect(backend.rules.single['startTime'], '18:00');
+    expect(backend.rules.single['startTime'], '17:30');
     expect(backend.steps['set_schedule'], 'done');
     expect(backend.classCreates, 1, reason: 'đặt lịch sửa lớp, không tạo lớp');
 
@@ -333,8 +357,8 @@ void defineOnboardingFlowTests() {
     await openApp(tester);
 
     expectStep(3);
-    expect(find.text(tl.onboardingStepSetSchedule), findsOneWidget);
-    expect(find.text(tl.classesRuleAdd), findsOneWidget);
+    expect(find.text(tl.onboardingScheduleTitle), findsOneWidget);
+    expect(find.text('+ ${tl.onboardingRuleAdd}'), findsOneWidget);
     expect(backend.classCreates, 1);
     expect(backend.studentCreates, 1);
     // Lớp tạo ở bước 1 vẫn là lớp được đặt lịch.
@@ -361,8 +385,8 @@ void defineOnboardingFlowTests() {
     await openApp(tester);
 
     expectStep(3);
-    expect(find.text(tl.classesRuleN(1)), findsOneWidget);
-    expect(find.text('18:00'), findsOneWidget);
+    expect(find.text('T2'), findsOneWidget);
+    expect(find.text('17:30'), findsOneWidget);
     expect(backend.classCreates, 1);
 
     await finish(tester);

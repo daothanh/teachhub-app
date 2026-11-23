@@ -305,7 +305,6 @@ class _FormBodyState extends State<_FormBody> {
             AppInput(
               controller: _location,
               label: l10n.classesFieldLocation,
-              required: true,
               maxLength: 200,
               errorText: _error('location'),
             ),

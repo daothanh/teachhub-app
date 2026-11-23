@@ -71,36 +71,33 @@ Future<void> _open(
 }
 
 Future<void> _fillClass(WidgetTester tester) async {
-  // Danh sách dựng lười: cuộn tới từng ô trước khi nhập (chữ lớn, bàn phím mở).
-  for (final (label, text) in [
-    ('Tên lớp', 'Toán 9A'),
-    ('Môn', 'Toán'),
-    ('Khối (1–12)', '9'),
-    ('Địa điểm', 'Nhà riêng'),
-  ]) {
+  // Figma B07: tên lớp, chọn môn và khối từ danh sách, mức phí theo buổi.
+  await _reveal(tester, _input('Tên lớp'));
+  await tester.enterText(_field('Tên lớp'), 'Toán 9A');
+  for (final (label, value) in [('Môn', 'Toán'), ('Khối', '9')]) {
     await _reveal(tester, _input(label));
-    await tester.enterText(_field(label), text);
+    await tester.tap(_field(label));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(value).last);
+    await tester.pumpAndSettle();
   }
-  await _reveal(tester, _input('Ngày bắt đầu'));
-  await tester.tap(_input('Ngày bắt đầu'));
-  await tester.pumpAndSettle();
-  await tester.tap(find.text('OK'));
+  await _reveal(tester, _input('Mức phí mỗi buổi'));
+  await tester.enterText(_field('Mức phí mỗi buổi'), '200000');
   await tester.pumpAndSettle();
 }
 
+/// Nút chính ở thanh đáy: "Tiếp tục" (bước 1) hoặc "Hoàn tất" (bước 3).
 Future<void> _save(WidgetTester tester) async {
-  final btn = find.widgetWithText(AppButton, 'Lưu');
-  await _reveal(tester, btn);
+  final next = find.widgetWithText(AppButton, 'Tiếp tục');
+  final btn = next.evaluate().isNotEmpty
+      ? next
+      : find.widgetWithText(AppButton, 'Hoàn tất');
   await tester.tap(btn);
   await tester.pumpAndSettle();
 }
 
-Future<void> _addRule(WidgetTester tester) async {
-  final add = find.widgetWithText(AppButton, 'Thêm buổi');
-  await _reveal(tester, add);
-  await tester.tap(add);
-  await tester.pumpAndSettle();
-}
+/// Bước 3 có sẵn một hàng "T2 · 17:30 · 90 phút" (Figma B09).
+Future<void> _addRule(WidgetTester tester) async {}
 
 Future<void> _saveStudent(WidgetTester tester) async {
   await tester.enterText(find.byType(EditableText).first, 'Minh Anh');
@@ -142,14 +139,20 @@ void main() {
         await _open(tester, onboarding, classes);
 
         expect(find.text('Bước 1/3'), findsOneWidget);
-        expect(find.text('Để sau'), findsNothing);
-        expect(find.text('Thêm buổi'), findsNothing); // lịch để bước 3
-        expect(find.text('Thu học phí'), findsNothing); // học phí cấu hình sau
+        // Bước 1 bắt buộc: "Bỏ qua" hiện nhưng không bấm được (Figma B07).
+        expect(
+          tester
+              .widget<TextButton>(find.widgetWithText(TextButton, 'Bỏ qua'))
+              .onPressed,
+          isNull,
+        );
+        expect(find.text('+ Thêm'), findsNothing); // lịch để bước 3
         expect(find.byType(Scaffold), findsOneWidget); // không Scaffold con
         await _fillClass(tester);
         await _save(tester);
 
-        expect(classes.calls, ['create']);
+        // Tạo lớp rồi ghi học phí theo buổi (POST chưa nhận học phí).
+        expect(classes.calls, ['create', 'update:new:fee']);
         expect(onboarding.patches, [(OnboardingStep.createClass, _done)]);
         expect(find.text('Bước 2/3'), findsOneWidget);
       },
@@ -161,9 +164,13 @@ void main() {
       final onboarding = FakeOnboardingRepository(onboardingOf({}));
       final classes = FakeClassesRepository();
       await _open(tester, onboarding, classes);
-      await _save(tester);
-
-      expect(find.text('Không được để trống.'), findsWidgets);
+      // Thiếu trường: nút "Tiếp tục" bị khóa (Figma B07).
+      expect(
+        tester
+            .widget<AppButton>(find.widgetWithText(AppButton, 'Tiếp tục'))
+            .onPressed,
+        isNull,
+      );
       expect(classes.calls, isEmpty);
       expect(onboarding.patches, isEmpty);
     });
@@ -185,7 +192,7 @@ void main() {
       _retry(tester);
       await tester.pumpAndSettle();
 
-      expect(classes.calls, ['create']);
+      expect(classes.calls.where((c) => c == 'create'), hasLength(1));
       expect(onboarding.patches.last, (OnboardingStep.createClass, _done));
       expect(find.text('Bước 2/3'), findsOneWidget);
     });
@@ -201,13 +208,17 @@ void main() {
       await _open(tester, onboarding, classes, kv: kv);
       await _fillClass(tester);
       await _save(tester);
-      expect(classes.calls, ['create']);
+      expect(classes.calls.where((c) => c == 'create'), hasLength(1));
 
       await _kill(tester);
       onboarding.patchError = null;
       await _open(tester, onboarding, classes, kv: kv);
 
-      expect(classes.calls, ['create'], reason: 'không tạo lớp thứ hai');
+      expect(
+        classes.calls.where((c) => c == 'create'),
+        hasLength(1),
+        reason: 'không tạo lớp thứ hai',
+      );
       expect(onboarding.patches.last, (OnboardingStep.createClass, _done));
       expect(find.text('Bước 2/3'), findsOneWidget);
     });
@@ -230,7 +241,8 @@ void main() {
         await _fillClass(tester);
         await _save(tester);
 
-        expect(classes.keys, hasLength(2));
+        // Khóa của hai lần tạo lớp (lần sau còn ghi học phí).
+        expect(classes.keys.length, greaterThanOrEqualTo(2));
         expect(classes.keys[0], classes.keys[1]);
         expect(find.text('Bước 2/3'), findsOneWidget);
       },
@@ -250,7 +262,6 @@ void main() {
         scale: 1.3,
         keyboard: 300,
       );
-      await _save(tester); // hiện đủ lỗi trường
       expect(tester.takeException(), isNull);
       await _fillClass(tester);
       await _save(tester);
@@ -504,7 +515,7 @@ void main() {
       await _open(tester, onboarding, classes, classId: 'c1');
 
       expect(find.text('Bước 3/3'), findsOneWidget);
-      expect(find.text('Để sau'), findsOneWidget);
+      expect(find.text('Bỏ qua'), findsOneWidget);
       expect(classes.calls.first, 'get:c1');
       expect(classes.calls, isNot(contains('list:active:1')));
       await _addRule(tester);
@@ -536,8 +547,8 @@ void main() {
       await _open(tester, onboarding, classes, kv: kv, classId: 'c1');
 
       expect(find.text('Bước 3/3'), findsOneWidget);
-      expect(find.text('Buổi 1'), findsOneWidget);
-      expect(find.text('18:00'), findsOneWidget);
+      expect(find.text('T2'), findsOneWidget);
+      expect(find.text('17:30'), findsOneWidget);
     });
 
     testWidgets('chưa có lớp nào: báo, không có form', (tester) async {
@@ -550,7 +561,7 @@ void main() {
         find.text('Chưa có lớp để đặt lịch. Hãy tạo lớp ở bước 1.'),
         findsOneWidget,
       );
-      expect(find.text('Thêm buổi'), findsNothing);
+      expect(find.text('+ Thêm'), findsNothing);
     });
 
     testWidgets('chưa lưu lớp nhưng có lớp: cho chọn, rồi tải đủ trường', (
@@ -568,7 +579,7 @@ void main() {
       await tester.tap(find.text('Lý 8B'));
       await tester.pumpAndSettle();
       expect(classes.calls, contains('get:a'));
-      expect(find.text('Thêm buổi'), findsOneWidget);
+      expect(find.text('+ Thêm'), findsOneWidget);
     });
 
     testWidgets('chữ 130%, bàn phím mở: nhiều buổi và lỗi trùng không tràn', (
@@ -582,10 +593,20 @@ void main() {
         keyboard: 300,
         classId: 'c1',
       );
-      await _addRule(tester);
-      await _addRule(tester);
-      await _save(tester);
-      expect(find.text('Có hai buổi cùng thứ bị chồng giờ.'), findsOneWidget);
+      // "+ Thêm" chép giờ của hàng cuối, chọn cùng thứ T2 → chồng giờ.
+      await tester.tap(find.text('+ Thêm'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Thứ').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('T2').last);
+      await tester.pumpAndSettle();
+      expect(find.text('Trùng giờ với buổi T2 17:30'), findsOneWidget);
+      expect(
+        tester
+            .widget<AppButton>(find.widgetWithText(AppButton, 'Hoàn tất'))
+            .onPressed,
+        isNull,
+      );
       expect(tester.takeException(), isNull);
     });
   });

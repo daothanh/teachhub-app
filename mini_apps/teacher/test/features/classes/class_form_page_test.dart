@@ -98,7 +98,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('lớp tại chỗ thiếu địa điểm: lỗi tại trường, chưa gọi API', (
+  testWidgets('lớp tại chỗ chưa có địa điểm vẫn lưu được (nhập sau)', (
     tester,
   ) async {
     await open(tester);
@@ -106,8 +106,8 @@ void main() {
     await pickToday(tester, 'Ngày bắt đầu');
     await save(tester);
 
-    expect(find.text('Không được để trống.'), findsOneWidget);
-    expect(repo.calls, isEmpty);
+    expect(repo.calls, contains('create'));
+    expect(repo.lastInput!.toJson()['location'], isNull);
   });
 
   testWidgets('lớp trực tuyến ẩn ô địa điểm và không gửi địa điểm', (
