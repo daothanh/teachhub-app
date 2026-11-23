@@ -6,10 +6,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.background
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,8 +34,12 @@ data object HomeRoute
 fun AppRoot(container: AppContainer) {
     val nav = rememberNavController()
 
-    LaunchedEffect(Unit) {
-        container.sessionExpired.collect { nav.resetTo(LoginRoute) }
+    val sessionExpired by container.sessionExpired.collectAsState()
+    LaunchedEffect(sessionExpired) {
+        if (!sessionExpired) return@LaunchedEffect
+        // Đang ở Đăng nhập thì giữ nguyên, không mất email đang nhập.
+        if (nav.currentDestination?.hasRoute<LoginRoute>() != true) nav.resetTo(LoginRoute)
+        container.sessionExpired.value = false
     }
 
     NavHost(navController = nav, startDestination = SplashRoute) {

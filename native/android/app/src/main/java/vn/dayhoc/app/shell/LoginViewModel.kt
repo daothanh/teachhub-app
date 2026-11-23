@@ -2,6 +2,7 @@ package vn.dayhoc.app.shell
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,10 +66,13 @@ class LoginViewModel(private val auth: AuthRepository) : ViewModel() {
             try {
                 auth.sendOtp(email)
                 _state.update { it.copy(sentTo = email, code = "") }
-                resendJob?.cancel()
-                resendJob = countdown(RESEND_AFTER_SEC) { st, sec -> st.copy(resendIn = sec) }
+                startResendCountdown(RESEND_AFTER_SEC)
             } catch (e: ApiError) {
                 _state.update { it.copy(failure = e.toFailure()) }
+                // Server bảo chờ bao lâu thì khóa nút gửi lại đúng bấy lâu.
+                if (e is ApiError.Http && (e.code == ApiError.RATE_LIMITED || e.httpStatus == 429)) {
+                    e.retryAfterSec?.let(::startResendCountdown)
+                }
             } finally {
                 _state.update { it.copy(sending = false) }
             }
@@ -92,6 +96,11 @@ class LoginViewModel(private val auth: AuthRepository) : ViewModel() {
                 _state.update { it.copy(loggedIn = true) }
             } catch (e: ApiError) {
                 onLoginFailed(e)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Lưu token lỗi (Keystore/đĩa): báo lỗi chung, không crash.
+                _state.update { it.copy(failure = LoginFailure.Generic) }
             } finally {
                 _state.update { it.copy(verifying = false) }
             }
@@ -120,6 +129,11 @@ class LoginViewModel(private val auth: AuthRepository) : ViewModel() {
             }
             else -> _state.update { it.copy(failure = e.toFailure()) }
         }
+    }
+
+    private fun startResendCountdown(seconds: Int) {
+        resendJob?.cancel()
+        resendJob = countdown(seconds) { st, sec -> st.copy(resendIn = sec) }
     }
 
     private fun countdown(seconds: Int, set: (LoginUiState, Int) -> LoginUiState): Job = viewModelScope.launch {

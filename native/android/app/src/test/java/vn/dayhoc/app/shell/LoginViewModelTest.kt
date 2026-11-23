@@ -29,6 +29,7 @@ import vn.dayhoc.app.core.auth.MembershipsResponse
 import vn.dayhoc.app.core.auth.RefreshRequest
 import vn.dayhoc.app.core.auth.SendOtpRequest
 import vn.dayhoc.app.core.auth.TokenResponse
+import vn.dayhoc.app.core.auth.TokenStore
 import vn.dayhoc.app.core.auth.Tokens
 import vn.dayhoc.app.core.auth.UserDto
 
@@ -129,6 +130,37 @@ class LoginViewModelTest {
         assertEquals(2, api.sentTo.size)
     }
 
+    @Test
+    fun `gui ma bi RATE_LIMITED thi dem nguoc gui lai theo retryAfterSec`() = runTest {
+        api.sendError = httpError(429, """{"code":"RATE_LIMITED","message":"x","details":{"retryAfterSec":42},"requestId":"r"}""")
+
+        sendCodeTo("co.lan@example.com")
+
+        assertEquals(LoginFailure.RateLimited, vm.state.value.failure)
+        assertEquals(42, vm.state.value.resendIn)
+    }
+
+    @Test
+    fun `luu token loi thi bao loi chung khong crash`() = runTest {
+        val brokenStore = object : TokenStore {
+            override val tokens: Tokens? = null
+            override suspend fun load(): Tokens? = null
+            override suspend fun save(tokens: Tokens) {
+                throw java.security.KeyStoreException("keystore hỏng")
+            }
+            override suspend fun clear() = Unit
+        }
+        vm = LoginViewModel(AuthRepository(api, brokenStore))
+        sendCodeTo("co.lan@example.com")
+
+        vm.onCodeChange("482913")
+        runCurrent()
+
+        assertEquals(LoginFailure.Generic, vm.state.value.failure)
+        assertFalse(vm.state.value.loggedIn)
+        assertFalse(vm.state.value.verifying)
+    }
+
     private fun kotlinx.coroutines.test.TestScope.sendCodeTo(email: String) {
         vm.onEmailChange(email)
         vm.sendCode()
@@ -143,9 +175,11 @@ private class FakeAuthApi : AuthApi {
     val sentTo = mutableListOf<String>()
     var lastLogin: LoginRequest? = null
     var loginError: HttpException? = null
+    var sendError: HttpException? = null
 
     override suspend fun sendOtp(body: SendOtpRequest) {
         sentTo += body.email
+        sendError?.let { throw it }
     }
 
     override suspend fun login(body: LoginRequest): LoginResponse {

@@ -6,14 +6,16 @@ import android.security.keystore.KeyProperties
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import java.security.GeneralSecurityException
 import java.security.KeyStore
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
+import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 private val Context.authDataStore by preferencesDataStore(name = "auth")
@@ -26,28 +28,41 @@ class KeystoreTokenStore(context: Context) : TokenStore {
     override var tokens: Tokens? = null
         private set
 
-    override suspend fun load(): Tokens? {
-        val blob = dataStore.data.first()[KEY_TOKENS] ?: return null
-        tokens = try {
-            Json.decodeFromString<Tokens>(decrypt(blob))
-        } catch (e: GeneralSecurityException) {
-            // Khóa mất (gỡ cài đặt, đổi khóa màn hình…): coi như chưa đăng nhập.
-            null
-        } catch (e: IllegalArgumentException) {
-            null
+    override suspend fun load(): Tokens? = withContext(Dispatchers.IO) {
+        // Đọc đĩa lỗi (IOException, CorruptionException…): coi như chưa đăng nhập.
+        val blob = orNull { dataStore.data.first()[KEY_TOKENS] } ?: return@withContext null
+        val loaded = orNull { Json.decodeFromString<Tokens>(decrypt(blob)) }
+        if (loaded == null) {
+            // Không giải mã được (khóa Keystore bị xóa/reset, blob hỏng): bỏ blob, đăng nhập lại.
+            orNull { dataStore.edit { it.remove(KEY_TOKENS) } }
         }
-        return tokens
+        tokens = loaded
+        loaded
     }
 
     override suspend fun save(tokens: Tokens) {
-        val blob = encrypt(Json.encodeToString(Tokens.serializer(), tokens))
-        dataStore.edit { it[KEY_TOKENS] = blob }
+        // Gán bộ nhớ trước: ghi đĩa lỗi chỉ làm mất phiên ở lần mở app sau, phiên đang chạy vẫn dùng được.
         this.tokens = tokens
+        withContext(Dispatchers.IO) {
+            orNull {
+                val blob = encrypt(Json.encodeToString(Tokens.serializer(), tokens))
+                dataStore.edit { it[KEY_TOKENS] = blob }
+            }
+        }
     }
 
     override suspend fun clear() {
         tokens = null
-        dataStore.edit { it.remove(KEY_TOKENS) }
+        withContext(Dispatchers.IO) { dataStore.edit { it.remove(KEY_TOKENS) } }
+    }
+
+    /** Chạy [block]; mọi lỗi trừ hủy coroutine thành `null`. */
+    private inline fun <T> orNull(block: () -> T): T? = try {
+        block()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        null
     }
 
     private fun encrypt(plain: String): String {

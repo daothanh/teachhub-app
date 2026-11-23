@@ -1,21 +1,21 @@
 package vn.dayhoc.app.core.network
 
-import app.cash.turbine.test
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runBlocking
 import mockwebserver3.Dispatcher
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.RecordedRequest
+import mockwebserver3.SocketEffect
 import okhttp3.Request
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import vn.dayhoc.app.core.auth.InMemoryTokenStore
@@ -73,25 +73,67 @@ class TokenAuthenticatorTest {
     }
 
     @Test
-    fun `refresh tra 401 thi xoa token va phat su kien het phien`() = runTest {
-        server.dispatcher = object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest): MockResponse {
-                if (request.url.encodedPath == "/v1/auth/refresh") refreshCalls.incrementAndGet()
-                return json(401, """{"code":"UNAUTHENTICATED","message":"thu hoi","requestId":"r2"}""")
-            }
-        }
+    fun `refresh tra 401 thi xoa token va bao het phien`() {
+        refreshRespondsWith { json(401, """{"code":"UNAUTHENTICATED","message":"thu hoi","requestId":"r2"}""") }
 
-        network.authenticator.sessionExpired.test {
-            val code = withContext(Dispatchers.IO) {
-                network.client.newCall(Request.Builder().url(server.url("/v1/auth/me")).build())
-                    .execute()
-                    .use { it.code }
-            }
-            assertEquals(401, code)
-            awaitItem()
-        }
+        assertEquals(401, getMe())
         assertEquals(1, refreshCalls.get())
         assertNull(store.tokens)
+        assertTrue(network.authenticator.sessionExpired.value)
+    }
+
+    @Test
+    fun `refresh tra 500 thi giu phien`() {
+        refreshRespondsWith { json(500, """{"code":"INTERNAL","message":"x","requestId":"r3"}""") }
+        assertSessionKept()
+    }
+
+    @Test
+    fun `refresh tra 429 thi giu phien`() {
+        refreshRespondsWith { json(429, """{"code":"RATE_LIMITED","message":"x","details":{"retryAfterSec":30},"requestId":"r4"}""") }
+        assertSessionKept()
+    }
+
+    @Test
+    fun `refresh mat mang thi giu phien`() {
+        refreshRespondsWith { MockResponse.Builder().onResponseStart(SocketEffect.CloseSocket()).build() }
+        assertSessionKept()
+    }
+
+    @Test
+    fun `dang xuat trong luc refresh dang chay thi token khong song lai`() {
+        refreshRespondsWith {
+            // Đăng xuất xen vào giữa lúc server đang xử lý refresh.
+            runBlocking { store.clear() }
+            json(200, """{"access_token":"new","refresh_token":"rt-new","expires_in":900}""")
+        }
+
+        assertEquals(401, getMe())
+        assertNull(store.tokens)
+        assertFalse(network.authenticator.sessionExpired.value)
+    }
+
+    /** `/auth/refresh` trả [refresh]; mọi request khác trả 401. */
+    private fun refreshRespondsWith(refresh: () -> MockResponse) {
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                if (request.url.encodedPath != "/v1/auth/refresh") {
+                    return json(401, """{"code":"TOKEN_EXPIRED","message":"het han","requestId":"r1"}""")
+                }
+                refreshCalls.incrementAndGet()
+                return refresh()
+            }
+        }
+    }
+
+    private fun getMe(): Int =
+        network.client.newCall(Request.Builder().url(server.url("/v1/auth/me")).build()).execute().use { it.code }
+
+    private fun assertSessionKept() {
+        assertEquals(401, getMe())
+        assertTrue(refreshCalls.get() >= 1)
+        assertEquals(Tokens("old", "rt-old"), store.tokens)
+        assertFalse(network.authenticator.sessionExpired.value)
     }
 
     private fun json(code: Int, body: String) = MockResponse.Builder()

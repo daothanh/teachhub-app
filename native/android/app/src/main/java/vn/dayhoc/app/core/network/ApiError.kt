@@ -2,12 +2,13 @@ package vn.dayhoc.app.core.network
 
 import java.io.IOException
 import java.io.InterruptedIOException
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.intOrNull
-import kotlinx.serialization.json.jsonPrimitive
 import retrofit2.HttpException
 
 /** Lỗi gọi API có kiểu (Technical Spec Mục 5.6). Màn hình đổi sang chuỗi tiếng Việt theo [Http.code]. */
@@ -19,7 +20,7 @@ sealed class ApiError : Exception() {
         val details: JsonObject = JsonObject(emptyMap()),
         val retryAfterSec: Int? = null,
     ) : ApiError() {
-        fun detailInt(key: String): Int? = details[key]?.jsonPrimitive?.intOrNull
+        fun detailInt(key: String): Int? = (details[key] as? JsonPrimitive)?.intOrNull
     }
 
     /** Không kết nối được (mất mạng, DNS, từ chối kết nối). */
@@ -52,16 +53,19 @@ suspend fun <T> apiCall(block: suspend () -> T): T =
         block()
     } catch (e: HttpException) {
         val response = e.response()
+        // Body lỗi đọc hỏng hoặc sai định dạng không được che mất mã HTTP.
         val body = try {
             response?.errorBody()?.string()?.let { errorJson.decodeFromString<ErrorBody>(it) }
-        } catch (e: SerializationException) {
+        } catch (ce: CancellationException) {
+            throw ce
+        } catch (parseError: Exception) {
             null
         }
         throw ApiError.Http(
             code = body?.code.orEmpty(),
             httpStatus = e.code(),
             details = body?.details ?: JsonObject(emptyMap()),
-            retryAfterSec = body?.details?.get("retryAfterSec")?.jsonPrimitive?.intOrNull
+            retryAfterSec = (body?.details?.get("retryAfterSec") as? JsonPrimitive)?.intOrNull
                 ?: response?.headers()?.get("Retry-After")?.toIntOrNull(),
         )
     } catch (e: SerializationException) {
