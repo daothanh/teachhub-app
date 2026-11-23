@@ -232,7 +232,10 @@ class ClassInput extends Equatable {
     'subject': subject.trim(),
     'grade': grade,
     'mode': mode.name,
-    'location': mode == ClassMode.offline ? location?.trim() : null,
+    // Địa điểm không bắt buộc (kể cả tại chỗ): ô trống gửi null, không gửi "".
+    'location': mode == ClassMode.offline && (location ?? '').trim().isNotEmpty
+        ? location!.trim()
+        : null,
     'capacity': capacity,
     'startDate': startDate,
     'endDate': endDate,
@@ -275,9 +278,6 @@ Map<String, ClassFieldError> validateClass(
     e['grade'] = ClassFieldError.required;
   } else if (g < 1 || g > 12) {
     e['grade'] = ClassFieldError.gradeRange;
-  }
-  if (i.mode == ClassMode.offline && (i.location ?? '').trim().isEmpty) {
-    e['location'] = ClassFieldError.required;
   }
   final c = i.capacity;
   if (c != null && (c < 1 || c > 500)) {
