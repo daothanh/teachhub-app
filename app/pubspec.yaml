@@ -134,6 +134,9 @@ flutter:
     # Hình minh họa T01 lấy nguyên từ Figma (88:11172).
     - assets/images/login/
 
+    # Ký hiệu logo DayHoc (D + chấm nặng) từ Figma Brand/Logo · Mark (80:2412).
+    - assets/brand/
+
   # Be Vietnam Pro (bettergui/BeVietnamPro, SIL OFL 1.1 — assets/fonts/be_vietnam_pro/OFL.txt), font của DayHoc DS v2.
   fonts:
     - family: Be Vietnam Pro

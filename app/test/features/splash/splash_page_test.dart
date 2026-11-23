@@ -5,7 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil_plus/flutter_screenutil_plus.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:app/core/widgets/brand_mark.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tasco_ui_kit/tasco_ui_kit.dart';
 import 'package:tasco_utils/tasco_utils.dart';
@@ -59,7 +61,10 @@ void main() {
       const MembershipState(statusLoad: LoadingStatus.loading),
     );
     expect(find.text('DayHoc'), findsOneWidget);
-    expect(find.text('D'), findsOneWidget);
+    // Logo mới là hình vector (D + chấm nặng), không còn chữ "D" bằng font.
+    expect(find.byType(BrandMark), findsOneWidget);
+    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(find.text('D'), findsNothing);
     expect(
       find.textContaining('Kết nối thầy, trò và gia đình.'),
       findsOneWidget,
