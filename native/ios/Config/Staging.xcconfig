@@ -1,0 +1,4 @@
+// Staging: build tối ưu như Release, trỏ API staging.
+PRODUCT_BUNDLE_IDENTIFIER = vn.dayhoc.app.stg
+API_URL = https:/$()/api-staging.dayhoc.app/v1
+INFOPLIST_FILE = Config/Info.plist

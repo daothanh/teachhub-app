@@ -1,0 +1,358 @@
+{
+  "sourceLanguage" : "vi",
+  "strings" : {
+    "app.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DayHoc"
+          }
+        }
+      }
+    },
+    "error.offline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Không có mạng. Thử lại sau."
+          }
+        }
+      }
+    },
+    "home.hello %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xin chào %@"
+          }
+        }
+      }
+    },
+    "login.email" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
+          }
+        }
+      }
+    },
+    "login.emailHelper" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chúng tôi gửi mã 6 số, không cần mật khẩu."
+          }
+        }
+      }
+    },
+    "login.emailHint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ten@email.com"
+          }
+        }
+      }
+    },
+    "login.emailInvalid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email chưa đúng định dạng, ví dụ: ten@gmail.com"
+          }
+        }
+      }
+    },
+    "login.failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đăng nhập không thành công. Vui lòng thử lại."
+          }
+        }
+      }
+    },
+    "login.rateLimited" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bạn thao tác quá nhanh, vui lòng thử lại sau."
+          }
+        }
+      }
+    },
+    "login.resend" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gửi lại mã"
+          }
+        }
+      }
+    },
+    "login.sendOtp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gửi mã đăng nhập"
+          }
+        }
+      }
+    },
+    "login.sending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang gửi mã…"
+          }
+        }
+      }
+    },
+    "login.slogan" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kết nối thầy, trò và gia đình."
+          }
+        }
+      }
+    },
+    "login.tagline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quản lý lớp dạy thêm thật đơn giản."
+          }
+        }
+      }
+    },
+    "login.terms" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiếp tục nghĩa là bạn đồng ý với Điều khoản sử dụng và Chính sách dữ liệu của DayHoc."
+          }
+        }
+      }
+    },
+    "login.unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hệ thống đang bận, vui lòng thử lại sau ít phút."
+          }
+        }
+      }
+    },
+    "logout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đăng xuất"
+          }
+        }
+      }
+    },
+    "otp.codeLabel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mã xác thực 6 số"
+          }
+        }
+      }
+    },
+    "otp.confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xác nhận"
+          }
+        }
+      }
+    },
+    "otp.heading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nhập mã xác thực"
+          }
+        }
+      }
+    },
+    "otp.invalid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mã chưa đúng."
+          }
+        }
+      }
+    },
+    "otp.locked" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tạm khóa"
+          }
+        }
+      }
+    },
+    "otp.lockedBody" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xác thực tạm khóa 15 phút để bảo vệ tài khoản."
+          }
+        }
+      }
+    },
+    "otp.lockedTitle" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nhập sai 5 lần"
+          }
+        }
+      }
+    },
+    "otp.resendIn %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gửi lại mã sau %@"
+          }
+        }
+      }
+    },
+    "otp.retryIn %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thử lại sau %@"
+          }
+        }
+      }
+    },
+    "otp.sentTo %@" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mã 6 số đã gửi tới %@"
+          }
+        }
+      }
+    },
+    "otp.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Xác thực email"
+          }
+        }
+      }
+    },
+    "otp.verifying" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang xác thực…"
+          }
+        }
+      }
+    },
+    "placeholder.chooseRole" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chọn vai trò (đang làm)"
+          }
+        }
+      }
+    },
+    "placeholder.note" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Màn tạm, sẽ thay ở NA-04."
+          }
+        }
+      }
+    },
+    "retry" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thử lại"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

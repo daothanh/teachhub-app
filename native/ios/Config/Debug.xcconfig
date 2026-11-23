@@ -1,0 +1,5 @@
+// Debug (dev): backend chạy local. `/$()/` để `//` không bị hiểu là comment.
+PRODUCT_BUNDLE_IDENTIFIER = vn.dayhoc.app.dev
+API_URL = http:/$()/localhost:3000/v1
+// Bản này cho phép HTTP tới localhost (ATS NSAllowsLocalNetworking).
+INFOPLIST_FILE = Config/Info-Debug.plist
