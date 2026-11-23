@@ -8,7 +8,6 @@ struct RootView: View {
         content
             .dhTheme()
             .task { await model.start() }
-            .task { await model.observeSessionExpiry() }
     }
 
     @ViewBuilder

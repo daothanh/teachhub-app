@@ -9,8 +9,12 @@ struct Tokens: Codable, Equatable, Sendable {
 /// Nơi giữ token phiên. Giao thức để test thay bằng bản trong bộ nhớ.
 protocol TokenStore: Sendable {
     func load() -> Tokens?
-    func save(_ tokens: Tokens)
+    func save(_ tokens: Tokens) throws
     func clear()
+}
+
+struct KeychainError: Error {
+    let status: OSStatus
 }
 
 /// Lưu token trong Keychain: chỉ đọc được sau lần mở khóa đầu, không theo bản sao lưu sang máy khác.
@@ -34,14 +38,17 @@ struct KeychainTokenStore: TokenStore {
         return try? JSONDecoder().decode(Tokens.self, from: data)
     }
 
-    func save(_ tokens: Tokens) {
-        guard let data = try? JSONEncoder().encode(tokens) else { return }
-        clear()
-        var query = baseQuery
-        query[kSecValueData as String] = data
-        query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-        let status = SecItemAdd(query as CFDictionary, nil)
-        assert(status == errSecSuccess, "Không lưu được token vào Keychain: \(status)")
+    /// Cập nhật tại chỗ, chỉ thêm khi chưa có: không có lúc nào Keychain trống giữa hai bước.
+    func save(_ tokens: Tokens) throws {
+        let data = try JSONEncoder().encode(tokens)
+        var status = SecItemUpdate(baseQuery as CFDictionary, [kSecValueData as String: data] as CFDictionary)
+        if status == errSecItemNotFound {
+            var query = baseQuery
+            query[kSecValueData as String] = data
+            query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+            status = SecItemAdd(query as CFDictionary, nil)
+        }
+        guard status == errSecSuccess else { throw KeychainError(status: status) }
     }
 
     func clear() {

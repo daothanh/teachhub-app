@@ -46,4 +46,35 @@ struct APIClientTests {
         #expect(await expired.next() != nil)
         #expect(server.requests(to: "auth/refresh").count == 1)
     }
+
+    @Test func refreshServerErrorKeepsSession() async throws {
+        let server = MockServer { request in
+            request.url?.path == "/v1/auth/refresh" ? .error(500, "INTERNAL") : .error(401, "TOKEN_EXPIRED")
+        }
+        let tokens = Tokens(accessToken: "old", refreshToken: "r1")
+        let store = InMemoryTokenStore(tokens)
+        let api = server.makeClient(tokenStore: store)
+
+        await #expect(throws: APIError.self) {
+            let _: UserDTO = try await api.request("GET", "auth/me")
+        }
+
+        #expect(store.load() == tokens)
+    }
+
+    @Test func logoutDuringRefreshDoesNotResurrectSession() async throws {
+        let store = InMemoryTokenStore(Tokens(accessToken: "old", refreshToken: "r1"))
+        let server = MockServer { request in
+            guard request.url?.path == "/v1/auth/refresh" else { return .error(401, "TOKEN_EXPIRED") }
+            store.clear()  // người dùng bấm Đăng xuất khi refresh chưa trả về
+            return Stub(status: 200, json: #"{"access_token":"new","refresh_token":"r2","expires_in":900}"#)
+        }
+        let api = server.makeClient(tokenStore: store)
+
+        await #expect(throws: APIError.self) {
+            let _: UserDTO = try await api.request("GET", "auth/me")
+        }
+
+        #expect(store.load() == nil)
+    }
 }

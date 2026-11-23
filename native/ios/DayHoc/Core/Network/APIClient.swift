@@ -119,11 +119,17 @@ final class APIClient: Sendable {
                     body: RefreshRequest(refreshToken: tokens.refreshToken),
                     authorized: false
                 )
-            } catch let error as APIError where error.status == 401 {
-                // Refresh token hết hạn hoặc bị thu hồi (dùng lại token cũ → server thu hồi cả phiên).
+            } catch let error as APIError where error.status == 401 || error.status == 403 {
+                // Refresh token hết hạn hoặc bị thu hồi. Chỉ xóa nếu phiên chưa đổi trong lúc chờ.
+                guard tokenStore.load()?.refreshToken == tokens.refreshToken else { throw error }
                 throw expire()
             }
-            tokenStore.save(Tokens(accessToken: fresh.accessToken, refreshToken: fresh.refreshToken))
+            // Đăng xuất hoặc đăng nhập mới trong lúc chờ: bỏ kết quả, không làm phiên cũ sống lại.
+            guard tokenStore.load()?.refreshToken == tokens.refreshToken else {
+                throw APIError(kind: .http, status: 401, code: "UNAUTHENTICATED")
+            }
+            // Lưu lỗi thì request này vẫn dùng token mới; lần mở app sau có thể phải đăng nhập lại.
+            try? tokenStore.save(Tokens(accessToken: fresh.accessToken, refreshToken: fresh.refreshToken))
             return fresh.accessToken
         }
     }

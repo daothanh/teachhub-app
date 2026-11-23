@@ -17,7 +17,7 @@ struct AuthRepository: Sendable {
             body: LoginRequest(email: email, code: code),
             authorized: false
         )
-        tokenStore.save(Tokens(accessToken: response.accessToken, refreshToken: response.refreshToken))
+        try tokenStore.save(Tokens(accessToken: response.accessToken, refreshToken: response.refreshToken))
         return response.user
     }
 

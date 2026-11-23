@@ -18,8 +18,15 @@ final class AppModel {
     private(set) var route: Route = .launching
     private let env: AppEnvironment
 
+    /// Vòng nghe hết phiên do model giữ: nếu để `.task` của view giữ, view dựng lại sẽ hủy task
+    /// và `AsyncStream` kết thúc, từ đó không còn nhận sự kiện nào.
+    @ObservationIgnored private var expiryListener: Task<Void, Never>?
+
     init(env: AppEnvironment) {
         self.env = env
+        expiryListener = Task { [weak self, stream = env.api.sessionExpired] in
+            for await _ in stream { self?.showLogin() }
+        }
     }
 
     /// Có token thì hỏi `/auth/me` rồi vào màn sau đăng nhập, không thì vào Đăng nhập.
@@ -30,13 +37,6 @@ final class AppModel {
             try await enter(env.auth.me())
         } catch {
             fail(error)
-        }
-    }
-
-    /// Nghe sự kiện hết phiên của `APIClient` suốt đời app.
-    func observeSessionExpiry() async {
-        for await _ in env.api.sessionExpired {
-            showLogin()
         }
     }
 
