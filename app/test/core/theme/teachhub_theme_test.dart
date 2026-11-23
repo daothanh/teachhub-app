@@ -23,6 +23,9 @@ void main() {
     expect(s.onSurface, const Color(0xFF1F1F1F));
     expect(s.onSurfaceVariant, const Color(0xFF52524C));
     expect(s.surface, Colors.white);
+    // Ô đang chọn (SegmentedButton, chip) dùng brand/primary-subtle, không dùng xanh Tasco.
+    expect(s.secondaryContainer, const Color(0xFFF7FFE6));
+    expect(s.onSecondaryContainer, const Color(0xFF1F1F1F));
     expect(light.scaffoldBackgroundColor, const Color(0xFFF7F7F4));
     final t = light.extension<TascoThemeExtension>()!;
     expect(t.focusRingColor, const Color(0xFF4F7300));
