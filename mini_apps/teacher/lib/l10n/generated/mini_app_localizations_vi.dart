@@ -2450,4 +2450,23 @@ class MiniAppLocalizationsVi extends MiniAppLocalizations {
 
   @override
   String get todayInviteLater => 'Để sau';
+
+  @override
+  String get navToday => 'Hôm nay';
+
+  @override
+  String get navSchedule => 'Lịch';
+
+  @override
+  String get navClasses => 'Lớp';
+
+  @override
+  String get navFees => 'Học phí';
+
+  @override
+  String get navMore => 'Thêm';
+
+  @override
+  String get moreIconCredit =>
+      'Icon thanh điều hướng: bộ Solar của 480 Design (CC BY 4.0).';
 }

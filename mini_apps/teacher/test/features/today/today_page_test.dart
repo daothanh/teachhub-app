@@ -266,40 +266,8 @@ void main() {
     },
   );
 
-  testWidgets('T05: có lối vào Lịch ngay trên màn Hôm nay', (tester) async {
-    await pumpRouter(tester, routerFor(FakeAttendanceRepository()));
-    await tester.tap(find.text('Lịch'));
-    await tester.pumpAndSettle();
-    expect(find.text('schedule-page'), findsOneWidget);
-  });
-
-  testWidgets(
-    'AC-4: có lối vào danh sách lớp và nút đổi vai trò khi chạy riêng',
-    (tester) async {
-      await pumpRouter(tester, routerFor(FakeAttendanceRepository()));
-      await tester.tap(find.text('Lớp học'));
-      await tester.pumpAndSettle();
-      expect(find.text('classes-page'), findsOneWidget);
-    },
-  );
-
-  testWidgets('S5-FL-05: có lối vào Học phí kỳ thu ngay trên màn Hôm nay', (
-    tester,
-  ) async {
-    await pumpRouter(tester, routerFor(FakeAttendanceRepository()));
-    await tester.ensureVisible(find.text('Học phí kỳ thu'));
-    await tester.tap(find.text('Học phí kỳ thu'));
-    await tester.pumpAndSettle();
-    expect(find.text('billing-page'), findsOneWidget);
-  });
-
-  testWidgets('S6-FL-03: có lối vào Công nợ trên màn Hôm nay', (tester) async {
-    await pumpRouter(tester, routerFor(FakeAttendanceRepository()));
-    await tester.ensureVisible(find.text('Công nợ'));
-    await tester.tap(find.text('Công nợ'));
-    await tester.pumpAndSettle();
-    expect(find.text('receivables-page'), findsOneWidget);
-  });
+  // Lối vào Lịch, Lớp, Học phí, Công nợ chuyển sang Bottom Nav và tab Thêm
+  // (test/features/nav/teacher_nav_shell_test.dart).
 
   testWidgets('AC-4: đổi vai trò khi chạy riêng mini-app', (tester) async {
     await pumpRouter(tester, routerFor(FakeAttendanceRepository()));

@@ -1605,5 +1605,11 @@
   "todayInviteTitle": "Invite parents to follow the class",
   "todayInviteBody": "Parents who follow the class get notified about attendance, test scores and fees.",
   "todayInviteSend": "Send link via Zalo",
-  "todayInviteLater": "Later"
+  "todayInviteLater": "Later",
+  "navToday": "Today",
+  "navSchedule": "Schedule",
+  "navClasses": "Classes",
+  "navFees": "Fees",
+  "navMore": "More",
+  "moreIconCredit": "Navigation icons: Solar by 480 Design (CC BY 4.0)."
 }

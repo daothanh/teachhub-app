@@ -1612,5 +1612,11 @@
   "todayInviteTitle": "Mời phụ huynh theo dõi lớp",
   "todayInviteBody": "Phụ huynh theo dõi lớp sẽ nhận được thông báo điểm danh, điểm kiểm tra, học phí.",
   "todayInviteSend": "Gửi link qua Zalo",
-  "todayInviteLater": "Để sau"
+  "todayInviteLater": "Để sau",
+  "navToday": "Hôm nay",
+  "navSchedule": "Lịch",
+  "navClasses": "Lớp",
+  "navFees": "Học phí",
+  "navMore": "Thêm",
+  "moreIconCredit": "Icon thanh điều hướng: bộ Solar của 480 Design (CC BY 4.0)."
 }

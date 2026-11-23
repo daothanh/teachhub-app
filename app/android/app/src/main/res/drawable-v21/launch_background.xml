@@ -3,10 +3,10 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/brand_logo" />
 
-    <!-- You can insert your own image assets here -->
-    <!-- <item>
+    <!-- Dấu D của logo DayHoc (brand/logo-fg) ở giữa, giống splash iOS. -->
+    <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+            android:src="@drawable/launch_logo" />
+    </item>
 </layer-list>

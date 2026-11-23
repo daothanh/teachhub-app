@@ -4203,6 +4203,42 @@ abstract class MiniAppLocalizations {
   /// In vi, this message translates to:
   /// **'Để sau'**
   String get todayInviteLater;
+
+  /// No description provided for @navToday.
+  ///
+  /// In vi, this message translates to:
+  /// **'Hôm nay'**
+  String get navToday;
+
+  /// No description provided for @navSchedule.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lịch'**
+  String get navSchedule;
+
+  /// No description provided for @navClasses.
+  ///
+  /// In vi, this message translates to:
+  /// **'Lớp'**
+  String get navClasses;
+
+  /// No description provided for @navFees.
+  ///
+  /// In vi, this message translates to:
+  /// **'Học phí'**
+  String get navFees;
+
+  /// No description provided for @navMore.
+  ///
+  /// In vi, this message translates to:
+  /// **'Thêm'**
+  String get navMore;
+
+  /// No description provided for @moreIconCredit.
+  ///
+  /// In vi, this message translates to:
+  /// **'Icon thanh điều hướng: bộ Solar của 480 Design (CC BY 4.0).'**
+  String get moreIconCredit;
 }
 
 class _MiniAppLocalizationsDelegate

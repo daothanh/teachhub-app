@@ -25,6 +25,8 @@ import 'features/billing/data/billing_repository.dart';
 import 'features/classes/classes_routes.dart';
 import 'features/fees/data/fee_repository.dart';
 import 'features/fees/fees_routes.dart';
+import 'features/more/more_page.dart';
+import 'features/nav/teacher_nav_shell.dart';
 import 'features/offline/offline_banner_shell.dart';
 import 'features/onboarding/data/onboarding_draft.dart';
 import 'features/onboarding/data/onboarding_models.dart';
@@ -65,8 +67,10 @@ class TeacherController {
   /// Mọi route teacher nằm trong khung banner "Ngoại tuyến" (S3-FL-09).
   List<RouteBase> routes() => [
     ShellRoute(
-      builder: (context, state, child) =>
-          OfflineBannerShell(path: state.uri.path, child: child),
+      builder: (context, state, child) => OfflineBannerShell(
+        path: state.uri.path,
+        child: TeacherNavShell(path: state.uri.path, child: child),
+      ),
       routes: _pageRoutes(),
     ),
   ];
@@ -111,6 +115,11 @@ class TeacherController {
     ...studentsRoutes(moduleId),
     ...attendanceRoutes(moduleId),
     ...scheduleRoutes(moduleId),
+    GoRoute(
+      path: MoreRoutes.more,
+      name: '$moduleId.more',
+      builder: (context, state) => const MorePage(),
+    ),
   ];
 
   /// CSDL chỉ mở ở lần đầu cần (lazy): người dùng không có vai trò Giáo viên

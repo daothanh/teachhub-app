@@ -2476,4 +2476,23 @@ class MiniAppLocalizationsEn extends MiniAppLocalizations {
 
   @override
   String get todayInviteLater => 'Later';
+
+  @override
+  String get navToday => 'Today';
+
+  @override
+  String get navSchedule => 'Schedule';
+
+  @override
+  String get navClasses => 'Classes';
+
+  @override
+  String get navFees => 'Fees';
+
+  @override
+  String get navMore => 'More';
+
+  @override
+  String get moreIconCredit =>
+      'Navigation icons: Solar by 480 Design (CC BY 4.0).';
 }
