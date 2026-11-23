@@ -1,6 +1,6 @@
 # TeachHub app — host shell
 
-> Đóng băng từ 23/11/2026: app mobile chuyển sang native (`../native`, ADR `TeachHub-ADR-Native-Mobile.md`, D25). Thư mục này chỉ nhận sửa lỗi chặn việc kiểm thử, không thêm tính năng, và sẽ bị xóa ở NA-13.
+> Đóng băng từ 23/11/2026: app mobile chuyển sang native ở repo [`dayhoc-app`](https://github.com/daothanh/dayhoc-app) (ADR `TeachHub-ADR-Native-Mobile.md`, D25). Thư mục này chỉ nhận sửa lỗi chặn việc kiểm thử, không thêm tính năng, và sẽ bị xóa ở NA-13.
 
 App Flutter của TeachHub trên app framework core (`tasco_*` 5.2.x). Đây là super app gồm
 host shell và một mini-app cho mỗi vai trò (Technical Spec v2.1 §3.7, §8.3).
